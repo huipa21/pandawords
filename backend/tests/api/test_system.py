@@ -206,7 +206,7 @@ def test_unexpected_error_is_safe_and_keeps_logged_request_id(
         structlog.get_logger().info("controlled_failure")
         raise RuntimeError("private error details")
 
-    with TestClient(app, raise_server_exceptions=False) as client:
+    with TestClient(app) as client:
         response = client.get(
             "/api/test-failure?token=example-query-value",
             headers={"Authorization": "Bearer example-header-value"},

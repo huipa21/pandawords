@@ -5,9 +5,8 @@ from typing import Literal
 from uuid import uuid4
 
 import structlog
-from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
-from starlette.requests import Request
-from starlette.responses import Response
+from starlette.datastructures import MutableHeaders
+from starlette.types import ASGIApp, Message, Receive, Scope, Send
 from structlog.contextvars import bound_contextvars, merge_contextvars
 
 AppEnvironment = Literal["development", "production"]
@@ -35,15 +34,23 @@ def configure_logging(environment: AppEnvironment) -> None:
     )
 
 
-class RequestIdMiddleware(BaseHTTPMiddleware):
-    async def dispatch(
-        self,
-        request: Request,
-        call_next: RequestResponseEndpoint,
-    ) -> Response:
+class RequestIdMiddleware:
+    def __init__(self, app: ASGIApp) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+
         request_id = uuid4().hex
-        request.state.request_id = request_id
+        scope.setdefault("state", {})["request_id"] = request_id
+
+        async def send_with_request_id(message: Message) -> None:
+            if message["type"] == "http.response.start":
+                message.setdefault("headers", [])
+                MutableHeaders(scope=message)["X-Request-ID"] = request_id
+            await send(message)
+
         with bound_contextvars(request_id=request_id):
-            response = await call_next(request)
-            response.headers["X-Request-ID"] = request_id
-            return response
+            await self.app(scope, receive, send_with_request_id)

@@ -6,16 +6,23 @@ from contextlib import asynccontextmanager
 from fastapi import APIRouter, FastAPI
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.types import ASGIApp
 
 from app.core.config import Settings
 from app.core.errors import (
     AppError,
+    HandledErrorGuard,
     app_error_handler,
     http_error_handler,
     unhandled_error_handler,
     validation_error_handler,
 )
 from app.core.logging import RequestIdMiddleware, configure_logging
+
+
+class _GuardedFastAPI(FastAPI):
+    def build_middleware_stack(self) -> ASGIApp:
+        return HandledErrorGuard(super().build_middleware_stack())
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -26,7 +33,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         configure_logging(app_settings.app_env)
         yield
 
-    app = FastAPI(
+    app = _GuardedFastAPI(
         title="PandaWords API",
         openapi_url="/api/openapi.json",
         lifespan=lifespan,
