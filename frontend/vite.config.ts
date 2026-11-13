@@ -1,9 +1,13 @@
 import { fileURLToPath, URL } from 'node:url'
 import vue from '@vitejs/plugin-vue'
+import UnoCSS from 'unocss/vite'
 import { defineConfig } from 'vitest/config'
+import { designCssPlugin } from './design-css-plugin.ts'
 
 export default defineConfig({
   plugins: [
+    designCssPlugin(),
+    UnoCSS(),
     vue(),
   ],
   resolve: {

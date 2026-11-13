@@ -10,10 +10,38 @@
 | `cytoscape-style.ts` (reads the computed CSS vars, rebuilt on theme change) | GraphCanvas |
 
 **Enforcement:**
-- UnoCSS `blocklist` rejects arbitrary values (`p-[13px]`, `text-[#fff]`) and the default palette
-  (`bg-red-500`).
-- An ESLint/stylelint rule rejects hex/rgb/px literals in `.vue` `<style>` and inline `style` attributes.
-- Exceptions need a `/* token-exception: reason */` comment.
+- UnoCSS's `blocklist` omits forbidden CSS; the enabled `unocss/blocklist` ESLint rule makes
+  literal classes such as `p-[13px]` and `bg-red-500` fail lint. A companion rule checks literals
+  in bound `:class` and `v-bind` expressions. Unspecified spacing steps, literal lengths, and
+  non-token font sizes, radii, shadows and motion durations are also blocked.
+- ESLint rejects hex/rgb/px literals and non-token font sizes in `.vue` `<style>` declarations and
+  at-rules, static `style` attributes, and literal values in bound styles. Numeric dimensions in
+  bound style objects are rejected too, because Vue converts them to pixels. Values computed
+  elsewhere cannot be checked statically and must still come from tokens.
+- A nonempty `/* token-exception: reason */` comment immediately before a single declaration or
+  at-rule permits raw literals in that declaration or at-rule only. For a bound style object, put
+  the comment immediately before its value. Exceptions do not exempt UnoCSS classes:
+
+  ```vue
+  <template>
+    <div style="/* token-exception: external diagram geometry */ width: 13px" />
+    <div :style="{ width: /* token-exception: external chart API */ '13px' }" />
+  </template>
+
+  <style scoped>
+  .external-diagram {
+    /* token-exception: external diagram geometry */
+    width: 13px;
+  }
+  </style>
+  ```
+
+The generated CSS includes `--pw-*` variables for both themes, layout, typography and motion.
+The spacing variable for `0.5` is `--pw-space-0-5`. Use `pw-focus-ring` for the tokenized outline
+and offset; for keyboard focus use `focus-visible:pw-focus-ring`. Reduced-motion media rules set all
+three duration variables to zero and suppress CSS animation/transition durations and delays,
+including those from UI components. `createCytoscapeStyle(element)` reads computed variables;
+rebuild the styles after changing the theme.
 
 Brand: **Google Material Blue**. Neutrals follow the Material grey scale. Dark mode follows the
 system by default, with a toggle (system / light / dark) stored in preferences.
@@ -86,7 +114,9 @@ put `text` on `warning-soft`.
 | `font-mono` | `"Roboto Mono", ui-monospace, monospace` |
 
 Latin fonts are self-hosted via `@fontsource-variable/*` (latin and latin-ext subsets). CJK text
-uses system fonts, which avoids multi-MB downloads.
+uses system fonts, which avoids multi-MB downloads. The build selects only those two subsets and
+aliases Fontsource's `* Variable` family names to the documented names above. It also includes each
+font's OFL license in the build output.
 
 | Size token | Uno | rem / px | Use |
 |---|---|---|---|

@@ -11,4 +11,11 @@
 - Shared components are catalogued in `docs/ui/components.md` and previewed at `/dev/design`.
 
 **Consequences.** The same look across the whole build, and changing the theme means changing one
-file. A raw value requires an explicit `token-exception` comment.
+file. A raw value requires an explicit `token-exception` comment with a reason immediately before
+the affected declaration, at-rule or bound style value; it never exempts a utility class.
+
+UnoCSS's blocklist alone only suppresses CSS, so the flat ESLint configuration enables
+`unocss/blocklist` as an error and checks bound class literals separately. The CSS generator and
+the selected self-hosted font subsets are bundled at build time; motion durations also respect
+`prefers-reduced-motion`. Computed style values supplied from elsewhere must still use tokens,
+since a static lint rule cannot prove their runtime values.
