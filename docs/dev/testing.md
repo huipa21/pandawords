@@ -24,7 +24,7 @@ failure output.
 - Tests isolate themselves by creating **fresh users** through factories. All user data is
   owner-scoped, and shared dictionary rows are deterministic and idempotent.
 - Mark a test `@pytest.mark.fresh_db` when it needs an empty database (e.g. migration tests). It
-  gets its own database.
+  gets its own **unmigrated** database, removed after that test.
 - The schema drift test applies the migrations to a fresh database and compares `INFO FOR DB`
   **and every `INFO FOR TABLE`** (including fields, indexes and events) with
   `backend/app/db/schema.snapshot.json`. JSON keys are sorted; schema definition strings are kept
@@ -36,6 +36,16 @@ failure output.
 
 ## Fixtures
 
+- `db`: async WebSocket connection to the migrated session database, or the empty database for
+  a `fresh_db` test. `test_settings` selects the same database; `session_db` and
+  `session_db_settings` explicitly access the shared migrated database.
+- `app`: a test-configured FastAPI application with its real lifespan running. `client` is an
+  async httpx client using that application through `ASGITransport`.
+- `make_user`: async factory hook only; it raises `NotImplementedError` until auth/user work in
+  1.5.x implements fresh owner creation. Do not share a single user between tests.
+- The backend runner currently implements only `test -Backend [-UpdateSnapshot]`; frontend,
+  E2E and combined orchestration are deferred to 1.6.1. Run from the selected worktree; it needs
+  that worktree's backend environment (`uv sync --locked`).
 - `lexicon_small.sqlite`: about 50 words (polysemy: *run*, *bank*; phrase: *kick the bucket*,
   *give up*; US/UK: *schedule*, *tomato*; derivation: *decide → decision*). It is built by the
   lexicon script from `backend/tests/fixtures/words.txt`.
