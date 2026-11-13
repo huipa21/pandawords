@@ -17,7 +17,8 @@ The user triggers work with **"implement task X.Y.Z"**. Other accepted forms are
 5. Mark each task in the set 🟡 in `PLAN.md`, fill **Current run** in `PROGRESS.md` (request,
    task → branch/worktree, next step), and commit both on `main` with `docs(plan): start X.Y.Z`
    before creating worktrees. This is what lets an interrupted run be resumed.
-   (Exception: 1.1.1 creates the repo, so it's done directly on `main` and marked ✅ when it's committed.)
+   (Exception: 1.1.1 creates the repo, so it's done directly on `main` and marked ✅ when it's committed.
+   This only waives the separate start commit and task worktree, not the progress log.)
 
 ## 2. Execute — parallel by default
 
@@ -71,9 +72,20 @@ and retry. Confirm with `git worktree list` that only the main worktree remains.
 
 ## 5. Close out
 
-- Update the status column in `PLAN.md` (✅) on `main`. In `PROGRESS.md`, remove the task from
-  **Current run**, add a **Log** entry (result, verification, findings, follow-ups), and move the
-  sub-agent's open issues to **Backlog** or **Blocked**. Commit both with `docs(plan): mark X.Y.Z done`.
+- Update the status column in `PLAN.md` (✅) on `main` only after the acceptance criteria are met.
+  Updating `PROGRESS.md` is mandatory for every task, including 1.1.1, and for blocked or
+  interrupted attempts. Each **Log** entry must record:
+  - Result and completed work, with the branch/commit when available.
+  - Dependencies checked and their status; write "none" when there are no prerequisites.
+  - Verification commands/checks and actual outcomes; distinguish passed, failed, and not run.
+  - Skipped, deferred, or out-of-scope work and the reason for each.
+  - Failures or process omissions, known causes (or "unknown"), and corrective actions.
+  - Blockers, findings, and follow-ups, including newly unblocked tasks.
+  Never record secrets or describe an unperformed check as passed.
+- Remove finished tasks from **Current run**; keep unfinished tasks there with their next step.
+  Put actionable blockers in **Blocked** and discovered out-of-scope work in **Backlog**.
+  Commit the status and progress updates with `docs(plan): mark X.Y.Z done`. Do not report a task
+  complete before its progress entry is committed.
 - Backlog items become PLAN.md tasks only after the user agrees; then remove them from Backlog.
 - Report to the user: what was done, verification results, and the next ready tasks (dependencies
   now satisfied).

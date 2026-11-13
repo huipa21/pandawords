@@ -60,6 +60,10 @@ Full procedure: [docs/dev/workflow.md](docs/dev/workflow.md). Summary:
    ✅ after merging) and [PROGRESS.md](docs/plans/PROGRESS.md) (current run, blockers, backlog,
    findings log), both on `main`. On "resume", read PROGRESS.md first, then follow
    [workflow.md § Resume](docs/dev/workflow.md#resume-after-an-interruption). Report results.
+7. Updating [PROGRESS.md](docs/plans/PROGRESS.md) is mandatory for every task, including 1.1.1.
+   Record completed work, skipped/deferred work and reasons, dependency checks, verification
+   results, failures and known causes, blockers, and follow-ups. Record explicit "none" or
+   "not applicable" where appropriate; never imply an unperformed check passed.
 
 ## Hard rules
 
@@ -79,4 +83,4 @@ Full procedure: [docs/dev/workflow.md](docs/dev/workflow.md). Summary:
 ## Definition of done
 
 Code + focused tests pass · `check` clean · related docs/ADRs updated · merged to `main` ·
-worktree and branch removed · PLAN.md status ✅.
+worktree and branch removed · PLAN.md status ✅ · PROGRESS.md updated and committed.
