@@ -31,9 +31,56 @@ the compose provider, start the machine and run `podman compose version`.
 
 ## Daily commands
 
-See the table in [../../AGENTS.md](../../AGENTS.md). `up` runs the API, worker and Vite as
-background jobs and writes logs to `.dev/logs/*.log`. `down` stops them by PID (from
-`.dev/pids.json`) and stops the dev DB container.
+See the table in [../../AGENTS.md](../../AGENTS.md). The planned `up` command runs the API, worker
+and Vite as background jobs and writes logs to `.dev/logs/*.log`; `down` stops them by PID (from
+`.dev/pids.json`) and stops the dev DB container. These commands are not implemented yet.
+
+## Local databases
+
+Start the Podman machine and ensure the main worktree's `.env.dev` has `SURREAL_USER` and
+`SURREAL_PASS` set. Single-quote passwords containing `$` so Compose reads them literally. From the
+main worktree root, start both services and wait for their healthchecks:
+
+```powershell
+podman compose --env-file .env.dev --file .\deploy\compose.dev.yml up --detach --wait
+```
+
+Both ports bind to localhost only. `surreal-dev` stores RocksDB data in the named volume
+`pandawords-dev-db`; `surreal-test` uses memory and loses its data whenever it restarts. Before
+running Compose, check that any existing volume with that name belongs to the `pandawords`
+project: Compose can otherwise reuse an unrelated volume. The root credentials initialize a new
+datastore; changing them in `.env.dev` does not change an existing root user in the dev volume.
+
+On Windows, if `localhost` resolves to IPv6 but Podman forwards only IPv4, the endpoints from
+`.env.example` can time out. Set these values in `.env.dev` instead:
+
+```dotenv
+SURREAL_URL=ws://127.0.0.1:8100/rpc
+SURREAL_TEST_URL=ws://127.0.0.1:8101/rpc
+```
+
+`.\scripts\dev.ps1 reset-db` **deletes all dev database data**. It stops and removes the dev
+container, removes its volume, and leaves the test container alone. It refuses to delete a volume
+owned by another Compose project or used by another container. An already-absent volume is a
+no-op. To start a fresh dev database after a reset:
+
+```powershell
+podman compose --env-file .env.dev --file .\deploy\compose.dev.yml up --detach --wait surreal-dev
+```
+
+The default Compose project is `pandawords`. For an isolated disposable instance, set both
+`COMPOSE_PROJECT_NAME` and `PANDAWORDS_DEV_VOLUME` to unique names in the process environment;
+the same values must be present when resetting it. `PANDAWORDS_DEV_PORT` and
+`PANDAWORDS_TEST_PORT` optionally change the host ports; update `SURREAL_URL` and `SURREAL_TEST_URL`
+accordingly. The inherited process environment takes precedence over `.env.dev`.
+
+The focused database integration test requires ports 8100 and 8101 to be free. It creates a unique
+disposable project and volume, writes synthetic records, and inspects and removes only its own
+resources:
+
+```powershell
+pwsh -NoProfile -File .\scripts\tests\dev-db.Tests.ps1
+```
 
 ## Ports
 

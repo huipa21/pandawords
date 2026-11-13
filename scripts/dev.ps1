@@ -131,6 +131,105 @@ function Invoke-WithFallback {
     return $fallbackResult.Output
 }
 
+function Get-DatabaseContext {
+    $project = [Environment]::GetEnvironmentVariable('COMPOSE_PROJECT_NAME')
+    if ([string]::IsNullOrEmpty($project)) {
+        $project = 'pandawords'
+    }
+    $volume = [Environment]::GetEnvironmentVariable('PANDAWORDS_DEV_VOLUME')
+    if ([string]::IsNullOrEmpty($volume)) {
+        $volume = 'pandawords-dev-db'
+    }
+    if ($project -cnotmatch '^[a-z0-9][a-z0-9_-]*$' -or
+        $volume -cnotmatch '^[a-zA-Z0-9][a-zA-Z0-9_.-]*$') {
+        throw 'Invalid Compose project or dev volume name.'
+    }
+    return @{
+        Project = $project
+        Volume  = $volume
+        File    = Join-Path (Split-Path -Parent $PSScriptRoot) 'deploy\compose.dev.yml'
+    }
+}
+
+function Invoke-DatabaseCompose {
+    param([Parameter(Mandatory)][string[]]$Arguments)
+
+    $context = Get-DatabaseContext
+    $composeArguments = @('compose', '--project-name', $context.Project, '--file', $context.File)
+    [void](Invoke-Quiet -Executable 'podman' -Arguments ($composeArguments + $Arguments))
+}
+
+function Test-DevVolumeOwnership {
+    param([Parameter(Mandatory)][hashtable]$Context)
+
+    $exists = Invoke-Captured -Executable 'podman' -Arguments @('volume', 'exists', $Context.Volume)
+    if ($exists.ExitCode -eq 1) {
+        return $false
+    }
+    if ($exists.ExitCode -ne 0) {
+        Write-CapturedOutput -Output $exists.Output
+        throw 'Could not check the dev database volume.'
+    }
+
+    $format = '{{ index .Labels "com.docker.compose.project" }}|{{ index .Labels "com.docker.compose.volume" }}'
+    $labels = Invoke-Quiet -Executable 'podman' -Arguments @('volume', 'inspect', '--format', $format, $Context.Volume)
+    if (($labels -join '').Trim() -cne "$($Context.Project)|dev-data") {
+        throw "Volume '$($Context.Volume)' does not belong to this Compose project; refusing database operation."
+    }
+    return $true
+}
+
+function Get-DevVolumeContainers {
+    param([Parameter(Mandatory)][hashtable]$Context)
+
+    $volumeFilter = "volume=$($Context.Volume)"
+    $idFormat = '{{.ID}}'
+    $users = @(Invoke-Quiet -Executable 'podman' -Arguments @(
+        'ps', '--all', '--no-trunc', '--filter', $volumeFilter, '--format', $idFormat))
+    $devUsers = @(Invoke-Quiet -Executable 'podman' -Arguments @(
+        'ps', '--all', '--no-trunc', '--filter', $volumeFilter,
+        '--filter', "label=com.docker.compose.project=$($Context.Project)",
+        '--filter', 'label=com.docker.compose.service=surreal-dev', '--format', $idFormat))
+    foreach ($container in $users) {
+        if ($container -cnotin $devUsers) {
+            throw "Refusing to use volume '$($Context.Volume)': another container uses it."
+        }
+    }
+    return $users
+}
+
+function Start-Database {
+    param([Parameter(Mandatory)][ValidateSet('surreal-dev', 'surreal-test')][string]$Service)
+    if ($Service -eq 'surreal-dev') {
+        $context = Get-DatabaseContext
+        if (Test-DevVolumeOwnership -Context $context) {
+            [void](Get-DevVolumeContainers -Context $context)
+        }
+    }
+    Invoke-DatabaseCompose -Arguments @('up', '--detach', '--wait', '--wait-timeout', '90', $Service)
+}
+
+function Stop-Database {
+    param([Parameter(Mandatory)][ValidateSet('surreal-dev', 'surreal-test')][string]$Service)
+    Invoke-DatabaseCompose -Arguments @('stop', $Service)
+}
+
+function Reset-Database {
+    $context = Get-DatabaseContext
+    if (-not (Test-DevVolumeOwnership -Context $context)) {
+        Write-Host "Dev database volume '$($context.Volume)' is already absent."
+        return
+    }
+
+    $users = @(Get-DevVolumeContainers -Context $context)
+    foreach ($container in $users) {
+        [void](Invoke-Quiet -Executable 'podman' -Arguments @('stop', $container))
+        [void](Invoke-Quiet -Executable 'podman' -Arguments @('rm', $container))
+    }
+    [void](Invoke-Quiet -Executable 'podman' -Arguments @('volume', 'rm', $context.Volume))
+    Write-Host "Removed dev database volume '$($context.Volume)'; the dev database is stopped."
+}
+
 function Show-Help {
     @'
 PandaWords development commands
@@ -138,8 +237,9 @@ PandaWords development commands
 Usage: ./scripts/dev.ps1 <command>
 
 Commands:
-  help    Show this help
-  setup   Check tools, install Python 3.14, sync existing projects, and create .env.dev
+  help      Show this help
+  setup     Check tools, install Python 3.14, sync existing projects, and create .env.dev
+  reset-db  Stop the dev database and delete its data volume
 '@ | Write-Host
 }
 
@@ -231,6 +331,12 @@ switch ($Command.ToLowerInvariant()) {
             throw 'The setup command does not accept additional arguments.'
         }
         Invoke-Setup
+    }
+    'reset-db' {
+        if ($CommandArgs.Count -ne 0) {
+            throw 'The reset-db command does not accept additional arguments.'
+        }
+        Reset-Database
     }
     default {
         throw "Unknown command '$Command'. Run './scripts/dev.ps1 help' for available commands."

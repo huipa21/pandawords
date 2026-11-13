@@ -1,0 +1,45 @@
+name: pandawords
+
+services:
+  surreal-dev:
+    image: docker.io/surrealdb/surrealdb:v3.3.5
+    command: start --no-banner --log warn rocksdb:/data/pandawords.db
+    environment:
+      SURREAL_USER: ${SURREAL_USER:?Set SURREAL_USER in .env.dev}
+      SURREAL_PASS: ${SURREAL_PASS:?Set SURREAL_PASS in .env.dev}
+    ports:
+      - "127.0.0.1:${PANDAWORDS_DEV_PORT:-8100}:8000"
+    volumes:
+      - dev-data:/data
+    tmpfs:
+      - /logs
+    healthcheck:
+      test: ["CMD", "/surreal", "is-ready", "--endpoint", "ws://127.0.0.1:8000"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 5s
+
+  surreal-test:
+    image: docker.io/surrealdb/surrealdb:v3.3.5
+    command: start --no-banner --log warn memory
+    environment:
+      SURREAL_USER: ${SURREAL_USER:?Set SURREAL_USER in .env.dev}
+      SURREAL_PASS: ${SURREAL_PASS:?Set SURREAL_PASS in .env.dev}
+    ports:
+      - "127.0.0.1:${PANDAWORDS_TEST_PORT:-8101}:8000"
+    tmpfs:
+      - /data
+      - /logs
+    healthcheck:
+      test: ["CMD", "/surreal", "is-ready", "--endpoint", "ws://127.0.0.1:8000"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 5s
+
+volumes:
+  dev-data:
+    name: ${PANDAWORDS_DEV_VOLUME:-pandawords-dev-db}
+    driver_opts:
+      o: uid=65532,gid=65532
