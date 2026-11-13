@@ -10,12 +10,13 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 ## Current run
 
 Request: resume and complete Phase 1, proceeding through waves in dependency order.
-Next step: implement wave 4 in parallel; all its prerequisites are ✅.
+Next step: implement wave 5 in parallel; all its prerequisites are ✅.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 1.2.3 | `task/1.2.3-db-client` | `../pandawords.worktrees/1.2.3` | Starting; dependencies 1.2.2 and 1.3.1 are ✅ |
-| 1.3.2 | `task/1.3.2-surreal-spike` | `../pandawords.worktrees/1.3.2` | Starting; dependencies 1.3.1 and 1.2.1 are ✅ |
+| 1.3.3 | `task/1.3.3-migrations` | `../pandawords.worktrees/1.3.3` | Starting; dependencies 1.2.3 and 1.3.2 are ✅ |
+| 1.4.4 | `task/1.4.4-design-preview` | `../pandawords.worktrees/1.4.4` | Starting; dependency 1.4.3 is ✅ |
+| 1.6.3 | `task/1.6.3-dockerfiles` | `../pandawords.worktrees/1.6.3` | Starting; dependencies 1.2.2 and 1.4.3 are ✅ |
 
 ## Blocked
 
@@ -41,6 +42,36 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 1.2.3 Database lifecycle
+- Result / completed: process-local reconnecting SDK lifecycle and safe readiness service;
+  commits `ed05b1f` and `6322f33` merged, final merge `46b3e5b`. Branch/worktree removed.
+- Dependencies: 1.2.2 and 1.3.1 are ✅.
+- Verification: real healthy readiness 200, unreachable readiness 503, healthz/startup unaffected,
+  reconnect and offline OpenAPI passed. Follow-up localhost-configured readiness passed without
+  private-env changes; integrated Ruff/format/basedpyright and 49 backend tests passed.
+- Skipped / deferred: aggregate commands await 1.6.1. No unrelated work performed.
+- Failures / causes / corrections: localhost resolves IPv6 first but compose publishes IPv4-only;
+  explicit default IPv4 URLs and URL-parsed literal-localhost normalization resolve the reproduced
+  timeout while preserving external hosts and explicit IPv6. Pylance tool timed out; direct
+  basedpyright passed. Existing Starlette warning remains.
+- Findings: SDK 3.0.0/server 3.3.5 confirmed; N02/N03 facts shared with spike agent.
+- Blockers / follow-ups: none.
+
+### 2026-11-14 — 1.3.2 SurrealDB verification spike
+- Result / completed: regression script and DB-scoped probe helpers, all 23 syntax/API facts and
+  working alternatives recorded; `1c6478a` merged as `6a95da2`. Branch/worktree removed.
+- Dependencies: 1.3.1 and 1.2.1 are ✅.
+- Verification: main spike passed 23/23 against 3.3.5/SDK 3.0.0, including rollback, exact cleanup,
+  stable schema info and complete HTTP export/import. Main Ruff/format/basedpyright and 57 backend
+  tests passed; frontend lint/typecheck and 41 Vitest tests passed. Generated DBs removed; shared
+  test server remains healthy.
+- Skipped / deferred: unverified CLI export not used; verified SDK HTTP backup is the alternative.
+  Aggregate check/test remains unavailable until 1.6.1.
+- Failures / causes / corrections: N17's no-argument transaction belief is false; verified UUID
+  transaction argument forms replace it. Existing Starlette warning remains.
+- Findings: 22 notes ✅, N17 ❌ with working replacement; all acceptance prerequisites resolved.
+- Blockers / follow-ups: none; wave 5 is ready.
 
 ### 2026-11-14 — 1.4.3 App shell
 - Result / completed: responsive app/auth layouts, navigation and providers, persisted theme and
