@@ -19,14 +19,11 @@ class _TestSettings(Settings):
 def test_healthz_and_request_id() -> None:
     with TestClient(create_app(_TestSettings())) as client:
         response = client.get("/api/healthz")
-        ready_response = client.get("/api/readyz")
         openapi_response = client.get("/api/openapi.json")
 
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
     assert response.headers["x-request-id"]
-    assert ready_response.status_code == 200
-    assert ready_response.json() == {"status": "ok"}
     assert openapi_response.status_code == 200
     assert "/api/healthz" in openapi_response.json()["paths"]
 

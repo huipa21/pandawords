@@ -4,6 +4,7 @@ import subprocess
 from pathlib import Path
 from typing import Literal
 
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -41,6 +42,14 @@ class Settings(BaseSettings):
     surreal_database: str = "dev"
     surreal_user: str = "root"
     surreal_pass: str = "change-me"
+    surreal_timeout_seconds: float = Field(default=2.0, gt=0)
+
+    @field_validator("surreal_url")
+    @classmethod
+    def validate_surreal_url(cls, value: str) -> str:
+        if not value.startswith(("ws://", "wss://")):
+            raise ValueError("SurrealDB requires a WebSocket URL")
+        return value
 
     api_port: int = 8000
     web_dev_port: int = 5173
