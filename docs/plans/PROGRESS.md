@@ -16,7 +16,6 @@ Next step: implement wave 5 in parallel; all its prerequisites are ✅.
 |---|---|---|---|
 | 1.3.3 | `task/1.3.3-migrations` | `../pandawords.worktrees/1.3.3` | Starting; dependencies 1.2.3 and 1.3.2 are ✅ |
 | 1.4.4 | `task/1.4.4-design-preview` | `../pandawords.worktrees/1.4.4` | Starting; dependency 1.4.3 is ✅ |
-| 1.6.3 | `task/1.6.3-dockerfiles` | `../pandawords.worktrees/1.6.3` | Starting; dependencies 1.2.2 and 1.4.3 are ✅ |
 
 ## Blocked
 
@@ -42,6 +41,22 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 1.6.3 Container packaging
+- Result / completed: multi-stage nonroot API and web Dockerfiles, context ignores and nginx
+  configuration; `2aa6052` merged as `69f61d2`. Branch and worktree removed.
+- Dependencies: 1.2.2 and 1.4.3 are ✅.
+- Verification: both `podman build --platform linux/amd64` builds passed on the task branch and
+  main; main images tagged `localhost/pandawords-api:phase1` and `localhost/pandawords-web:phase1`.
+  Agent smoke tests passed API health 200, web index 200, SPA fallback, API proxy, readiness 503
+  without DB, gzip, immutable caching, missing assets/internal media 404, nginx syntax and nonroot
+  runtime checks. Exact smoke containers/network removed; images retained.
+  Main Ruff/format/basedpyright and 57 backend tests, frontend lint/typecheck and 41 tests passed.
+- Skipped / deferred: aggregate scripts await 1.6.1. Production compose belongs to 1.6.4.
+- Failures / causes / corrections: none; official registries succeeded without TLS/config changes.
+  Existing Starlette warning remains.
+- Findings: none.
+- Blockers / follow-ups: none for this task; 1.6.4 also needs 1.3.3.
 
 ### 2026-11-14 — 1.2.3 Database lifecycle
 - Result / completed: process-local reconnecting SDK lifecycle and safe readiness service;
