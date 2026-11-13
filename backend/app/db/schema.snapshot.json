@@ -1,0 +1,34 @@
+{
+  "database": {
+    "accesses": {},
+    "analyzers": {},
+    "apis": {},
+    "buckets": {},
+    "configs": {},
+    "functions": {},
+    "models": {},
+    "modules": {},
+    "params": {},
+    "sequences": {},
+    "tables": {
+      "_migration": "DEFINE TABLE _migration TYPE NORMAL SCHEMAFULL PERMISSIONS NONE"
+    },
+    "users": {}
+  },
+  "tables": {
+    "_migration": {
+      "events": {},
+      "fields": {
+        "applied_at": "DEFINE FIELD applied_at ON _migration TYPE datetime PERMISSIONS FULL",
+        "checksum": "DEFINE FIELD checksum ON _migration TYPE string PERMISSIONS FULL",
+        "name": "DEFINE FIELD name ON _migration TYPE string PERMISSIONS FULL",
+        "version": "DEFINE FIELD version ON _migration TYPE string PERMISSIONS FULL"
+      },
+      "indexes": {
+        "migration_version": "DEFINE INDEX migration_version ON _migration FIELDS version UNIQUE"
+      },
+      "lives": {},
+      "tables": {}
+    }
+  }
+}

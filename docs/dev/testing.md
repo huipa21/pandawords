@@ -25,8 +25,14 @@ failure output.
   owner-scoped, and shared dictionary rows are deterministic and idempotent.
 - Mark a test `@pytest.mark.fresh_db` when it needs an empty database (e.g. migration tests). It
   gets its own database.
-- The schema drift test applies the migrations to a fresh database and compares `INFO FOR DB` with
-  `backend/app/db/schema.snapshot.json`. `dev.ps1 test -Backend -UpdateSnapshot` rewrites the snapshot.
+- The schema drift test applies the migrations to a fresh database and compares `INFO FOR DB`
+  **and every `INFO FOR TABLE`** (including fields, indexes and events) with
+  `backend/app/db/schema.snapshot.json`. JSON keys are sorted; schema definition strings are kept
+  intact, and records, migration timestamps and random database names are not included.
+- Normal test runs never rewrite the snapshot. Missing or changed snapshots fail with a unified
+  diff (`committed` → `migrated`). Review the change, then run
+  `.\scripts\dev.ps1 test -Backend -UpdateSnapshot` and commit the updated JSON alongside the new
+  migration. The backend runner passes pytest's `--update-snapshot` flag explicitly.
 
 ## Fixtures
 
