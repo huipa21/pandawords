@@ -16,6 +16,34 @@ version). `DOCKER_REGISTRY_MIRROR` is used only if Docker Hub fails.
 
 The exact `podman save` flags must be verified in task 1.6.5, and the result recorded here.
 
+## Building the application images
+
+Run from the repository root (the web build needs the workspace lockfile and nginx config):
+
+```powershell
+podman build --platform linux/amd64 -f backend\Dockerfile -t localhost/pandawords-api:dev backend
+podman build --platform linux/amd64 -f frontend\Dockerfile -t localhost/pandawords-web:dev .
+```
+
+The backend uses Python 3.14 slim (Debian trixie), uv 0.11.18 and the frozen production
+dependencies only. Its runtime user is UID/GID `10001:10001`; writable media mounts at
+`/data/media` must permit that UID to write. Mount the lexicon read-only at `/data/lexicon`.
+The same backend image supports command overrides for the worker and migrations.
+The web build uses Node 24.21.0 Alpine 3.23, the workspace-pinned pnpm, and nginx 1.30 Alpine.
+The Dockerfile-specific web ignore file and backend ignore file exclude local dependencies,
+build output and environment files.
+
+On the container network the backend must have the alias `api` before nginx starts.
+Web serves SPA routes, proxies `/api` without stripping the prefix, compresses text responses,
+and caches fingerprinted `/assets/` files immutably for one year (missing assets return 404).
+Mount media read-only at `/data/media` in web: direct `/_media/` requests return 404; only a
+trusted API response's `X-Accel-Redirect` can serve those files. Liveness is `/api/healthz`;
+`/api/readyz` can return 503 when the database is unavailable.
+
+Base-image overrides (`PYTHON_IMAGE`, `UV_IMAGE`, `NODE_IMAGE`, `NGINX_IMAGE`) are available
+as build arguments for explicitly configured registry mirrors. Try official registries first;
+do not disable TLS verification or change user-wide registry configuration.
+
 ## First-time server setup
 
 ```bash
