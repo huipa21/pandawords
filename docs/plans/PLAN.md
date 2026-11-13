@@ -21,21 +21,21 @@ are in `phase-N.md`. If a phase file doesn't exist yet, the agent asks before wr
 |---|---|---|---|---|---|
 | 1.1.1 | Initialize repository (main branch, ignore files, `.env.example`, README) | — | 1 | S | ✅ |
 | 1.1.2 | `dev.ps1` skeleton: dispatch, root/env resolution, `setup`, fallback sources | 1.1.1 | 2 | M | ✅ |
-| 1.1.3 | lefthook pre-commit (ruff, eslint, secrets guard) | 1.2.1, 1.4.1 | 3 | S | 🟡 |
+| 1.1.3 | lefthook pre-commit (ruff, eslint, secrets guard) | 1.2.1, 1.4.1 | 3 | S | ✅ |
 | 1.1.4 | VS Code workspace settings and recommended extensions | 1.1.1 | 2 | S | ✅ |
 | 1.2.1 | Backend uv project (Python 3.14, ruff, basedpyright, pytest) | 1.1.1 | 2 | S | ✅ |
-| 1.2.2 | API skeleton: app factory, settings, logging, error format, health | 1.2.1 | 3 | M | 🟡 |
-| 1.2.3 | SurrealDB client lifecycle + `readyz` | 1.2.2, 1.3.1 | 4 | S | ⬜ |
-| 1.3.1 | Podman dev (8100) and test (8101) SurrealDB, `reset-db` | 1.1.2 | 3 | S | 🟡 |
-| 1.3.2 | SurrealQL 3.3 verification spike (N01–N23) | 1.3.1, 1.2.1 | 4 | M | ⬜ |
+| 1.2.2 | API skeleton: app factory, settings, logging, error format, health | 1.2.1 | 3 | M | ✅ |
+| 1.2.3 | SurrealDB client lifecycle + `readyz` | 1.2.2, 1.3.1 | 4 | S | 🟡 |
+| 1.3.1 | Podman dev (8100) and test (8101) SurrealDB, `reset-db` | 1.1.2 | 3 | S | ✅ |
+| 1.3.2 | SurrealQL 3.3 verification spike (N01–N23) | 1.3.1, 1.2.1 | 4 | M | 🟡 |
 | 1.3.3 | Migration runner (`_migration`, checksums, transactions, `.py` support) | 1.2.3, 1.3.2 | 5 | M | ⬜ |
 | 1.3.4 | Schema snapshot + drift test | 1.3.3 | 6 | S | ⬜ |
 | 1.3.5 | Test harness: per-session test DB, `fresh_db`, ASGI client | 1.3.3 | 6 | M | ⬜ |
 | 1.4.1 | Frontend project (pnpm workspace, Vite 8, Vue 3.5, TS 6.0, eslint, vitest) | 1.1.1 | 2 | S | ✅ |
-| 1.4.2 | Design tokens + generators (CSS vars, Naive, Uno, Cytoscape) + fonts + enforcement | 1.4.1 | 3 | M | 🟡 |
-| 1.4.3 | App shell: router, Pinia, i18n, theme toggle, responsive layout, icons | 1.4.2 | 4 | M | ⬜ |
+| 1.4.2 | Design tokens + generators (CSS vars, Naive, Uno, Cytoscape) + fonts + enforcement | 1.4.1 | 3 | M | ✅ |
+| 1.4.3 | App shell: router, Pinia, i18n, theme toggle, responsive layout, icons | 1.4.2 | 4 | M | 🟡 |
 | 1.4.4 | `/dev/design` preview page (dev only) | 1.4.3 | 5 | S | ⬜ |
-| 1.4.5 | OpenAPI → TS types pipeline (`gen-api`) + API client with refresh | 1.4.1, 1.2.2 | 4 | M | ⬜ |
+| 1.4.5 | OpenAPI → TS types pipeline (`gen-api`) + API client with refresh | 1.4.1, 1.2.2 | 4 | M | 🟡 |
 | 1.5.1 | Migration: `user`, `refresh_token` | 1.3.4, 1.3.5 | 7 | S | ⬜ |
 | 1.5.2 | Security core: argon2, JWT, refresh rotation, admin bootstrap | 1.5.1 | 8 | M | ⬜ |
 | 1.5.3 | Auth API (login, refresh, logout, me, password) + forced change gate | 1.5.2 | 9 | M | ⬜ |

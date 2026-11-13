@@ -10,22 +10,19 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 ## Current run
 
 Request: resume and complete Phase 1, proceeding through waves in dependency order.
-Next step: finish and integrate the remaining wave 3 tasks in parallel.
+Next step: implement wave 4 in parallel; all its prerequisites are ✅.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 1.1.3 | `task/1.1.3-lefthook` | `../pandawords.worktrees/1.1.3` | Starting; dependencies 1.2.1 and 1.4.1 are ✅ |
-| 1.2.2 | `task/1.2.2-logging-guard` | `../pandawords.worktrees/1.2.2` | Reopened: Uvicorn logs the raw message of a handled request exception |
-| 1.3.1 | `task/1.3.1-dev-db` | `../pandawords.worktrees/1.3.1` | Starting; dependency 1.1.2 is ✅ |
-| 1.4.2 | `task/1.4.2-design-tokens` | `../pandawords.worktrees/1.4.2` | Starting; dependency 1.4.1 is ✅ |
-| 1.4.4 | — | — | Blocked: dependency 1.4.3 is not ✅ |
+| 1.2.3 | `task/1.2.3-db-client` | `../pandawords.worktrees/1.2.3` | Starting; dependencies 1.2.2 and 1.3.1 are ✅ |
+| 1.3.2 | `task/1.3.2-surreal-spike` | `../pandawords.worktrees/1.3.2` | Starting; dependencies 1.3.1 and 1.2.1 are ✅ |
+| 1.4.3 | `task/1.4.3-app-shell` | `../pandawords.worktrees/1.4.3` | Starting; dependency 1.4.2 is ✅ |
+| 1.4.5 | `task/1.4.5-api-client` | `../pandawords.worktrees/1.4.5` | Starting; dependencies 1.4.1 and 1.2.2 are ✅ |
 
 ## Blocked
 
 | Task | Blocked by (task, tool, decision) | Since | Notes |
 |---|---|---|---|
-| 1.4.4 | 1.4.3 | 2026-11-13 | PLAN.md is ⬜; implementation cannot start until 1.4.3 is complete and merged. Task 1.4.3 itself depends on 1.4.2. |
-| 1.4.5 | 1.2.2 | 2026-11-13 | 1.2.2 was reopened to prevent raw handled exception messages reaching Uvicorn logs. |
 
 ## Backlog (discovered, not yet in PLAN.md)
 
@@ -46,6 +43,33 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — Wave 3 integration and recovery
+- Result / completed: 1.1.3 hooks (`73a5fec`, `2e53492`, merge `87aae46`, integration fix `f0204ab`);
+  1.3.1 databases (`ab2e561`, merge `eed2bd5`); 1.4.2 tokens (`f1900d9`, merge `767db47`);
+  and the reopened 1.2.2 logging fix (`fa9b9d8`) are merged. All four branches and worktree folders
+  were removed; only main remains.
+- Dependencies: 1.1.3 checked 1.2.1/1.4.1; 1.3.1 checked 1.1.2; 1.4.2 checked 1.4.1;
+  1.2.2 checked 1.2.1; all are ✅.
+- Verification: backend Ruff, formatting, basedpyright and pytest passed (22 tests, including
+  real Uvicorn and cancellation regressions); frontend build/typecheck/lint/Vitest passed
+  (26 tests). Disposable database tests passed healthchecks, RocksDB persistence, memory reset,
+  ownership refusal and dev reset without disturbing test data; all disposable resources removed.
+  Hook suites passed 33 cases, including partial staging, synthetic env files and missing
+  worktree-local dependencies; actual hooks installed on main.
+- Skipped / deferred: aggregate check/test commands remain unavailable until 1.6.1; direct
+  equivalents were used. Remote setup remains deferred without a supplied URL; no push performed.
+- Failures / causes / corrections: lost agent contexts left committed/partial work; recovered
+  it directly and reran validation. Real Uvicorn exposed raw exception re-logging; the narrowly
+  scoped handled-response guard fixes it while cancellation/background/transport failures propagate.
+  Hook fixtures needed token-rule files after merging; staged lint was extracted from eval into a
+  script to fix worker preload resolution. pnpm 11 requires explicit lifecycle policy; automatic
+  lefthook builds are disabled and its verified binary is installed explicitly.
+  Windows worktree removal left clean tracked files; exact leftovers were removed and absence checked.
+- Findings: pre-existing unrelated Phase 2 documentation edits appeared during integration and
+  were preserved, not modified. The Node TLS override remains user-owned; network commands used
+  certificate verification. One existing Starlette TestClient deprecation warning remains.
+- Blockers / follow-ups: none for wave 3; proceed with 1.2.3, 1.3.2, 1.4.3 and 1.4.5.
 
 ### 2026-11-13 — 1.2.2 API skeleton
 - Result / completed: added the app factory, settings, request logging, safe error responses,
