@@ -54,6 +54,16 @@ the script only imports the runner. Assertions are the checks: run without Pytho
 
 ## Verified snippets
 
+Task **1.5.1**, **2026-11-14**, reverified auth DDL on the loopback **test** server (8101),
+reporting **surrealdb-3.3.5**, with SDK **3.0.0**. `0002_auth.surql` and
+`tests/integration/test_auth_schema.py` verify literal string unions (`'admin' | 'user'`,
+theme and accent), SCHEMAFULL nested object fields, required booleans, typed `record<user>`
+and `option<record<refresh_token>>`, optional datetimes, and unique username/hash indexes.
+Duplicate writes fail naming their unique index; wrong role/theme/accent/reference table and
+string expiry/boolean values are rejected. UTC expiry/revocation datetimes and replacement
+record IDs round-trip. All writes use fresh harness databases, removed individually on teardown;
+the dev database is untouched. The snapshot runner captures the accepted field/index definitions.
+
 All snippets below target **server 3.3.5 / Python SDK 3.0.0**. Executable versions live in
 `app.db.spike_support`, `spike_records`, `spike_graph`, and `spike_operations`; do not move
 SurrealQL into scripts, API handlers, or services.

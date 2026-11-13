@@ -70,11 +70,12 @@ async def db(migration_settings: Settings) -> AsyncIterator[AsyncWsSurrealConnec
 
 
 async def test_fresh_apply_noop_and_read_only_dry_run(db: AsyncWsSurrealConnection) -> None:
-    assert await run_migrations(db, dry_run=True) == ["0001_bootstrap.surql"]
+    expected = [migration.path.name for migration in discover(MIGRATIONS)]
+    assert await run_migrations(db, dry_run=True) == expected
     assert await tables(db) == {}
-    assert await run_migrations(db) == ["0001_bootstrap.surql"]
+    assert await run_migrations(db) == expected
     before = await history(db)
-    assert len(before) == 1
+    assert len(before) == len(expected)
     assert before[0]["version"] == "0001"
     assert before[0]["checksum"] == discover(MIGRATIONS)[0].checksum
     assert before[0]["applied_at"] is not None
@@ -170,10 +171,11 @@ async def test_cli_dry_run_apply_and_noop(
         "surreal_pass",
     ):
         monkeypatch.setenv(key.upper(), str(getattr(migration_settings, key)))
+    migration_names = [migration.path.name for migration in discover(MIGRATIONS)]
     for arguments, expected in (
-        (["--dry-run"], "Pending: 0001_bootstrap.surql"),
-        ([], "Applied: 0001_bootstrap.surql"),
-        ([], "No pending migrations."),
+        (["--dry-run"], [f"Pending: {name}" for name in migration_names]),
+        ([], [f"Applied: {name}" for name in migration_names]),
+        ([], ["No pending migrations."]),
     ):
         result = await asyncio.to_thread(
             subprocess.run,
@@ -185,10 +187,10 @@ async def test_cli_dry_run_apply_and_noop(
             check=False,
         )
         assert result.returncode == 0, result.stderr
-        assert expected in result.stdout
+        assert all(line in result.stdout.splitlines() for line in expected)
         if arguments:
             assert await tables(db) == {}
-    assert len(await history(db)) == 1
+    assert len(await history(db)) == len(discover(MIGRATIONS))
     await invalidate_history_checksum(db)
     failure = await asyncio.to_thread(
         subprocess.run,

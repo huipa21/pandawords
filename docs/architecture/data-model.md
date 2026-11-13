@@ -89,4 +89,12 @@ lives under its own lexeme/sense, like any lemma.
 
 `lemma(lang, text)` unique · `user(username)` unique · `project(owner)` · `memory(due)` filtered by
 user via ID prefix · `review_log(owner, at)` · `job(status, run_after)` · `note(owner, target)` ·
-`media(target)` · `refresh_token(token_hash)` unique.
+`media(target)` · `refresh_token(token_hash)` unique · `user(role)` (admin bootstrap) ·
+`refresh_token(user)` (session revocation) · `refresh_token(expires_at)` (expiry cleanup).
+
+Auth tables are introduced by `0002_auth.surql`. User fields are required, with no database
+defaults; callers supply the flags, languages and complete preferences. Preferences have
+`theme` = system/light/dark, a string `locale`, and `accent` = US/UK. Refresh tokens require a
+`record<user>` reference, string hash and datetime expiry; `revoked_at` is an optional datetime,
+and `replaced_by` an optional `record<refresh_token>`. These typed references constrain the
+target table, not record existence. Only refresh-token hashes, never raw tokens, are stored.

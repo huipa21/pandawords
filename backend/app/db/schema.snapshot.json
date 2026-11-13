@@ -11,7 +11,9 @@
     "params": {},
     "sequences": {},
     "tables": {
-      "_migration": "DEFINE TABLE _migration TYPE NORMAL SCHEMAFULL PERMISSIONS NONE"
+      "_migration": "DEFINE TABLE _migration TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
+      "refresh_token": "DEFINE TABLE refresh_token TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
+      "user": "DEFINE TABLE user TYPE NORMAL SCHEMAFULL PERMISSIONS NONE"
     },
     "users": {}
   },
@@ -26,6 +28,45 @@
       },
       "indexes": {
         "migration_version": "DEFINE INDEX migration_version ON _migration FIELDS version UNIQUE"
+      },
+      "lives": {},
+      "tables": {}
+    },
+    "refresh_token": {
+      "events": {},
+      "fields": {
+        "expires_at": "DEFINE FIELD expires_at ON refresh_token TYPE datetime PERMISSIONS FULL",
+        "replaced_by": "DEFINE FIELD replaced_by ON refresh_token TYPE none | record<refresh_token> PERMISSIONS FULL",
+        "revoked_at": "DEFINE FIELD revoked_at ON refresh_token TYPE none | datetime PERMISSIONS FULL",
+        "token_hash": "DEFINE FIELD token_hash ON refresh_token TYPE string PERMISSIONS FULL",
+        "user": "DEFINE FIELD user ON refresh_token TYPE record<user> PERMISSIONS FULL"
+      },
+      "indexes": {
+        "refresh_token_expires_at": "DEFINE INDEX refresh_token_expires_at ON refresh_token FIELDS expires_at",
+        "refresh_token_hash": "DEFINE INDEX refresh_token_hash ON refresh_token FIELDS token_hash UNIQUE",
+        "refresh_token_user": "DEFINE INDEX refresh_token_user ON refresh_token FIELDS user"
+      },
+      "lives": {},
+      "tables": {}
+    },
+    "user": {
+      "events": {},
+      "fields": {
+        "disabled": "DEFINE FIELD disabled ON user TYPE bool PERMISSIONS FULL",
+        "must_change_password": "DEFINE FIELD must_change_password ON user TYPE bool PERMISSIONS FULL",
+        "password_hash": "DEFINE FIELD password_hash ON user TYPE string PERMISSIONS FULL",
+        "prefs": "DEFINE FIELD prefs ON user TYPE object PERMISSIONS FULL",
+        "prefs.accent": "DEFINE FIELD prefs.accent ON user TYPE 'US' | 'UK' PERMISSIONS FULL",
+        "prefs.locale": "DEFINE FIELD prefs.locale ON user TYPE string PERMISSIONS FULL",
+        "prefs.theme": "DEFINE FIELD prefs.theme ON user TYPE 'system' | 'light' | 'dark' PERMISSIONS FULL",
+        "role": "DEFINE FIELD role ON user TYPE 'admin' | 'user' PERMISSIONS FULL",
+        "source_lang": "DEFINE FIELD source_lang ON user TYPE string PERMISSIONS FULL",
+        "target_lang": "DEFINE FIELD target_lang ON user TYPE string PERMISSIONS FULL",
+        "username": "DEFINE FIELD username ON user TYPE string PERMISSIONS FULL"
+      },
+      "indexes": {
+        "user_role": "DEFINE INDEX user_role ON user FIELDS role",
+        "user_username": "DEFINE INDEX user_username ON user FIELDS username UNIQUE"
       },
       "lives": {},
       "tables": {}
