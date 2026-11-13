@@ -10,12 +10,11 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 ## Current run
 
 Request: resume and complete Phase 1, proceeding through waves in dependency order.
-Next step: implement wave 7 in parallel; all its prerequisites are ✅.
+Next step: implement wave 8 security core; dependency 1.5.1 is ✅.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 1.5.1 | `task/1.5.1-auth-schema` | `../pandawords.worktrees/1.5.1` | Starting; dependencies 1.3.4 and 1.3.5 are ✅ |
-| 1.6.5 | `task/1.6.5-release` | `../pandawords.worktrees/1.6.5` | Starting; dependency 1.6.4 is ✅ |
+| 1.5.2 | `task/1.5.2-security-core` | `../pandawords.worktrees/1.5.2` | Starting; dependency 1.5.1 is ✅ |
 
 ## Blocked
 
@@ -41,6 +40,33 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 1.5.1 Auth schema
+- Result / completed: immutable0002_auth user/refresh-token schema, indexes and regenerated
+  snapshot; `551984d` merged as `4d71e4b`. Branch/worktree removed;0001 unchanged.
+- Dependencies: 1.3.4 and1.3.5 are ✅.
+- Verification: real3.3.5 duplicate username rejection, snapshot-update and normal suites passed;
+  integrated backend Ruff/format/basedpyright and91 tests, frontend lint/typecheck and43 tests
+  passed. Hooks passed.
+- Skipped / deferred: make_user awaits1.5.2; aggregate check awaits1.6.1.
+- Failures / causes / corrections: missing pytest resolved via locked offline sync; Pylance timed
+  out but direct typecheck passed. Existing Starlette warning remains.
+- Findings: required prefs and role/theme/accent unions are enforced by schema.
+- Blockers / follow-ups: none.
+
+### 2026-11-14 — 1.6.5 Release bundles
+- Result / completed: versioned linux/amd64 image archive, deploy bundle and SHA256SUMS tooling;
+  `f98dd6b` merged as `dffc8db`. Branch/worktree removed.
+- Dependencies: 1.6.4 is ✅.
+- Verification: focused PowerShell guard/manifest/hash tests passed on branch/main; actual release
+ 0.1.165 built both images, loaded matching IDs into initially empty isolated tmpfs/VFS store within
+  180s and removed store without touching shared images. Deploy manifest contains compose.yml,
+  .env.example, Caddyfile.snippet, VERSION. Commands recorded in deployment.md.
+  Main backend checks/91 tests and frontend checks/43 tests passed.
+- Skipped / deferred: Docker daemon/production deployment not tested; restore.sh belongs to6.1.5.
+- Failures / causes / corrections: none.
+- Findings: exact multi-image save/load flags and clean-store procedure verified.
+- Blockers / follow-ups: none.
 
 ### 2026-11-14 — 1.3.4 Schema snapshots
 - Result / completed: canonical schema JSON, readable drift test and explicit update plugin;

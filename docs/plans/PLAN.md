@@ -36,8 +36,8 @@ are in `phase-N.md`. If a phase file doesn't exist yet, the agent asks before wr
 | 1.4.3 | App shell: router, Pinia, i18n, theme toggle, responsive layout, icons | 1.4.2 | 4 | M | ✅ |
 | 1.4.4 | `/dev/design` preview page (dev only) | 1.4.3 | 5 | S | ✅ |
 | 1.4.5 | OpenAPI → TS types pipeline (`gen-api`) + API client with refresh | 1.4.1, 1.2.2 | 4 | M | ✅ |
-| 1.5.1 | Migration: `user`, `refresh_token` | 1.3.4, 1.3.5 | 7 | S | 🟡 |
-| 1.5.2 | Security core: argon2, JWT, refresh rotation, admin bootstrap | 1.5.1 | 8 | M | ⬜ |
+| 1.5.1 | Migration: `user`, `refresh_token` | 1.3.4, 1.3.5 | 7 | S | ✅ |
+| 1.5.2 | Security core: argon2, JWT, refresh rotation, admin bootstrap | 1.5.1 | 8 | M | 🟡 |
 | 1.5.3 | Auth API (login, refresh, logout, me, password) + forced change gate | 1.5.2 | 9 | M | ⬜ |
 | 1.5.4 | Admin users API | 1.5.3 | 10 | S | ⬜ |
 | 1.5.5 | Frontend auth: login, store, guards, change password | 1.5.3, 1.4.3, 1.4.5 | 10 | M | ⬜ |
