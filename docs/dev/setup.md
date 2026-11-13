@@ -22,6 +22,13 @@
 
 Open <http://localhost:5173> and log in with `ADMIN_USERNAME` / `ADMIN_PASSWORD` from `.env.dev`.
 
+The script resolves the main worktree through Git, so it can be run from a linked worktree and
+still uses the main worktree's `.env.dev`. Existing process environment variables take precedence
+over values in that file. Run `./scripts/dev.ps1 help` to list the commands currently implemented;
+additional commands are added in later foundation tasks.
+Setup reports installed tool versions without requiring the Podman machine to be running. To verify
+the compose provider, start the machine and run `podman compose version`.
+
 ## Daily commands
 
 See the table in [../../AGENTS.md](../../AGENTS.md). `up` runs the API, worker and Vite as
@@ -43,4 +50,5 @@ background jobs and writes logs to `.dev/logs/*.log`. `down` stops them by PID (
   enough for SurrealDB.
 - Port already in use: `Get-NetTCPConnection -LocalPort 8000` → stop that PID.
 - Package downloads are slow or failing: set `PIP_FALLBACK_INDEX_URL` / `NPM_FALLBACK_REGISTRY` in
-  `.env.dev`. They are used only after the official source fails.
+  `.env.dev`. `uv` and `pnpm` try their official sources first and use these fallbacks only after
+  the official source fails.
