@@ -3,7 +3,7 @@ from __future__ import annotations
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
-from fastapi import APIRouter, FastAPI
+from fastapi import APIRouter, Depends, FastAPI
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.types import ASGIApp
@@ -18,6 +18,8 @@ from app.core.errors import (
     validation_error_handler,
 )
 from app.core.logging import RequestIdMiddleware, configure_logging
+from app.db.client import database_lifespan
+from app.services.system import check_readiness
 
 
 class _GuardedFastAPI(FastAPI):
@@ -31,7 +33,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @asynccontextmanager
     async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
         configure_logging(app_settings.app_env)
-        yield
+        async with database_lifespan(app_settings) as database:
+            _app.state.database = database
+            yield
 
     app = _GuardedFastAPI(
         title="PandaWords API",
@@ -51,7 +55,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     async def healthz() -> dict[str, str]:
         return {"status": "ok"}
 
-    @router.get("/readyz", tags=["system"])
+    @router.get("/readyz", tags=["system"], dependencies=[Depends(check_readiness)])
     async def readyz() -> dict[str, str]:
         return {"status": "ok"}
 

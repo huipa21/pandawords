@@ -31,6 +31,9 @@ target-version = "py314"
 [tool.ruff.lint]
 select = ["ASYNC", "B", "E", "F", "I", "UP"]
 
+[tool.ruff.lint.isort]
+known-first-party = ["app"]
+
 [tool.basedpyright]
 pythonVersion = "3.14"
 typeCheckingMode = "standard"
