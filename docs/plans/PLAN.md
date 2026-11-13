@@ -28,13 +28,13 @@ are in `phase-N.md`. If a phase file doesn't exist yet, the agent asks before wr
 | 1.2.3 | SurrealDB client lifecycle + `readyz` | 1.2.2, 1.3.1 | 4 | S | ✅ |
 | 1.3.1 | Podman dev (8100) and test (8101) SurrealDB, `reset-db` | 1.1.2 | 3 | S | ✅ |
 | 1.3.2 | SurrealQL 3.3 verification spike (N01–N23) | 1.3.1, 1.2.1 | 4 | M | ✅ |
-| 1.3.3 | Migration runner (`_migration`, checksums, transactions, `.py` support) | 1.2.3, 1.3.2 | 5 | M | 🟡 |
-| 1.3.4 | Schema snapshot + drift test | 1.3.3 | 6 | S | ⬜ |
-| 1.3.5 | Test harness: per-session test DB, `fresh_db`, ASGI client | 1.3.3 | 6 | M | ⬜ |
+| 1.3.3 | Migration runner (`_migration`, checksums, transactions, `.py` support) | 1.2.3, 1.3.2 | 5 | M | ✅ |
+| 1.3.4 | Schema snapshot + drift test | 1.3.3 | 6 | S | 🟡 |
+| 1.3.5 | Test harness: per-session test DB, `fresh_db`, ASGI client | 1.3.3 | 6 | M | 🟡 |
 | 1.4.1 | Frontend project (pnpm workspace, Vite 8, Vue 3.5, TS 6.0, eslint, vitest) | 1.1.1 | 2 | S | ✅ |
 | 1.4.2 | Design tokens + generators (CSS vars, Naive, Uno, Cytoscape) + fonts + enforcement | 1.4.1 | 3 | M | ✅ |
 | 1.4.3 | App shell: router, Pinia, i18n, theme toggle, responsive layout, icons | 1.4.2 | 4 | M | ✅ |
-| 1.4.4 | `/dev/design` preview page (dev only) | 1.4.3 | 5 | S | 🟡 |
+| 1.4.4 | `/dev/design` preview page (dev only) | 1.4.3 | 5 | S | ✅ |
 | 1.4.5 | OpenAPI → TS types pipeline (`gen-api`) + API client with refresh | 1.4.1, 1.2.2 | 4 | M | ✅ |
 | 1.5.1 | Migration: `user`, `refresh_token` | 1.3.4, 1.3.5 | 7 | S | ⬜ |
 | 1.5.2 | Security core: argon2, JWT, refresh rotation, admin bootstrap | 1.5.1 | 8 | M | ⬜ |
@@ -45,7 +45,7 @@ are in `phase-N.md`. If a phase file doesn't exist yet, the agent asks before wr
 | 1.6.1 | `dev.ps1` `up`/`down`/`check`/`test` complete | 1.3.3, 1.4.3, 1.6.2 | 11 | M | ⬜ |
 | 1.6.2 | Worker skeleton + `job` table + jobs API | 1.3.4, 1.3.5, 1.5.3, 1.6.4 | 10 | M | ⬜ |
 | 1.6.3 | Dockerfiles (api, web/nginx) | 1.2.2, 1.4.3 | 5 | M | ✅ |
-| 1.6.4 | Production `compose.yml` + pre-migrate export + Caddy snippet | 1.6.3, 1.3.3, 1.3.2 | 6 | M | ⬜ |
+| 1.6.4 | Production `compose.yml` + pre-migrate export + Caddy snippet | 1.6.3, 1.3.3, 1.3.2 | 6 | M | 🟡 |
 | 1.6.5 | `dev.ps1 release` (images → tar.gz, deploy bundle) | 1.6.4 | 7 | S | ⬜ |
 | 1.6.6 | E2E: admin creates user → first login → forced password change | 1.5.6, 1.6.1 | 12 | S | ⬜ |
 

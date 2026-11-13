@@ -10,12 +10,13 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 ## Current run
 
 Request: resume and complete Phase 1, proceeding through waves in dependency order.
-Next step: implement wave 5 in parallel; all its prerequisites are ✅.
+Next step: implement wave 6 in parallel; all its prerequisites are ✅.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 1.3.3 | `task/1.3.3-migrations` | `../pandawords.worktrees/1.3.3` | Starting; dependencies 1.2.3 and 1.3.2 are ✅ |
-| 1.4.4 | `task/1.4.4-design-preview` | `../pandawords.worktrees/1.4.4` | Starting; dependency 1.4.3 is ✅ |
+| 1.3.4 | `task/1.3.4-schema-snapshot` | `../pandawords.worktrees/1.3.4` | Starting; dependency 1.3.3 is ✅ |
+| 1.3.5 | `task/1.3.5-test-harness` | `../pandawords.worktrees/1.3.5` | Starting; dependency 1.3.3 is ✅ |
+| 1.6.4 | `task/1.6.4-production-compose` | `../pandawords.worktrees/1.6.4` | Starting; dependencies 1.6.3, 1.3.3 and 1.3.2 are ✅ |
 
 ## Blocked
 
@@ -41,6 +42,33 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 1.3.3 Transactional migration runner
+- Result / completed: checksum-protected forward-only SQL/Python migration CLI and bootstrap;
+  `daee119` merged as `4abf1fb`; branch/worktree removed.
+- Dependencies: 1.2.3 and 1.3.2 are ✅.
+- Verification: real isolated DB tests passed fresh application, no-op repeat, checksum rejection,
+  SQL/Python rollback, dry-run and CLI exit codes; exact DB cleanup confirmed. Main Ruff/format/
+  basedpyright and 67 backend tests, frontend lint/typecheck and 41 tests passed.
+- Skipped / deferred: aggregate scripts remain unavailable until 1.6.1.
+- Failures / causes / corrections: Pylance timed out; direct basedpyright passed. Existing
+  Starlette warning remains. No other failures.
+- Findings: verified UUID transactions make migration SQL/Python changes and tracking atomic.
+- Blockers / follow-ups: none; 1.3.4/1.3.5/1.6.4 are ready.
+
+### 2026-11-14 — 1.4.4 Dev-only design preview
+- Result / completed: bilingual token/component preview and catalogue update; `2c60243` merged
+  as `cb4abc8`; branch/worktree removed.
+- Dependencies: 1.4.3 is ✅.
+- Verification: agent browser checks passed 375px/1280px, both themes, translations, input/message
+  interactions and no overflow; exact server PID stopped. Main production build and text/chunk
+  scan confirmed no dev preview output. Frontend lint/typecheck and 43 Vitest tests, backend
+  Ruff/basedpyright and 67 tests passed. Hooks passed.
+- Skipped / deferred: aggregate scripts await 1.6.1.
+- Failures / causes / corrections: cached deps restored with no downloads; favicon 404 remains
+  unspecified by this task. Existing backend Starlette warning remains.
+- Findings: none.
+- Blockers / follow-ups: none.
 
 ### 2026-11-14 — 1.6.3 Container packaging
 - Result / completed: multi-stage nonroot API and web Dockerfiles, context ignores and nginx
