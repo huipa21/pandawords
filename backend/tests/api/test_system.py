@@ -1,3 +1,4 @@
+import json
 from http import HTTPStatus
 
 import pytest
@@ -198,7 +199,7 @@ def test_unknown_http_status_uses_generic_code_and_message() -> None:
 def test_unexpected_error_is_safe_and_keeps_logged_request_id(
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    app = create_app(_TestSettings(app_env="development"))
+    app = create_app(_TestSettings(app_env="production"))
 
     @app.get("/api/test-failure")
     async def failure_endpoint() -> None:
@@ -206,7 +207,10 @@ def test_unexpected_error_is_safe_and_keeps_logged_request_id(
         raise RuntimeError("private error details")
 
     with TestClient(app, raise_server_exceptions=False) as client:
-        response = client.get("/api/test-failure")
+        response = client.get(
+            "/api/test-failure?token=example-query-value",
+            headers={"Authorization": "Bearer example-header-value"},
+        )
 
     assert response.status_code == 500
     assert response.json() == {
@@ -214,4 +218,14 @@ def test_unexpected_error_is_safe_and_keeps_logged_request_id(
         "message": "Internal server error.",
         "field": None,
     }
-    assert response.headers["x-request-id"] in capsys.readouterr().out
+    log_output = capsys.readouterr().out
+    events = {entry["event"]: entry for entry in map(json.loads, log_output.splitlines())}
+    assert {"controlled_failure", "unhandled_error"} <= events.keys()
+    request_id = response.headers["x-request-id"]
+    assert events["controlled_failure"]["request_id"] == request_id
+    assert events["unhandled_error"]["request_id"] == request_id
+    assert events["unhandled_error"]["level"] == "error"
+    assert events["unhandled_error"]["exception_type"] == "RuntimeError"
+    for private_value in ("private error details", "example-query-value", "example-header-value"):
+        assert private_value not in log_output
+        assert private_value not in response.text

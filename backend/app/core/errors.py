@@ -1,6 +1,7 @@
 from collections.abc import Mapping
 from http import HTTPStatus
 
+import structlog
 from fastapi import Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -87,9 +88,15 @@ async def http_error_handler(_request: Request, exc: Exception) -> Response:
     return _error_response(code, exc.status_code, message, headers=exc.headers)
 
 
-async def unhandled_error_handler(request: Request, _exc: Exception) -> JSONResponse:
+async def unhandled_error_handler(request: Request, exc: Exception) -> JSONResponse:
     request_id = getattr(request.state, "request_id", None)
-    headers = {"X-Request-ID": request_id} if isinstance(request_id, str) else None
+    safe_request_id = request_id if isinstance(request_id, str) else None
+    structlog.get_logger().error(
+        "unhandled_error",
+        request_id=safe_request_id,
+        exception_type=type(exc).__name__,
+    )
+    headers = {"X-Request-ID": safe_request_id} if safe_request_id is not None else None
     return _error_response(
         "internal.error",
         500,
