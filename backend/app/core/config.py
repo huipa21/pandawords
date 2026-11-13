@@ -63,6 +63,7 @@ class Settings(BaseSettings):
     web_dev_port: int = 5173
     public_base_url: str = "http://localhost:5173"
     app_env: Literal["development", "production"] = "development"
+    app_version: str = "dev"
 
     jwt_secret: str = "replace-with-a-long-random-secret"
     jwt_access_ttl_minutes: int = 15
