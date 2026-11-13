@@ -10,12 +10,11 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 ## Current run
 
 Request: implement tasks 1.1.2, 1.2.1, and 1.1.4.
-Next step: continue the existing 1.1.2/1.2.1 work and create the 1.1.4 task worktree for VS Code workspace settings.
+Next step: continue close-out for 1.1.2 and 1.1.4; 1.2.1 is merged and closed out.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
 | 1.1.2 | `task/1.1.2-dev-ps1` | `..\pandawords.worktrees\1.1.2` | In progress; dependency 1.1.1 is ✅. |
-| 1.2.1 | `task/1.2.1-backend-uv` | `..\pandawords.worktrees\1.2.1` | Starting; dependency 1.1.1 is ✅. |
 | 1.1.4 | `task/1.1.4-vscode-workspace` | `..\pandawords.worktrees\1.1.4` | Starting; dependency 1.1.1 is ✅. |
 
 ## Blocked
@@ -42,6 +41,22 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-13 — 1.2.1 Backend uv project
+- Result / completed: Added the Python 3.14 backend project, dependency lock, lint/type-check/test
+  configuration, and `app` package marker. Commit `bf2be71` was merged to `main` as `9004d94`.
+- Dependencies: 1.1.1 is ✅.
+- Verification: `uv sync --locked`, `uv run ruff check`, `uv run ruff format --check`,
+  `uv run basedpyright`, `uv run pytest -q`, and `uv lock --check` passed on Python 3.14.3;
+  pytest reported 1 passed. `git diff --cached --check` passed. The attempted
+  `./scripts/dev.ps1 check` returned `Unknown command 'check'`; that command is planned for task
+  1.6.1, so the backend checks were run directly.
+- Skipped / deferred: no change to `conventions.md` was needed; its Python conventions already
+  specify the selected Ruff and basedpyright rules. No other work was deferred.
+- Failures / causes / corrections: initial pytest collection could not import `app` because the
+  project directory was not on pytest's import path; adding `pythonpath = ["."]` fixed it and the
+  complete check set then passed. `dev.ps1 check` remains unavailable until task 1.6.1.
+- Blockers / follow-ups: none. This completes the 1.2.1 dependency for 1.2.2 and 2.1.1.
 
 ### 2026-11-13 — 1.1.4 VS Code workspace (in progress)
 - Result / completed: task start recorded on `main`; workspace configuration not yet implemented.
