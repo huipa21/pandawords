@@ -1,0 +1,49 @@
+[project]
+name = "pandawords-backend"
+version = "0.1.0"
+requires-python = ">=3.14,<3.15"
+dependencies = [
+    "fastapi",
+    "httpx",
+    "orjson",
+    "pwdlib[argon2]",
+    "pydantic>=2,<3",
+    "pydantic-settings",
+    "pyjwt",
+    "python-multipart",
+    "structlog",
+    "surrealdb>=3.0,<4",
+    "uvicorn[standard]",
+]
+
+[dependency-groups]
+dev = [
+    "anyio",
+    "basedpyright",
+    "pytest",
+    "ruff",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+
+[tool.ruff.lint]
+select = ["ASYNC", "B", "E", "F", "I", "UP"]
+
+[tool.basedpyright]
+pythonVersion = "3.14"
+typeCheckingMode = "standard"
+include = ["app", "tests"]
+venvPath = "."
+venv = ".venv"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+anyio_mode = "auto"
+pythonpath = ["."]
+markers = [
+    "integration: requires a running external service",
+    "fresh_db: requires a fresh database for the test",
+]
