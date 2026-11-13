@@ -240,7 +240,42 @@ Commands:
   help      Show this help
   setup     Check tools, sync projects, install Git hooks, and create .env.dev
   reset-db  Stop the dev database and delete its data volume
+  gen-api   Export OpenAPI offline and regenerate frontend API types in this worktree
 '@ | Write-Host
+}
+
+function Export-ApiTypes {
+    $worktreeRoot = Split-Path -Parent $PSScriptRoot
+    $apiDirectory = Join-Path $worktreeRoot 'frontend\src\api'
+    Push-Location (Join-Path $worktreeRoot 'backend')
+    try {
+        $schema = @(& uv run --offline python -m app.openapi)
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Offline OpenAPI export failed. Restore backend dependencies with uv sync first.'
+        }
+        $json = $schema -join "`n"
+        $null = $json | ConvertFrom-Json
+        New-Item -ItemType Directory -Force -Path $apiDirectory | Out-Null
+        [System.IO.File]::WriteAllText((Join-Path $apiDirectory 'openapi.json'), "$json`n")
+    }
+    finally {
+        Pop-Location
+    }
+
+    Push-Location (Join-Path $worktreeRoot 'frontend')
+    try {
+        & pnpm exec openapi-typescript src/api/openapi.json -o src/api/schema.d.ts
+        if ($LASTEXITCODE -ne 0) {
+            throw 'OpenAPI TypeScript generation failed.'
+        }
+        & pnpm exec eslint src/api/openapi.json src/api/schema.d.ts --fix
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Generated API contract formatting failed.'
+        }
+    }
+    finally {
+        Pop-Location
+    }
 }
 
 function Invoke-Setup {
@@ -330,6 +365,12 @@ $script:MainRoot = Get-MainWorktreeRoot
 Import-EnvironmentFile -Path (Join-Path $script:MainRoot '.env.dev')
 
 switch ($Command.ToLowerInvariant()) {
+    'gen-api' {
+        if ($CommandArgs.Count -ne 0) {
+            throw 'The gen-api command does not accept additional arguments.'
+        }
+        Export-ApiTypes
+    }
     'help' {
         if ($CommandArgs.Count -ne 0) {
             throw 'The help command does not accept additional arguments.'
