@@ -20,6 +20,10 @@ export default defineConfig({
   ],
   rules: [
     [
+      'pb-bottom-nav',
+      { 'padding-bottom': 'var(--pw-layout-bottom-nav-with-safe-area)' },
+    ],
+    [
       'pw-focus-ring',
       {
         'outline': 'var(--pw-focus-ring)',

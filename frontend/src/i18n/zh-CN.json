@@ -1,6 +1,39 @@
 {
   "app": {
     "name": "PandaWords",
-    "ready": "前端已就绪。"
+    "ready": "前端已就绪。",
+    "placeholder": "此页面即将上线。"
+  },
+  "navigation": {
+    "skip": "跳转到正文",
+    "sidebar": "主导航",
+    "mobile": "底部导航",
+    "projects": "项目",
+    "review": "复习",
+    "words": "单词",
+    "me": "我的",
+    "settings": "设置"
+  },
+  "preferences": {
+    "themeAction": "主题：{mode}。切换到下一个主题",
+    "system": "跟随系统",
+    "light": "浅色",
+    "dark": "深色",
+    "localeAction": "切换到英文"
+  },
+  "pages": {
+    "projects": "项目",
+    "project": "项目词树",
+    "review": "复习",
+    "plan": "学习计划",
+    "words": "全部单词",
+    "word": "单词详情",
+    "reading": "阅读",
+    "settings": "设置",
+    "users": "用户管理",
+    "backup": "备份",
+    "design": "设计预览",
+    "login": "登录",
+    "notFound": "页面不存在"
   }
 }
