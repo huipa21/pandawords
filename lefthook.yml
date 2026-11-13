@@ -27,6 +27,7 @@ pre-commit:
         PW_LINTER: ruff-format
         PW_LINT_STAGED: &lint-staged |
           const path = require('node:path')
+          const { existsSync } = require('node:fs')
           const { spawnSync } = require('node:child_process')
           const root = process.cwd()
           // Read the index directly so partial staging and shell-sensitive paths are handled safely.
@@ -52,7 +53,13 @@ pre-commit:
 
           async function main() {
             if (!files.length) return
+            if (!existsSync(path.join(root, 'node_modules', 'lefthook'))) {
+              throw new Error('Lefthook dependencies are missing in this worktree; run pnpm install.')
+            }
             if (process.env.PW_LINTER === 'eslint') {
+              if (!existsSync(path.join(root, 'frontend', 'node_modules', 'eslint'))) {
+                throw new Error('ESLint dependencies are missing in this worktree; run pnpm install.')
+              }
               const { ESLint } = require('./frontend/node_modules/eslint')
               // Antfu detects its optional Vue and TypeScript plugins from the frontend directory.
               process.chdir(path.join(root, 'frontend'))
@@ -83,10 +90,14 @@ pre-commit:
               throw new Error('Unknown linter: ' + mode)
             }
             const command = mode === 'ruff-format' ? ['format', '--check'] : ['check']
+            const ruff = path.join(root, 'backend', '.venv',
+              process.platform === 'win32' ? 'Scripts/ruff.exe' : 'bin/ruff')
+            if (!existsSync(ruff)) {
+              throw new Error('Ruff is missing in this worktree; run uv sync in backend.')
+            }
             for (const file of files) {
-              const result = spawnSync('uv', [
-                'run', '--offline', '--no-sync', '--locked', '--project', 'backend',
-                'ruff', ...command, '--config', 'backend/pyproject.toml', '--stdin-filename', file, '-',
+              const result = spawnSync(ruff, [
+                ...command, '--config', 'backend/pyproject.toml', '--stdin-filename', file, '-',
               ], { cwd: root, input: staged(file), stdio: ['pipe', 'inherit', 'inherit'] })
               if (result.error) throw result.error
               if (result.status !== 0) {
