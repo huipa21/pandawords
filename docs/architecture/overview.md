@@ -41,6 +41,8 @@ Only `web` joins the Caddy network. SurrealDB is never exposed publicly.
 
 The API exposes `/api/healthz` for liveness, `/api/readyz` for readiness, and its schema at
 `/api/openapi.json`. Readiness remains a stub until the database lifecycle is implemented.
+Backend settings resolve `.env.dev` from the main worktree (or the project root outside Git);
+inherited environment variables take precedence.
 
 ## Backend modules
 

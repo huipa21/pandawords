@@ -42,6 +42,7 @@ class RequestIdMiddleware(BaseHTTPMiddleware):
         call_next: RequestResponseEndpoint,
     ) -> Response:
         request_id = uuid4().hex
+        request.state.request_id = request_id
         with bound_contextvars(request_id=request_id):
             response = await call_next(request)
             response.headers["X-Request-ID"] = request_id
