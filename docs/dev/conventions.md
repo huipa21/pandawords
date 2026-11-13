@@ -1,0 +1,48 @@
+# Conventions
+
+## General
+
+- English for code, comments, docs and commit messages. UI text goes through i18n.
+- Times are UTC everywhere (DB and API, ISO 8601 with `Z`). Convert to local time only for display.
+- Files stay under about 300 lines. Split by responsibility, not by layer type.
+- Comments only where the code needs clarification.
+
+## Python
+
+| Item | Convention |
+|---|---|
+| Format / lint | ruff (`ruff format`, `ruff check`), line length 100 |
+| Types | basedpyright. Every function is typed. No `Any` in public signatures |
+| Names | modules `snake_case`, classes `PascalCase`, functions `snake_case`, constants `UPPER_SNAKE` |
+| Models | `XxxCreate` / `XxxUpdate` / `XxxRead` (API), `Xxx` (internal) |
+| Async | Everything that touches I/O is async. No blocking calls in request handlers (run CPU-heavy spaCy work via `anyio.to_thread`) |
+| Errors | Domain exceptions carry an error `code` like `project.not_found` |
+
+## TypeScript / Vue
+
+| Item | Convention |
+|---|---|
+| Format / lint | `@antfu/eslint-config` (it formats too; no Prettier) |
+| Files | components `PascalCase.vue`, composables `useXxx.ts`, stores `xxx.store.ts` exporting `useXxxStore` |
+| SFC order | `<script setup lang="ts">` → `<template>` → `<style scoped>` (rarely needed; prefer Uno classes) |
+| Props | `defineProps<{...}>()` with TS types. Emits are typed too |
+| Imports | `@/` alias for `src/` |
+
+## API
+
+- Prefix `/api`. Resources are plural nouns: `/api/projects/{id}/words`.
+- **IDs in the API** are opaque URL-safe strings (`rid`): base64url of the SurrealDB record id,
+  produced by `app/db/ids.py` (`encode_rid` / `decode_rid`). Decoding validates the expected table.
+- Lists use `?limit=&cursor=` and return `{ items, next_cursor }`.
+- Errors: HTTP status plus `{ "code": "project.not_found", "message": "...", "field": null }`. The
+  frontend shows `t('errors.' + code)`.
+- Async operations return `202 { job_id }`. `GET /api/jobs/{id}` returns the status.
+
+## Git
+
+- Branches: `main`, plus `task/X.Y.Z-short-slug` per task. No other long-lived branches.
+- Commits: Conventional Commits with the task ID as scope: `feat(1.5.3): login and refresh endpoints`,
+  `fix(2.4.1): …`, `docs(plan): …`, `chore`, `refactor`, `test`.
+- Merges: `--no-ff` with the message `merge: task X.Y.Z <title>`.
+- lefthook pre-commit runs ruff, eslint (staged files) and a secrets check (blocks `.env*` other
+  than `.env.example`).

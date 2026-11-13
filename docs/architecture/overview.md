@@ -1,0 +1,71 @@
+# Architecture overview
+
+## Containers (production, `deploy/compose.yml`)
+
+```
+               external Caddy (existing container, network ${CADDY_NETWORK})
+                                │  reverse_proxy web:80
+┌──────────────────────── pandawords (internal network) ─────────────────────────┐
+│  web       nginx:alpine — serves the Vue SPA, proxies /api → api:8000,         │
+│            serves media via X-Accel-Redirect (internal location)               │
+│  api       pandawords-api image — uvicorn app.main:app                         │
+│  worker    pandawords-api image — python -m app.worker                         │
+│  migrate   pandawords-api image — python -m app.db.migrate (one-shot);         │
+│            api and worker depend on it (service_completed_successfully)        │
+│  surrealdb surrealdb/surrealdb:v3.3.x — rocksdb:/data/db                       │
+└────────────────────────────────────────────────────────────────────────────────┘
+volumes: surreal-data, media, lexicon (read-only, transferred separately), backups
+```
+
+Only `web` joins the Caddy network. SurrealDB is never exposed publicly.
+
+## Local development
+
+| Process | How it runs | Port |
+|---|---|---|
+| SurrealDB dev (persistent) | Podman, `deploy/compose.dev.yml` | 8100 |
+| SurrealDB test (in-memory, throwaway) | Podman, same compose file | 8101 |
+| API | `uv run uvicorn --reload` on the host | 8000 |
+| Worker | `uv run python -m app.worker` on the host | — |
+| Web | `pnpm dev` (Vite proxies `/api` → 8000) | 5173 |
+
+## Request flow
+
+1. The SPA calls `/api/...` with the access token from memory. On a 401 it calls `/api/auth/refresh`
+   once (with the httpOnly refresh cookie), then retries.
+2. Routers validate input and resolve `current_user`, then call services. Services call repositories
+   in `app/db/`.
+3. Slow work (lexicon materialization, enrichment, audio, LLM) is written as a `job` record. The
+   worker wakes up via a LIVE query, with polling as a fallback. The UI polls the job status or
+   refetches the data.
+
+## Backend modules
+
+| Module | Responsibility |
+|---|---|
+| `app/main.py` | App factory, routers, lifespan (DB connect, admin bootstrap) |
+| `app/core/` | config, security (JWT, hashing), errors, logging |
+| `app/db/` | client, migrations, repositories, named queries, schema snapshot |
+| `app/domain/` | pydantic models |
+| `app/services/` | auth, projects, dictionary, enrichment, lexicon reader, srs, exercises, llm, media, jobs, bundles |
+| `app/api/` | routers per resource |
+| `app/worker/` | job loop + handlers registry |
+| `scripts/` | lexicon download/build |
+
+## Frontend modules
+
+| Path | Responsibility |
+|---|---|
+| `src/app/` | main.ts, router, plugins (naive, i18n, pinia), AppShell |
+| `src/design/` | tokens.ts, naive-theme.ts, uno preset, cytoscape styles |
+| `src/components/` | shared domain components (see `docs/ui/components.md`) |
+| `src/features/<x>/` | auth, projects, words, review, graph, reading, admin, settings, dev-design |
+| `src/api/` | generated `schema.d.ts`, `client.ts` (auth + refresh middleware) |
+| `src/stores/` | auth, preferences (theme, locale, accent) |
+| `src/i18n/` | `zh-CN.json`, `en.json` |
+
+## Routes (frontend)
+
+`/login` · `/projects` · `/projects/:id` (tree) · `/projects/:id/review` · `/projects/:id/plan` ·
+`/words` (all-words graph) · `/words/:lemmaId` · `/reading/:passageId` · `/settings` ·
+`/admin/users` · `/admin/backup` · `/dev/design` (dev only)
