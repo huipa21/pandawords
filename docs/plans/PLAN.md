@@ -20,7 +20,7 @@ are in `phase-N.md`. If a phase file doesn't exist yet, the agent asks before wr
 | ID | Task | Depends on | Wave | Size | Status |
 |---|---|---|---|---|---|
 | 1.1.1 | Initialize repository (main branch, ignore files, `.env.example`, README) | — | 1 | S | ✅ |
-| 1.1.2 | `dev.ps1` skeleton: dispatch, root/env resolution, `setup`, fallback sources | 1.1.1 | 2 | M | ⬜ |
+| 1.1.2 | `dev.ps1` skeleton: dispatch, root/env resolution, `setup`, fallback sources | 1.1.1 | 2 | M | 🟡 |
 | 1.1.3 | lefthook pre-commit (ruff, eslint, secrets guard) | 1.2.1, 1.4.1 | 3 | S | ⬜ |
 | 1.1.4 | VS Code workspace settings and recommended extensions | 1.1.1 | 2 | S | ⬜ |
 | 1.2.1 | Backend uv project (Python 3.14, ruff, basedpyright, pytest) | 1.1.1 | 2 | S | ⬜ |

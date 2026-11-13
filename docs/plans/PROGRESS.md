@@ -9,11 +9,12 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 
 ## Current run
 
-Request: —
-Next step: —
+Request: implement task 1.1.2.
+Next step: create the task worktree and implement `scripts/dev.ps1`, then validate and close out.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
+| 1.1.2 | `task/1.1.2-dev-ps1` | `..\pandawords.worktrees\1.1.2` | In progress; dependency 1.1.1 is ✅. |
 
 ## Blocked
 
