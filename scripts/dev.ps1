@@ -103,7 +103,7 @@ function Invoke-WithFallback {
     param(
         [Parameter(Mandatory)][string]$Executable,
         [Parameter()][string[]]$Arguments = @(),
-        [Parameter(Mandatory)][string]$FallbackSource,
+        [Parameter(Mandatory)][AllowEmptyString()][string]$FallbackSource,
         [Parameter(Mandatory)][string]$FallbackName,
         [Parameter(Mandatory)][string[]]$FallbackArguments
     )
