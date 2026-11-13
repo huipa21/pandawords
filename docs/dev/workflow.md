@@ -116,7 +116,7 @@ blockers, backlog, log) and git state. When the user says "resume" (or a session
 
 | Resource | Handling |
 |---|---|
-| `.env.dev` | Gitignored. Scripts load it from the **main worktree root** (`git rev-parse --git-common-dir` → parent) |
+| `.env.dev` | Gitignored. Scripts load it from the **main worktree root** (`git rev-parse --git-common-dir` → parent); inherited process environment variables take precedence |
 | `data/lexicon`, `data/media` | Absolute paths in `.env.dev`, so all worktrees share them |
 | Python venv / node_modules | Per worktree. uv and pnpm caches make installs fast |
 | Test DB (8101) | Shared instance; each test session uses its own database name (see testing.md) |
