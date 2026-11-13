@@ -11,4 +11,7 @@ vite-plugin-pwa, vitest, Playwright, @antfu/eslint-config.
 provide the JS language-service API that vue-tsc and Volar rely on. Revisit when vue-tsc supports 7.
 
 **Consequences.** There is one UI library and one icon set. Visual consistency is enforced through
-tokens (ADR 0011).
+tokens (ADR 0011). The root is a private pnpm workspace; the frontend package owns its scripts and
+dependencies, and pins TypeScript to an exact 6.0.x version. Both package manifests declare the same
+pnpm `packageManager` version. The hello page uses vue-i18n messages in `zh-CN` (the default) and
+`en` (the fallback); locale selection is part of the later app shell.
