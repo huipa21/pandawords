@@ -30,6 +30,21 @@
 
 ## API
 
+- Regenerate the committed frontend contract with `.\scripts\dev.ps1 gen-api`: offline
+  `uv run --offline python -m app.openapi` exports JSON without starting the API or database,
+  then local `openapi-typescript` generates `frontend/src/api/schema.d.ts`. Both outputs belong
+  to the invoking worktree (unlike setup's main-worktree targets); ESLint formats the outputs.
+  Never edit generated types. `openapi-typescript` 7.13 declares a TypeScript 5 peer range,
+  so pnpm warns with our pinned TypeScript 6; generation, typecheck and build are verified on 6.
+- Use `createApiClient` from `frontend/src/api/client.ts`. Its optional `auth` lifecycle reads
+  the access token, refreshes/persists it, and clears local auth state on refresh failure.
+  Concurrent 401s share one refresh, including late responses, and requests retry at most once.
+  Error responses are normalized to `{code, message, field}`; `readApiError` also accepts raw
+  responses. Auth is opt-in until task 1.5.3 adds the actual endpoints: regenerate the contract
+  then wire lifecycle callbacks using those generated types, not placeholder endpoint types.
+  Refresh must use a separate non-recovering client; configure `shouldRefresh` to exclude
+  login/refresh requests. No token persistence or auth store is imposed by this layer.
+
 - Prefix `/api`. Resources are plural nouns: `/api/projects/{id}/words`.
 - **IDs in the API** are opaque URL-safe strings (`rid`): base64url of the SurrealDB record id,
   produced by `app/db/ids.py` (`encode_rid` / `decode_rid`). Decoding validates the expected table.
