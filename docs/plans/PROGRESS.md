@@ -10,13 +10,12 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 ## Current run
 
 Request: resume and complete Phase 1, proceeding through waves in dependency order.
-Next step: implement wave 6 in parallel; all its prerequisites are ✅.
+Next step: implement wave 7 in parallel; all its prerequisites are ✅.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 1.3.4 | `task/1.3.4-schema-snapshot` | `../pandawords.worktrees/1.3.4` | Starting; dependency 1.3.3 is ✅ |
-| 1.3.5 | `task/1.3.5-test-harness` | `../pandawords.worktrees/1.3.5` | Starting; dependency 1.3.3 is ✅ |
-| 1.6.4 | `task/1.6.4-production-compose` | `../pandawords.worktrees/1.6.4` | Starting; dependencies 1.6.3, 1.3.3 and 1.3.2 are ✅ |
+| 1.5.1 | `task/1.5.1-auth-schema` | `../pandawords.worktrees/1.5.1` | Starting; dependencies 1.3.4 and 1.3.5 are ✅ |
+| 1.6.5 | `task/1.6.5-release` | `../pandawords.worktrees/1.6.5` | Starting; dependency 1.6.4 is ✅ |
 
 ## Blocked
 
@@ -42,6 +41,50 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 1.3.4 Schema snapshots
+- Result / completed: canonical schema JSON, readable drift test and explicit update plugin;
+  `80d71fb` merged as `c6b63c8`; branch/worktree removed.
+- Dependencies: 1.3.3 is ✅.
+- Verification: real deliberate migration drift failed with table/field/index diff; explicit update
+  restored passing comparison. Main standalone plugin run passed 69 tests; after harness merge,
+  `dev.ps1 test -Backend -UpdateSnapshot` passed 78 tests and left committed snapshot unchanged.
+- Skipped / deferred: aggregate check awaits 1.6.1.
+- Failures / causes / corrections: registered plugin in integrated conftest; stdin Ruff needed
+  explicit app/tests first-party classification. Pylance timed out; basedpyright passed.
+- Findings: schema includes DB and every table's definitions, not records/runtime timestamps.
+- Blockers / follow-ups: none.
+
+### 2026-11-14 — 1.3.5 Isolated test harness
+- Result / completed: session/fresh databases, lifespan-managed ASGI client and backend runner;
+  `4ec156c` merged as `707e931`; branch/worktree removed.
+- Dependencies: 1.3.3 is ✅.
+- Verification: agent ran two concurrent pytest processes (76 passed each), observed overlapping
+  distinct databases and verified exact cleanup. Integrated backend runner/update flag passed
+  78 tests; command safety/startup/selector/snapshot forwarding tests passed.
+- Skipped / deferred: make_user intentionally unfinished until 1.5.x; container-down runner path
+  was mocked rather than stopping shared server. Aggregate check awaits 1.6.1.
+- Failures / causes / corrections: testing-doc conflict retained empty fresh-db semantics and
+  full snapshot details. Pylance timeout; direct typecheck passed.
+- Findings: none.
+- Blockers / follow-ups: implement make_user during auth work.
+
+### 2026-11-14 — 1.6.4 Production compose and backups
+- Result / completed: production services/networks/limits, fail-closed pre-migration backup and
+  Caddy snippet/env/docs; `ad35149` merged as `3606eea`, settings fix `dfedc70`.
+  Branch/worktree removed.
+- Dependencies: 1.6.3, 1.3.3 and 1.3.2 are ✅.
+- Verification: isolated production compose migrate exited 0, services healthy, web readiness200;
+  fresh/existing exports restored exactly and unwritable backup failed nonzero. Owned synthetic
+  containers/networks/volumes/files removed. Main Ruff/format/basedpyright, backend runner85 tests,
+  frontend lint/typecheck and43 tests passed.
+- Skipped / deferred: real server deployment not requested; full check awaits1.6.1.
+- Failures / causes / corrections: upstream SurrealDB cannot write fresh portable named volumes
+  as its default nonroot user; capability-free/no-new-privileges root for DB documented. API
+  stays UID10001. Full integration caught missing APP_VERSION Settings field; added and retested.
+  Existing Starlette warning and Pylance timeout remain; direct typecheck passed.
+- Findings: verified HTTP exports prevent migration on backup failure.
+- Blockers / follow-ups: none; wave7 ready.
 
 ### 2026-11-14 — 1.3.3 Transactional migration runner
 - Result / completed: checksum-protected forward-only SQL/Python migration CLI and bootstrap;
