@@ -241,6 +241,7 @@ Commands:
   setup     Check tools, sync projects, install Git hooks, and create .env.dev
   reset-db  Stop the dev database and delete its data volume
   gen-api   Export OpenAPI offline and regenerate frontend API types in this worktree
+  release -Version x.y.z  Build linux/amd64 images and deployment archives in dist
   test -Backend [-UpdateSnapshot]  Run backend tests against the isolated test server
 '@ | Write-Host
 }
@@ -366,6 +367,10 @@ $script:MainRoot = Get-MainWorktreeRoot
 Import-EnvironmentFile -Path (Join-Path $script:MainRoot '.env.dev')
 
 switch ($Command.ToLowerInvariant()) {
+    'release' {
+        . (Join-Path $PSScriptRoot 'release.ps1')
+        Invoke-Release -Arguments $CommandArgs
+    }
     'test' {
         . (Join-Path $PSScriptRoot 'test-backend.ps1')
         Invoke-BackendTests -Arguments $CommandArgs

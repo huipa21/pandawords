@@ -8,13 +8,86 @@ Podman, transferred manually, and loaded with Docker on the server (Korea, 2 vCP
 | File | Contents |
 |---|---|
 | `dist/pandawords-x.y.z-images.tar.gz` | `pandawords-api:x.y.z` and `pandawords-web:x.y.z` (`podman build --platform linux/amd64`, `podman save --format docker-archive --multi-image-archive`, gzip) |
-| `dist/pandawords-x.y.z-deploy.tar.gz` | `compose.yml`, `.env.example`, `restore.sh`, `Caddyfile.snippet`, `VERSION` |
+| `dist/pandawords-x.y.z-deploy.tar.gz` | `compose.yml`, `.env.example`, `Caddyfile.snippet`, `VERSION` (`restore.sh` deferred to 6.1.5) |
+| `dist/SHA256SUMS` | SHA-256 checksums of the two release archives, with relative filenames |
 | `dist/pandawords-lexicon-<date>.tar.gz` | `lexicon.sqlite` + `manifest.json` (only when the lexicon changes) |
 
 SurrealDB is pulled on the server from the official `surrealdb/surrealdb:v3.3.x` image (pinned patch
 version). `DOCKER_REGISTRY_MIRROR` is used only if Docker Hub fails.
 
-The exact `podman save` flags must be verified in task 1.6.5, and the result recorded here.
+Run `pwsh -NoProfile -File scripts\dev.ps1 release -Version 0.1.0` from this worktree.
+PowerShell 7.3+ supplies the native .NET tar/gzip APIs; no archiver package is installed.
+Versions must be exactly three nonnegative integers without leading zeros (no suffixes,
+whitespace or shell syntax). Existing artifacts, `SHA256SUMS`, concurrent releases, and
+existing release image tags are refused rather than overwritten. Move the complete previous
+release out of `dist/` before building another. A failed build leaves no published artifacts;
+any images already built remain cached, so retry with a new version. `dist/` is gitignored.
+
+Release builds use the Dockerfiles' official registries and `--tls-verify=true`; they do not
+silently retry against mirrors or change registry configuration. If an official build fails,
+diagnose that failure before considering an explicitly configured fallback.
+
+The archive uses explicit `docker.io/library/pandawords-{api,web}:x.y.z` tags, not Podman's
+implicit `localhost/` prefix. These identify the same Docker images as the unqualified
+`pandawords-{api,web}:x.y.z` names in production Compose.
+
+### Verified release round trip (task 1.6.5)
+
+Verified with PowerShell 7.7.0, Podman client 5.8.2 / VM 5.8.4:
+
+```powershell
+pwsh -NoProfile -File scripts\tests\release.Tests.ps1
+pwsh -NoProfile -File scripts\dev.ps1 release -Version 0.1.165
+# The helper builds both images with --platform linux/amd64, then executes:
+podman save --format docker-archive --multi-image-archive --output images.tar docker.io/library/pandawords-api:0.1.165 docker.io/library/pandawords-web:0.1.165
+# images.tar is compressed with .NET GZipStream, not a PowerShell text pipeline.
+tar -tzf dist\pandawords-0.1.165-deploy.tar.gz
+tar -xOf dist\pandawords-0.1.165-images.tar.gz manifest.json
+```
+
+`manifest.json` contained exactly two entries:
+
+| RepoTag | Config / image ID (SHA-256, before and after load) |
+|---|---|
+| `docker.io/library/pandawords-api:0.1.165` | `7e01eb7292ab18b8f0039b622e8e1cec17ab09b1f2616cda1f8a201199f102a4` |
+| `docker.io/library/pandawords-web:0.1.165` | `74d476130c8e3b2612edad99b38b2fc636edc2b885364c2c40b492240457a1bf` |
+
+Both configs were `linux/amd64`. Deploy members were exactly `.env.example`,
+`Caddyfile.snippet`, `compose.yml`, `VERSION`; `VERSION` contained `0.1.165` plus LF.
+The example is copied from the repository root, not from any local `.env`.
+
+The produced `SHA256SUMS` was verified with `sha256sum -c SHA256SUMS` from `dist/`:
+
+```text
+0f5f92f1189c2b36047901c335ac12882f46af9a192e8d95c7a485a9998256a6  pandawords-0.1.165-images.tar.gz
+6e2de6a563bba47156ef3a286f19468a2b5bc24b94a8caa46b1578e36aeaf7b8  pandawords-0.1.165-deploy.tar.gz
+```
+
+Clean-store acceptance ran the following shell via `podman machine ssh` in the rootful
+Linux VM (adjust the shared worktree path on another laptop). A unique 4 GiB tmpfs mounted
+under the worktree gives the disposable VFS store native Linux permissions, without using
+the shared `/var/lib/containers/storage`. No shared images were removed, pruned or reset:
+
+```sh
+set -eu
+cd /mnt/c/other/pandawords.worktrees/1.6.5
+scratch="$PWD/.dev/release-load-0.1.165"
+mkdir "$scratch"
+mount -t tmpfs -o size=4G,nosuid,nodev tmpfs "$scratch"
+trap 'umount "$scratch"; rmdir "$scratch"' EXIT
+p() { podman --root "$scratch/store" --runroot "$scratch/run" --storage-driver vfs --events-backend none "$@"; }
+test -z "$(p images -q)"
+(cd dist && sha256sum -c SHA256SUMS)
+timeout 180 podman --root "$scratch/store" --runroot "$scratch/run" --storage-driver vfs --events-backend none load --input "$PWD/dist/pandawords-0.1.165-images.tar.gz"
+test "$(p images -q | sort -u | wc -l)" -eq 2
+p image inspect --format '{{.Id}} {{.Os}}/{{.Architecture}} {{.RepoTags}}' docker.io/library/pandawords-api:0.1.165 docker.io/library/pandawords-web:0.1.165
+```
+
+`load --input` accepted gzip directly, loaded both images, and preserved the above IDs.
+The empty-store check, both archive hashes, image count and platform checks passed.
+The tmpfs was unmounted and the disposable directory removed afterward. The first checksum
+attempt ran from the wrong directory and failed before loading; rerunning from `dist/`
+passed. This verifies Podman import, not a live Docker daemon or production deployment.
 
 ## Building the application images
 
@@ -48,6 +121,7 @@ do not disable TLS verification or change user-wide registry configuration.
 
 ```bash
 mkdir -p /opt/pandawords && cd /opt/pandawords
+sha256sum -c SHA256SUMS
 tar xzf pandawords-x.y.z-deploy.tar.gz
 cp .env.example .env && vi .env        # secrets, APP_DOMAIN, CADDY_NETWORK, APP_VERSION=x.y.z
 mkdir -p lexicon && tar xzf pandawords-lexicon-<date>.tar.gz -C lexicon
@@ -55,8 +129,7 @@ gunzip -c pandawords-x.y.z-images.tar.gz | docker load
 docker compose up -d                   # migrate runs first; API waits for it
 ```
 
-The release command/bundles are task 1.6.5; for a source checkout use
-`podman compose --env-file deploy/.env -f deploy/compose.yml up -d`.
+For a source checkout use `podman compose --env-file deploy/.env -f deploy/compose.yml up -d`.
 Compose resolves `.env` and `lexicon/` beside `compose.yml`. Production overrides in
 `.env.example` must replace the development values, with real random secrets.
 The images are `pandawords-api:${APP_VERSION}` and `pandawords-web:${APP_VERSION}`.
