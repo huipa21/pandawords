@@ -21,13 +21,15 @@ size (`text-base` = 16, `text-lg` = 20, `text-xl` = 24).
 
 | Component | Purpose / key props |
 |---|---|
-| `AppShell` | Header, sidebar (≥ `lg`) / bottom nav (< `lg`), Naive providers, theme root |
+| `AppShell` | Implemented: header, sidebar (≥ `lg`) / bottom nav (< `lg`), router outlet; root `app/App.vue` owns Naive providers and theme sync |
+| `AppHeader` | Shared brand link and preference controls for auth and app layouts |
+| `AppNavigation` | Localized router links with active/keyboard states; `mobile?` selects bottom navigation |
 | `PageHeader` | `title`, `subtitle?`, `back?`; `actions` slot |
 | `EmptyState` | Wraps NEmpty. `icon`, `titleKey`, `descKey?`; `action` slot |
 | `ErrorState` | Wraps NResult with retry. `error`, `@retry` |
 | `ConfirmAction` | Wraps a destructive action with a dialog. `titleKey`, `contentKey`, `@confirm` |
-| `ThemeToggle` | system / light / dark |
-| `LocaleSwitch` | zh-CN / en |
+| `ThemeToggle` | Implemented: accessible icon button cycles system → light → dark; persists via preferences store |
+| `LocaleSwitch` | Implemented: accessible icon button toggles zh-CN / en, including Naive locale and document language |
 | `JobStatus` | Inline progress for background jobs. `jobId` or `jobs[]` |
 | `SourceAttribution` | License attribution line for dictionary content |
 

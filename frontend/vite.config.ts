@@ -1,6 +1,10 @@
 import { fileURLToPath, URL } from 'node:url'
 import vue from '@vitejs/plugin-vue'
 import UnoCSS from 'unocss/vite'
+import IconsResolver from 'unplugin-icons/resolver'
+import Icons from 'unplugin-icons/vite'
+import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
+import Components from 'unplugin-vue-components/vite'
 import { defineConfig } from 'vitest/config'
 import { designCssPlugin } from './design-css-plugin.ts'
 
@@ -9,6 +13,17 @@ export default defineConfig({
     designCssPlugin(),
     UnoCSS(),
     vue(),
+    Icons({ compiler: 'vue3' }),
+    Components({
+      dts: false,
+      resolvers: [
+        NaiveUiResolver(),
+        IconsResolver({
+          prefix: 'i',
+          enabledCollections: ['lucide'],
+        }),
+      ],
+    }),
   ],
   resolve: {
     alias: {

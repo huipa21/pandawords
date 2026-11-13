@@ -8,6 +8,12 @@
   `gap-6` between sections.
 - Detail pages on mobile open full screen. On desktop, list + detail can sit side by side
   (`lg:grid-cols-[...]` is not allowed; use named grid template classes defined in the uno config).
+- `src/app/router.ts` separates `/login` (auth layout) from the app layout. Documented routes
+  have localized placeholders until their feature tasks land; `/review` is the global review
+  entry. `/dev/design` is registered only in development. Admin links and auth/role guards await
+  the auth task; the admin placeholders expose no data.
+- The root provides Naive config, message, dialog and notification contexts to both layouts.
+  Bottom navigation reserves token-based space plus the device safe area.
 
 ## Forms
 
@@ -61,6 +67,10 @@
 
 - Never assume a white background. Use `bg-page`, `bg-surface` and `bg-raised`.
 - Images get a 1px `border-base` so they don't bleed into dark surfaces.
+- The Pinia preferences store persists theme (`system` / `light` / `dark`) and locale
+  (`zh-CN` default / `en`) in `pandawords.preferences`. System mode follows live
+  `prefers-color-scheme` changes; explicit themes ignore them. The same resolved theme drives
+  Naive overrides and the document `data-theme`. Storage failures retain in-memory preferences.
 
 ## Accessibility
 

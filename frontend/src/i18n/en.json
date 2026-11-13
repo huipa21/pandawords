@@ -1,6 +1,39 @@
 {
   "app": {
     "name": "PandaWords",
-    "ready": "Frontend is ready."
+    "ready": "Frontend is ready.",
+    "placeholder": "This page is coming soon."
+  },
+  "navigation": {
+    "skip": "Skip to content",
+    "sidebar": "Main navigation",
+    "mobile": "Bottom navigation",
+    "projects": "Projects",
+    "review": "Review",
+    "words": "Words",
+    "me": "Me",
+    "settings": "Settings"
+  },
+  "preferences": {
+    "themeAction": "Theme: {mode}. Switch to the next theme",
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark",
+    "localeAction": "Switch to Chinese"
+  },
+  "pages": {
+    "projects": "Projects",
+    "project": "Project tree",
+    "review": "Review",
+    "plan": "Study plan",
+    "words": "All words",
+    "word": "Word details",
+    "reading": "Reading",
+    "settings": "Settings",
+    "users": "User management",
+    "backup": "Backup",
+    "design": "Design preview",
+    "login": "Sign in",
+    "notFound": "Page not found"
   }
 }
