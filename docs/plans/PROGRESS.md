@@ -9,18 +9,24 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 
 ## Current run
 
-Request: implement task 1.1.3 — lefthook pre-commit.
-Next step: complete and merge task 1.4.1, then resume 1.1.3.
+Request: implement task 1.4.4 — `/dev/design` preview page (dev only).
+Next step: complete and merge task 1.4.3, then resume 1.4.4.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
 | 1.1.3 | — | — | Blocked: dependency 1.4.1 is not ✅ |
+| 1.4.2 | — | — | Blocked: dependency 1.4.1 is not ✅ |
+| 1.4.4 | — | — | Blocked: dependency 1.4.3 is not ✅ |
+| 1.4.5 | — | — | Blocked: dependencies 1.4.1 and 1.2.2 are not ✅ |
 
 ## Blocked
 
 | Task | Blocked by (task, tool, decision) | Since | Notes |
 |---|---|---|---|
 | 1.1.3 | 1.4.1 | 2026-11-13 | PLAN.md is ⬜; prerequisite branch `task/1.4.1-frontend-project` has commit `2ecf4c6` but is not merged. Resume after it is complete. |
+| 1.4.2 | 1.4.1 | 2026-11-13 | PLAN.md is ⬜; implementation cannot start until 1.4.1 is complete and merged. |
+| 1.4.4 | 1.4.3 | 2026-11-13 | PLAN.md is ⬜; implementation cannot start until 1.4.3 is complete and merged. Task 1.4.3 itself depends on 1.4.2. |
+| 1.4.5 | 1.4.1, 1.2.2 | 2026-11-13 | Both prerequisites are ⬜ in PLAN.md; their task branches exist but are not merged. Implementation cannot start until both are complete and merged. |
 
 ## Backlog (discovered, not yet in PLAN.md)
 
@@ -123,3 +129,41 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Blockers / follow-ups: no blocker to local development. Remote setup remains deferred until the
   user supplies a GitHub URL; the omitted URL request remains an unmet procedural acceptance item.
   Ready next: 1.1.2, 1.1.4, 1.2.1, and 1.4.1; none were started by this task.
+
+### 2026-11-13 — 1.4.2 dependency check
+
+- Result / completed: checked the task row and details for 1.4.2. It depends on 1.4.1, which
+  remains ⬜ in [PLAN.md](PLAN.md); implementation was not started.
+- Dependencies: 1.4.1 is not ✅, so the workflow's dependency gate blocks this task.
+- Verification: `git status --short --branch` confirmed a clean `main` working tree before
+  recording this blocker. No application checks were run because no code changed.
+- Skipped / deferred: token implementation, generators, fonts, and enforcement are deferred until
+  1.4.1 is complete and merged.
+- Failures / causes / corrections: none.
+- Blockers / follow-ups: complete and merge 1.4.1, then resume 1.4.2.
+
+### 2026-11-13 — 1.4.4 dependency check
+
+- Result / completed: checked the task row and details for 1.4.4. Implementation was not started.
+- Dependencies: 1.4.3 is ⬜ in [PLAN.md](PLAN.md); the workflow dependency gate blocks this task.
+  Task 1.4.3 itself depends on 1.4.2.
+- Verification: inspected PLAN.md task statuses and `git status --short --branch`; main already
+  had a pre-existing edit to PROGRESS.md. No application checks were run because no code changed.
+- Skipped / deferred: `/dev/design` page implementation and related frontend tests are deferred
+  until 1.4.3 is complete and merged.
+- Failures / causes / corrections: none.
+- Blockers / follow-ups: complete and merge 1.4.3, then resume 1.4.4.
+
+### 2026-11-13 — 1.4.5 dependency check
+
+- Result / completed: checked the task row and details for 1.4.5. Implementation was not started.
+- Dependencies: 1.4.1 and 1.2.2 are both ⬜ in [PLAN.md](PLAN.md); their branches are not merged.
+- Verification: inspected PLAN.md task statuses and `git worktree list` / `git branch --list
+  "task/*"`; both prerequisite branches exist in separate worktrees. `git status --short --branch`
+  showed pre-existing edits to PROGRESS.md on main. No application checks were run because no code
+  changed.
+- Skipped / deferred: OpenAPI generation, API client implementation, tests, and generated files are
+  deferred until both prerequisites are complete and merged.
+- Failures / causes / corrections: none.
+- Blockers / follow-ups: complete and merge 1.4.1 and 1.2.2, then resume 1.4.5. The pre-existing
+  dirty PROGRESS.md means the required clean-main preparation gate also remains unresolved.
