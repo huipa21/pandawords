@@ -10,11 +10,10 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 ## Current run
 
 Request: implement tasks 1.1.2, 1.2.1, and 1.1.4.
-Next step: continue close-out for 1.1.2 and 1.1.4; 1.2.1 is merged and closed out.
+Next step: continue close-out for 1.1.4; 1.1.2 and 1.2.1 are merged and closed out.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 1.1.2 | `task/1.1.2-dev-ps1` | `..\pandawords.worktrees\1.1.2` | In progress; dependency 1.1.1 is ✅. |
 | 1.1.4 | `task/1.1.4-vscode-workspace` | `..\pandawords.worktrees\1.1.4` | Starting; dependency 1.1.1 is ✅. |
 
 ## Blocked
@@ -41,6 +40,27 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-13 — 1.1.2 `dev.ps1` skeleton
+- Result / completed: Added command dispatch/help, main-worktree and `.env.dev` resolution,
+  setup/tool checks, quiet command execution, fallback retries, and `.dev/logs` creation. Updated
+  setup/worktree guidance. Task commits `ae1721c` and `9200c9c` were merged to `main` as
+  `dae7ef3` and `61cd3bf`; status/progress close-out is committed separately.
+- Dependencies: 1.1.1 is ✅.
+- Verification: `./scripts/dev.ps1 help` and `./scripts/dev.ps1 setup` passed on PowerShell 7.7.
+  Setup installed/confirmed Python 3.14.3 and, after backend 1.2.1 landed, `uv sync` passed.
+  A linked-worktree smoke test confirmed that `TARGET_LANGUAGE` was loaded from the main
+  `.env.dev` without printing its value. A forced official-command failure retried successfully
+  with the fallback. `git diff --check` passed.
+- Skipped / deferred: `pnpm install` was skipped because `frontend/` does not exist yet.
+  `dev.ps1 check` and application tests were not run because the check command and test projects
+  are not implemented yet. Compose-provider version probing was not part of setup because it
+  requires a running Podman machine.
+- Failures / causes / corrections: an initial `podman compose version` probe failed because the
+  Podman machine was stopped; setup now checks Podman's installed version without requiring a
+  running machine. The subsequent setup run exposed an empty fallback-source binding when backend
+  `uv sync` was available; allowing the intentionally empty source fixed it, and setup passed.
+- Blockers / follow-ups: none. Task 1.3.1 is now ready because its 1.1.2 dependency is ✅.
 
 ### 2026-11-13 — 1.2.1 Backend uv project
 - Result / completed: Added the Python 3.14 backend project, dependency lock, lint/type-check/test
