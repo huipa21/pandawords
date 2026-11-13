@@ -24,7 +24,7 @@ are in `phase-N.md`. If a phase file doesn't exist yet, the agent asks before wr
 | 1.1.3 | lefthook pre-commit (ruff, eslint, secrets guard) | 1.2.1, 1.4.1 | 3 | S | 🟡 |
 | 1.1.4 | VS Code workspace settings and recommended extensions | 1.1.1 | 2 | S | ✅ |
 | 1.2.1 | Backend uv project (Python 3.14, ruff, basedpyright, pytest) | 1.1.1 | 2 | S | ✅ |
-| 1.2.2 | API skeleton: app factory, settings, logging, error format, health | 1.2.1 | 3 | M | ✅ |
+| 1.2.2 | API skeleton: app factory, settings, logging, error format, health | 1.2.1 | 3 | M | 🟡 |
 | 1.2.3 | SurrealDB client lifecycle + `readyz` | 1.2.2, 1.3.1 | 4 | S | ⬜ |
 | 1.3.1 | Podman dev (8100) and test (8101) SurrealDB, `reset-db` | 1.1.2 | 3 | S | 🟡 |
 | 1.3.2 | SurrealQL 3.3 verification spike (N01–N23) | 1.3.1, 1.2.1 | 4 | M | ⬜ |

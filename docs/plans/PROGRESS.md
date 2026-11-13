@@ -15,6 +15,7 @@ Next step: finish and integrate the remaining wave 3 tasks in parallel.
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
 | 1.1.3 | `task/1.1.3-lefthook` | `../pandawords.worktrees/1.1.3` | Starting; dependencies 1.2.1 and 1.4.1 are ✅ |
+| 1.2.2 | `task/1.2.2-logging-guard` | `../pandawords.worktrees/1.2.2` | Reopened: Uvicorn logs the raw message of a handled request exception |
 | 1.3.1 | `task/1.3.1-dev-db` | `../pandawords.worktrees/1.3.1` | Starting; dependency 1.1.2 is ✅ |
 | 1.4.2 | `task/1.4.2-design-tokens` | `../pandawords.worktrees/1.4.2` | Starting; dependency 1.4.1 is ✅ |
 | 1.4.4 | — | — | Blocked: dependency 1.4.3 is not ✅ |
@@ -24,6 +25,7 @@ Next step: finish and integrate the remaining wave 3 tasks in parallel.
 | Task | Blocked by (task, tool, decision) | Since | Notes |
 |---|---|---|---|
 | 1.4.4 | 1.4.3 | 2026-11-13 | PLAN.md is ⬜; implementation cannot start until 1.4.3 is complete and merged. Task 1.4.3 itself depends on 1.4.2. |
+| 1.4.5 | 1.2.2 | 2026-11-13 | 1.2.2 was reopened to prevent raw handled exception messages reaching Uvicorn logs. |
 
 ## Backlog (discovered, not yet in PLAN.md)
 
