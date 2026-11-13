@@ -9,12 +9,11 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 
 ## Current run
 
-Request: implement tasks 1.1.2, 1.2.1, and 1.1.4.
-Next step: continue close-out for 1.1.4; 1.1.2 and 1.2.1 are merged and closed out.
+Request: implement task 1.1.4 — VS Code workspace.
+Next step: none; all tasks in this run are completed.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 1.1.4 | `task/1.1.4-vscode-workspace` | `..\pandawords.worktrees\1.1.4` | Starting; dependency 1.1.1 is ✅. |
 
 ## Blocked
 
@@ -78,13 +77,13 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
   complete check set then passed. `dev.ps1 check` remains unavailable until task 1.6.1.
 - Blockers / follow-ups: none. This completes the 1.2.1 dependency for 1.2.2 and 2.1.1.
 
-### 2026-11-13 — 1.1.4 VS Code workspace (in progress)
-- Result / completed: task start recorded on `main`; workspace configuration not yet implemented.
+### 2026-11-13 — 1.1.4 VS Code workspace
+- Result / completed: added `.vscode/settings.json` and `.vscode/extensions.json` in commit `d696e8f`, merged to `main` as `67114bd`; task worktree and branch were removed.
 - Dependencies: 1.1.1 is ✅.
-- Verification: `git status --short --branch` confirmed the `main` worktree had no tracked changes before task tracking was updated; implementation checks not run yet.
-- Skipped / deferred: none.
-- Failures / causes / corrections: none.
-- Blockers / follow-ups: create task worktree, add `.vscode` settings and recommended extensions, then verify and close out. Tasks 1.1.2 and 1.2.1 remain open in their separate worktrees.
+- Verification: PowerShell JSON parsing and targeted assertions verified all requested search/watcher excludes, the `backend/.venv` interpreter, ESLint flat config, UnoCSS root, and six extension recommendations. `git show --check d696e8f` passed. `./scripts/dev.ps1 check` was attempted but is not yet a supported command; `./scripts/dev.ps1 help` listed only `help` and `setup`. Application tests were not run because this task changes only VS Code configuration.
+- Skipped / deferred: interactive VS Code search was not exercised; the configured excludes were validated directly. No application tests apply to these configuration-only changes.
+- Failures / causes / corrections: `./scripts/dev.ps1 check` returned `Unknown command 'check'`; that command is planned for task 1.6.1, so it remains unavailable in the current repository.
+- Blockers / follow-ups: none.
 
 ### 2026-11-13 — 1.1.1 Initialize repository (backfilled)
 
