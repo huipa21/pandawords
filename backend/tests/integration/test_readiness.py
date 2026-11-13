@@ -50,6 +50,23 @@ async def test_readyz_queries_database_and_reuses_connection(db: FastAPI) -> Non
 
 
 @pytest.mark.integration
+async def test_readyz_accepts_legacy_localhost_configuration() -> None:
+    settings = Settings(
+        surreal_url="ws://localhost:8101/rpc",
+        surreal_test_url="ws://localhost:8101/rpc",
+        surreal_database=f"test_{uuid4().hex}",
+    )
+    app = create_app(settings)
+    async with app.router.lifespan_context(app):
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://test"
+        ) as client:
+            response = await client.get("/api/readyz")
+    assert response.status_code == 200
+    assert response.json() == {"status": "ok"}
+
+
+@pytest.mark.integration
 async def test_sdk_reconnects_the_same_connection_after_socket_loss(db: FastAPI) -> None:
     database = cast(DatabaseClient, db.state.database)
     connection = await database.get_connection()

@@ -7,6 +7,32 @@ from pydantic_settings import SettingsConfigDict
 from app.core.config import Settings
 
 
+@pytest.mark.parametrize("field", ["surreal_url", "surreal_test_url"])
+@pytest.mark.parametrize(
+    ("url", "expected"),
+    [
+        ("ws://localhost:8101/rpc", "ws://127.0.0.1:8101/rpc"),
+        (
+            "wss://user:pass@LOCALHOST:8101/rpc?host=localhost#localhost",
+            "wss://user:pass@127.0.0.1:8101/rpc?host=localhost#localhost",
+        ),
+        ("ws://localhost/rpc", "ws://127.0.0.1/rpc"),
+        ("wss://db.example.org:8101/rpc?host=localhost", None),
+        ("ws://localhost.example.org:8101/rpc", None),
+        ("ws://[::1]:8101/rpc", None),
+    ],
+)
+def test_settings_normalize_only_literal_localhost(
+    field: str, url: str, expected: str | None
+) -> None:
+    class TestSettings(Settings):
+        model_config = SettingsConfigDict(env_file=None)
+
+    settings = TestSettings.model_validate({field: url})
+
+    assert getattr(settings, field) == (expected or url)
+
+
 def test_settings_cover_env_example_keys() -> None:
     project_root = Path(__file__).resolve().parents[3]
     env_keys = {

@@ -45,19 +45,24 @@ main worktree root, start both services and wait for their healthchecks:
 podman compose --env-file .env.dev --file .\deploy\compose.dev.yml up --detach --wait
 ```
 
-Both ports bind to localhost only. `surreal-dev` stores RocksDB data in the named volume
+Both ports bind to IPv4 loopback (`127.0.0.1`) only. `surreal-dev` stores RocksDB data in the named volume
 `pandawords-dev-db`; `surreal-test` uses memory and loses its data whenever it restarts. Before
 running Compose, check that any existing volume with that name belongs to the `pandawords`
 project: Compose can otherwise reuse an unrelated volume. The root credentials initialize a new
 datastore; changing them in `.env.dev` does not change an existing root user in the dev volume.
 
-On Windows, if `localhost` resolves to IPv6 but Podman forwards only IPv4, the endpoints from
-`.env.example` can time out. Set these values in `.env.dev` instead:
+SurrealDB URLs in Settings and `.env.example` use IPv4 loopback to match those bindings:
 
 ```dotenv
 SURREAL_URL=ws://127.0.0.1:8100/rpc
 SURREAL_TEST_URL=ws://127.0.0.1:8101/rpc
 ```
+
+On Windows, `localhost` can resolve to IPv6 first while Podman forwards only IPv4, causing the
+WebSocket handshake to time out. Settings therefore normalizes the literal hostname `localhost`
+to `127.0.0.1` in both `SURREAL_URL` and `SURREAL_TEST_URL`, including values from existing
+`.env.dev` files; no private file needs editing. External hostnames and explicit IPv6 URLs are
+unchanged. Ports, credentials, paths, query strings, and fragments are preserved.
 
 `.\scripts\dev.ps1 reset-db` **deletes all dev database data**. It stops and removes the dev
 container, removes its volume, and leaves the test container alone. It refuses to delete a volume

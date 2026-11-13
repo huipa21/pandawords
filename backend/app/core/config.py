@@ -3,6 +3,7 @@ from __future__ import annotations
 import subprocess
 from pathlib import Path
 from typing import Literal
+from urllib.parse import urlsplit, urlunsplit
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -36,20 +37,27 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
-    surreal_url: str = "ws://localhost:8100/rpc"
-    surreal_test_url: str = "ws://localhost:8101/rpc"
+    surreal_url: str = "ws://127.0.0.1:8100/rpc"
+    surreal_test_url: str = "ws://127.0.0.1:8101/rpc"
     surreal_namespace: str = "pandawords"
     surreal_database: str = "dev"
     surreal_user: str = "root"
     surreal_pass: str = "change-me"
     surreal_timeout_seconds: float = Field(default=2.0, gt=0)
 
-    @field_validator("surreal_url")
+    @field_validator("surreal_url", "surreal_test_url")
     @classmethod
     def validate_surreal_url(cls, value: str) -> str:
         if not value.startswith(("ws://", "wss://")):
             raise ValueError("SurrealDB requires a WebSocket URL")
-        return value
+        parts = urlsplit(value)
+        if parts.hostname != "localhost":
+            return value
+        userinfo, separator, _ = parts.netloc.rpartition("@")
+        authority = f"{userinfo}{separator}127.0.0.1"
+        if parts.port is not None:
+            authority += f":{parts.port}"
+        return urlunsplit(parts._replace(netloc=authority))
 
     api_port: int = 8000
     web_dev_port: int = 5173
