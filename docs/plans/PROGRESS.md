@@ -9,13 +9,14 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 
 ## Current run
 
-Request: implement tasks 1.1.2 and 1.2.1.
-Next step: create the 1.2.1 task worktree and implement the backend uv project, then validate and close out.
+Request: implement tasks 1.1.2, 1.2.1, and 1.1.4.
+Next step: continue the existing 1.1.2/1.2.1 work and create the 1.1.4 task worktree for VS Code workspace settings.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
 | 1.1.2 | `task/1.1.2-dev-ps1` | `..\pandawords.worktrees\1.1.2` | In progress; dependency 1.1.1 is ✅. |
 | 1.2.1 | `task/1.2.1-backend-uv` | `..\pandawords.worktrees\1.2.1` | Starting; dependency 1.1.1 is ✅. |
+| 1.1.4 | `task/1.1.4-vscode-workspace` | `..\pandawords.worktrees\1.1.4` | Starting; dependency 1.1.1 is ✅. |
 
 ## Blocked
 
@@ -41,6 +42,14 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-13 — 1.1.4 VS Code workspace (in progress)
+- Result / completed: task start recorded on `main`; workspace configuration not yet implemented.
+- Dependencies: 1.1.1 is ✅.
+- Verification: `git status --short --branch` confirmed the `main` worktree had no tracked changes before task tracking was updated; implementation checks not run yet.
+- Skipped / deferred: none.
+- Failures / causes / corrections: none.
+- Blockers / follow-ups: create task worktree, add `.vscode` settings and recommended extensions, then verify and close out. Tasks 1.1.2 and 1.2.1 remain open in their separate worktrees.
 
 ### 2026-11-13 — 1.1.1 Initialize repository (backfilled)
 
