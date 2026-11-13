@@ -9,11 +9,12 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 
 ## Current run
 
-Request: implement task 1.4.4 — `/dev/design` preview page (dev only).
-Next step: complete and merge task 1.4.3, then resume 1.4.4.
+Request: resume and complete Phase 1, proceeding through waves in dependency order.
+Next step: verify and complete the existing 1.4.1 branch, then resume wave 3 in parallel.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
+| 1.4.1 | `task/1.4.1-frontend-project` | `../pandawords.worktrees/1.4.1` | Resuming existing committed implementation; dependency 1.1.1 is ✅ |
 | 1.1.3 | — | — | Blocked: dependency 1.4.1 is not ✅ |
 | 1.4.2 | — | — | Blocked: dependency 1.4.1 is not ✅ |
 | 1.4.4 | — | — | Blocked: dependency 1.4.3 is not ✅ |
