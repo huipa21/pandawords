@@ -16,7 +16,6 @@ Next step: implement wave 4 in parallel; all its prerequisites are ✅.
 |---|---|---|---|
 | 1.2.3 | `task/1.2.3-db-client` | `../pandawords.worktrees/1.2.3` | Starting; dependencies 1.2.2 and 1.3.1 are ✅ |
 | 1.3.2 | `task/1.3.2-surreal-spike` | `../pandawords.worktrees/1.3.2` | Starting; dependencies 1.3.1 and 1.2.1 are ✅ |
-| 1.4.3 | `task/1.4.3-app-shell` | `../pandawords.worktrees/1.4.3` | Starting; dependency 1.4.2 is ✅ |
 
 ## Blocked
 
@@ -42,6 +41,23 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 1.4.3 App shell
+- Result / completed: responsive app/auth layouts, navigation and providers, persisted theme and
+  locale preferences, bilingual placeholder routes, Lucide/Naive imports; commit `984f8c7` merged
+  as `300f265`. Task branch and worktree removed.
+- Dependencies: 1.4.2 is ✅.
+- Verification: agent browser checks passed at 375px/1280px without overflow, system-theme
+  following, synchronized Naive/CSS colors, persisted preferences and auth layout. Main frontend
+  build/lint/typecheck and 41 Vitest tests passed; backend Ruff/format/basedpyright and 22 pytest
+  tests passed. Commit hooks passed. Agent stopped its smoke server by PID.
+- Skipped / deferred: auth/admin guards belong to 1.5.5; aggregate check/test remains unavailable
+  until 1.6.1.
+- Failures / causes / corrections: package/lockfile merge conflicts retained both independent
+  dependency additions; frozen offline installation passed. Unspecified favicon returns 404;
+  no application errors. Existing backend test-client deprecation warning remains.
+- Findings: none beyond the documented missing favicon.
+- Blockers / follow-ups: none for this task; 1.4.4 and 1.6.3 are ready after wave 4 completes.
 
 ### 2026-11-14 — 1.4.5 API types pipeline and client
 - Result / completed: deterministic offline OpenAPI/TypeScript generation, typed API client,

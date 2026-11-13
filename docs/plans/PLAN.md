@@ -33,7 +33,7 @@ are in `phase-N.md`. If a phase file doesn't exist yet, the agent asks before wr
 | 1.3.5 | Test harness: per-session test DB, `fresh_db`, ASGI client | 1.3.3 | 6 | M | ⬜ |
 | 1.4.1 | Frontend project (pnpm workspace, Vite 8, Vue 3.5, TS 6.0, eslint, vitest) | 1.1.1 | 2 | S | ✅ |
 | 1.4.2 | Design tokens + generators (CSS vars, Naive, Uno, Cytoscape) + fonts + enforcement | 1.4.1 | 3 | M | ✅ |
-| 1.4.3 | App shell: router, Pinia, i18n, theme toggle, responsive layout, icons | 1.4.2 | 4 | M | 🟡 |
+| 1.4.3 | App shell: router, Pinia, i18n, theme toggle, responsive layout, icons | 1.4.2 | 4 | M | ✅ |
 | 1.4.4 | `/dev/design` preview page (dev only) | 1.4.3 | 5 | S | ⬜ |
 | 1.4.5 | OpenAPI → TS types pipeline (`gen-api`) + API client with refresh | 1.4.1, 1.2.2 | 4 | M | ✅ |
 | 1.5.1 | Migration: `user`, `refresh_token` | 1.3.4, 1.3.5 | 7 | S | ⬜ |
