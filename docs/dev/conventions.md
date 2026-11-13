@@ -53,5 +53,17 @@
 - Commits: Conventional Commits with the task ID as scope: `feat(1.5.3): login and refresh endpoints`,
   `fix(2.4.1): …`, `docs(plan): …`, `chore`, `refactor`, `test`.
 - Merges: `--no-ff` with the message `merge: task X.Y.Z <title>`.
-- lefthook pre-commit runs ruff, eslint (staged files) and a secrets check (blocks `.env*` other
-  than `.env.example`).
+- `./scripts/dev.ps1 setup` installs lefthook into the main worktree's shared Git hooks directory.
+  It enables Node TLS certificate verification for package installation.
+  Running a hook does not synchronize hooks automatically; run `pnpm exec lefthook install` from
+  main when installation or a hook update is needed. Dependencies are per worktree: use
+  `uv sync --project backend` and `pnpm install --ignore-scripts` in a linked worktree to avoid
+  lefthook's package postinstall changing the shared hooks.
+- Before a commit, lefthook runs `ruff format --check`, `ruff check` and ESLint on the staged
+  contents of Python, TypeScript and Vue files, including partially staged files. It does not modify
+  or stage files. The check uses the backend Ruff and frontend ESLint configurations.
+- The environment-file guard blocks staged paths containing an `.env*` component, including
+  force-added ignored files. Only a file named exactly `.env.example` is allowed; deleting a
+  previously tracked environment file is allowed.
+- Run `pwsh -NoProfile -File ./scripts/tests/lefthook.test.ps1` to exercise the hook in a disposable
+  Git repository under `.dev/`. It uses synthetic environment files and removes the repository.

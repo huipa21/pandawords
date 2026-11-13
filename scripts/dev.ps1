@@ -238,12 +238,14 @@ Usage: ./scripts/dev.ps1 <command>
 
 Commands:
   help      Show this help
-  setup     Check tools, install Python 3.14, sync existing projects, and create .env.dev
+  setup     Check tools, sync projects, install Git hooks, and create .env.dev
   reset-db  Stop the dev database and delete its data volume
 '@ | Write-Host
 }
 
 function Invoke-Setup {
+    $env:NODE_TLS_REJECT_UNAUTHORIZED = '1'
+
     if (-not (Test-Path -LiteralPath (Join-Path $script:MainRoot '.env.dev') -PathType Leaf)) {
         $examplePath = Join-Path $script:MainRoot '.env.example'
         Copy-Item -LiteralPath $examplePath -Destination (Join-Path $script:MainRoot '.env.dev')
@@ -304,6 +306,14 @@ function Invoke-Setup {
             [void](Invoke-WithFallback -Executable 'pnpm' -Arguments @('install') `
                 -FallbackSource $npmFallback -FallbackName 'NPM_FALLBACK_REGISTRY' `
                 -FallbackArguments $pnpmFallbackArguments)
+        }
+        finally {
+            Pop-Location
+        }
+
+        Push-Location $script:MainRoot
+        try {
+            [void](Invoke-Quiet -Executable 'pnpm' -Arguments @('exec', 'lefthook', 'install'))
         }
         finally {
             Pop-Location
