@@ -124,8 +124,15 @@ try {
         (Join-Path 'frontend' 'eslint.config.mjs'),
         (Join-Path 'frontend' 'package.json'),
         (Join-Path 'scripts' 'dev.ps1')
+        (Join-Path 'scripts' 'lint-staged.cjs')
     )
     foreach ($file in $projectFiles) { Copy-ProjectFile -Path $file }
+    Copy-Item -LiteralPath (Join-Path $repoRoot 'frontend\eslint-rules') `
+        -Destination (Join-Path $testRoot 'frontend\eslint-rules') -Recurse
+    Copy-ProjectFile -Path 'frontend\uno.config.ts'
+    New-Item -ItemType Directory -Path (Join-Path $testRoot 'frontend\src') -Force | Out-Null
+    Copy-Item -LiteralPath (Join-Path $repoRoot 'frontend\src\design') `
+        -Destination (Join-Path $testRoot 'frontend\src\design') -Recurse
     Write-TestFile -Path '.gitignore' -Content "node_modules/`n.venv/`n.env*`n!.env.example`n"
     Write-TestFile -Path '.env.example' -Content "LEFTHOOK_SYNTHETIC=example`n"
     Add-TestLink -Path 'node_modules'

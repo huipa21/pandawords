@@ -125,6 +125,7 @@ try {
         (Join-Path 'backend' 'uv.lock'),
         (Join-Path 'frontend' 'eslint.config.mjs'),
         (Join-Path 'frontend' 'package.json')
+        (Join-Path 'scripts' 'lint-staged.cjs')
     )
     foreach ($file in $projectFiles) {
         $destination = Join-Path $mainRoot $file
@@ -149,6 +150,13 @@ try {
         throw 'Lefthook did not install in the disposable repository.'
     }
     [void](Invoke-Git -Arguments @('worktree', 'add', '--quiet', '-b', 'linked-test', $linkedRoot, 'HEAD'))
+    Copy-Item -LiteralPath (Join-Path $projectRoot 'frontend\eslint-rules') `
+        -Destination (Join-Path $linkedRoot 'frontend\eslint-rules') -Recurse
+    Copy-Item -LiteralPath (Join-Path $projectRoot 'frontend\uno.config.ts') `
+        -Destination (Join-Path $linkedRoot 'frontend\uno.config.ts')
+    New-Item -ItemType Directory -Path (Join-Path $linkedRoot 'frontend\src') -Force | Out-Null
+    Copy-Item -LiteralPath (Join-Path $projectRoot 'frontend\src\design') `
+        -Destination (Join-Path $linkedRoot 'frontend\src\design') -Recurse
 
     Set-Location $linkedRoot
     $linkedCommon = (Resolve-Path -LiteralPath (Invoke-Git -Arguments @(
