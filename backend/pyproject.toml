@@ -32,7 +32,7 @@ target-version = "py314"
 select = ["ASYNC", "B", "E", "F", "I", "UP"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["app"]
+known-first-party = ["app", "tests"]
 
 [tool.basedpyright]
 pythonVersion = "3.14"
