@@ -10,10 +10,14 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 ## Current run
 
 Request: resume and complete Phase 1, proceeding through waves in dependency order.
-Next step: start wave 3 in parallel, resuming the existing 1.2.2 branch.
+Next step: implement wave 3 in parallel, resuming the existing 1.2.2 branch.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
+| 1.1.3 | `task/1.1.3-lefthook` | `../pandawords.worktrees/1.1.3` | Starting; dependencies 1.2.1 and 1.4.1 are ✅ |
+| 1.2.2 | `task/1.2.2-api-skeleton` | `../pandawords.worktrees/1.2.2` | Resuming existing commit; dependency 1.2.1 is ✅ |
+| 1.3.1 | `task/1.3.1-dev-db` | `../pandawords.worktrees/1.3.1` | Starting; dependency 1.1.2 is ✅ |
+| 1.4.2 | `task/1.4.2-design-tokens` | `../pandawords.worktrees/1.4.2` | Starting; dependency 1.4.1 is ✅ |
 | 1.4.4 | — | — | Blocked: dependency 1.4.3 is not ✅ |
 | 1.4.5 | — | — | Blocked: dependency 1.2.2 is not ✅ |
 
