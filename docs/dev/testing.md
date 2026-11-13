@@ -41,8 +41,13 @@ failure output.
   `session_db_settings` explicitly access the shared migrated database.
 - `app`: a test-configured FastAPI application with its real lifespan running. `client` is an
   async httpx client using that application through `ASGITransport`.
-- `make_user`: async factory hook only; it raises `NotImplementedError` until auth/user work in
-  1.5.x implements fresh owner creation. Do not share a single user between tests.
+- `make_user`: async factory hook only; it raises `NotImplementedError`. Completion is deferred
+  to 1.5.2 so it can use the real password hashing/security implementation rather than inventing
+  one in the schema task. Do not share a single user between tests.
+- Auth schema integration tests use `fresh_db`, apply the real migrations, and exercise username
+  and token-hash uniqueness, field constraints and rotation metadata against the test server.
+  Their opaque test password hashes are schema inputs, not usable login credentials. Teardown
+  removes exactly each generated database; no dev database or shared test rows are modified.
 - The backend runner currently implements only `test -Backend [-UpdateSnapshot]`; frontend,
   E2E and combined orchestration are deferred to 1.6.1. Run from the selected worktree; it needs
   that worktree's backend environment (`uv sync --locked`).

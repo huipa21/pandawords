@@ -1,0 +1,24 @@
+DEFINE TABLE IF NOT EXISTS user SCHEMAFULL;
+DEFINE FIELD IF NOT EXISTS username ON user TYPE string;
+DEFINE FIELD IF NOT EXISTS password_hash ON user TYPE string;
+DEFINE FIELD IF NOT EXISTS role ON user TYPE 'admin' | 'user';
+DEFINE FIELD IF NOT EXISTS disabled ON user TYPE bool;
+DEFINE FIELD IF NOT EXISTS must_change_password ON user TYPE bool;
+DEFINE FIELD IF NOT EXISTS source_lang ON user TYPE string;
+DEFINE FIELD IF NOT EXISTS target_lang ON user TYPE string;
+DEFINE FIELD IF NOT EXISTS prefs ON user TYPE object;
+DEFINE FIELD IF NOT EXISTS prefs.theme ON user TYPE 'system' | 'light' | 'dark';
+DEFINE FIELD IF NOT EXISTS prefs.locale ON user TYPE string;
+DEFINE FIELD IF NOT EXISTS prefs.accent ON user TYPE 'US' | 'UK';
+DEFINE INDEX IF NOT EXISTS user_username ON user FIELDS username UNIQUE;
+DEFINE INDEX IF NOT EXISTS user_role ON user FIELDS role;
+
+DEFINE TABLE IF NOT EXISTS refresh_token SCHEMAFULL;
+DEFINE FIELD IF NOT EXISTS user ON refresh_token TYPE record<user>;
+DEFINE FIELD IF NOT EXISTS token_hash ON refresh_token TYPE string;
+DEFINE FIELD IF NOT EXISTS expires_at ON refresh_token TYPE datetime;
+DEFINE FIELD IF NOT EXISTS revoked_at ON refresh_token TYPE option<datetime>;
+DEFINE FIELD IF NOT EXISTS replaced_by ON refresh_token TYPE option<record<refresh_token>>;
+DEFINE INDEX IF NOT EXISTS refresh_token_hash ON refresh_token FIELDS token_hash UNIQUE;
+DEFINE INDEX IF NOT EXISTS refresh_token_user ON refresh_token FIELDS user;
+DEFINE INDEX IF NOT EXISTS refresh_token_expires_at ON refresh_token FIELDS expires_at;
