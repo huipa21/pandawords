@@ -8,6 +8,9 @@ from fastapi.responses import JSONResponse
 from fastapi.utils import is_body_allowed_for_status_code
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.responses import Response
+from starlette.types import ASGIApp, Message, Receive, Scope, Send
+
+_HANDLED_ERROR_KEY = "pandawords.handled_error"
 
 
 class AppError(Exception):
@@ -97,9 +100,47 @@ async def unhandled_error_handler(request: Request, exc: Exception) -> JSONRespo
         exception_type=type(exc).__name__,
     )
     headers = {"X-Request-ID": safe_request_id} if safe_request_id is not None else None
-    return _error_response(
+    response = _error_response(
         "internal.error",
         500,
         "Internal server error.",
         headers=headers,
     )
+    request.scope[_HANDLED_ERROR_KEY] = exc
+    return response
+
+
+class HandledErrorGuard:
+    def __init__(self, app: ASGIApp) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+
+        sending_error_response = False
+        error_response_complete = False
+
+        async def tracked_send(message: Message) -> None:
+            nonlocal sending_error_response, error_response_complete
+            if message["type"] == "http.response.start":
+                sending_error_response = (
+                    scope.get(_HANDLED_ERROR_KEY) is not None and message["status"] == 500
+                )
+            await send(message)
+            if (
+                sending_error_response
+                and message["type"] == "http.response.body"
+                and not message.get("more_body", False)
+            ):
+                error_response_complete = True
+
+        try:
+            await self.app(scope, receive, tracked_send)
+        except Exception as exc:
+            # Starlette re-raises the handled exception after sending its response.
+            if not (error_response_complete and scope.get(_HANDLED_ERROR_KEY) is exc):
+                raise
+        finally:
+            scope.pop(_HANDLED_ERROR_KEY, None)
