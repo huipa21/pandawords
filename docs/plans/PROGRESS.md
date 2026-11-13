@@ -17,7 +17,6 @@ Next step: implement wave 4 in parallel; all its prerequisites are ✅.
 | 1.2.3 | `task/1.2.3-db-client` | `../pandawords.worktrees/1.2.3` | Starting; dependencies 1.2.2 and 1.3.1 are ✅ |
 | 1.3.2 | `task/1.3.2-surreal-spike` | `../pandawords.worktrees/1.3.2` | Starting; dependencies 1.3.1 and 1.2.1 are ✅ |
 | 1.4.3 | `task/1.4.3-app-shell` | `../pandawords.worktrees/1.4.3` | Starting; dependency 1.4.2 is ✅ |
-| 1.4.5 | `task/1.4.5-api-client` | `../pandawords.worktrees/1.4.5` | Starting; dependencies 1.4.1 and 1.2.2 are ✅ |
 
 ## Blocked
 
@@ -43,6 +42,21 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 1.4.5 API types pipeline and client
+- Result / completed: deterministic offline OpenAPI/TypeScript generation, typed API client,
+  shared refresh/retry/logout lifecycle and normalized errors; commit `7693724` merged as
+  `99d9991`. Task branch and worktree removed.
+- Dependencies: 1.4.1 and 1.2.2 are ✅.
+- Verification: on main, gen-api reproduced committed files; frontend build/lint/typecheck and
+  Vitest passed (35 tests, including 9 client cases); backend Ruff/format/basedpyright and pytest
+  passed (22 tests). Active hooks passed on the task commit.
+- Skipped / deferred: real auth integration awaits 1.5.3; mocked lifecycle tests cover concurrent
+  401s and refresh failures. Aggregate check/test commands remain unavailable until 1.6.1.
+- Failures / causes / corrections: none. Existing Starlette test-client deprecation warning remains.
+- Findings: openapi-typescript's TypeScript peer range names 5.x; generation and checks pass on the
+  required pinned TypeScript 6. No TypeScript downgrade or handwritten API types were introduced.
+- Blockers / follow-ups: none for this task; regenerate contracts after future backend changes.
 
 ### 2026-11-14 — Wave 3 integration and recovery
 - Result / completed: 1.1.3 hooks (`73a5fec`, `2e53492`, merge `87aae46`, integration fix `f0204ab`);
