@@ -10,24 +10,19 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 ## Current run
 
 Request: resume and complete Phase 1, proceeding through waves in dependency order.
-Next step: verify and complete the existing 1.4.1 branch, then resume wave 3 in parallel.
+Next step: start wave 3 in parallel, resuming the existing 1.2.2 branch.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 1.4.1 | `task/1.4.1-frontend-project` | `../pandawords.worktrees/1.4.1` | Resuming existing committed implementation; dependency 1.1.1 is ✅ |
-| 1.1.3 | — | — | Blocked: dependency 1.4.1 is not ✅ |
-| 1.4.2 | — | — | Blocked: dependency 1.4.1 is not ✅ |
 | 1.4.4 | — | — | Blocked: dependency 1.4.3 is not ✅ |
-| 1.4.5 | — | — | Blocked: dependencies 1.4.1 and 1.2.2 are not ✅ |
+| 1.4.5 | — | — | Blocked: dependency 1.2.2 is not ✅ |
 
 ## Blocked
 
 | Task | Blocked by (task, tool, decision) | Since | Notes |
 |---|---|---|---|
-| 1.1.3 | 1.4.1 | 2026-11-13 | PLAN.md is ⬜; prerequisite branch `task/1.4.1-frontend-project` has commit `2ecf4c6` but is not merged. Resume after it is complete. |
-| 1.4.2 | 1.4.1 | 2026-11-13 | PLAN.md is ⬜; implementation cannot start until 1.4.1 is complete and merged. |
 | 1.4.4 | 1.4.3 | 2026-11-13 | PLAN.md is ⬜; implementation cannot start until 1.4.3 is complete and merged. Task 1.4.3 itself depends on 1.4.2. |
-| 1.4.5 | 1.4.1, 1.2.2 | 2026-11-13 | Both prerequisites are ⬜ in PLAN.md; their task branches exist but are not merged. Implementation cannot start until both are complete and merged. |
+| 1.4.5 | 1.2.2 | 2026-11-13 | 1.4.1 is ✅; the existing 1.2.2 task branch is not yet merged. |
 
 ## Backlog (discovered, not yet in PLAN.md)
 
@@ -48,6 +43,26 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-13 — 1.4.1 Frontend project
+- Result / completed: resumed the existing frontend scaffold, added bilingual hello-page text and
+  completed its tooling. Task commits `2ecf4c6` and `e18850e` were merged as `c08586f`; the task
+  branch and worktree were removed.
+- Dependencies: 1.1.1 is ✅.
+- Verification: on main, `pnpm install --frozen-lockfile --offline`, frontend `build`, `typecheck`,
+  `lint` and `test` passed (1 test); backend Ruff, format check, basedpyright and pytest passed
+  (1 test). The task agent also passed browser and `/api` proxy smoke checks. `git diff --check`
+  passed.
+- Skipped / deferred: `dev.ps1 check` returned `Unknown command 'check'`, and `dev.ps1 test` is not
+  implemented until 1.6.1; equivalent available checks were run directly. No E2E test applies yet.
+- Failures / causes / corrections: `git worktree remove --force` removed its Git registration but
+  left generated `node_modules` and four clean tracked files on Windows; those specific leftovers
+  were removed and the branch deletion and absent folder were confirmed. The browser requested an
+  unspecified favicon and received 404; no icon asset is specified by this scaffold task.
+- Findings: this environment sets `NODE_TLS_REJECT_UNAUTHORIZED=0`. The agent reported verifying
+  its six added package hashes using certificate-checked HTTPS; the main install was offline with
+  Node TLS verification enabled. Future network installs must explicitly enable verification.
+- Blockers / follow-ups: none for this task. 1.1.3 and 1.4.2 are now ready; 1.4.5 still needs 1.2.2.
 
 ### 2026-11-13 — 1.1.3 lefthook pre-commit
 - Result / completed: blocked before implementation; no code or configuration changes made.
