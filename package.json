@@ -1,5 +1,8 @@
 {
   "name": "pandawords",
   "private": true,
-  "packageManager": "pnpm@11.2.2"
+  "packageManager": "pnpm@11.2.2",
+  "devDependencies": {
+    "lefthook": "2.2.2"
+  }
 }
