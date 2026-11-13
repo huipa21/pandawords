@@ -9,16 +9,18 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 
 ## Current run
 
-Request: implement task 1.1.4 — VS Code workspace.
-Next step: none; all tasks in this run are completed.
+Request: implement task 1.1.3 — lefthook pre-commit.
+Next step: complete and merge task 1.4.1, then resume 1.1.3.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
+| 1.1.3 | — | — | Blocked: dependency 1.4.1 is not ✅ |
 
 ## Blocked
 
 | Task | Blocked by (task, tool, decision) | Since | Notes |
 |---|---|---|---|
+| 1.1.3 | 1.4.1 | 2026-11-13 | PLAN.md is ⬜; prerequisite branch `task/1.4.1-frontend-project` has commit `2ecf4c6` but is not merged. Resume after it is complete. |
 
 ## Backlog (discovered, not yet in PLAN.md)
 
@@ -39,6 +41,15 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-13 — 1.1.3 lefthook pre-commit
+- Result / completed: blocked before implementation; no code or configuration changes made.
+- Dependencies: 1.2.1 is ✅; 1.4.1 is ⬜ in PLAN.md and its task branch is not merged.
+- Verification: main worktree was clean; inspected PLAN.md and confirmed branch `task/1.4.1-frontend-project` has commit `2ecf4c6` but remains separate from main. Implementation checks were not run.
+- Skipped / deferred: all 1.1.3 deliverables and acceptance checks, because prerequisite 1.4.1 is incomplete.
+- Failures / causes / corrections: none.
+- Findings: none.
+- Blockers / follow-ups: complete and merge 1.4.1, then resume 1.1.3.
 
 ### 2026-11-13 — 1.1.2 `dev.ps1` skeleton
 - Result / completed: Added command dispatch/help, main-worktree and `.env.dev` resolution,
