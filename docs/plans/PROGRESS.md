@@ -10,23 +10,20 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 ## Current run
 
 Request: resume and complete Phase 1, proceeding through waves in dependency order.
-Next step: implement wave 3 in parallel, resuming the existing 1.2.2 branch.
+Next step: finish and integrate the remaining wave 3 tasks in parallel.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
 | 1.1.3 | `task/1.1.3-lefthook` | `../pandawords.worktrees/1.1.3` | Starting; dependencies 1.2.1 and 1.4.1 are ✅ |
-| 1.2.2 | `task/1.2.2-api-skeleton` | `../pandawords.worktrees/1.2.2` | Resuming existing commit; dependency 1.2.1 is ✅ |
 | 1.3.1 | `task/1.3.1-dev-db` | `../pandawords.worktrees/1.3.1` | Starting; dependency 1.1.2 is ✅ |
 | 1.4.2 | `task/1.4.2-design-tokens` | `../pandawords.worktrees/1.4.2` | Starting; dependency 1.4.1 is ✅ |
 | 1.4.4 | — | — | Blocked: dependency 1.4.3 is not ✅ |
-| 1.4.5 | — | — | Blocked: dependency 1.2.2 is not ✅ |
 
 ## Blocked
 
 | Task | Blocked by (task, tool, decision) | Since | Notes |
 |---|---|---|---|
 | 1.4.4 | 1.4.3 | 2026-11-13 | PLAN.md is ⬜; implementation cannot start until 1.4.3 is complete and merged. Task 1.4.3 itself depends on 1.4.2. |
-| 1.4.5 | 1.2.2 | 2026-11-13 | 1.4.1 is ✅; the existing 1.2.2 task branch is not yet merged. |
 
 ## Backlog (discovered, not yet in PLAN.md)
 
@@ -47,6 +44,25 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-13 — 1.2.2 API skeleton
+- Result / completed: added the app factory, settings, request logging, safe error responses,
+  health/readiness stubs and offline OpenAPI generation. Task commits `9742b25`, `3f13bdb` and
+  `ec30475` were merged as `c8d0dce`; the task branch and worktree were removed.
+- Dependencies: 1.2.1 is ✅.
+- Verification: on main, Ruff, formatting, basedpyright, pytest (17 passed), offline OpenAPI
+  generation and frontend build, typecheck, lint and test (1 passed) all passed. The task agent
+  also passed a bounded Uvicorn startup smoke test and stopped its process.
+- Skipped / deferred: real database readiness belongs to 1.2.3. `dev.ps1 check` still returns
+  `Unknown command 'check'`, and `dev.ps1 test` is not implemented until 1.6.1; available direct
+  checks were run instead. E2E is not applicable yet.
+- Failures / causes / corrections: initial review found the generic 500 handler did not log
+  unexpected errors; a follow-up added a structured event with request ID and exception type
+  without logging exception messages, and a focused test passed. Pytest reported one existing
+  Starlette `TestClient`/httpx deprecation warning; tests passed.
+- Findings: `auth.md` specifies a 60-minute access token while the existing settings/example
+  default is 15 minutes; reconcile this when implementing 1.5.2 without modifying the private env.
+- Blockers / follow-ups: none for this task. 1.4.5 is ready after wave 3; 1.2.3 also needs 1.3.1.
 
 ### 2026-11-13 — 1.4.1 Frontend project
 - Result / completed: resumed the existing frontend scaffold, added bilingual hello-page text and
