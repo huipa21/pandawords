@@ -3,6 +3,13 @@
 Use these. If something is missing, add it here **and** to `src/components/`, with an entry on the
 `/dev/design` preview page. Feature-only components stay in `src/features/<x>/components/`.
 
+The development-only `/dev/design` route compares light/dark semantic, graph and rating tokens,
+typography, spacing, radii and shadows. It includes an interactive Naive UI playground and all
+currently implemented app components (the surrounding AppShell plus AppHeader, AppNavigation,
+ThemeToggle and LocaleSwitch). Other catalogue entries below are planned, not preview stubs.
+Preview code and its local bilingual messages are lazy-loaded behind `import.meta.env.DEV`;
+neither is included in production bundles.
+
 ## Base layer: Naive UI (used directly)
 
 | Need | Component | Rules |

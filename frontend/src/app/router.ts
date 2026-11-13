@@ -33,7 +33,7 @@ export function createAppRouter(history: RouterHistory = createWebHistory()) {
     children.push({
       path: 'dev/design',
       name: 'design',
-      component: placeholder,
+      component: () => import('@/features/dev-design/DesignPreviewPage.vue'),
       meta: { title: 'design' },
     })
   }
