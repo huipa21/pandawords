@@ -31,6 +31,19 @@ Only `web` joins the Caddy network. SurrealDB is never exposed publicly.
 
 ## Request flow
 
+### Tag API (4.3.1)
+
+Authenticated `/api/tags` supports POST (201), GET (visible shared/own list),
+and `/{id}` GET/PATCH/DELETE (204 for deletion). Shared tag records cannot be changed.
+`GET /api/tags/assignments?target_table=...&target_id=...` returns visible tags plus
+edge-level `readonly`. `PUT /api/tags/{id}/members` accepts
+`{target_table: sense|morpheme|tag, target_id}`; DELETE on that path uses the same query
+fields. Both are idempotent 204 operations on only the current owner's memberships.
+Request bodies forbid extra fields; tag creation never accepts owner/ID. IDs use the strict
+opaque codec. Missing/foreign endpoints return 404, shared-record writes 403, cycles 409.
+All successful responses are no-store. Router → service → `db/tags.py` keeps queries at the
+repository boundary. API types are generated offline with `dev.ps1 gen-api`.
+
 1. The SPA calls `/api/...` with the access token from memory. On a 401 it calls `/api/auth/refresh`
    once (with the httpOnly refresh cookie), then retries.
 2. Routers validate input and resolve `current_user`, then call services. Services call repositories

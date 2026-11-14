@@ -71,6 +71,11 @@ export async function setup(locale: 'en' | 'zh-CN' = 'en', wait = true) {
     routes: [
       { path: '/words/:lemmaId', name: 'word', component: LemmaDetailPage },
       {
+        path: '/tags',
+        name: 'tags',
+        component: { template: '<p>Tags</p>' },
+      },
+      {
         path: '/projects/:id',
         name: 'project',
         component: { template: '<p>Project</p>' },

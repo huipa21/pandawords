@@ -559,6 +559,78 @@ export interface paths {
     patch: operations['update_note_api_notes__id__patch']
     trace?: never
   }
+  '/api/tags': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List Tags */
+    get: operations['list_tags_api_tags_get']
+    put?: never
+    /** Create Tag */
+    post: operations['create_tag_api_tags_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/tags/assignments': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List Assignments */
+    get: operations['list_assignments_api_tags_assignments_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/tags/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Read Tag */
+    get: operations['read_tag_api_tags__id__get']
+    put?: never
+    post?: never
+    /** Delete Tag */
+    delete: operations['delete_tag_api_tags__id__delete']
+    options?: never
+    head?: never
+    /** Update Tag */
+    patch: operations['update_tag_api_tags__id__patch']
+    trace?: never
+  }
+  '/api/tags/{id}/members': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Assign Tag */
+    put: operations['assign_tag_api_tags__id__members_put']
+    post?: never
+    /** Remove Tag */
+    delete: operations['remove_tag_api_tags__id__members_delete']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -1534,6 +1606,44 @@ export interface components {
       retrievability?: number | null
       /** Memory Version */
       readonly memory_version: string
+    }
+    /** TagAssignment */
+    'TagAssignment': {
+      target_table: components['schemas']['TagTarget']
+      /** Target Id */
+      target_id: string
+    }
+    /** TagAssignmentRead */
+    'TagAssignmentRead': {
+      tag: components['schemas']['TagRead']
+      /** Readonly */
+      readonly: boolean
+    }
+    /** TagCreate */
+    'TagCreate': {
+      name: components['schemas']['TagName']
+      /** @default custom */
+      kind: components['schemas']['TagKind']
+    }
+    /** @enum {string} */
+    'TagKind': 'morph_group' | 'concept' | 'domain' | 'custom'
+    'TagName': string
+    /** TagRead */
+    'TagRead': {
+      /** Id */
+      id: string
+      /** Name */
+      name: string
+      kind: components['schemas']['TagKind']
+      /** Readonly */
+      readonly: boolean
+    }
+    /** @enum {string} */
+    'TagTarget': 'sense' | 'morpheme' | 'tag'
+    /** TagUpdate */
+    'TagUpdate': {
+      name?: components['schemas']['TagName'] | null
+      kind?: components['schemas']['TagKind'] | null
     }
     'Text-Output': string
     /** Unavailable */
@@ -2955,6 +3065,251 @@ export interface operations {
         content: {
           'application/json': components['schemas']['NoteRead']
         }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  list_tags_api_tags_get: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TagRead'][]
+        }
+      }
+    }
+  }
+  create_tag_api_tags_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TagCreate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TagRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  list_assignments_api_tags_assignments_get: {
+    parameters: {
+      query: {
+        target_table: components['schemas']['TagTarget']
+        target_id: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TagAssignmentRead'][]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  read_tag_api_tags__id__get: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TagRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  delete_tag_api_tags__id__delete: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  update_tag_api_tags__id__patch: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TagUpdate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['TagRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  assign_tag_api_tags__id__members_put: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['TagAssignment']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  remove_tag_api_tags__id__members_delete: {
+    parameters: {
+      query: {
+        target_table: components['schemas']['TagTarget']
+        target_id: string
+      }
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Validation Error */
       422: {

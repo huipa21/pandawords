@@ -1,5 +1,20 @@
 # Data model (SurrealDB 3.3)
 
+## Hierarchical user tags (4.3.1)
+
+Tag API kinds are `custom`, `concept`, `domain`, and `morph_group`; names are trimmed,
+nonempty and at most 200 characters. Server-generated opaque tag IDs cannot replace source IDs.
+`member_of` connects only sense/morpheme/tag to tag. Every user edge owns both its authorization
+and its identity: reads check edge, source and destination visibility independently. Shared edges
+are read-only; users may add/remove their own edges between visible endpoints, including shared tags.
+Cycles are checked across the owner's and shared visible edges, including self-parenting.
+Migration 0018 adds indexed owner/source/destination lookups and `user.tag_revision`; real revision
+writes serialize each owner's hierarchy mutations and make duplicate assignment retries idempotent.
+Owned tag deletion and own incoming/outgoing edge cleanup share a transaction. Because SurrealDB
+automatically cascades all incident relation edges, a tag with foreign/shared incident edges
+fails closed with `409 tag.in_use` instead of deleting protected edges. Such edges cannot be
+created through another owner's tag API, but the guard also protects imported/corrupted graphs. (SurrealDB 3.3)
+
 The source of truth for the current schema is `backend/app/db/schema.snapshot.json` (generated)
 plus the migrations. This doc explains the intent. Syntax details: [../dev/surrealdb-notes.md](../dev/surrealdb-notes.md).
 

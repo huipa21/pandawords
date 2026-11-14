@@ -287,7 +287,10 @@
         "out": "DEFINE FIELD out ON member_of TYPE record<tag> PERMISSIONS FULL",
         "owner": "DEFINE FIELD owner ON member_of TYPE none | record<user> PERMISSIONS FULL"
       },
-      "indexes": {},
+      "indexes": {
+        "member_owner_in": "DEFINE INDEX member_owner_in ON member_of FIELDS owner, in",
+        "member_owner_out": "DEFINE INDEX member_owner_out ON member_of FIELDS owner, out"
+      },
       "lives": {},
       "tables": {}
     },
@@ -493,7 +496,9 @@
         "name": "DEFINE FIELD name ON tag TYPE string PERMISSIONS FULL",
         "owner": "DEFINE FIELD owner ON tag TYPE none | record<user> PERMISSIONS FULL"
       },
-      "indexes": {},
+      "indexes": {
+        "tag_owner": "DEFINE INDEX tag_owner ON tag FIELDS owner"
+      },
       "lives": {},
       "tables": {}
     },
@@ -523,6 +528,7 @@
         "prefs.theme": "DEFINE FIELD prefs.theme ON user TYPE 'system' | 'light' | 'dark' PERMISSIONS FULL",
         "role": "DEFINE FIELD role ON user TYPE 'admin' | 'user' PERMISSIONS FULL",
         "source_lang": "DEFINE FIELD source_lang ON user TYPE string PERMISSIONS FULL",
+        "tag_revision": "DEFINE FIELD tag_revision ON user TYPE int DEFAULT 0 PERMISSIONS FULL",
         "target_lang": "DEFINE FIELD target_lang ON user TYPE string PERMISSIONS FULL",
         "username": "DEFINE FIELD username ON user TYPE string PERMISSIONS FULL"
       },

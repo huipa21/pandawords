@@ -24,6 +24,22 @@ the existing loopback **8101** server:
 Retained probes: `test_context_schema.py`, `test_dictionary_schema.py`,
 `test_schema_snapshot.py`, `test_migrations.py`. No persistent dev database was changed.
 
+### Hierarchical tags and relation deletion (4.3.1) ✅
+
+Verified with SDK 3.0 against migrated random databases on existing loopback **8101**:
+`SELECT *, out.* AS tag` expands the target record, and combined relation-owner and independently
+dereferenced endpoint-owner predicates filter memberships. A real `user.tag_revision += 1`
+write serializes concurrent opposing parent edits; the existing `_atomic` conflict retry
+rechecks paths and yields one successful assignment plus one cycle conflict. Duplicate assignment
+retries commit one owner edge. Incoming/outgoing cleanup and tag deletion roll back together.
+**Deleting a relation endpoint automatically removes even foreign-owned incident relation edges.**
+The API therefore rejects tag deletion when any shared/foreign incident edge exists, before
+cleanup, rather than relying on an owner-filtered explicit edge DELETE to protect those edges.
+The real API suite retains this corruption probe and the rollback/concurrency cases.
+The bound relation expansion, independent owner filters and automatic endpoint cascade were
+also verified on the existing **8100** development database using uniquely named scratch
+tag/edge records; all scratch records were removed without changing schema or services.
+
 ### Recognition relation reads (3.2.3) ✅
 
 Verified against the migrated isolated harness on existing loopback **8101**: owner-filtered
