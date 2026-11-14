@@ -229,10 +229,29 @@ export interface paths {
     patch: operations['update_project_api_projects__id__patch']
     trace?: never
   }
+  '/api/dictionary/candidates': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Candidates */
+    post: operations['candidates_api_dictionary_candidates_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
   schemas: {
+    /** @enum {string} */
+    Accent: 'US' | 'UK'
     /** AdminUserCreate */
     AdminUserCreate: {
       /** Username */
@@ -288,6 +307,39 @@ export interface components {
       token_type: 'bearer'
       user: components['schemas']['UserRead']
     }
+    /** Candidate */
+    Candidate: {
+      lemma: components['schemas']['LexiconLemma']
+      /** Matched By */
+      matched_by: ('exact' | 'form' | 'spacy')[]
+      /** Lexemes */
+      lexemes: components['schemas']['CandidateLexeme'][]
+    }
+    /** CandidateLexeme */
+    CandidateLexeme: {
+      lexeme: components['schemas']['LexiconLexeme']
+      /** Senses */
+      senses: components['schemas']['LexiconSense'][]
+      /** Pronunciations */
+      pronunciations: components['schemas']['LexiconPronunciation'][]
+      /** Glosses */
+      glosses: components['schemas']['LexiconGloss'][]
+    }
+    /** CandidateRequest */
+    CandidateRequest: {
+      /** Text */
+      text: string
+    }
+    /** CandidateResponse */
+    CandidateResponse: {
+      /** Normalized */
+      normalized: string
+      /** Candidates */
+      candidates: components['schemas']['Candidate'][]
+      /** Sources */
+      sources: components['schemas']['LexiconSource'][]
+    }
+    DictionaryKey: (string | number)[]
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
@@ -313,6 +365,105 @@ export interface components {
       run_after: string
       /** Error */
       error?: string | null
+    }
+    JsonValue: unknown
+    /** LexiconGloss */
+    LexiconGloss: {
+      lexeme_id: components['schemas']['DictionaryKey']
+      /** Gloss */
+      gloss: string
+      /** Source */
+      source: string
+      sense_id: components['schemas']['DictionaryKey'] | null
+    }
+    /** LexiconLemma */
+    LexiconLemma: {
+      id: components['schemas']['DictionaryKey']
+      /** Text */
+      text: string
+      /** Lang */
+      lang: string
+      /**
+       * Kind
+       * @enum {string}
+       */
+      kind: 'word' | 'phrase'
+      /** Freq Zipf */
+      freq_zipf: number | null
+      /** Cefr */
+      cefr: string | null
+      /** Source */
+      source: string
+    }
+    /** LexiconLexeme */
+    LexiconLexeme: {
+      id: components['schemas']['DictionaryKey']
+      lemma_id: components['schemas']['DictionaryKey']
+      /** Pos */
+      pos: string
+      /** Etymology No */
+      etymology_no: number
+      /** Etymology Text */
+      etymology_text: string | null
+      /** Source */
+      source: string
+    }
+    /** LexiconPronunciation */
+    LexiconPronunciation: {
+      /** Id */
+      id: string
+      lexeme_id: components['schemas']['DictionaryKey']
+      accent: components['schemas']['Accent'] | null
+      /** Ipa */
+      ipa: string | null
+      /** Audio */
+      audio: {
+        [key: string]: components['schemas']['JsonValue']
+      }
+      /** Tags */
+      tags: string[]
+      /** Source */
+      source: string
+    }
+    /** LexiconSense */
+    LexiconSense: {
+      id: components['schemas']['DictionaryKey']
+      lexeme_id: components['schemas']['DictionaryKey']
+      /** Definition */
+      definition: string
+      /** Glosses */
+      glosses: string[]
+      /** Gloss Zh */
+      gloss_zh: string | null
+      /** Tags */
+      tags: string[]
+      /** Register */
+      register: string[]
+      /** Domain */
+      domain: string[]
+      /** Examples */
+      examples: {
+        [key: string]: components['schemas']['JsonValue']
+      }[]
+      /** Rank */
+      rank: number
+      /** Common */
+      common: boolean
+      /** Source */
+      source: string
+      /** Source Id */
+      source_id: string | null
+      /** Lexname */
+      lexname: string | null
+    }
+    /** LexiconSource */
+    LexiconSource: {
+      /** Name */
+      name: string
+      /** Metadata */
+      metadata: {
+        [key: string]: components['schemas']['JsonValue']
+      }
     }
     /** LoginRequest */
     LoginRequest: {
@@ -964,6 +1115,39 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ProjectRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  candidates_api_dictionary_candidates_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CandidateRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CandidateResponse']
         }
       }
       /** @description Validation Error */

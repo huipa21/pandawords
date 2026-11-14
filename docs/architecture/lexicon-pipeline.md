@@ -8,7 +8,7 @@
 | Open English WordNet (2025 WN-LMF XML, compatible with `wn`) | synonym/antonym/hypernym/hyponym relations, lexnames (concept tags) | CC BY 4.0 + inherited Princeton WordNet license; attribute both teams |
 | ECDICT (skywind3000/ECDICT csv) | Chinese glosses, exam tags (`zk gk cet4 cet6 ky toefl ielts gre`), Collins/Oxford flags, BNC/COCA frequency, inflections (`exchange`) | MIT |
 | wordfreq | Zipf frequency (used to pre-check "common" senses and band words) | Apache-2.0 / data CC BY-SA |
-| spaCy `en_core_web_sm` | lemmatizing user input, sentences and passages | MIT |
+| spaCy + `spacy-lookups-data` English lookup pipeline | offline lemmatizing of candidate input; contextual sentence/passage models deferred | MIT |
 | lemminflect | inflection fallback when Wiktionary forms are missing | MIT |
 
 Field names in kaikki and ECDICT must be checked against the real files in task 2.1.x. Record them in
@@ -190,6 +190,46 @@ and source contracts are in the scripts README's ECDICT/wordfreq section.
 5. **`audio` job** (per lexeme × accent): Wiktionary audio URL → download → `media`. If there is no
    recording, use edge-tts (`EDGE_TTS_VOICE_US` / `EDGE_TTS_VOICE_UK`) on the lemma text. Shared
    audio has `owner = NONE` and is generated once for all users.
+
+### Candidates contract (2.4.1)
+
+`POST /api/dictionary/candidates`, bearer-authenticated, takes exactly `{"text":"went"}`.
+Input is English, 1–200 characters before normalization, then NFKC/case-folded with collapsed
+whitespace. Blank, non-string, punctuation-only/numeric-only, hidden control characters and
+unknown body fields fail with `422 validation.invalid`. Whitespace separators are permitted.
+Authentication uses the normal enabled-user/password-change gates (401/403).
+
+The 200 response is `{normalized, candidates, sources}` with `Cache-Control: no-store`.
+Each candidate has the full typed `lemma`, `matched_by` (`exact`, `form`, `spacy`) and
+`lexemes`. Each lexeme entry contains `{lexeme, senses, pronunciations, glosses}`.
+Structured lemma/lexeme/sense IDs are retained for add-to-project selection; senses retain
+their rank, `common` preselection flag, bilingual definitions, examples and source/source_id.
+`sources` contains the lexicon attribution records with licenses/version/checksums. Candidate
+data is shared, not user-owned, and contains no personal membership or override data.
+Unknown words/phrases return `candidates: [], sources: []`, not 404.
+
+Exact matches come first, followed by every `form_index` result, deduplicated by lemma ID.
+If a single-word input has no exact match, spaCy's lemma and its form-index matches are
+appended without discarding existing candidates. Phrases are atomic: exact phrase and
+phrase-form lookups only, never separate per-token guesses. Lexemes/senses retain reader order.
+
+The production dependency `app.api.dependencies.get_lexicon_reader` uses
+`Settings.lexicon_path` (`LEXICON_PATH`) when supplied, otherwise
+`Settings.lexicon_dir / "lexicon.sqlite"` (`LEXICON_DIR`). Paths resolve against the API
+process's working directory; use absolute paths for fixture-backed servers/E2E, for example
+`C:\other\pandawords\backend\tests\fixtures\lexicon_small.sqlite`. Tests can construct
+`create_app(settings.model_copy(update={"lexicon_path": fixture_path}))`; no private env
+edit, dictionary download or reader mock is required. Missing/invalid artifacts return
+`503 lexicon.missing` / `503 lexicon.invalid` lazily on candidate reads, leaving health,
+OpenAPI and unrelated routes available.
+
+Python 3.14 uses locked spaCy 3.8.18 (verified `cp314-win_amd64` wheel) with
+`spacy.blank("en")` + lookup-mode lemmatizer and locked `spacy-lookups-data` 1.0.5.
+No statistical model, model download, LLM or network request is needed at runtime.
+Pipeline creation/initialization and inference both run in `asyncio.to_thread`, protected by
+a worker-side lock and cached once per process. Lookup is deterministic but not contextual
+POS disambiguation; form-index ambiguity is preserved. Contextual sentence/passage tagging
+and its separate model selection remain later work.
 
 ## LLM (DeepSeek) uses — always optional
 

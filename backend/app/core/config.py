@@ -79,6 +79,7 @@ class Settings(BaseSettings):
     source_language: str = "zh"
     media_dir: Path = Path("data/media")
     lexicon_dir: Path = Path("data/lexicon")
+    lexicon_path: Path | None = None
     app_domain: str = "localhost"
     caddy_network: str = "pandawords"
     pixabay_api_key: str = "replace-with-your-api-key"
