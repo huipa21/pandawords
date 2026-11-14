@@ -68,6 +68,18 @@ and ownership contract rather than inventing scalar IDs.
 
 ### Scheduling service and settings
 
+Authenticated `GET /api/projects/{id}/study-plan` returns `StudyPlanRead`, with bounded queue
+pagination (`offset`, `limit`), plan settings, raw due/new and UTC completed counts, remaining
+allowances, exam capacity/buffer warnings and actual seven-day forecasts.
+`PUT /api/projects/{id}/study-plan/order` takes `SenseOrderUpdate` (every visible selected
+sense ID once), preserves hidden slots and returns `SenseOrderRead` (full persisted order).
+Other-owner projects return 404; success uses `Cache-Control: no-store`.
+`GET /api/dashboard` returns only the authenticated owner's deduplicated due/new availability,
+completed counts, nullable 30-date retention, streak and project forecasts. It cannot select
+another owner. These routers call `services/study_plan.py`; pure UTC/FSRS calculations live
+in `study_plan_calculations.py`, owner-bound snapshots/order writes in `db/study_plan.py`.
+Settings continue to use complete `plan` replacement through the project PATCH endpoint.
+
 `services/srs.py` owns per-user/sense FSRS 6.x cards and atomic completed reviews.
 Add-to-project creates absent cards in the membership/job transaction. Legacy selections,
 including hidden ones, are reconciled through `reconcile_memberships` before queue reads.

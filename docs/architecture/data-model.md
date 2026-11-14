@@ -109,7 +109,7 @@ content tasks should reuse them rather than redefine this migration.
 | `user` | `username`, `password_hash`, `role` (admin\|user), `disabled`, `must_change_password`, `source_lang`, `target_lang`, `prefs {theme, locale, accent, desired_retention}` | |
 | `refresh_token` | `user`, `token_hash`, `expires_at`, `revoked_at?`, `replaced_by?` | rotation |
 | `project` | `owner`, `name`, `description`, `target_lang`, `source_lang`, `plan {daily_new, exam_date?, review_cap?}`, `created_at` | |
-| `includes` (edge) | project → lemma\|lexeme\|sense\|sentence\|passage | `hidden`, `added_at`. Selected senses = `includes` edges to senses. Lexeme edges are independent group-visibility markers, not sense selections. Hidden items are kept for restore and history |
+| `includes` (edge) | project → lemma\|lexeme\|sense\|sentence\|passage | `hidden`, `added_at`, `study_order?`. Selected senses = `includes` edges to senses. Lexeme edges are independent group-visibility markers, not sense selections. Hidden items are kept for restore and history |
 | `override` | id `override:[user:<id>, <target record>]`, `fields` (partial object), `updated_at` | Edits per user, applied on read |
 | `note` | `owner`, `target` (any record), `kind` (note\|mnemonic), `text` | |
 | `media` | `owner?` (NONE for shared audio), `target`, `kind` (audio\|image), `path`, `mime`, `source` (wiktionary\|edge_tts\|pixabay\|upload), `attribution?`, `accent?` | |
@@ -192,6 +192,16 @@ required string. The migration adds just `project_owner(owner)` and
 `note_owner_target(owner, target)` non-unique indexes. Media remains a separate migration.
 
 ### Project API models and lifecycle
+
+Migration `0016_project_sense_order.surql` adds optional nonnegative integer
+`includes.study_order`. Existing memberships remain unchanged and initially sort by `added_at`
+then edge ID; the owner-scoped reorder transaction writes contiguous positions across all
+selected senses, including hidden items. Duplicate legacy edges receive the same target's
+position. Hidden flags, membership IDs/timestamps, cards and history are not replaced.
+New memberships without an explicit position append after persisted slots. The existing
+owner/project/target lookup index serves these reads/writes; ordering is computed inside the
+bounded snapshot. Reorder increments the existing internal project revision to serialize
+concurrent reorders.
 
 `ProjectCreate` requires `name` (trimmed, 1–128 characters). `description` defaults to `""`
 (maximum 10,000 characters); `target_lang`/`source_lang` default to `en`/`zh` and accept trimmed

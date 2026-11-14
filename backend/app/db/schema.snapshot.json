@@ -139,7 +139,8 @@
         "hidden": "DEFINE FIELD hidden ON includes TYPE bool PERMISSIONS FULL",
         "in": "DEFINE FIELD in ON includes TYPE record<project> PERMISSIONS FULL",
         "out": "DEFINE FIELD out ON includes TYPE record<lemma | lexeme | sense | sentence | passage> PERMISSIONS FULL",
-        "owner": "DEFINE FIELD owner ON includes TYPE record<user> PERMISSIONS FULL"
+        "owner": "DEFINE FIELD owner ON includes TYPE record<user> PERMISSIONS FULL",
+        "study_order": "DEFINE FIELD study_order ON includes TYPE none | int ASSERT $value = NONE OR $value >= 0 PERMISSIONS FULL"
       },
       "indexes": {
         "includes_owner_project_target": "DEFINE INDEX includes_owner_project_target ON includes FIELDS owner, in, out"

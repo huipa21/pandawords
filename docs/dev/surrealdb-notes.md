@@ -4,6 +4,17 @@ Check here before writing SurrealQL. **Status:** ✅ verified on the version sho
 form is wrong (a working, verified replacement is given). New, unverified beliefs must be
 tested before being used.
 
+### Persisted study order and planning snapshots (3.1.3) ✅
+
+Verified 2026-11-14 against SurrealDB 3.3.5 / SDK 3.0, isolated migrated databases on
+existing `127.0.0.1:8101`: optional nonnegative `includes.study_order` survives visibility
+updates without replacing IDs or timestamps. Bound owner/project/target updates assign all
+legacy duplicate memberships the same position. Owner-filtered memory reads with bound
+`sense IN $senses` handle empty arrays; owner history `at <= $end` includes completions exactly
+at the read instant. Actual API tests verify persisted hidden slots, shared cards, every
+content/edge ownership layer, UTC counts, schedules and forecasts. Existing membership/graph
+lookup indexes and transaction helpers are reused. No persistent dev DB was modified.
+
 ### Atomic scheduling and preferences (3.1.2) ✅
 
 Verified 2026-11-14 against SurrealDB 3.3.5 / SDK 3.0.0, isolated random harness databases

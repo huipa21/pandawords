@@ -829,6 +829,160 @@
         }
       }
     },
+    "/api/projects/{id}/study-plan": {
+      "get": {
+        "tags": [
+          "study-plan"
+        ],
+        "summary": "Read Plan",
+        "operationId": "read_plan_api_projects__id__study_plan_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 10000,
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudyPlanRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/{id}/study-plan/order": {
+      "put": {
+        "tags": [
+          "study-plan"
+        ],
+        "summary": "Reorder",
+        "operationId": "reorder_api_projects__id__study_plan_order_put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SenseOrderUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SenseOrderRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dashboard": {
+      "get": {
+        "tags": [
+          "study-plan"
+        ],
+        "summary": "Read Dashboard",
+        "operationId": "read_dashboard_api_dashboard_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardRead"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/api/projects/{project_id}/tree": {
       "get": {
         "tags": [
@@ -2038,6 +2192,91 @@
         ],
         "title": "CandidateResponse"
       },
+      "CardState": {
+        "properties": {
+          "card_id": {
+            "type": "integer",
+            "title": "Card Id"
+          },
+          "state": {
+            "$ref": "#/components/schemas/State"
+          },
+          "step": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Step"
+          },
+          "stability": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stability"
+          },
+          "difficulty": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Difficulty"
+          },
+          "due": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Due"
+          },
+          "last_review": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Review"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "card_id",
+          "state",
+          "due"
+        ],
+        "title": "CardState"
+      },
+      "CompletedCounts": {
+        "properties": {
+          "new": {
+            "type": "integer",
+            "title": "New",
+            "default": 0
+          },
+          "reviews": {
+            "type": "integer",
+            "title": "Reviews",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "title": "CompletedCounts"
+      },
       "CustomSenseCreate": {
         "properties": {
           "definition": {
@@ -2093,6 +2332,67 @@
           "definition"
         ],
         "title": "CustomSenseCreate"
+      },
+      "DashboardRead": {
+        "properties": {
+          "as_of": {
+            "type": "string",
+            "format": "date-time",
+            "title": "As Of"
+          },
+          "due_today": {
+            "type": "integer",
+            "title": "Due Today"
+          },
+          "new_today": {
+            "type": "integer",
+            "title": "New Today"
+          },
+          "today": {
+            "$ref": "#/components/schemas/CompletedCounts"
+          },
+          "retention_30_days": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retention 30 Days"
+          },
+          "streak": {
+            "type": "integer",
+            "title": "Streak"
+          },
+          "forecast": {
+            "items": {
+              "$ref": "#/components/schemas/ForecastDay"
+            },
+            "type": "array",
+            "title": "Forecast"
+          },
+          "projects": {
+            "items": {
+              "$ref": "#/components/schemas/ProjectForecast"
+            },
+            "type": "array",
+            "title": "Projects"
+          }
+        },
+        "type": "object",
+        "required": [
+          "as_of",
+          "due_today",
+          "new_today",
+          "today",
+          "retention_30_days",
+          "streak",
+          "forecast",
+          "projects"
+        ],
+        "title": "DashboardRead"
       },
       "DictionaryEntryRead": {
         "properties": {
@@ -2197,6 +2497,68 @@
           "sentence",
           "passage"
         ]
+      },
+      "ExamPacing": {
+        "properties": {
+          "remaining_new": {
+            "type": "integer",
+            "title": "Remaining New"
+          },
+          "days_left": {
+            "type": "integer",
+            "title": "Days Left"
+          },
+          "suggested_daily_new": {
+            "type": "integer",
+            "title": "Suggested Daily New"
+          },
+          "capacity": {
+            "type": "integer",
+            "title": "Capacity"
+          },
+          "buffer_capacity": {
+            "type": "integer",
+            "title": "Buffer Capacity"
+          },
+          "impossible": {
+            "type": "boolean",
+            "title": "Impossible"
+          },
+          "buffer_at_risk": {
+            "type": "boolean",
+            "title": "Buffer At Risk"
+          }
+        },
+        "type": "object",
+        "required": [
+          "remaining_new",
+          "days_left",
+          "suggested_daily_new",
+          "capacity",
+          "buffer_capacity",
+          "impossible",
+          "buffer_at_risk"
+        ],
+        "title": "ExamPacing"
+      },
+      "ForecastDay": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "due": {
+            "type": "integer",
+            "title": "Due"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "due"
+        ],
+        "title": "ForecastDay"
       },
       "Form-Input": {
         "properties": {
@@ -2669,6 +3031,33 @@
           "password"
         ],
         "title": "LoginRequest"
+      },
+      "MemoryRead": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "sense_id": {
+            "type": "string",
+            "title": "Sense Id"
+          },
+          "introduced": {
+            "type": "boolean",
+            "title": "Introduced"
+          },
+          "card": {
+            "$ref": "#/components/schemas/CardState"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "sense_id",
+          "introduced",
+          "card"
+        ],
+        "title": "MemoryRead"
       },
       "NoteCreate": {
         "properties": {
@@ -3311,6 +3700,57 @@
         ],
         "title": "ProjectCreate"
       },
+      "ProjectForecast": {
+        "properties": {
+          "project_id": {
+            "type": "string",
+            "title": "Project Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "due": {
+            "type": "integer",
+            "title": "Due"
+          },
+          "new": {
+            "type": "integer",
+            "title": "New"
+          },
+          "today": {
+            "$ref": "#/components/schemas/CompletedCounts"
+          },
+          "forecast": {
+            "items": {
+              "$ref": "#/components/schemas/ForecastDay"
+            },
+            "type": "array",
+            "title": "Forecast"
+          },
+          "exam": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExamPacing"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "project_id",
+          "name",
+          "due",
+          "new",
+          "today",
+          "forecast",
+          "exam"
+        ],
+        "title": "ProjectForecast"
+      },
       "ProjectMembershipRead": {
         "properties": {
           "id": {
@@ -3663,6 +4103,45 @@
         "maximum": 9.223372036854776e+18,
         "minimum": 0.0
       },
+      "SenseOrderRead": {
+        "properties": {
+          "project_id": {
+            "type": "string",
+            "title": "Project Id"
+          },
+          "sense_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Sense Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "project_id",
+          "sense_ids"
+        ],
+        "title": "SenseOrderRead"
+      },
+      "SenseOrderUpdate": {
+        "properties": {
+          "sense_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "maxItems": 10000,
+            "title": "Sense Ids"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "sense_ids"
+        ],
+        "title": "SenseOrderUpdate"
+      },
       "SrsPreferences": {
         "properties": {
           "desired_retention": {
@@ -3692,6 +4171,150 @@
           "desired_retention"
         ],
         "title": "SrsPreferencesUpdate"
+      },
+      "State": {
+        "type": "integer",
+        "enum": [
+          1,
+          2,
+          3
+        ],
+        "title": "State",
+        "description": "Enum representing the learning state of a Card object."
+      },
+      "StudyPlanRead": {
+        "properties": {
+          "project_id": {
+            "type": "string",
+            "title": "Project Id"
+          },
+          "as_of": {
+            "type": "string",
+            "format": "date-time",
+            "title": "As Of"
+          },
+          "plan": {
+            "$ref": "#/components/schemas/ProjectPlan"
+          },
+          "due": {
+            "type": "integer",
+            "title": "Due"
+          },
+          "new": {
+            "type": "integer",
+            "title": "New"
+          },
+          "today": {
+            "$ref": "#/components/schemas/CompletedCounts"
+          },
+          "remaining_new_allowance": {
+            "type": "integer",
+            "title": "Remaining New Allowance"
+          },
+          "remaining_review_allowance": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remaining Review Allowance"
+          },
+          "queue": {
+            "items": {
+              "$ref": "#/components/schemas/StudyQueueItem"
+            },
+            "type": "array",
+            "title": "Queue"
+          },
+          "queue_total": {
+            "type": "integer",
+            "title": "Queue Total"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "exam": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExamPacing"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "forecast": {
+            "items": {
+              "$ref": "#/components/schemas/ForecastDay"
+            },
+            "type": "array",
+            "title": "Forecast"
+          }
+        },
+        "type": "object",
+        "required": [
+          "project_id",
+          "as_of",
+          "plan",
+          "due",
+          "new",
+          "today",
+          "remaining_new_allowance",
+          "remaining_review_allowance",
+          "queue",
+          "queue_total",
+          "offset",
+          "limit",
+          "exam",
+          "forecast"
+        ],
+        "title": "StudyPlanRead"
+      },
+      "StudyQueueItem": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "review",
+              "new"
+            ],
+            "title": "Kind"
+          },
+          "memory": {
+            "$ref": "#/components/schemas/MemoryRead"
+          },
+          "retrievability": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retrievability"
+          },
+          "memory_version": {
+            "type": "string",
+            "title": "Memory Version",
+            "readOnly": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "memory",
+          "memory_version"
+        ],
+        "title": "StudyQueueItem"
       },
       "Text-Output": {
         "type": "string",

@@ -70,6 +70,15 @@
 
 ## Projects
 
+- Study-plan consumers use the generated `GET /api/projects/{id}/study-plan` contract.
+  Raw due/new counts, today's completed counts and the capped/paginated queue have different
+  meanings; do not infer totals from the queue page length. Save settings through project PATCH
+  with the full plan object. Reorder sends all effectively visible selected sense IDs to
+  `PUT .../study-plan/order`; do not send hidden items or rebuild their positions on restore.
+  Display exam impossibility and seven-day-buffer risk separately. UTC forecast dates and
+  stored exam instants are converted for display, never recalculated from the displayed local
+  date. Dashboard retention null means no data, not 0%. Queue reads do not introduce cards;
+  a framework attempt must retain the issued `memory_version` until confirmation.
 - `/projects` uses responsive cards, paginated API data and shared loading/empty/error patterns.
   Refresh and failed pagination keep confirmed rows; Retry repeats the failed page. Deletion uses
   `ConfirmAction` and only removes a card after API success; deleting a page's final card returns

@@ -117,7 +117,55 @@ implemented by 3.2.6/3.3.2.
   retrievability (lowest first).
 - Queue order: due reviews first, then new senses in project order (the user can reorder).
 
+### Planning API (3.1.3)
+
+`GET /api/projects/{id}/study-plan?offset=0&limit=100` returns settings, visible due-now and
+unintroduced counts, completed UTC-today introduction/review counts, remaining allowances,
+the capped queue, exam pacing and seven forecast dates. Queue pages allow offsets 0–10,000
+and limits 1–500; `queue_total` is the size after daily caps, before pagination. Counts are
+not reduced by pagination. A null review cap is unlimited; zero disables its category.
+Same-day learning repetitions remain eligible when scheduled due again, consuming review
+capacity rather than a second introduction. Each item contains `memory`, `memory_version`
+(the issuance fingerprint) and optional `retrievability`; confirmation still belongs to the
+trusted exercise framework, not this read API.
+
+Eligibility reuses selected memberships, independently visible lemma/lexeme/sense ancestors,
+and shared/requester-owned content **and** graph edges. Legacy cards are reconciled without
+introducing them. Due introduced cards sort by ascending actual FSRS retrievability, then due
+instant and opaque sense ID. Missing/nonpositive stability, missing last review, calculation
+errors or nonfinite/out-of-range results use a conservative sorting value of zero and expose
+`retrievability: null`; ties still use due/ID. New cards follow persisted membership order.
+
+`PUT /api/projects/{id}/study-plan/order` accepts `{sense_ids: [...]}` containing every
+effectively visible selected sense exactly once. It replaces only visible slots in the full
+order, keeping hidden senses (including hidden ancestors' descendants) in their original slots.
+It returns the complete order including hidden items. Missing/extra visible IDs are a
+`409 study.invalid_order`; duplicate IDs are invalid input. Initial order is membership
+`added_at`, then membership ID. Reordering persists all slots; future additions append.
+Use the existing `PATCH /api/projects/{id}` with a **complete** `plan` to change settings.
+
+Exam pacing honors the stored UTC **instant**, including local-midnight timestamps.
+`days_left` counts today's remaining window plus future UTC dates starting strictly before
+the exam; it is zero at/past the instant. The suggestion is
+`min(daily_new, ceil(remaining_new / max(1, days_left - 7)))`, never a new cap.
+Capacity is today's unspent new allowance plus a daily allowance for each such future date,
+or zero at/past the instant. `impossible` compares remaining new with exam capacity;
+`buffer_at_risk` independently compares it with capacity before the instant seven days earlier.
+For 20 remaining/10 daily/12 windows the suggestion is 4; 20/3/10 suggests 3 and risks only
+the buffer. A future midnight contributes no window on that midnight's date.
+
 ## Dashboard
 
 Due today, new today, retention over the last 30 days, a streak, and a per-project forecast for the
 next 7 days.
+
+`GET /api/dashboard` deduplicates shared cards across the owner's visible projects. Due today
+includes overdue cards and cards scheduled later on today's UTC date. New today is the maximum
+number of distinct visible unintroduced cards assignable to projects' remaining new allowances;
+shared cards never consume two introductions. Project forecasts retain their own memberships,
+plan pacing and completed counts. Owner totals include completed history even after a project
+is deleted. Retention is correct/completed answers over the last 30 UTC dates including today,
+or null without answers. Streak ends today or yesterday. Forecasts contain seven UTC dates,
+bucket overdue cards under today and use actual introduced-card due dates, never simulated
+reviews. Planning snapshots explicitly reject oversized trees, over 1,000 projects or over
+100,000 completed history rows with 413 rather than silently returning incomplete counts.
