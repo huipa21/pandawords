@@ -122,9 +122,10 @@ running this flow. Normal Playwright reports/results remain gitignored.
   `lexicon-small-oewn.xml` and `lexicon-small-frequency.json` sources. These original concise
   glosses and frequency values are test inputs, not extracts or authoritative lexical claims.
   `lexicon_reader` is a reusable pytest fixture returning the typed, async `LexiconReader`.
-  Derivation is currently etymology text; production affix extraction is deferred and the
-  committed affix table is empty. A private copy with affix rows tests the reader's ordering
-  and structured-key decoding without changing the production artifact.
+  Derivation uses the production Kaikki suffix-template importer: typed affix rows attach
+  the normalized base `decide` and suffix `-ion` to the `decision` lexeme. Reader tests follow
+  the base back to the source lemma/lexeme and verify ordered components and provenance;
+  no test-only SQL inserts these fixture rows.
 - The DeepSeek client is faked in tests by default. No network access in unit, integration or API tests.
 
 ### Rebuild and verify the small lexicon
@@ -144,6 +145,7 @@ Commit updated source inputs and the rebuilt database together. The focused test
 a worktree-local scratch directory and compare the complete logical SQL dump with the committed
 artifact (including source checksums). They cover exact/inflected/phrase lookup, polysemy,
 ranked/common senses, accents, translations, tags, frequencies, directional OEWN relations,
+structured derivation components imported from source etymology templates,
 missing/invalid databases and invalid record payloads. A read-only probe attempts a write on
 the actual connection before the service sets `query_only`; concurrent reads preserve the
 file's hash/mtime and leave no open Windows file handle or journal. No full lexicon is loaded.

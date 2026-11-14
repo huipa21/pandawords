@@ -328,8 +328,21 @@ the unmodified ECDICT, frequency and OEWN hooks; it never creates or patches SQL
 The injected frequency version is `synthetic-fixture-v1`. Input hashes and the logical database
 dump are reproducible; SQLite byte layout is not a compatibility guarantee.
 
-Derivation coverage currently means preserved `decide → decision` etymology text. Affix graph
-extraction is a later production feature; no fixture-only transform fabricates those rows.
+The production Kaikki importer extracts English `suffix` (alias `suf`) templates of the form
+`{{suffix|en|base|suffix}}` into the existing `affix` table. Positions 0/1 contain the normalized
+base (`type='root'`) and hyphen-prefixed suffix (`type='suffix'`), with Wiktionary provenance.
+This positional contract is documented by
+[Wiktionary's suffix template](https://en.wiktionary.org/wiki/Template:suffix/documentation)
+(checked 2026-11-14). Display metadata such as `alt1` does not replace the base lemma identity.
+Non-English component language overrides, missing/malformed components, extra positional
+components, wiki markup and conflicting supported decompositions are skipped, not guessed.
+Equivalent duplicate templates collapse; duplicate backbone records retain the first pair.
+Other etymology templates are not parsed. No new schema or relation type is introduced.
+
+The fixture's `decision` source explicitly supplies base `decide`, suffix `ion` and display
+stem `alt1=decis`; both affix rows now come from this production transform. Resolve a root's
+`text` with `get_lemma` and `lexemes` to follow the structured base→derived association;
+`affix.lexeme_id` identifies the derived lexeme. No fixture-only SQL inserts those rows.
 Use `app.services.lexicon.LexiconReader` for runtime reads and the pytest `lexicon_reader`
 fixture in consumers' tests. See [testing](../../docs/dev/testing.md#rebuild-and-verify-the-small-lexicon)
 for the focused offline test command.

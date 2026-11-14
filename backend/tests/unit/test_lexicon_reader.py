@@ -103,30 +103,22 @@ async def test_relations_are_directional_and_typed(lexicon_reader: LexiconReader
     }
 
 
-async def test_derivation_and_reserved_affix_reads(lexicon_reader: LexiconReader) -> None:
+async def test_derivation_reads_production_template_components(
+    lexicon_reader: LexiconReader,
+) -> None:
     decide = await lexicon_reader.get_lexeme(lexeme_key("en", "decide", "verb"))
     decision = await lexicon_reader.get_lexeme(lexeme_key("en", "decision", "noun"))
     assert decide is not None and decision is not None
     assert "decide" in (decision.etymology_text or "")
-    assert await lexicon_reader.affixes(decision.id) == []
-
-
-async def test_affix_rows_decode_structured_keys(tmp_path: Path) -> None:
-    output = tmp_path / "affixes.sqlite"
-    shutil.copyfile(FIXTURES / "lexicon_small.sqlite", output)
-    with closing(sqlite3.connect(output)) as connection:
-        connection.executemany(
-            "INSERT INTO affix VALUES (?, ?, ?, ?, 'wiktionary')",
-            [
-                ('["en","decision","noun",1]', 1, "-ion", "suffix"),
-                ('["en","decision","noun",1]', 0, "decis", "root"),
-            ],
-        )
-        connection.commit()
-    key = lexeme_key("en", "decision", "noun")
-    affixes = await LexiconReader(output).affixes(key)
-    assert [(item.text, item.type) for item in affixes] == [("decis", "root"), ("-ion", "suffix")]
-    assert all(item.lexeme_id == key for item in affixes)
+    affixes = await lexicon_reader.affixes(decision.id)
+    assert [(item.position, item.text, item.type) for item in affixes] == [
+        (0, "decide", "root"),
+        (1, "-ion", "suffix"),
+    ]
+    assert all(item.lexeme_id == decision.id and item.source == "wiktionary" for item in affixes)
+    base = await lexicon_reader.get_lemma(affixes[0].text)
+    assert base is not None and base.id == decide.lemma_id
+    assert decide in await lexicon_reader.lexemes(base.id)
 
 
 async def test_readonly_and_concurrent_reads(tmp_path: Path) -> None:

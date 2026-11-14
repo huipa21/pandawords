@@ -87,9 +87,14 @@ from `backend`; `dev.ps1 lexicon` orchestration remains task 2.1.6.
   Frequency uses an explicit synthetic snapshot/version, not a machine-dependent wordfreq
   installation. Source names identify the parser/enricher; input hashes retain provenance.
   Rebuilds preserve logical data; byte-identical SQLite files are not guaranteed.
-  `decide → decision` is preserved in `lexeme.etymology_text`; affix/derivation graph extraction
-  is not implemented by the current production importer, so the fixture's affix table is
-  intentionally empty (not patched with fixture-only SQL).
+  `decide → decision` is represented by production-imported `affix` rows on the `decision`
+  lexeme: position 0 is root/base lemma `decide`, position 1 is suffix `-ion`. The template's
+  `alt1=decis` is display text, not the base identity. Typed reader tests resolve that root
+  back to the `decide` lemma/verb lexeme; no fixture-only SQL fabricates the relationship.
+  The importer conservatively supports English `suffix`/`suf` templates with exactly one
+  base and suffix. It skips malformed, non-English, multi-component, markup-containing and
+  conflicting decompositions rather than guessing. This uses the existing affix schema,
+  not a new semantic relation type; `relates_to` and later graph materialization are separate.
 
 ### Runtime reader
 

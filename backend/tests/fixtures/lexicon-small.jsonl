@@ -7,7 +7,7 @@
 {"word":"schedule","lang_code":"en","pos":"noun","senses":[{"id":"schedule-plan","glosses":["A plan listing times for activities."]}],"sounds":[{"ipa":"/ˈskɛdʒuːl/","tags":["US"]},{"ipa":"/ˈʃɛdjuːl/","tags":["UK"]}]}
 {"word":"tomato","lang_code":"en","pos":"noun","senses":[{"id":"tomato-fruit","glosses":["A soft red fruit used as food."]}],"forms":[{"form":"tomatoes","tags":["plural"]}],"sounds":[{"ipa":"/təˈmeɪtoʊ/","tags":["US"]},{"ipa":"/təˈmɑːtəʊ/","tags":["UK"]}]}
 {"word":"decide","lang_code":"en","pos":"verb","senses":[{"id":"decide-choose","glosses":["Choose after thinking."]}],"forms":[{"form":"decided","tags":["past"]}],"derived":[{"word":"decision"}]}
-{"word":"decision","lang_code":"en","pos":"noun","etymology_text":"Derived from decide with the noun-forming suffix -ion; the stem changes to decis-.","etymology_templates":[{"name":"suffix","args":{"1":"en","2":"decide","3":"ion"}}],"senses":[{"id":"decision-choice","glosses":["A choice made after thinking."]}]}
+{"word":"decision","lang_code":"en","pos":"noun","etymology_text":"Derived from decide with the noun-forming suffix -ion; the stem changes to decis-.","etymology_templates":[{"name":"suffix","args":{"1":"en","2":"decide","3":"ion","alt1":"decis"}}],"senses":[{"id":"decision-choice","glosses":["A choice made after thinking."]}]}
 {"word":"walk","lang_code":"en","pos":"verb","senses":[{"id":"walk-move","glosses":["Move on foot at an ordinary pace."]}],"forms":[{"form":"walked","tags":["past"]}]}
 {"word":"move","lang_code":"en","pos":"verb","senses":[{"id":"move-position","glosses":["Change position or place."]}]}
 {"word":"happy","lang_code":"en","pos":"adj","senses":[{"id":"happy-pleased","glosses":["Feeling pleased and content."]}]}
