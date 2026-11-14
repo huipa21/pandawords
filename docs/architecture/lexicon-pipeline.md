@@ -63,8 +63,20 @@ from `backend`; `dev.ps1 lexicon` orchestration remains task 2.1.6.
   [`backend/scripts/README.md`](../../backend/scripts/README.md#sqlite-v1-and-extension-contract).
 - Senses are aligned across sources: Wiktionary is the backbone. ECDICT Chinese glosses attach at
   POS level (`sense.gloss_zh` for the top sense, `zh_gloss` lexeme-level list otherwise). OEWN
-  relations attach by best gloss overlap (a token Jaccard score; below the threshold they attach to
-  the lexeme's top sense with `source='oewn:approx'`).
+  aligns only existing lemma/POS senses, using the maximum pairwise gloss token Jaccard
+  score across all Wiktionary glosses and OEWN synset definitions. Tokens are NFKC/case-folded
+  Unicode alphanumeric words, with the fixed stopword list recorded in source metadata.
+  A score **>= 0.30** selects the best sense; ties prefer etymology number, sense rank, then ID.
+  Below 0.30 (including missing/empty definitions), the first etymology's top sense is used.
+  Relations have `source='oewn:approx'` if **either** endpoint uses that fallback.
+  Same-synset members produce both synonym directions; explicit sense/synset relations retain
+  their supplied direction and only synonym/antonym/hypernym/hyponym types are admitted.
+  Missing lemma/POS/synset/target mappings and self-edges are skipped, never materialized as
+  placeholders. OEWN `lexfile` fills an aligned sense's empty `lexname`; existing values and
+  domain tags are preserved (first source-order assignment wins if several synsets converge).
+  Three streaming XML passes retain only matched identities/alignments, not the XML tree or
+  full source relation graph. Plain XML and the downloaded gzip artifact are supported without
+  installing `wn`; source records retain OEWN and Princeton attribution and input checksum.
 - Test fixture: `backend/tests/fixtures/lexicon_small.sqlite`, about 50 words covering polysemy,
   phrases, US/UK differences and derivations. It is built by the same script with `--words fixture.txt`.
 
