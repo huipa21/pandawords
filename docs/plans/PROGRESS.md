@@ -42,6 +42,21 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
 
+### 2026-11-14 — Integrated release acceptance
+- Result / completed: main `dev.ps1 release -Version0.1.6913` built current API/worker and
+  responsive admin frontend into versioned image/deploy archives and SHA256SUMS.
+- Dependencies: all runtime tasks are ✅; E2E tooling1.6.6 remains in progress.
+- Verification: both hashes, exactly four deployment members, two image configs/platforms
+  linux/amd64, and clean initially-empty tmpfs/VFS-store load/identity/count checks passed.
+  Disposable store unmounted/removed; shared image store unchanged by the load check.
+- Skipped / deferred: live Docker/remote server deployment not run; E2E runner verification pending.
+- Failures / causes / corrections: first final image inspect failed because PowerShell pipeline
+  appended CR to its last argument; isolated store trap cleaned it. Repeated complete clean-store
+  load with final shell-comment terminator passed. Documented Windows pipeline pitfall.
+- Findings: archive images include all Phase1 runtime features; release command fails closed
+  on existing artifacts rather than silently overwriting.
+- Blockers / follow-ups: none.
+
 ### 2026-11-14 — 1.6.1 Complete development commands
 - Result / completed: up/down/check/test selectors, dev-only seeds entrypoint, locked/PID-safe
   lifecycle with native Windows Job Objects/process hosts, ready checks, logs and rollback;

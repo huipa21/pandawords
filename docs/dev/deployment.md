@@ -222,6 +222,22 @@ capability-free root configuration above resolved it without host ownership hack
 Only task-owned project resources and synthetic files were removed after the run;
 no dev/test database was used.
 
+### Phase 1 integrated acceptance
+
+The completed auth/admin frontend and API/worker images were rebuilt on 2026-11-14.
+An isolated production Compose project passed configuration validation, fresh migration,
+API readiness through the stand-in Caddy network, and worker startup as UID 10001.
+A separate disposable database proved the production image's worker executes `noop` once
+and stops gracefully. Worker is a top-level service, not an API `depends_on` entry.
+All smoke containers, volumes and networks were removed afterward.
+
+Release acceptance version `0.1.6913` produced exactly two `linux/amd64` images and the four
+documented deployment members. Both SHA-256 checks and a load into an initially empty
+tmpfs/VFS image store passed; the store was unmounted and removed without changing shared
+images. When piping a shell script through PowerShell to `podman machine ssh bash -s`,
+end it with a shell comment: the pipeline's trailing CRLF must not become part of the last
+command's argument.
+
 ## Upgrade
 
 ```bash
