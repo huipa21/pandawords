@@ -118,6 +118,29 @@ content tasks should reuse them rather than redefine this migration.
 | `job` | `type`, `payload`, `status` (queued\|running\|done\|failed), `attempts`, `run_after`, `error?`, `owner?` | |
 | `_migration` | id = version, `name`, `checksum`, `applied_at` | |
 
+Migration `0006_project_overlays.surql` adds only `project`, `includes`, `override` and `note`.
+All four are SCHEMAFULL with required `owner: record<user>` (no shared/NONE/NULL owners).
+Project names, descriptions and languages are required strings; `plan` is a typed object with
+required integer `daily_new`, optional datetime `exam_date`, and optional integer `review_cap`.
+`created_at`, membership `added_at` and override `updated_at` are required datetimes, supplied
+by callers; `hidden` is a required boolean, not deletion. Restore updates the same membership
+edge, preserving its ID and `added_at`.
+
+`includes` is ENFORCED from an existing project to an existing lemma, sense, sentence or passage;
+it does **not** accept lexeme endpoints. The tree API must derive ancestor visibility within this
+contract; direct lexeme membership would require a later migration. Owners on projects, edges
+and targets must each be checked by repositories: endpoint enforcement does not enforce matching
+owners or authorization. No membership-uniqueness index is added by this task.
+
+Override `fields` is a flexible partial object, preserving arbitrary nested values without
+changing shared records. Repositories construct `override:[user, target]`, maintain its matching
+`owner`, validate target visibility and permitted edit fields, and delete that owner-bound row
+to reset; the database does not assert the ID shape or apply the overlay automatically.
+There is no separate override `target` field. Note `target` is a required `record` of any table
+(existence/visibility is checked by repositories), `kind` is `note | mnemonic`, and `text` is a
+required string. The migration adds just `project_owner(owner)` and
+`note_owner_target(owner, target)` non-unique indexes. Media remains a separate migration.
+
 ## Effective views
 
 - **Sense as seen by a user** = the shared sense record with `override:[user, sense].fields`
