@@ -161,3 +161,10 @@ Handle `exercise.no_usable`, expiry, unavailable hints, hidden/removed membershi
 attempt errors explicitly. Receipt-backed completed retries survive expiry; abandoned attempts
 require a new issuance. Transport orchestration remains the study-page task; the shared controls
 do not make API calls, import generators or expose their private answer specifications.
+
+For concrete recall (3.2.4), render cloze's blanked `prompt.text` verbatim; source examples
+are normalized with the shared English answer contract. Listening deliberately has empty
+prompt text and an opaque `media_id`: resolve it through the existing authenticated blob
+adapter and `AudioButton`, not a direct unauthenticated media URL. Do not fetch dictionary
+headwords/inflections to construct a listening label or a client-side answer key. Playback
+failure is unavailable media, never permission to reveal the spelling before server grading.

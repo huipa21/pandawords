@@ -56,6 +56,36 @@ the existing locked dependencies with `uv sync --frozen --quiet` resolved it. ES
 findings were fixed before the passing final check. No backend tests, E2E, generated-contract
 edits, stack lifecycle operations or live-data changes were performed for this frontend task.
 
+## Cloze and listening recall (3.2.4)
+
+On the existing loopback 8101 server, from `backend`:
+
+```powershell
+uv run --no-sync pytest -q tests\unit\test_exercise_recall.py tests\api\test_recall_attempts.py tests\unit\test_exercise_framework.py tests\api\test_exercise_attempts.py
+```
+
+Pure cases cover selected inflections, normalized Unicode/case/whitespace/punctuation,
+whole-word and multiword blanks, invalid examples, all-answer-occurrence removal, strict
+listening spelling, and independent fallback to recognition. Migrated API cases explicitly
+schedule introduced **Review** cards (new/learning cards must still select recognition),
+then exercise real create/read/answer/give-up/confirm flows and pregrade answer-key exclusion.
+They store local synthetic media bytes, exercise both accent preferences and authenticated
+delivery, reject private/wrong-target/wrong-accent/missing files and changed headword spelling,
+and verify that grading alone creates no review log. Media scratch directories live inside
+the worktree and are removed after each test; no live audio/LLM calls are needed.
+The framework's existing owner-isolation and replay tests remain in the focused command.
+
+Verification on 2026-11-14: all **77 focused recall/framework tests passed**. The complete
+repository `dev.ps1 check` passed. The complete backend run had **781 passed, 1 failed**: the unchanged
+`test_valid_persistent_canonical_cache_disabled` hit its five-second mocked-provider timeout
+on the first SDK call; adding that test to the focused retry reproduced the same timeout
+while all 77 exercise tests passed. This is not a clean full-suite pass. No provider network
+traffic is involved in that LLM fixture. Pylance's worktree hover request timed out; actual
+runtime tests and basedpyright checked the plugin contracts instead. Missing worktree test
+dependencies were restored with `uv sync` after the initial no-sync runner could not find
+pytest. No schemas, migrations or API transport shapes changed, so gen-api was not needed.
+No E2E, stack lifecycle or persistent dev-database operations were performed.
+
 ## Daily plan and dashboard (3.1.3)
 
 From `backend`, with `SURREAL_TEST_URL=ws://127.0.0.1:8101/rpc` and loopback proxy bypass:
