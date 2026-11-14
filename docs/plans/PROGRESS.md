@@ -10,14 +10,13 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 ## Current run
 
 Request: resume and complete Phase 1, proceeding through waves in dependency order.
-Next step: implement wave 10 admin API, frontend auth and worker/jobs in parallel task worktrees;
-assemble and verify each before starting wave 11.
+Next step: implement wave 11 admin UI and complete development commands in parallel;
+verify integrated UI/lifecycle, then implement wave 12 E2E.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 1.5.4 | `task/1.5.4-admin-api` | `../pandawords.worktrees/1.5.4` | Starting; dependency1.5.3 is ✅ |
-| 1.5.5 | `task/1.5.5-frontend-auth` | `../pandawords.worktrees/1.5.5` | Starting; dependencies1.5.3/1.4.3/1.4.5 are ✅ |
-| 1.6.2 | `task/1.6.2-worker-jobs` | `../pandawords.worktrees/1.6.2` | Starting; dependencies1.3.4/1.3.5/1.5.3/1.6.4 are ✅ |
+| 1.5.6 | `task/1.5.6-admin-ui` | `../pandawords.worktrees/1.5.6` | Starting; dependencies1.5.4/1.5.5 are ✅ |
+| 1.6.1 | `task/1.6.1-dev-lifecycle` | `../pandawords.worktrees/1.6.1` | Starting; dependencies1.3.3/1.4.3/1.6.2 are ✅ |
 
 ## Blocked
 
@@ -43,6 +42,54 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 1.5.4 Admin users API
+- Result / completed: paginated credential-free list, create/reset temporary passwords, role and
+  disable controls, atomic session revocation, self/last-enabled-admin guards; `83b367b` merged
+  as `1d1daad` with combined0003/0004 snapshot and regenerated API contracts.
+- Dependencies:1.5.3 is ✅.
+- Verification:18 focused cases and branch176 backend tests passed; combined main189 tests,
+  Ruff/format/basedpyright and frontend lint/types/43 tests passed; normal snapshot check left
+  generated snapshot unchanged. Real independent transaction races prove last-admin protection.
+- Skipped / deferred: admin UI remains1.5.6; no admin learning-data access added.
+- Failures / causes / corrections: expected router/generated snapshot/contracts conflicts
+  integrated without dropping jobs; generator rewrote contracts. Initial concurrent test
+  contention passed isolated reruns; no timeout changes. Existing Starlette warning remains.
+- Findings:0004_admin_guard serializes mutations and prevents write-skew; migration gaps work.
+- Blockers / follow-ups: none.
+
+### 2026-11-14 — 1.5.5 Frontend auth
+- Result / completed: NForm login/password pages, memory-only Pinia tokens, shared session restore,
+  user/admin/forced-change guards, logout and bilingual errors; `d896538` plus expired-logout
+  regression fix `7e3bd57` merged as `c8d2916`.
+- Dependencies:1.5.3/1.4.3/1.4.5 are ✅.
+- Verification: main default frontend suite59 tests, lint/typecheck/build passed; backend checks
+  unchanged clean. Real browser against isolated SurrealDB-backed API passed admin login,
+  httpOnly/Strict/path cookie, reload restore, memory-only token, actual signed-expired-token
+  logout401→refresh200→logout204 and cookie removal/reload logged-out; created user forced-change
+  redirect, hidden admin links, password change and post-change restore passed.
+- Skipped / deferred: responsive admin actions remain1.5.6; E2E runner remains1.6.6.
+- Failures / causes / corrections: expired logout initially left cookie, fixed with independent
+  refresh/revocation and focused failing-before/passing-after regression. Agent parallel test
+  resource contention resolved; normal main tests passed without timeout changes.
+- Findings: auth state never persisted; explicit cookie mutations serialize logout/relogin.
+- Blockers / follow-ups: none. Bounded Vite/API helpers stopped; isolated test DB cleaned up.
+
+### 2026-11-14 — 1.6.2 Worker and jobs
+- Result / completed:0003_job, owner-scoped jobs endpoint, conditional atomic claims, noop registry,
+  LIVE wakeup/reconnect with5s polling fallback, bounded exponential retries and graceful shutdown;
+  worker compose service and generated contracts; `953e6a2` merged before admin integration.
+- Dependencies:1.3.4/1.3.5/1.5.3/1.6.4 are ✅.
+- Verification: branch full170 tests plus final focused15 passed; integrated main171, then
+  combined admin189 backend tests passed; Ruff/format/basedpyright and frontend checks/tests
+  passed. Snapshot explicit-update followed by normal comparison passed. Real3.3.5 independent
+  WS exactly-once claim, LIVE CREATE/UPDATE, disconnect/reconnect, retries and shutdown tested.
+- Skipped / deferred: integrated production image/compose smoke scheduled for final acceptance;
+  abrupt-crash running jobs require documented manual recovery, beyond graceful-shutdown skeleton.
+- Failures / causes / corrections: Windows signal registration regression fixed/tested;
+  known Starlette warning remains; no unresolved implementation failures.
+- Findings: verified SQL/LIVE behavior recorded in SurrealDB notes.
+- Blockers / follow-ups: none;1.6.1 now ready.
 
 ### 2026-11-14 — 1.5.3 Auth API
 - Result / completed: five auth endpoints, strict cookie, reload-based current_user/require_admin,
