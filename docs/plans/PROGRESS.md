@@ -18,7 +18,8 @@ browser logs will be committed as source.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 2.2.3 | task/2.2.3-dictionary-repository | ../pandawords.worktrees/2.2.3 | Starting; materialization/effective reads |
+| 2.3.3 | task/2.3.3-user-dictionary-api | ../pandawords.worktrees/2.3.3 | Starting; overrides/custom senses/notes |
+| 2.4.2 | task/2.4.2-add-to-project | ../pandawords.worktrees/2.4.2 | Starting; selected memberships and jobs |
 
 ## Blocked
 
@@ -44,6 +45,20 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 2.2.3 Shared materialization and effective reads
+- Result / completed: deterministic idempotent materialization, owner-safe record/entry/edge
+  reads and requester-only nonmutating overrides; typed facade; `701deb5` merged.
+- Dependencies: 2.2.1, 2.2.2 and 2.1.5 checked ✅. User dictionary and add APIs now ready.
+- Verification: agent focused 4 integration cases, backend 456, `check` and hooks passed;
+  main merge `check` and combined backend/frontend passed (476 backend).
+- Skipped / deferred: unsupported source associations and media ingestion remain separate
+  tasks; selected memberships are intentionally not repository-global state.
+- Failures / causes / corrections: initial environment restored after missing-tool failures;
+  no unresolved failures or blockers.
+- Follow-ups: selected `None` means common, empty list means no senses; effective cached
+  entry reads are filtered by project membership only in the upcoming project-tree service.
+  Branch/worktree removed after verification.
 
 ### 2026-11-14 — 2.4.1 Dictionary candidates API
 - Result / completed: authenticated normalized exact/form/phrase candidates with common senses
