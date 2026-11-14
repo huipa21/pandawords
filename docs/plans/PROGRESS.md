@@ -34,12 +34,11 @@ The images agent was notified before integration. Other additions require coordi
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 4.3.2 | task/4.3.2-morphology | ../pandawords.worktrees/4.3.2 | Committed 1c219be; awaiting integration |
 | 4.2.3 | task/4.2.3-reading | ../pandawords.worktrees/4.2.3 | Committed 865a5ae; awaiting integration |
 | 4.4.2 | task/4.4.2-graph-ui | ../pandawords.worktrees/4.4.2 | Agent running |
-| 4.4.4 | task/4.4.4-context-exercises | ../pandawords.worktrees/4.4.4 | Waiting for 4.2.2, 4.3.2 |
+| 4.4.4 | task/4.4.4-context-exercises | ../pandawords.worktrees/4.4.4 | Ready; both context prerequisites verified |
 | 4.4.3 | task/4.4.3-relations | ../pandawords.worktrees/4.4.3 | Waiting for 4.4.2 |
-| 5.1.3 | task/5.1.3-image-review | ../pandawords.worktrees/5.1.3 | Ready; prerequisite 5.1.1 verified |
+| 5.1.3 | task/5.1.3-image-review | ../pandawords.worktrees/5.1.3 | Agent running |
 
 ## Blocked
 
@@ -66,6 +65,19 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
 
+### 2026-11-15 — 4.3.2 Evidenced morphology and groups
+- Result / completed: `1c219be` merged as `da068b4`; source-backed ordered morphemes/provenance,
+  deterministic owner-safe groups and explicit opt-in validated fallback. Migration 0021/snapshot,
+  SQLite v3 fixture; rebuild older source artifacts rather than overwrite real data with fixtures.
+- Dependencies: 2.1.2, 4.3.1 and 3.2.5 checked ✅.
+- Verification: agent check and 90 focused/regression cases passed. Main integrated check and
+  81 morphology/phrase/build/reader/tag-migration/snapshot cases passed.
+- Failures / causes / corrections: initial agent full backend 959 passed/one tag migration test
+  assuming it was last; corrected that directly coupled assumption and targeted regression passed.
+  Full suite not claimed; docs conflicts preserved both features.
+- Skipped / deferred: final full suites/browser sweep; no public API change/gen-api needed.
+- Blockers / follow-ups: none; context exercise ready. Task cleanup pending.
+
 ### 2026-11-15 — 5.1.1 Deployed-proxy acceptance complete
 - Result / completed: follow-up `948d211` merged; fresh API-owned media volumes now retain
   their ownership when the later nginx mount encounters an otherwise empty directory. Dockerfile
@@ -78,8 +90,8 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: initial empty-volume copy-up by nginx reset ownership to 0:0;
   `nocopy` alone did not resolve it. Regression script and existing deployment/testing docs retained.
 - Skipped / deferred: none for image acceptance; live providers deliberately mocked/offline.
-- Blockers / follow-ups: none; 5.1.1 complete, image exercise ready. Scratch resources removed;
-  task branch/folder cleanup pending.
+- Blockers / follow-ups: none; 5.1.1 complete, image exercise running. Scratch resources removed;
+  task branch/folder safely removed after unlinking 1,631 reparse points without traversal.
 
 ### 2026-11-15 — 5.1.2 Mnemonic notes and optional suggestions
 - Result / completed: `42981cc` merged as `30c5caa`; kind-separated retained mnemonic drafts,
