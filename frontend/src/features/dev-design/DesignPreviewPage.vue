@@ -5,6 +5,10 @@ import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppHeader from '@/components/app/AppHeader.vue'
 import AppNavigation from '@/components/app/AppNavigation.vue'
+import ConfirmAction from '@/components/app/ConfirmAction.vue'
+import EmptyState from '@/components/app/EmptyState.vue'
+import ErrorState from '@/components/app/ErrorState.vue'
+import PageHeader from '@/components/app/PageHeader.vue'
 import { darkThemeOverrides, themeOverrides } from '@/design/naive-theme'
 import { radius, spacing, themes, typography } from '@/design/tokens'
 import en from '@/i18n/dev-design/en.json'
@@ -14,6 +18,8 @@ const { t } = useI18n({
   useScope: 'local',
   messages: { en, 'zh-CN': zhCN },
 })
+const { t: globalT } = useI18n({ useScope: 'global' })
+const confirming = ref(false)
 const message = useMessage()
 const sample = ref('')
 const selection = ref<ThemeMode>('light')
@@ -212,6 +218,26 @@ function colorVariable(group: typeof groups[number], name: string) {
         {{ t('mobile') }}
       </h3>
       <AppNavigation mobile />
+      <PageHeader :title="globalT('pages.users')" :subtitle="globalT('admin.protectionNotice')">
+        <template #actions>
+          <NButton size="large" @click="confirming = true">
+            {{ globalT('admin.disable') }}
+          </NButton>
+        </template>
+      </PageHeader>
+      <EmptyState title-key="admin.empty">
+        <template #action>
+          <NButton size="large" @click="message.success(globalT('admin.saved'))">
+            {{ globalT('admin.create') }}
+          </NButton>
+        </template>
+      </EmptyState>
+      <ErrorState :error="globalT('errors.transport')" @retry="message.success(globalT('admin.saved'))" />
+      <ConfirmAction
+        :show="confirming" title-key="admin.disable" content-key="admin.confirmNotice"
+        :params="{ username: globalT('auth.username') }"
+        @confirm="confirming = false" @cancel="confirming = false"
+      />
     </section>
   </div>
 </template>

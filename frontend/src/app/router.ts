@@ -16,13 +16,18 @@ const pages = [
   ['words/:lemmaId', 'word', 'word'],
   ['reading/:passageId', 'reading', 'reading'],
   ['settings', 'settings', 'settings'],
-  ['admin/users', 'admin-users', 'users'],
   ['admin/backup', 'admin-backup', 'backup'],
 ] as const
 
 export function createAppRouter(history: RouterHistory = createWebHistory()) {
   const children: RouteRecordRaw[] = [
     { path: '', redirect: '/projects' },
+    {
+      path: 'admin/users',
+      name: 'admin-users',
+      component: () => import('@/features/admin/AdminUsersPage.vue'),
+      meta: { title: 'users', admin: true },
+    },
     ...pages.map(([path, name, title]) => ({
       path,
       name,
