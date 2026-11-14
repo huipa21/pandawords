@@ -19,7 +19,6 @@ browser logs will be committed as source.
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
 | 2.2.3 | task/2.2.3-dictionary-repository | ../pandawords.worktrees/2.2.3 | Starting; materialization/effective reads |
-| 2.4.1 | task/2.4.1-candidates | ../pandawords.worktrees/2.4.1 | Starting; normalization and candidates API |
 
 ## Blocked
 
@@ -45,6 +44,20 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 2.4.1 Dictionary candidates API
+- Result / completed: authenticated normalized exact/form/phrase candidates with common senses
+  and provenance; offline spaCy lookup pipeline runs off the event loop; `6596fe4` merged.
+  Added optional absolute LEXICON_PATH for fixture/test configuration.
+- Dependencies: 2.1.5, 2.2.2 and 1.5.3 checked ✅.
+- Verification: agent `check`, backend 472, frontend and generated contracts passed.
+  Main locked sync after manifest change installed Python 3.14-compatible spaCy dependencies;
+  `gen-api`, `check` and combined backend/frontend passed (472 backend).
+- Skipped / deferred: contextual statistical models not required for deterministic offline
+  candidates; no runtime model download. E2E belongs to 2.6.6.
+- Failures / causes / corrections: initial environment/test issues fixed; package cache used
+  safe copy fallback where Windows hardlink unavailable. No unresolved failures or blockers.
+- Follow-ups: add API waits for repository; branch/worktree removed after verification.
 
 ### 2026-11-14 — 2.1.5 Fixture lexicon and typed reader
 - Result / completed: repeatable production-built 50-lemma fixture, read-only typed async
