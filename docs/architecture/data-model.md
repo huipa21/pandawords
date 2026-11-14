@@ -14,6 +14,12 @@ User-created dictionary-like rows (a custom sense, sentence, passage, tag or rel
 same tables as shared rows, but with `owner` set. **Every read filters `owner = NONE OR owner = $user`.**
 Edges carry `owner` too, so a user's custom sense attached to a shared lexeme stays invisible to others.
 
+Migration `0005_dictionary.surql` introduces all seven dictionary tables and all nine dictionary
+edges below as SCHEMAFULL, with `owner: option<record<user>>` on each. Omitted ownership is
+shared (`NONE`); `NULL`, strings and references to other tables are rejected. This is a storage
+contract, not database-level authorization: repositories must apply the owner filter on every
+record and edge read.
+
 ## Record IDs
 
 Shared rows use deterministic IDs, so materialization is idempotent and imports merge cleanly:
@@ -74,6 +80,27 @@ API transport uses `app/core/record_ids.py`; see [conventions](../dev/convention
 Phrase rule: `contains` always exists, even for idioms. `sense used_in phrase` exists only when a
 word's sense applies literally (e.g. *heavy rain*, not *kick the bucket*). A phrase's own meaning
 lives under its own lexeme/sense, like any lemma.
+
+Dictionary field types: textual fields (including `source`, POS, CEFR and tag kind) are strings;
+`freq_zipf` is a number; etymology number, ranks, orders and positions are integers; `common`
+is boolean. String-list fields have typed string elements. Forms/pronunciations are typed object
+arrays; pronunciation accents are `US | UK`, and optional audio is `record<media>`. Gloss and
+translation are flexible objects with string-valued language keys, preserving languages beyond
+`zh`. Fields marked `?` are optional (`NONE`, not `NULL`); `span` is exactly two integers.
+Relation endpoint unions match the table above and are `ENFORCED`: endpoints must exist.
+Phrase-only semantics for lemma endpoints remain a repository responsibility.
+
+The dictionary migration adds the minimum unique `lemma(lang, text)` index. Its uniqueness is
+global across owners, as specified above; custom lemma identity/ownership changes would need
+a later forward migration. Relation endpoint traversal uses SurrealDB's graph storage; no
+additional speculative lookup or edge-uniqueness indexes are introduced before repository queries
+exist. In particular, different owners may attach edges to the same endpoints.
+
+Scope: `media` metadata is listed under **Per-user tables**, not dictionary tables, and is
+deferred to the media work. The pronunciation reference constrains its target table but does
+not require a media record to exist. No media table/index, project, includes, override or note
+schema is introduced by `0005`; sentence/passage and their edges are already present, so later
+content tasks should reuse them rather than redefine this migration.
 
 ## Per-user tables
 
