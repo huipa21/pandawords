@@ -9,7 +9,7 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 
 ## Current run
 
-Request: implement Phase 4 with dependency-driven parallel agents (maximum five), merge all
+Request: implement Phases 4 and 5 with dependency-driven parallel agents (global maximum five), merge all
 task branches to main, commit all task files and remove task branches/worktree folders.
 Interpretation: "phase-34md" means the supplied Phase 4 detail document; Phase 3 is complete.
 Status: starting. Main was clean at `a1c8849`; all external Phase 1-3 dependencies are ✅.
@@ -23,13 +23,17 @@ default 24-worker load. Its bounded rerun (`--maxWorkers=2 --testTimeout=60000`)
 the complete bounded frontend baseline then passed 162/162. No unrelated timeout/configuration
 changes made. Main started the owned offline dev stack for syntax/browser verification
 (LLM budget zero, placeholder key, audio networking disabled); 8100/8000/5173 are ready.
-Coordination: another session is drafting `phase-5.md` only. Preserve that unrelated document
-without staging it; no Phase 5 implementation or cross-phase concurrent integration is authorized.
+Coordination update: the user subsequently authorized Phase 5 implementation in the other session,
+which handed off sole coordination here. The supplied `phase-5.md` is now explicitly in scope.
+All external Phase 5 dependencies are ✅; 5.1.3 waits for 5.1.1 integration/verification.
+Partition lemma-detail additions into separate components; preserve every locale/API contribution.
+Migration reservations: 0018 for image storage/search retry metadata only if required; 0019 for
+review media preferences (5.1.3); other schema additions require a coordinator allocation.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 4.1.1 | task/4.1.1-phrases | ../pandawords.worktrees/4.1.1 | Agent running, wave 1 |
-| 4.2.1 | task/4.2.1-context-schema | ../pandawords.worktrees/4.2.1 | Agent running, wave 1 |
+| 4.1.1 | task/4.1.1-phrases | ../pandawords.worktrees/4.1.1 | Committed c4ef220, awaiting integration |
+| 4.2.1 | task/4.2.1-context-schema | ../pandawords.worktrees/4.2.1 | Merged a266512, integrated check running |
 | 4.3.1 | task/4.3.1-tags | ../pandawords.worktrees/4.3.1 | Agent running, wave 1 |
 | 4.1.2 | task/4.1.2-phrase-flow | ../pandawords.worktrees/4.1.2 | Waiting for 4.1.1 |
 | 4.2.2 | task/4.2.2-ingestion | ../pandawords.worktrees/4.2.2 | Waiting for 4.2.1 |
@@ -39,6 +43,9 @@ without staging it; no Phase 5 implementation or cross-phase concurrent integrat
 | 4.4.2 | task/4.4.2-graph-ui | ../pandawords.worktrees/4.4.2 | Waiting for 4.4.1 |
 | 4.4.4 | task/4.4.4-context-exercises | ../pandawords.worktrees/4.4.4 | Waiting for 4.2.2, 4.3.2 |
 | 4.4.3 | task/4.4.3-relations | ../pandawords.worktrees/4.4.3 | Waiting for 4.4.2 |
+| 5.1.1 | task/5.1.1-images | ../pandawords.worktrees/5.1.1 | Ready, wave 1 |
+| 5.1.2 | task/5.1.2-mnemonics | ../pandawords.worktrees/5.1.2 | Ready, wave 1 |
+| 5.1.3 | task/5.1.3-image-review | ../pandawords.worktrees/5.1.3 | Waiting for 5.1.1 |
 
 ## Blocked
 
