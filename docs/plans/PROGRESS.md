@@ -18,8 +18,8 @@ Migration allocations: 0013 memory/history; 0014 LLM; 0015 SRS preferences;
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 3.1.1 | task/3.1.1-memory | ../pandawords.worktrees/3.1.1 | Ready; migration 0013 |
-| 3.2.5 | task/3.2.5-llm | ../pandawords.worktrees/3.2.5 | Ready; migration 0014 |
+| 3.1.1 | task/3.1.1-memory | ../pandawords.worktrees/3.1.1 | Agent running; migration 0013 |
+| 3.2.5 | task/3.2.5-llm | ../pandawords.worktrees/3.2.5 | Agent running; migration 0014 |
 | 3.1.2 | task/3.1.2-srs | ../pandawords.worktrees/3.1.2 | Waiting for 3.1.1 |
 | 3.1.3 | task/3.1.3-plan | ../pandawords.worktrees/3.1.3 | Waiting for 3.1.2 |
 | 3.2.1 | task/3.2.1-exercises | ../pandawords.worktrees/3.2.1 | Waiting for 3.1.2 |
@@ -60,7 +60,10 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 ### 2026-11-14 — Phase 3 start
 - Result / completed: execution set recorded; existing user-authored Phase 3 planning included.
 - Dependencies: all external Phase 1/2 prerequisites checked ✅; internal dependencies pending.
-- Verification: repository state and tool availability inspected; implementation checks not run yet.
+- Verification: baseline `dev.ps1 check` passed; `dev.ps1 test -Backend -Frontend`
+  passed (556 backend tests, existing Starlette warning). Fixture-backed offline main stack
+  started with audio networking disabled; API/Vite/dev DB readiness returned HTTP 200.
+  Implementation-specific checks are pending.
 - Skipped / deferred: none; queued tasks wait for their dependencies.
 - Failures / causes / corrections: dirty main contained only requested planning input; preserved
   in the start commit under the user's explicit instruction to commit all files.
