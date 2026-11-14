@@ -11,8 +11,14 @@ the same memory.
 - `Scheduler` with default parameters at first. Per-user parameter optimization (from `review_log`)
   comes later.
 - Desired retention: per-user setting, default 0.9.
-- A new card is created when a sense is first added. It becomes reviewable once it is introduced
-  through the daily plan.
+- A new card is created in the add-to-project transaction for each selected sense. It remains
+  unintroduced until its first completed review. Repeat adds, second projects and hide/restore
+  never reset it. `srs.reconcile_memberships(db, owner)` backfills pre-Phase-3 selections,
+  including hidden memberships, atomically and idempotently; daily-plan callers must run this
+  before reading a legacy queue. `srs.read_memory` also reconciles when the requested card is absent.
+- `GET/PATCH /api/auth/me/srs-preferences` reads/updates only the authenticated user's
+  `desired_retention` (strictly between 0 and 1, default 0.9), preserving theme/locale/accent.
+  The scheduler reads this setting at confirmation, without rewriting existing due dates.
 
 ## Auto-rating (the user can change the rating before moving on)
 
@@ -25,11 +31,39 @@ Exercises are either **recognition** (choose from options) or **recall** (type o
 | Correct, normal time | Good | Good |
 | Correct and fast (< fast threshold) | Good (capped) | Easy |
 
-- The thresholds are per exercise type and per user: the rolling median of their correct response
-  times × 0.6 (fast) / × 1.8 (slow). Until 20 samples exist, use defaults from settings.
+- The thresholds use the last 100 prior completed correct responses of the same owner and exact
+  exercise type: median × 0.6 (fast) / × 1.8 (slow), after at least 20 samples.
+  Defaults are recognition 3,000/12,000 ms and recall 5,000/20,000 ms, configurable through
+  `SRS_RECOGNITION_FAST_MS`, `SRS_RECOGNITION_SLOW_MS`, `SRS_RECALL_FAST_MS` and
+  `SRS_RECALL_SLOW_MS`. Fast must not exceed slow; both boundaries themselves are normal.
 - Response time is measured on the client from when the prompt is shown to when the answer is
   submitted. It is capped at 60 s.
 - `review_log` stores `auto_rating`, the final `rating` and `duration_ms`.
+
+### Trusted framework integration
+
+`srs.read_memory(db, owner, sense_id) -> MemoryRead` provides the complete card and a
+content-derived `version`. Capture this version when issuing an attempt, not at confirmation.
+Only the exercise framework supplies `FrameworkGrade(exercise, kind, correct, gave_up,
+hint_used, duration_ms)` after server grading and elapsed-time validation; this is not an HTTP
+request model. The SRS wrapper rejects negative/noninteger duration and caps at 60,000 ms.
+
+`srs.grade_review(db, settings, owner, *, attempt_id, project_id, sense_id, expected_version,
+grade) -> GradedReview` checks effective tree eligibility and fixes the suggestion from prior
+history. Persist this immutable object in the server-owned attempt. The client may supply only
+its final rating to the framework's confirmation endpoint.
+
+`srs.apply_review(db, owner, review: GradedReview, rating: Rating, *, now=None) -> ReviewReceipt`
+rechecks owner, selected sense and visible ancestors/edges, the issuance version, UTC daily
+limits and retention inside one retryable transaction. The card, completed log and receipt
+commit together. A project revision write serializes capacity across different cards; a stale
+card fails with `srs.stale_review`. Identical completed retries return the original persisted
+receipt even after later reviews or project deletion; changed completion data fails with
+`srs.attempt_conflict`. Wrong/give-up correctness stays false even with a manual Easy override.
+
+The first review consumes the introduction project's UTC new allowance. Every later review,
+including same-day learning repetitions and reviews in another project, consumes that review
+project's allowance. A null review cap is unlimited; zero disables that category.
 
 ## Exercise types (Phase 3)
 

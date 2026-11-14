@@ -14,7 +14,7 @@ from app.domain.add_to_project import (
     EnrichJobPayload,
 )
 from app.domain.jobs import JobCreate, JobRead
-from app.services import dictionary, jobs
+from app.services import dictionary, jobs, srs
 from app.services.lexicon import LexiconReader
 
 
@@ -49,6 +49,8 @@ async def add_to_project(
             ],
             txn_id=txn,
         )
+        for sense in materialized.selected_sense_ids:
+            await srs.ensure_card(db, owner, sense, txn_id=txn)
         queued: list[JobRead] = []
 
         async def enqueue(kind: str, payload: EnrichJobPayload | AudioJobPayload, key: str) -> None:

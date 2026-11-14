@@ -10,6 +10,7 @@ class UserPreferences(BaseModel):
     theme: Literal["system", "light", "dark"] = "system"
     locale: str = "zh-CN"
     accent: Literal["US", "UK"] = "US"
+    desired_retention: float = Field(default=0.9, gt=0, lt=1, allow_inf_nan=False)
 
 
 class UserCreate(BaseModel):

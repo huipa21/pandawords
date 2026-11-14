@@ -36,7 +36,13 @@ async def test_duplicate_username_rejected(
     auth_db: AsyncWsSurrealConnection, user_attributes: dict[str, Value]
 ) -> None:
     first = await create_user(auth_db, user_attributes)
-    assert {key: first[key] for key in user_attributes} == user_attributes
+    assert {key: first[key] for key in user_attributes if key != "prefs"} == {
+        key: value for key, value in user_attributes.items() if key != "prefs"
+    }
+    assert first["prefs"]["desired_retention"] == 0.9
+    assert {key: value for key, value in first["prefs"].items() if key != "desired_retention"} == (
+        user_attributes["prefs"]
+    )
     with pytest.raises(MigrationError, match="user_username"):
         await create_user(auth_db, user_attributes)
     other = await create_user(auth_db, {**user_attributes, "username": "other", "role": "admin"})

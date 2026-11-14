@@ -30,7 +30,12 @@ function user(id: string, role: 'admin' | 'user' = 'user', disabled = false): co
     must_change_password: false,
     source_lang: 'zh-CN',
     target_lang: 'en',
-    prefs: { theme: 'system', locale: 'en', accent: 'US' },
+    prefs: {
+      theme: 'system',
+      locale: 'en',
+      accent: 'US',
+      desired_retention: 0.9,
+    },
   }
 }
 const self = user('owner', 'admin')

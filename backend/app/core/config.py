@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Literal
 from urllib.parse import urlsplit, urlunsplit
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -74,6 +74,20 @@ class Settings(BaseSettings):
     deepseek_api_key: str = "replace-with-your-api-key"
     deepseek_base_url: str = "https://api.deepseek.com"
     deepseek_model: str = "deepseek-chat"
+
+    srs_recognition_fast_ms: int = Field(default=3000, ge=0, le=60000)
+    srs_recognition_slow_ms: int = Field(default=12000, ge=0, le=60000)
+    srs_recall_fast_ms: int = Field(default=5000, ge=0, le=60000)
+    srs_recall_slow_ms: int = Field(default=20000, ge=0, le=60000)
+
+    @model_validator(mode="after")
+    def validate_srs_thresholds(self) -> Settings:
+        if (
+            self.srs_recognition_fast_ms > self.srs_recognition_slow_ms
+            or self.srs_recall_fast_ms > self.srs_recall_slow_ms
+        ):
+            raise ValueError("SRS fast thresholds must not exceed slow thresholds")
+        return self
 
     target_language: str = "en"
     source_language: str = "zh"

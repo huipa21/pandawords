@@ -38,7 +38,17 @@ async def test_enqueue_failure_rolls_back_dictionary_memberships_and_prior_jobs(
     lexemes = await lexicon_reader.lexemes(["en", "decision"])
     senses = await lexicon_reader.senses(lexemes[0].id)
     data = AddToProjectCreate(lemma_key=["en", "decision"], selected_senses=[senses[0].id])
-    tables = ("lemma", "lexeme", "sense", "morpheme", "has_sense", "composed_of", "includes", "job")
+    tables = (
+        "lemma",
+        "lexeme",
+        "sense",
+        "morpheme",
+        "has_sense",
+        "composed_of",
+        "includes",
+        "job",
+        "memory",
+    )
     before = {table: await visible(db, table, owner) for table in tables}
     original = jobs.enqueue
     calls = 0

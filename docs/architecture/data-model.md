@@ -106,7 +106,7 @@ content tasks should reuse them rather than redefine this migration.
 
 | Table | Fields | Notes |
 |---|---|---|
-| `user` | `username`, `password_hash`, `role` (admin\|user), `disabled`, `must_change_password`, `source_lang`, `target_lang`, `prefs {theme, locale, accent}` | |
+| `user` | `username`, `password_hash`, `role` (admin\|user), `disabled`, `must_change_password`, `source_lang`, `target_lang`, `prefs {theme, locale, accent, desired_retention}` | |
 | `refresh_token` | `user`, `token_hash`, `expires_at`, `revoked_at?`, `replaced_by?` | rotation |
 | `project` | `owner`, `name`, `description`, `target_lang`, `source_lang`, `plan {daily_new, exam_date?, review_cap?}`, `created_at` | |
 | `includes` (edge) | project → lemma\|lexeme\|sense\|sentence\|passage | `hidden`, `added_at`. Selected senses = `includes` edges to senses. Lexeme edges are independent group-visibility markers, not sense selections. Hidden items are kept for restore and history |
@@ -114,7 +114,7 @@ content tasks should reuse them rather than redefine this migration.
 | `note` | `owner`, `target` (any record), `kind` (note\|mnemonic), `text` | |
 | `media` | `owner?` (NONE for shared audio), `target`, `kind` (audio\|image), `path`, `mime`, `source` (wiktionary\|edge_tts\|pixabay\|upload), `attribution?`, `accent?` | |
 | `memory` | id `memory:[user:<id>, <sense record>]`, `owner`, `sense`, FSRS card state (`card_id`, `state`, `step?`, `stability?`, `difficulty?`, `due`, `last_review?`), `introduced` | One per user and sense, shared across projects |
-| `review_log` | `owner`, `memory`, `project`, `exercise`, `rating`, `auto_rating`, `correct`, `hint_used`, `duration_ms`, `at`, `is_introduction`, `attempt_id` | Completed reviews only; unique `(owner, attempt_id)` |
+| `review_log` | `owner`, `memory`, `project`, `exercise`, `rating`, `auto_rating`, `correct`, `hint_used`, `duration_ms`, `at`, `is_introduction`, `attempt_id`, `request_fingerprint?`, `receipt?` | Completed reviews only; unique `(owner, attempt_id)` |
 | `job` | `type`, `payload`, `status` (queued\|running\|done\|failed), `attempts`, `run_after`, `error?`, `owner?` | |
 | `_migration` | id = version, `name`, `checksum`, `applied_at` | |
 
@@ -139,6 +139,20 @@ Project references deliberately do not enforce existence or cascade: deleting a 
 removes its memberships but preserves cards and completed history (including its original
 project ID). Hiding/removing memberships also leaves cards and logs untouched.
 
+Migration `0015_srs_preferences.surql` adds `user.prefs.desired_retention` (float,
+0 < value < 1, default/backfill 0.9), without replacing the existing preferences object.
+It adds internal `project.srs_revision` (integer, default/backfill 0); completed review
+transactions increment it to serialize per-project limits across distinct cards. Public
+project models deliberately omit this storage-only revision.
+New logs additionally retain optional `request_fingerprint` and flexible `receipt` fields.
+The fingerprint binds the immutable server grade, issuance card version, attempt/project/sense
+and final rating. The receipt contains the complete resulting card and original completion
+metadata; JSON UTC timestamps are restored by typed models. Fields are optional for older
+logs; an old identity without a verifiable receipt is rejected rather than applied again.
+The owner/attempt uniqueness index from `0013` remains the exactly-once identity constraint.
+The FSRS 6.x wrapper round-trips all seven card fields through typed constructors, preserving
+optional values and UTC precision. Only the first confirmed review flips `introduced`.
+
 Migration `0006_project_overlays.surql` adds only `project`, `includes`, `override` and `note`.
 All four are SCHEMAFULL with required `owner: record<user>` (no shared/NONE/NULL owners).
 Project names, descriptions and languages are required strings; `plan` is a typed object with
@@ -153,7 +167,8 @@ the initial `added_at`. Targets are exactly the lemma plus explicitly selected s
 lexemes have no memberships until a tree visibility update creates a group marker. A repeat reuses any existing matching owner/project/target
 memberships (including legacy IDs), sets only their `hidden` flag to false, and preserves
 IDs/timestamps. Omitted senses and their hidden flags remain untouched; additions accumulate
-instead of replacing selections. No shared content, overrides, notes or memory is rewritten.
+instead of replacing selections. No shared content, overrides or notes are rewritten; absent memory is created within the
+same transaction without replacing an existing card.
 Migration `0008_includes_lookup.surql` adds the nonunique `(owner, in, out)` lookup index;
 deterministic IDs and the retryable add transaction prevent new duplicate memberships.
 

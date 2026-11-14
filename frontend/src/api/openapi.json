@@ -264,6 +264,76 @@
         ]
       }
     },
+    "/api/auth/me/srs-preferences": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Srs Preferences",
+        "operationId": "srs_preferences_api_auth_me_srs_preferences_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SrsPreferences"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Patch Srs Preferences",
+        "operationId": "patch_srs_preferences_api_auth_me_srs_preferences_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SrsPreferencesUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SrsPreferences"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/api/jobs/{id}": {
       "get": {
         "tags": [
@@ -3593,6 +3663,36 @@
         "maximum": 9.223372036854776e+18,
         "minimum": 0.0
       },
+      "SrsPreferences": {
+        "properties": {
+          "desired_retention": {
+            "type": "number",
+            "exclusiveMaximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Desired Retention",
+            "default": 0.9
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "SrsPreferences"
+      },
+      "SrsPreferencesUpdate": {
+        "properties": {
+          "desired_retention": {
+            "type": "number",
+            "exclusiveMaximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Desired Retention"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "desired_retention"
+        ],
+        "title": "SrsPreferencesUpdate"
+      },
       "Text-Output": {
         "type": "string",
         "maxLength": 10000
@@ -3622,6 +3722,13 @@
             ],
             "title": "Accent",
             "default": "US"
+          },
+          "desired_retention": {
+            "type": "number",
+            "exclusiveMaximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Desired Retention",
+            "default": 0.9
           }
         },
         "type": "object",

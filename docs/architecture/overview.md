@@ -66,6 +66,22 @@ Malformed/wrong-table IDs, missing projects and other users' projects all return
 Project tree and word-add endpoints are separate tasks; they must reuse the same project `rid`
 and ownership contract rather than inventing scalar IDs.
 
+### Scheduling service and settings
+
+`services/srs.py` owns per-user/sense FSRS 6.x cards and atomic completed reviews.
+Add-to-project creates absent cards in the membership/job transaction. Legacy selections,
+including hidden ones, are reconciled through `reconcile_memberships` before queue reads.
+Cards/history survive project deletion. The exercise framework, not a correctness-bearing
+client endpoint, supplies immutable graded attempts; confirmation applies the final rating,
+card update and exactly-once receipt together with owner/tree/daily-limit checks.
+
+Authenticated `GET/PATCH /api/auth/me/srs-preferences` uses `SrsPreferences`
+(`desired_retention`, default 0.9, strictly between 0 and 1). It cannot select another user
+and preserves other preferences. PATCH requires `SrsPreferencesUpdate.desired_retention`;
+an empty body cannot silently reset a saved setting. Auth's public `UserPreferences` also exposes the setting.
+The generated OpenAPI/types include this contract. Server timing defaults are configurable
+with the four `SRS_{RECOGNITION,RECALL}_{FAST,SLOW}_MS` environment settings.
+
 ## Backend modules
 
 | Module | Responsibility |
