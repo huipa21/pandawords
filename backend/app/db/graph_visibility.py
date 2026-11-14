@@ -36,12 +36,22 @@ async def bounded_rows(
     return rows
 
 
-async def visible(db: AsyncSurrealConnection, user: RecordID, txn: UUID) -> set[RecordID]:
+async def visible(
+    db: AsyncSurrealConnection, user: RecordID, txn: UUID, project: RecordID | None = None
+) -> set[RecordID]:
+    if project is not None and not await _rows(
+        db,
+        "SELECT id FROM $project WHERE owner = $user;",
+        {"project": project, "user": user},
+        txn_id=txn,
+    ):
+        raise AppError("project.not_found", 404, "Project not found.")
     memberships = await bounded_rows(
         db,
         "SELECT in, out, hidden FROM includes WHERE owner = $user AND in.owner = $user "
-        "AND (out.owner = NONE OR out.owner = $user) LIMIT $limit;",
-        {"user": user},
+        "AND (out.owner = NONE OR out.owner = $user) "
+        "AND ($project = NONE OR in = $project) LIMIT $limit;",
+        {"user": user, "project": project},
         txn,
         MAX_AUTH_ROWS,
     )
@@ -75,7 +85,7 @@ async def visible(db: AsyncSurrealConnection, user: RecordID, txn: UUID) -> set[
         grandparents = {parent for ancestor in ancestors for parent in parents.get(ancestor, set())}
         if not ({target} | ancestors | grandparents) & blocked:
             authorized.add(target)
-    for table in TABLE_FIELDS:
+    for table in () if project is not None else TABLE_FIELDS:
         owned = await bounded_rows(
             db,
             "SELECT id FROM type::table($table) WHERE owner = $user LIMIT $limit;",

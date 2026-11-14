@@ -8,7 +8,15 @@ from app.core.errors import AppError
 from app.core.record_ids import decode_rid
 from app.db import graph
 from app.domain.dictionary import DictionaryTable
-from app.domain.graph import GraphQuery, GraphRead
+from app.domain.graph import GraphNode, GraphQuery, GraphRead, GraphSeedsQuery
+
+
+async def seeds(db: AsyncSurrealConnection, owner: str, query: GraphSeedsQuery) -> list[GraphNode]:
+    try:
+        project = decode_rid(query.project_id, "project") if query.project_id else None
+    except ValueError:
+        raise AppError("graph.invalid_id", 422, "Invalid project ID.") from None
+    return await graph.seeds(db, owner, query, project)
 
 
 async def read(db: AsyncSurrealConnection, owner: str, query: GraphQuery) -> GraphRead:

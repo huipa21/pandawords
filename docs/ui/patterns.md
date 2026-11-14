@@ -16,6 +16,19 @@ retain the original file and request identity for retry; provider retries reuse 
 - Mobile-first. Below `lg`: header + bottom nav (Projects · Review · Words · Reading · Me).
   From `lg`: header + sidebar (Projects, All words, Reading, Review, Settings, Admin when the
   user is an admin).
+
+### Vocabulary graph (4.4.2)
+
+`/words` discovers paginated visible project vocabulary plus user-owned dictionary records.
+Nothing loads a graph until a focus is explicitly chosen. Search applies to effective labels;
+project graph discovery is scoped to the current project's non-hidden selections.
+Project detail defaults to the existing tree; switching to graph retains the tree instance,
+its page and expanded branches, and remembers graph focus when returning.
+The graph replaces its bounded neighborhood on expansion rather than accumulating nodes:
+depth is 0–3 and a 413 shows narrowing instructions instead of a partial/truncated graph.
+Filters and retry remain available after failures. Select a word/phrase to navigate to its
+detail; every node supports explicit expansion without requiring pointer gestures.
+
 - Each page: `PageHeader`, then content in a `max-w-content` container with `p-4 lg:p-6` and
   `gap-6` between sections.
 - Detail pages on mobile open full screen. On desktop, list + detail can sit side by side

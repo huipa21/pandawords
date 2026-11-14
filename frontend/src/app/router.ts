@@ -7,7 +7,6 @@ import AuthLayout from './layouts/AuthLayout.vue'
 const placeholder = () => import('./pages/PlaceholderPage.vue')
 
 const pages = [
-  ['words', 'words', 'words'],
   ['settings', 'settings', 'settings'],
   ['admin/backup', 'admin-backup', 'backup'],
 ] as const
@@ -20,6 +19,12 @@ export function createAppRouter(history: RouterHistory = createWebHistory()) {
       name: 'reading',
       component: () => import('@/features/reading/ReadingPage.vue'),
       meta: { title: 'reading' },
+    },
+    {
+      path: 'words',
+      name: 'words',
+      component: () => import('@/features/graph/AllWordsPage.vue'),
+      meta: { title: 'words' },
     },
     {
       path: 'tags',

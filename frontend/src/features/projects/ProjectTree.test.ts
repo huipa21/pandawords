@@ -11,6 +11,9 @@ const client = vi.hoisted(() => ({
   DELETE: vi.fn(),
 }))
 vi.mock('@/api/client', () => ({ api: client }))
+vi.mock('@/components/graph/GraphCanvas.vue', () => ({
+  default: { name: 'GraphCanvas', template: '<div />' },
+}))
 type Branch = components['schemas']['ProjectTreeLemmaRead']
 let cleanup: (() => void) | undefined
 let branches: Branch[]
@@ -96,6 +99,21 @@ afterEach(() => {
 })
 
 describe('project tree', () => {
+  it('switches to an on-demand graph and back without discarding the project tree', async () => {
+    const app = await setup(`/projects/${project.id}`)
+    cleanup = app.cleanup
+    const tree = app.wrapper.findComponent({ name: 'ProjectTree' })
+    const element = tree.element
+    expect(client.GET.mock.calls.some(call => call[0] === '/api/graph')).toBe(false)
+    await button('Graph').trigger('click')
+    await flushPromises()
+    expect(app.wrapper.find('[data-testid="graph-explorer"]').exists()).toBe(true)
+    expect(app.wrapper.findComponent({ name: 'ProjectTree' }).element).toBe(element)
+    await button('Tree').trigger('click')
+    await flushPromises()
+    expect(app.wrapper.findComponent({ name: 'ProjectTree' }).element).toBe(element)
+    expect(app.wrapper.find('[data-testid="graph-explorer"]').exists()).toBe(false)
+  })
   it('renders effective fields and accessible hidden management, preserving descendant flags', async () => {
     const app = await setup(`/projects/${project.id}`)
     cleanup = app.cleanup

@@ -4,6 +4,23 @@
  */
 
 export interface paths {
+  '/api/graph/seeds': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Graph Seeds */
+    get: operations['graph_seeds_api_graph_seeds_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/graph': {
     parameters: {
       query?: never
@@ -2491,6 +2508,40 @@ export interface components {
 }
 export type $defs = Record<string, never>
 export interface operations {
+  graph_seeds_api_graph_seeds_get: {
+    parameters: {
+      query?: {
+        q?: string
+        project_id?: string | null
+        page?: number
+        page_size?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GraphNode'][]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   read_graph_api_graph_get: {
     parameters: {
       query: {

@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import ErrorState from '@/components/app/ErrorState.vue'
 import PageHeader from '@/components/app/PageHeader.vue'
+import GraphExplorer from '@/features/graph/GraphExplorer.vue'
 import AddWordDialog from './AddWordDialog.vue'
 import ProjectTree from './ProjectTree.vue'
 import { useProject } from './useProject'
@@ -14,6 +15,12 @@ const router = useRouter()
 const { project, loading, loadError, load } = useProject(() => String(route.params.id))
 const adding = ref(false)
 const tree = ref<InstanceType<typeof ProjectTree>>()
+const view = ref<'tree' | 'graph'>('tree')
+const graphFocus = ref('')
+watch(() => route.params.id, () => {
+  graphFocus.value = ''
+  view.value = 'tree'
+})
 </script>
 
 <template>
@@ -51,7 +58,16 @@ const tree = ref<InstanceType<typeof ProjectTree>>()
         </p>
         <p>{{ t('projects.dailyNew', { count: project.plan.daily_new ?? 20 }) }}</p>
       </NCard>
-      <ProjectTree :key="project.id" ref="tree" :project-id="project.id" :source-lang="project.source_lang" @add="adding = true" />
+      <div class="flex gap-2" role="group" :aria-label="t('graph.view')">
+        <NButton size="large" :aria-pressed="view === 'tree'" @click="view = 'tree'">
+          {{ t('graph.tree') }}
+        </NButton>
+        <NButton size="large" :aria-pressed="view === 'graph'" @click="view = 'graph'">
+          {{ t('graph.title') }}
+        </NButton>
+      </div>
+      <ProjectTree v-show="view === 'tree'" :key="project.id" ref="tree" :project-id="project.id" :source-lang="project.source_lang" @add="adding = true" />
+      <GraphExplorer v-if="view === 'graph'" :key="project.id" :project-id="project.id" :initial-focus="graphFocus" @focus="graphFocus = $event" />
       <AddWordDialog v-model:show="adding" :project-id="project.id" @added="tree?.refresh()" @jobs-settled="tree?.refresh()" />
     </template>
   </section>

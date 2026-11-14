@@ -1,5 +1,14 @@
 # SurrealDB 3.3 notes
 
+## Scoped graph seed discovery (4.4.2) ✅
+
+Verified against the throwaway 8101 instance by `tests/api/test_graph.py`:
+binding optional project IDs in `($project = NONE OR in = $project)` preserves global
+project-union visibility and restricts project discovery when supplied. Project ownership is
+checked separately in the same transaction. Hidden lemma ancestry removes shared selected
+senses; owned global tags remain discoverable, and a second user's project discovery is 404.
+Seed batches reuse existing effective-node/override queries (maximum 300 per batch).
+
 ## Containing-phrase traversal (4.1.2) ✅
 
 Verified against the existing isolated random-database harness on loopback **8101**,

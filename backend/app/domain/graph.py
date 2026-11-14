@@ -9,6 +9,13 @@ from app.domain.dictionary import DictionaryRelation, DictionaryTable
 type GraphDirection = Literal["both", "outgoing", "incoming"]
 
 
+class GraphSeedsQuery(BaseModel):
+    q: str = Field(default="", max_length=200)
+    project_id: str | None = Field(default=None, max_length=16384)
+    page: int = Field(default=1, ge=1, le=10000)
+    page_size: int = Field(default=20, ge=1, le=100)
+
+
 class GraphQuery(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
