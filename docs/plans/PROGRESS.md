@@ -48,6 +48,20 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
 
+### 2026-11-14 — Phase 2 preparation and baseline
+- Result / completed: included the existing Phase 2 details and plan link in `b88db12`;
+  started four independent root tasks in isolated worktrees, maximum five concurrent agents.
+  Preserved pre-existing browser snapshots locally and ignored transient tool output in `c3fe592`.
+- Dependencies: all Phase 1 prerequisites checked ✅; no Phase 2 dependency bypassed.
+- Verification: main `check` passed; backend baseline 191 passed. Frontend baseline 64 passed
+  and one token-enforcement test timed out at 20s during parallel environment setup; targeted
+  rerun `pnpm exec vitest run src/design/enforcement.test.ts --reporter=dot` passed all 12.
+- Skipped / deferred: E2E and integrated Phase 2 acceptance pending implementation.
+- Failures / causes / corrections: initial progress patch partially applied because the table
+  separator differed; retried only the remaining file successfully. Baseline timeout was
+  transient concurrent CPU contention; no test timeout or product behavior changed.
+- Blockers / follow-ups: none currently; integrate finished prerequisites and dispatch dependents.
+
 ### 2026-11-14 — 1.6.6 First-login E2E and Phase 1 completion
 - Result / completed: planned Playwright dependency/config and one Chromium UI flow, generated
   contract types, isolated learner cleanup, safe credential inputs and disabled recordings;
