@@ -1,5 +1,18 @@
 # Component catalogue
 
+## Study feature components (`src/features/study/`)
+
+- `StudyCounts`: due-now/due-today, unintroduced/available-today and completed-today counters.
+- `StudyForecast`: accessible seven-date UTC table of actual scheduled reviews.
+- `ExamSummary`: server-calculated pacing, capacity, past-exam and revision-buffer warnings.
+- `RetentionSettings`: separately validated per-user scheduling preference; no history rewrite.
+- `SenseOrderEditor`: keyboard-operable, paginated priority draft over all visible selections,
+  including those outside today's capped queue. It starts explicitly in tree order because the
+  API currently cannot read the saved full priority. Loading every tree page must succeed
+  before saving; hidden slots remain server-managed.
+
+These are feature-owned, not shared exercise components. The project plan reuses `ProjectForm`.
+
 Use these. If something is missing, add it here **and** to `src/components/`, with an entry on the
 `/dev/design` preview page. Feature-only components stay in `src/features/<x>/components/`.
 

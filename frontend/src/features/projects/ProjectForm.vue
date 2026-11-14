@@ -20,6 +20,7 @@ const model = reactive({
   target_lang: props.initial?.target_lang ?? 'en',
   source_lang: props.initial?.source_lang ?? 'zh',
   plan: {
+    ...props.initial?.plan,
     daily_new: dailyNew,
     review_cap: props.initial?.plan?.review_cap ?? null,
     exam_date: props.initial?.plan?.exam_date ?? null,

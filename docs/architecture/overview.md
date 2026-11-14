@@ -157,6 +157,13 @@ SDK payload-bearing debug events are filtered even when debug logging is enabled
 
 ## Routes (frontend)
 
+`/review` is the authenticated global learning dashboard/project picker.
+`/projects/:id/plan` provides progress, server-calculated exam pacing, seven-date forecasts,
+the existing project settings form, an explicit visible-sense priority draft and separate
+personal desired-retention settings. Both use generated contracts and the authenticated API
+client; no learning data is persisted in browser storage. Feature-local display, form and
+priority components live in `src/features/study/`.
+
 `/login` · `/projects` · `/projects/:id` (tree) · `/projects/:id/review` · `/projects/:id/plan` ·
 `/words` (all-words graph) · `/words/:lemmaId` · `/reading/:passageId` · `/settings` ·
 `/admin/users` · `/admin/backup` · `/dev/design` (dev only)

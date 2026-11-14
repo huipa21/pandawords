@@ -28,6 +28,32 @@ request timed out; actual imports/tests, Ruff and basedpyright supplied validati
 Missing worktree Python dependencies were restored with offline `uv sync`, without changing
 manifests. No full backend suite or E2E run is implied by this focused result.
 
+## Plan and dashboard UI (3.3.3)
+
+Focused command from `frontend`:
+`pnpm exec vitest run src\features\study src\features\projects\ProjectEditorPage.test.ts --maxWorkers=2`.
+Tests cover complete project-plan preservation, optional-field clearing, zero limits,
+validation and save failures; separate desired-retention validation/PATCH without card/history
+writes; past/impossible/buffer-at-risk exams; loading, no-history versus true 0% retention,
+empty queues/projects, bilingual API/transport failures and review/plan navigation.
+Priority tests load multiple tree pages, include visible senses outside a zero-capped queue,
+exclude hidden ancestors, block partial-load saves and retain drafts on selection conflicts.
+The priority editor deliberately declares its tree-order initialization: the current API has
+no read endpoint for the full saved priority.
+
+Verification on 2026-11-14: `dev.ps1 check` passed, and the final full frontend suite passed
+**126 tests** with
+`pnpm exec vitest run --maxWorkers=2 --testTimeout=60000 --retry=1 --reporter=dot`.
+The production build (`pnpm build`) passed. The normal `dev.ps1 test -Frontend` run encountered
+three existing App/token-enforcement wall-clock timeouts under shared-machine load; the
+serial run passed 125 tests but still hit the token suite's explicit 20-second first-test
+timeout. An isolated retry confirmed that explicit timeout is not overridden by the CLI's
+60-second default. The final retry-enabled run accommodates ESLint's cold initialization
+without changing unrelated test files. The first check lacked worktree-local `ruff`; restoring
+the existing locked dependencies with `uv sync --frozen --quiet` resolved it. ESLint formatting
+findings were fixed before the passing final check. No backend tests, E2E, generated-contract
+edits, stack lifecycle operations or live-data changes were performed for this frontend task.
+
 ## Daily plan and dashboard (3.1.3)
 
 From `backend`, with `SURREAL_TEST_URL=ws://127.0.0.1:8101/rpc` and loopback proxy bypass:
