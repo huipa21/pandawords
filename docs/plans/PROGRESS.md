@@ -34,10 +34,9 @@ The images agent was notified before integration. Other additions require coordi
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 4.2.2 | task/4.2.2-ingestion | ../pandawords.worktrees/4.2.2 | Merged 40436cb; integrated verification running |
 | 4.3.2 | task/4.3.2-morphology | ../pandawords.worktrees/4.3.2 | Agent running |
 | 4.4.1 | task/4.4.1-graph-api | ../pandawords.worktrees/4.4.1 | Agent running; all prerequisites verified |
-| 4.2.3 | task/4.2.3-reading | ../pandawords.worktrees/4.2.3 | Waiting for 4.2.2 |
+| 4.2.3 | task/4.2.3-reading | ../pandawords.worktrees/4.2.3 | Ready; prerequisite 4.2.2 verified |
 | 4.4.2 | task/4.4.2-graph-ui | ../pandawords.worktrees/4.4.2 | Waiting for 4.4.1 |
 | 4.4.4 | task/4.4.4-context-exercises | ../pandawords.worktrees/4.4.4 | Waiting for 4.2.2, 4.3.2 |
 | 4.4.3 | task/4.4.3-relations | ../pandawords.worktrees/4.4.3 | Waiting for 4.4.2 |
@@ -69,6 +68,20 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-15 — 4.2.2 Owner-scoped sentence/passage ingestion
+- Result / completed: `4724129` merged as `40436cb`; private CRUD, atomic retry-safe ingestion,
+  reusable ordered sentences, Unicode spans, occurrence candidates/manual resolution and reading API.
+- Dependencies: 4.2.1, 2.4.1 and 3.2.5 checked ✅.
+- Verification: agent gen-api/check and final focused 31 passed; wider 106 passed/one existing
+  two-second database setup timeout, exact case passed on retry. Main regenerated all APIs,
+  check and 39 combined content/tag/phrase cases passed.
+- Failures / causes / corrections: interrupted agent full suite is not a pass; final integrated
+  suite follows later. Foreign incident edges block DELETE with 409 to prevent server cascade;
+  updates preserve record identity. Plain scalar aliases preserve existing generated schema names.
+  Router/docs conflicts merged retaining all routes; generated files rebuilt from integrated API.
+- Skipped / deferred: final full suites/browser sweep; no migration or live provider needed.
+- Blockers / follow-ups: none; reading ready, context exercise awaits morphology. Cleanup pending.
 
 ### 2026-11-15 — 4.1.2 Phrase discovery and add flow
 - Result / completed: `93a9848` merged as `866458e`; bounded exact containing-phrase lookup,
