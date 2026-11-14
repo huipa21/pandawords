@@ -18,6 +18,12 @@ TEXT = "The bus is leaving, so Maya moves quickly on foot to reach the stop."
 
 
 @pytest.fixture
+def db(job_db: AsyncSurrealConnection) -> AsyncSurrealConnection:
+    """Keep the auth factory, SRS state and worker queue in one per-test database."""
+    return job_db
+
+
+@pytest.fixture
 def settings() -> Settings:
     options: dict[str, Any] = {
         "_env_file": None,

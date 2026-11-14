@@ -16,6 +16,7 @@ from tests.conftest import UserFactory
 from tests.integration.srs_support import create_study
 from tests.llm_support import provider as provider
 from tests.scenario_support import TEXT, claim_scenario, study_context
+from tests.scenario_support import db as db
 from tests.scenario_support import scheduled as scheduled
 from tests.scenario_support import settings as settings
 

@@ -22,6 +22,7 @@ from tests.conftest import UserFactory
 from tests.integration.srs_support import create_study, graded
 from tests.llm_support import provider as provider
 from tests.scenario_support import TEXT, claim_scenario, study_context
+from tests.scenario_support import db as db
 from tests.scenario_support import scheduled as scheduled
 from tests.scenario_support import settings as settings
 
@@ -122,11 +123,13 @@ async def test_custom_source_cache_never_crosses_owners(
 
 async def test_scenario_uses_durable_local_grading_ownership_and_timing(
     db: AsyncSurrealConnection,
+    job_db: AsyncSurrealConnection,
     make_user: UserFactory,
     lexicon_reader: LexiconReader,
     settings: Settings,
     provider: dict[str, Any],
 ) -> None:
+    assert db is job_db, "Scenario auth, cards and worker jobs must use one isolated database"
     study = await create_study(db, make_user, lexicon_reader)
     other = await make_user()
     context = await study_context(db, study)
