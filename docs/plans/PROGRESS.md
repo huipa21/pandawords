@@ -18,7 +18,6 @@ Migration allocations: 0013 memory/history; 0014 LLM; 0015 SRS preferences;
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 3.1.3 | task/3.1.3-plan | ../pandawords.worktrees/3.1.3 | Agent running; migration 0016 |
 | 3.2.1 | task/3.2.1-exercises | ../pandawords.worktrees/3.2.1 | Agent running; migration 0017 |
 | 3.2.2 | task/3.2.2-distractors | ../pandawords.worktrees/3.2.2 | Waiting for 3.2.1 |
 | 3.2.3 | task/3.2.3-recognition | ../pandawords.worktrees/3.2.3 | Waiting for 3.2.2 |
@@ -26,7 +25,7 @@ Migration allocations: 0013 memory/history; 0014 LLM; 0015 SRS preferences;
 | 3.2.6 | task/3.2.6-scenario | ../pandawords.worktrees/3.2.6 | Waiting for 3.2.1; 3.2.5 complete |
 | 3.3.1 | task/3.3.1-components | ../pandawords.worktrees/3.3.1 | Waiting for 3.2.1 |
 | 3.3.2 | task/3.3.2-review | ../pandawords.worktrees/3.3.2 | Waiting for review prerequisites |
-| 3.3.3 | task/3.3.3-dashboard | ../pandawords.worktrees/3.3.3 | Waiting for 3.1.3 |
+| 3.3.3 | task/3.3.3-dashboard | ../pandawords.worktrees/3.3.3 | Ready |
 | 3.3.4 | task/3.3.4-e2e | ../pandawords.worktrees/3.3.4 | Waiting for 3.3.2 and 3.3.3 |
 
 ## Blocked
@@ -53,6 +52,30 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — Phase 4 task details
+- Result / completed: added [phase-4.md](phase-4.md) with goals, deliverables and acceptance
+  criteria for all Phase 4 tasks; Phase 3 run and PLAN statuses are unchanged.
+- Dependencies: plan and existing architecture/UI/testing contracts reviewed; Phase 4 task
+  dependencies remain as listed in PLAN.md.
+- Verification: documentation reviewed against PLAN.md and existing contracts; `git diff --check`
+  passed. No code tests apply to this documentation-only change.
+- Skipped / deferred: no implementation or migration performed.
+- Failures / causes / corrections: none.
+- Findings: sentence, passage, phrase, tag, morpheme and related edge schemas already exist in
+  migration 0005; task 4.2.1 requires verification and only additive migration if needed.
+- Blockers / follow-ups: none.
+
+### 2026-11-14 — 3.1.3 Study plans and dashboard API
+- Result / completed: `b25660f` merged; owner-scoped bounded queues, preserved hidden order,
+  exact UTC exam pacing, retention/streak/forecasts, migration 0016 and generated contracts.
+- Dependencies: 3.1.2 checked ✅.
+- Verification: agent focused 46/backend 689/frontend 109 passed; integrated main gen-api,
+  check and backend/frontend passed (689 backend; existing Starlette warning).
+- Skipped / deferred: none. Failures / causes / corrections: agent frontend token test
+  timed out under concurrency; serial frontend run passed. Pylance worktree resolution
+  unavailable; runtime and basedpyright passed.
+- Blockers / follow-ups: none; dashboard UI now ready; cleanup follows.
 
 ### 2026-11-14 — 3.1.2 Atomic FSRS scheduling
 - Result / completed: `3045820` merged; FSRS 6.3.3 round-tripping, transaction card creation,
