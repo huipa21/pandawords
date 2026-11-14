@@ -20,7 +20,7 @@ browser logs will be committed as source.
 |---|---|---|---|
 | 2.1.3 | task/2.1.3-ecdict-frequency | ../pandawords.worktrees/2.1.3 | Starting; Chinese/frequency enrichment |
 | 2.1.4 | task/2.1.4-oewn | ../pandawords.worktrees/2.1.4 | Starting; sense relation alignment |
-| 2.3.2 | task/2.3.2-project-api | ../pandawords.worktrees/2.3.2 | Starting; owner-scoped CRUD |
+| 2.6.2 | task/2.6.2-project-pages | ../pandawords.worktrees/2.6.2 | Starting; project CRUD UI |
 
 ## Blocked
 
@@ -46,6 +46,17 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 2.3.2 Project CRUD API
+- Result / completed: owner-scoped validated CRUD and pagination, safe membership cleanup,
+  generated contracts; `773c577` merged.
+- Dependencies: 2.3.1, 1.5.3 and 2.2.2 checked ✅; project pages now ready and starting.
+- Verification: agent `check`, generation, 351 backend and frontend passed. Main merge
+  `gen-api`, `check`, combined backend/frontend passed (386 backend).
+- Failures / causes / corrections: parallel router-import conflict resolved by retaining both
+  media and project routers, then regenerating combined OpenAPI. No unresolved failures.
+- Skipped / deferred: none for CRUD; project tree is a separate task.
+- Blockers: none. Branch/worktree removed after verification.
 
 ### 2026-11-14 — 2.5.1 Authorized media storage and serving
 - Result / completed: typed media metadata/storage and authenticated internal nginx redirect;
