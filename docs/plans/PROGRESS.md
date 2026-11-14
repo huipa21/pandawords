@@ -36,7 +36,7 @@ The images agent was notified before integration. Other additions require coordi
 | 4.1.2 | task/4.1.2-phrase-flow | ../pandawords.worktrees/4.1.2 | Agent running |
 | 4.2.2 | task/4.2.2-ingestion | ../pandawords.worktrees/4.2.2 | Agent running |
 | 4.3.2 | task/4.3.2-morphology | ../pandawords.worktrees/4.3.2 | Ready; awaiting global agent slot |
-| 4.4.1 | task/4.4.1-graph-api | ../pandawords.worktrees/4.4.1 | Ready; all prerequisites verified |
+| 4.4.1 | task/4.4.1-graph-api | ../pandawords.worktrees/4.4.1 | Agent running; all prerequisites verified |
 | 4.2.3 | task/4.2.3-reading | ../pandawords.worktrees/4.2.3 | Waiting for 4.2.2 |
 | 4.4.2 | task/4.4.2-graph-ui | ../pandawords.worktrees/4.4.2 | Waiting for 4.4.1 |
 | 4.4.4 | task/4.4.4-context-exercises | ../pandawords.worktrees/4.4.4 | Waiting for 4.2.2, 4.3.2 |
@@ -70,6 +70,20 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
 
+### 2026-11-14 — First-wave browser environment verification
+- Result / completed: initial real-stack E2E run passed first-login but failed word-add and review.
+- Dependencies: first-wave Phase 4 integrations verified; existing Phase 2/3 E2E harness reused.
+- Verification / failures: candidate lookup returned 503 because no configured lexicon artifact
+  exists in `data/lexicon`; review test process lacked the explicit offline environment overrides.
+  Logs/configuration confirmed these environment causes; no production code was changed.
+- Corrections: restarted only this run's owned stack with the already-merged SQLite v2 synthetic
+  fixture via `LEXICON_PATH`, zero LLM budget and disabled audio networking, and passed the same
+  overrides to the browser runner. The production artifact directory was not created/overwritten.
+- Verification outcome: rerun exited successfully; Playwright's timestamped result is `passed`
+  with no failed tests, and API logs show the completed receipt/retry/cleanup flow.
+- Skipped / deferred: final post-integration E2E sweep remains; no browser test intentionally skipped.
+- Blockers / follow-ups: none; shared test DB 8101 left untouched.
+
 ### 2026-11-14 — 4.3.1 Hierarchical tags and assignment
 - Result / completed: `a7086e3` merged as `be5afd3`; owner-safe CRUD/assignment, concurrent cycle
   protection, localized management/detail UI, generated API, additive 0018 migration/snapshot.
@@ -82,7 +96,8 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Findings: SurrealDB cascades foreign edges on record deletion; tag delete fails closed (409)
   if protected edges exist. Unique 8100 syntax probe cleaned without service changes.
 - Skipped / deferred: final full suites/browser verification later; no live providers required.
-- Blockers / follow-ups: none; graph API and morphology ready. Tag cleanup pending.
+- Blockers / follow-ups: none; graph API running, morphology awaits slot. Tag branch/folder safely
+  removed after unlinking 1,631 reparse points without following targets.
 
 ### 2026-11-14 — 4.1.1 Phrase lexicon and composition
 - Result / completed: `c4ef220` merged as `553612e`; attributed, source-backed ordered components,
