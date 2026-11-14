@@ -334,3 +334,41 @@ uv run --no-sync pytest tests\unit\test_lexicon_oewn.py --basetemp=.dev\lexicon-
 
 From the repository root, run `.\scripts\dev.ps1 check` and
 `.\scripts\dev.ps1 test -Backend` for repository validation.
+
+### Committed runtime fixture (2.1.5)
+
+From `backend`, rebuild the 50-lemma fixture entirely offline:
+
+```powershell
+uv run --no-sync python -m scripts.build_fixture_lexicon
+uv run --no-sync python -m scripts.build_fixture_lexicon --output .dev\lexicon-small-rebuilt.sqlite
+```
+
+The default output is `tests\fixtures\lexicon_small.sqlite`. The curated word list
+`lexicon-small.words`, synthetic wiktextract `lexicon-small.jsonl`, ECDICT-shaped
+`lexicon-small-ecdict.csv`, WN-LMF `lexicon-small-oewn.xml` and explicit frequency snapshot
+`lexicon-small-frequency.json` are committed beside it. They contain original test glosses,
+not upstream extracts; source names in the database indicate the production processing route,
+not claims of upstream authenticity. The wrapper delegates to `build` with the word filter and
+the unmodified ECDICT, frequency and OEWN hooks; it never creates or patches SQLite rows itself.
+The injected frequency version is `synthetic-fixture-v1`. Input hashes and the logical database
+dump are reproducible; SQLite byte layout is not a compatibility guarantee.
+
+The production Kaikki importer extracts English `suffix` (alias `suf`) templates of the form
+`{{suffix|en|base|suffix}}` into the existing `affix` table. Positions 0/1 contain the normalized
+base (`type='root'`) and hyphen-prefixed suffix (`type='suffix'`), with Wiktionary provenance.
+This positional contract is documented by
+[Wiktionary's suffix template](https://en.wiktionary.org/wiki/Template:suffix/documentation)
+(checked 2026-11-14). Display metadata such as `alt1` does not replace the base lemma identity.
+Non-English component language overrides, missing/malformed components, extra positional
+components, wiki markup and conflicting supported decompositions are skipped, not guessed.
+Equivalent duplicate templates collapse; duplicate backbone records retain the first pair.
+Other etymology templates are not parsed. No new schema or relation type is introduced.
+
+The fixture's `decision` source explicitly supplies base `decide`, suffix `ion` and display
+stem `alt1=decis`; both affix rows now come from this production transform. Resolve a root's
+`text` with `get_lemma` and `lexemes` to follow the structured base→derived association;
+`affix.lexeme_id` identifies the derived lexeme. No fixture-only SQL inserts those rows.
+Use `app.services.lexicon.LexiconReader` for runtime reads and the pytest `lexicon_reader`
+fixture in consumers' tests. See [testing](../../docs/dev/testing.md#rebuild-and-verify-the-small-lexicon)
+for the focused offline test command.

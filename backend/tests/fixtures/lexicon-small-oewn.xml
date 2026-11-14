@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Synthetic WN-LMF input with original test definitions, not an OEWN extract. -->
+<LexicalResource>
+  <Lexicon id="fixture" label="Synthetic fixture" language="en" version="1">
+    <LexicalEntry id="run"><Lemma writtenForm="run" partOfSpeech="v"/>
+      <Sense id="wn-run" synset="motion-fast"/>
+    </LexicalEntry>
+    <LexicalEntry id="walk"><Lemma writtenForm="walk" partOfSpeech="v"/>
+      <Sense id="wn-walk" synset="motion-walk"/>
+    </LexicalEntry>
+    <LexicalEntry id="move"><Lemma writtenForm="move" partOfSpeech="v"/>
+      <Sense id="wn-move" synset="motion"/>
+    </LexicalEntry>
+    <LexicalEntry id="happy"><Lemma writtenForm="happy" partOfSpeech="a"/>
+      <Sense id="wn-happy" synset="pleased"><SenseRelation relType="antonym" target="wn-sad"/></Sense>
+    </LexicalEntry>
+    <LexicalEntry id="joyful"><Lemma writtenForm="joyful" partOfSpeech="a"/>
+      <Sense id="wn-joyful" synset="pleased"/>
+    </LexicalEntry>
+    <LexicalEntry id="sad"><Lemma writtenForm="sad" partOfSpeech="a"/>
+      <Sense id="wn-sad" synset="unhappy"><SenseRelation relType="antonym" target="wn-happy"/></Sense>
+    </LexicalEntry>
+    <LexicalEntry id="animal"><Lemma writtenForm="animal" partOfSpeech="n"/>
+      <Sense id="wn-animal" synset="creature"/>
+    </LexicalEntry>
+    <LexicalEntry id="dog"><Lemma writtenForm="dog" partOfSpeech="n"/>
+      <Sense id="wn-dog" synset="barking-pet"/>
+    </LexicalEntry>
+    <Synset id="motion-fast" partOfSpeech="v" lexfile="verb.motion">
+      <Definition>Move quickly on foot.</Definition><SynsetRelation relType="hypernym" target="motion"/>
+    </Synset>
+    <Synset id="motion-walk" partOfSpeech="v" lexfile="verb.motion">
+      <Definition>Move on foot at an ordinary pace.</Definition><SynsetRelation relType="hypernym" target="motion"/>
+    </Synset>
+    <Synset id="motion" partOfSpeech="v" lexfile="verb.motion">
+      <Definition>Change position or place.</Definition><SynsetRelation relType="hyponym" target="motion-fast"/>
+    </Synset>
+    <Synset id="pleased" partOfSpeech="a" lexfile="adj.all">
+      <Definition>Feeling pleased and content.</Definition>
+    </Synset>
+    <Synset id="unhappy" partOfSpeech="a" lexfile="adj.all">
+      <Definition>Feeling unhappy or sorrowful.</Definition>
+    </Synset>
+    <Synset id="creature" partOfSpeech="n" lexfile="noun.animal">
+      <Definition>A living creature that eats and moves.</Definition><SynsetRelation relType="hyponym" target="barking-pet"/>
+    </Synset>
+    <Synset id="barking-pet" partOfSpeech="n" lexfile="noun.animal">
+      <Definition>A barking animal often kept as a pet.</Definition><SynsetRelation relType="hypernym" target="creature"/>
+    </Synset>
+  </Lexicon>
+</LexicalResource>

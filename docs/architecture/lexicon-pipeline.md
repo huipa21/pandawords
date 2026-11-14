@@ -96,8 +96,56 @@ Concurrent builds of the same output directory are refused by a release lock.
   Three streaming XML passes retain only matched identities/alignments, not the XML tree or
   full source relation graph. Plain XML and the downloaded gzip artifact are supported without
   installing `wn`; source records retain OEWN and Princeton attribution and input checksum.
-- Test fixture: `backend/tests/fixtures/lexicon_small.sqlite`, about 50 words covering polysemy,
-  phrases, US/UK differences and derivations. It is built by the same script with `--words fixture.txt`.
+- Test fixture: `backend/tests/fixtures/lexicon_small.sqlite`, exactly 50 lemmas (52 input
+  records) covering polysemy, phrases, US/UK differences and derivation etymology. Rebuild
+  offline from `backend` with `uv run --no-sync python -m scripts.build_fixture_lexicon`.
+  The committed `lexicon-small.words`, `.jsonl`, `-ecdict.csv`, `-oewn.xml` and
+  `-frequency.json` files in `tests/fixtures` are curated **synthetic test data**, not upstream
+  extracts or authoritative dictionary/frequency claims. The wrapper calls the production
+  `build(..., words=..., enrichers=...)` with the production ECDICT, frequency and OEWN hooks.
+  Frequency uses an explicit synthetic snapshot/version, not a machine-dependent wordfreq
+  installation. Source names identify the parser/enricher; input hashes retain provenance.
+  Rebuilds preserve logical data; byte-identical SQLite files are not guaranteed.
+  `decide → decision` is represented by production-imported `affix` rows on the `decision`
+  lexeme: position 0 is root/base lemma `decide`, position 1 is suffix `-ion`. The template's
+  `alt1=decis` is display text, not the base identity. Typed reader tests resolve that root
+  back to the `decide` lemma/verb lexeme; no fixture-only SQL fabricates the relationship.
+  The importer conservatively supports English `suffix`/`suf` templates with exactly one
+  base and suffix. It skips malformed, non-English, multi-component, markup-containing and
+  conflicting decompositions rather than guessing. This uses the existing affix schema,
+  not a new semantic relation type; `relates_to` and later graph materialization are separate.
+
+### Runtime reader
+
+`app.services.lexicon.LexiconReader(path: Path)` is an async read-only boundary for repositories,
+candidate selection and jobs. Pass the configured artifact path explicitly; it neither loads
+environment files nor imports build scripts. Call `await reader.validate()` at startup to check
+schema v1, required columns, integrity, foreign keys and nonempty senses.
+
+All public reads are async and return `app.domain.lexicon` pydantic records, never SQLite rows,
+cursors or connections. Lemma/lexeme/sense IDs and foreign IDs are shared `DictionaryKey`
+lists (`list[str | int]`), decoded from the storage representation; callers can pass the
+existing `lemma_key`, `lexeme_key` and `sense_key` results directly. Pronunciation IDs remain
+opaque strings. `LexiconSense.registers` holds source register labels.
+
+| Reader method | Result |
+|---|---|
+| `get_lemma(text, *, lang="en")`, `get_lemma_by_id(key)` | `LexiconLemma \| None` |
+| `lookup_form(text, *, lang="en")` | `list[LexiconLemma]` (all matching normalized inflections/phrases) |
+| `get_lexeme(key)`, `lexemes(lemma_id, *, pos=None)` | optional `LexiconLexeme` / list |
+| `get_sense(key)`, `senses(lexeme_id, *, common_only=False)` | optional `LexiconSense` / ranked list |
+| `pronunciations(lexeme_id, *, accent=None)`, `forms(lexeme_id)` | `list[LexiconPronunciation]` / `list[LexiconForm]` |
+| `relations(sense_id, *, type=None, direction="outgoing")` | `list[LexiconRelation]`; incoming does not reverse stored endpoints |
+| `glosses(lexeme_id)`, `tags(lemma_id)`, `frequencies(lemma_id)` | `list[LexiconGloss]` / `list[LexiconTag]` / `list[LexiconFrequency]` |
+| `affixes(lexeme_id)`, `sources()` | `list[LexiconAffix]` / `list[LexiconSource]` |
+
+Exact lemma lookup does not fall back to inflections; use `lookup_form` explicitly. Text
+lookups use canonical normalization, IDs are exact, and all collections have deterministic
+ordering. Absent records return `None`/`[]`. Missing/invalid artifacts raise `AppError` with
+`lexicon.missing` / `lexicon.invalid` (503), including at read time. SQLite/JSON/model validation
+errors do not escape the service. Reads use bound values and worker-thread-local connections
+with URI `mode=ro` and `query_only=ON`; no write API exists. Every operation closes its connection,
+so no lifecycle/close call is required and readers do not hold files open between operations.
 
 ### ECDICT/wordfreq selection (2.1.3)
 
