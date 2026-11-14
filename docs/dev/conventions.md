@@ -47,8 +47,23 @@
 
 - Prefix `/api`. Resources are plural nouns: `/api/projects/{id}/words`.
 - **IDs in the API** are opaque URL-safe strings (`rid`): base64url of the SurrealDB record id,
-  without padding. General `app/db/ids.py` (`encode_rid` / `decode_rid`) is planned in 2.2.2;
-  auth currently uses the narrow typed `app/domain/identity.py` helpers for scalar user IDs.
+  without padding. Use the independent `app/core/record_ids.py` helpers:
+  `encode_rid(record: RecordID, expected_table: str) -> str` and
+  `decode_rid(value: str, expected_table: str) -> RecordID`. Both validate the table and raise
+  `ValueError` on invalid input. Bind the decoded SDK object as a query parameter; never interpolate
+  its text into a query. Existing scalar auth and job IDs remain unchanged by these helpers.
+  Auth retains its narrow `app/domain/identity.py` contract.
+- `rid` text uses plain ASCII table identifiers and canonical compact UTF-8 record literals.
+  String keys use unquoted alphanumeric/underscore text unless entirely numeric; other strings
+  use JSON quoting. Integer keys are signed 64-bit. Structured keys are arrays or objects
+  (sorted string keys), recursively containing strings, signed integers, finite floats, booleans,
+  null, arrays, objects and nested `RecordID` values. Record references remain typed references,
+  not strings. Root keys must be strings, integers, arrays or objects; UUID, range, tuple, bytes
+  and other SDK-specific key/value types are not supported. The codec is not the SDK's
+  `RecordID.parse`, which turns structured key text into a scalar string.
+  Only canonical encodings are accepted (no padding, alternate pad bits, whitespace variants,
+  duplicate object keys or trailing text). Tokens are limited to 16,384 characters and nesting
+  to 32 levels; malformed, excessive or unsupported values are rejected with `ValueError`.
   Decoding validates the expected table and canonical encoding.
 - Lists use `?limit=&cursor=` and return `{ items, next_cursor }`.
 - Errors: HTTP status plus `{ "code": "project.not_found", "message": "...", "field": null }`. The
