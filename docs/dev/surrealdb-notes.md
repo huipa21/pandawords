@@ -54,6 +54,26 @@ the script only imports the runner. Assertions are the checks: run without Pytho
 
 ## Verified snippets
 
+Task **1.5.4**, **2026-11-14**, verified against the existing loopback **test** server
+(8101), **surrealdb-3.3.5**, SDK **3.0.0**. Migration `0004_admin_guard.surql` adds
+an internal SCHEMAFULL singleton with an integer `version`; `UPDATE admin_guard:singleton
+SET version += 1` is a real shared write inside UUID transactions. Synchronized two-admin
+cross-disables and cross-demotions both start from exactly two enabled admins plus one
+disabled admin. One commits, the other encounters a transaction conflict and retries its
+authorization check, returning forbidden; exactly one enabled admin remains. Tests assert
+at least three authorization attempts across the two operations. Bound `LIMIT $limit
+START $start`, `ORDER BY username, id`, `SELECT count() AS total ... GROUP ALL`, and
+explicit `CREATE/UPDATE ... RETURN` public-field projections work as used in `db/admin.py`.
+Password/role/disabled mutations and owner-bound refresh revocation commit together;
+temporary plaintext passwords are never sent to DB. Fresh harness databases are removed
+individually; no dev DB or shared server lifecycle changes.
+
+Migration numbering intentionally leaves `0003` for the independent job task. The migration
+loader determines pending files by applied-version membership, not by a highest-version
+watermark (`run_migrations`), so a subsequently added `0003_job.surql` can be applied after
+`0004`; fresh combined migrations run in numeric order. Parent must regenerate the combined
+schema snapshot after merging both branches.
+
 Task **1.5.1**, **2026-11-14**, reverified auth DDL on the loopback **test** server (8101),
 reporting **surrealdb-3.3.5**, with SDK **3.0.0**. `0002_auth.surql` and
 `tests/integration/test_auth_schema.py` verify literal string unions (`'admin' | 'user'`,

@@ -2,8 +2,8 @@
 
 - **Bootstrap**: on API startup, if no admin user exists, create one from `ADMIN_USERNAME` /
   `ADMIN_PASSWORD` with `must_change_password = true` in production.
-- **No self-signup.** The admin creates users (username plus a temporary password). Users must change
-  the password at first login.
+- **No self-signup.** The admin submits a username and optional role; the API generates a random
+  temporary password. Admin-created accounts must change it at first login in every environment.
 - **Roles**: `admin` (user management, site backup) and `user`. Every user's data is isolated.
   Admins do not browse other users' learning data in the UI. They can only back up or restore the
   whole site.
@@ -17,6 +17,23 @@
 - **Endpoints**: `POST /api/auth/login`, `POST /api/auth/refresh`, `POST /api/auth/logout`,
   `GET /api/auth/me`, `POST /api/auth/password`. Admin: `GET/POST /api/admin/users`,
   `PATCH /api/admin/users/{id}` (disable, role, reset password).
+- **Admin account contract (1.5.4):** list accepts `page` (default 1) and `page_size`
+  (default 20, maximum 100), returning `{items, total, page, page_size}` ordered by username/id.
+  Create accepts `{username, role?}` and returns 201 `{user, temporary_password}`. Patch accepts
+  `{disabled?, role?, reset_password?: boolean}`; reset generates a new password and sets
+  `must_change_password`, returning the same envelope (`temporary_password` is null otherwise).
+  Extra fields and explicit null changes are rejected. Reads project only `UserRead` fields;
+  credential hashes and other users' learning data are never exposed. Admin responses use
+  `Cache-Control: no-store`; deliver temporary passwords securely, never log or persist them.
+  Unknown users return 404 and duplicate usernames return 409.
+- **Admin safety:** no self-disable/self-demotion, and no removal of the last **enabled** admin.
+  Disabled admins do not count and cannot act, even with a stale access token. Each mutation
+  increments the internal `admin_guard:singleton.version` in the same transaction before
+  rechecking the acting admin and target; transaction conflicts retry the entire check.
+  This serializes concurrent two-admin disables/demotions rather than allowing write skew.
+  Disable/enable, effective role changes and password resets revoke the target's refresh
+  sessions in the same transaction. Existing access tokens are checked against current DB
+  identity/role/disabled/password-change state; no admin privilege bypasses owner filtering.
 - **Database access**: the backend connects to SurrealDB with one database-level user, and all
   authorization is done in Python (see ADR 0006). SurrealDB record-level permissions are not used.
 - **Login protection**: exponential backoff per username + IP (in-process, since there is a single
