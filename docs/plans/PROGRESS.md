@@ -18,14 +18,13 @@ Migration allocations: 0013 memory/history; 0014 LLM; 0015 SRS preferences;
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 3.2.5 | task/3.2.5-llm | ../pandawords.worktrees/3.2.5 | Agent running; migration 0014 |
 | 3.1.2 | task/3.1.2-srs | ../pandawords.worktrees/3.1.2 | Agent running; migration 0015 |
 | 3.1.3 | task/3.1.3-plan | ../pandawords.worktrees/3.1.3 | Waiting for 3.1.2 |
 | 3.2.1 | task/3.2.1-exercises | ../pandawords.worktrees/3.2.1 | Waiting for 3.1.2 |
 | 3.2.2 | task/3.2.2-distractors | ../pandawords.worktrees/3.2.2 | Waiting for 3.2.1 |
 | 3.2.3 | task/3.2.3-recognition | ../pandawords.worktrees/3.2.3 | Waiting for 3.2.2 |
 | 3.2.4 | task/3.2.4-recall | ../pandawords.worktrees/3.2.4 | Waiting for 3.2.1 |
-| 3.2.6 | task/3.2.6-scenario | ../pandawords.worktrees/3.2.6 | Waiting for 3.2.1 and 3.2.5 |
+| 3.2.6 | task/3.2.6-scenario | ../pandawords.worktrees/3.2.6 | Waiting for 3.2.1; 3.2.5 complete |
 | 3.3.1 | task/3.3.1-components | ../pandawords.worktrees/3.3.1 | Waiting for 3.2.1 |
 | 3.3.2 | task/3.3.2-review | ../pandawords.worktrees/3.3.2 | Waiting for review prerequisites |
 | 3.3.3 | task/3.3.3-dashboard | ../pandawords.worktrees/3.3.3 | Waiting for 3.1.3 |
@@ -55,6 +54,19 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 3.2.5 Optional DeepSeek client
+- Result / completed: `b8c43bb` merged as `ed125ce`; typed JSON service, validated persistent
+  shared/owner cache, atomic UTC provider budgets, bounded calls and observable unavailability.
+  Migration 0014, OpenAI dependency, config, mock-only tests and related docs included.
+- Dependencies: 1.2.2 and 1.5.1 checked ✅.
+- Verification: agent final focused tests 38, backend 584 and check passed. Integrated main
+  check and backend/frontend passed (615 backend; existing Starlette warning).
+- Skipped / deferred: live DeepSeek deliberately not contacted; E2E waits for review UI.
+- Failures / causes / corrections: additive documentation conflicts retained both sections;
+  main lacked newly added OpenAI dependency, restored with manifest-based `uv sync`.
+  SDK logging filters and realistic cold-start mock timeout verified by agent tests.
+- Blockers / follow-ups: none; scenario awaits 3.2.1. Task branch/worktree cleanup follows.
 
 ### 2026-11-14 — 3.1.1 Memory and review history
 - Result / completed: `a63be3b` merged; migration 0013, full FSRS state, canonical owner/sense
