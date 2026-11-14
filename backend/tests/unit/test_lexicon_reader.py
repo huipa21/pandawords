@@ -119,6 +119,9 @@ async def test_derivation_reads_production_template_components(
     base = await lexicon_reader.get_lemma(affixes[0].text)
     assert base is not None and base.id == decide.lemma_id
     assert decide in await lexicon_reader.lexemes(base.id)
+    assert await lexicon_reader.affixes_for_root(" ＤＥＣＩＤＥ ") == [affixes[0]]
+    assert await lexicon_reader.affixes_for_root("decide", lang="zh") == []
+    assert await lexicon_reader.affixes_for_root("missing-root") == []
 
 
 async def test_readonly_and_concurrent_reads(tmp_path: Path) -> None:

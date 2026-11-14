@@ -256,5 +256,16 @@ class LexiconReader:
             _key(lexeme_id),
         )
 
+    async def affixes_for_root(self, text: str, *, lang: str = "en") -> list[LexiconAffix]:
+        language, normalized = lemma_key(lang, text)
+        return await self._many(
+            LexiconAffix,
+            "SELECT a.* FROM affix a JOIN lexeme x ON a.lexeme_id = x.id "
+            "JOIN lemma l ON x.lemma_id = l.id WHERE a.type = 'root' AND a.text = ? "
+            "AND l.lang = ? ORDER BY a.lexeme_id, a.position, a.source",
+            normalized,
+            language,
+        )
+
     async def sources(self) -> list[LexiconSource]:
         return await self._many(LexiconSource, "SELECT * FROM source ORDER BY name")

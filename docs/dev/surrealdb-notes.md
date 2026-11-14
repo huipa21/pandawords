@@ -84,6 +84,26 @@ Verified against isolated migrated databases on the existing test instance **810
 `pron.*.audio` field preserves record references and effective reads encode opaque IDs.
 An empty-string IPA permits an audio-only accent entry without fabricating a transcription.
 Private media cannot be attached to shared pronunciations. No migration is necessary.
+### Shared enrichment metadata (2.4.3) ✅
+
+Verified against the existing isolated test databases on **8101**, SurrealDB **3.3.5** /
+Python **3.14.3** / SDK **3.0.0**: migration `0010`'s optional arrays of typed objects
+retain frequency/tag source attribution; absent nested option fields decode as omitted keys.
+Bound `UPDATE $record MERGE $fields WHERE owner = NONE` updates only existing shared lemma
+metadata within the same UUID transaction as insert-only deterministic dictionary edges.
+Shared `derives_to` edges retain optional source attribution and `via`; both base-first and
+derived-first fixture sequences yield exactly one base → derived edge. Shared semantic edges
+retain exact source/type/direction; absent/private related endpoints do not get imported.
+The registered worker claim/dispatch tests verify persisted metadata, overlays, retry/recovery
+and context cleanup using the real SDK. No dev database or shared server lifecycle changes.
+Verification: focused enrichment/dictionary/worker/reader suite **29 passed**; full
+`dev.ps1 test -Backend -UpdateSnapshot` **488 passed**, one existing Starlette/httpx warning;
+normal snapshot-comparison suite **10 passed**; `dev.ps1 check` clean. Initial required
+check/test attempts lacked `ruff`/`pytest`; `uv sync --frozen` restored the locked environment.
+The initial focused test's short password and a `Value`/iterable typing error were corrected.
+Pylance's linked-worktree symbol lookup returned no symbols; basedpyright reported no errors.
+The initial commit hook rejected root-vs-backend import classification of the fixture builder;
+the optional-build test now imports it locally, and both check contexts are validated.
 
 ### Atomic add-to-project boundary (2.4.2) ✅
 

@@ -138,6 +138,7 @@ opaque strings. `LexiconSense.registers` holds source register labels.
 | `relations(sense_id, *, type=None, direction="outgoing")` | `list[LexiconRelation]`; incoming does not reverse stored endpoints |
 | `glosses(lexeme_id)`, `tags(lemma_id)`, `frequencies(lemma_id)` | `list[LexiconGloss]` / `list[LexiconTag]` / `list[LexiconFrequency]` |
 | `affixes(lexeme_id)`, `sources()` | `list[LexiconAffix]` / `list[LexiconSource]` |
+| `affixes_for_root(text, *, lang="en")` | `list[LexiconAffix]`; normalized exact root backlinks, language-filtered |
 
 Exact lemma lookup does not fall back to inflections; use `lookup_form` explicitly. Text
 lookups use canonical normalization, IDs are exact, and all collections have deterministic
@@ -270,6 +271,38 @@ Effective entry reads encode `lexemes[*].lexeme.fields.pron[*].audio` as an opaq
 The detail UI can use that ID with authenticated `GET /api/media/{id}`; metadata comes from
 `media.read(db, settings, id, user)` for internal callers. No local path or external URL is
 used for playback, and no API model/schema change or regenerated API types is needed.
+`enrich` is registered alongside `audio` in the production worker registry.
+Add-to-project itself only persists work and exposes its status.
+
+### Enrichment worker contract (2.4.3)
+
+`app.worker.enrich.enrich(Job)` validates the v1 `EnrichJobPayload`, obtains the dispatch's
+database/settings via task-local `worker.context.get_context()`, constructs the configured
+typed reader and calls `services.enrichment.enrich(db, reader, payload)`. `execute`/`run_once`
+accept optional keyword-only `settings`; `run_worker` passes its actual settings. Existing
+Job-only custom handlers still work, and context is reset after success/failure/cancellation.
+
+Payload lemma/lexeme/sense identities must match the reader's source lineage and already
+exist as shared rows. Enrichment never creates related senses, lexemes or user-owned items.
+It reuses dictionary relation projection and insert-only graph materialization in one retryable
+transaction. Incoming/outgoing semantic edges retain their exact stored type, direction and
+`source`, including `oewn:approx`; deterministic edge identity includes source and type.
+Missing/private optional endpoints are skipped, while occupied private anchor/edge identities
+fail without modifying them. Requester jobs remain owner-scoped; imported edges have `owner = NONE`.
+
+Conservative derivation uses the production affix reader, not guessed morphology: exactly one
+root plus modifiers, consistent source attribution, and exactly one source base lexeme are
+required. It adds base → derived `derives_to` with source and modifier text in `via`; reverse
+root lookup also handles a base added after its derived item. Ambiguous/missing bases are logged.
+Neither endpoint is imported by enrichment.
+
+Typed frequency rows attach to `lemma.frequencies` (source, Zipf, BNC/COCA ranks); a unique
+available Zipf updates `freq_zipf`. Conflicting Zipf values are retained with provenance but
+logged instead of guessed. Exam tags attach as `exam_tags` plus `exam_tag_sources` (tag/source).
+Migration `0010` adds these optional provenance fields and `derives_to.source`.
+Absent optional source collections are explicitly logged and leave existing metadata unchanged;
+missing/invalid artifacts and database failures propagate into the worker's scheduled retries.
+Only shared metadata changes: per-user overrides, notes, memberships and custom edges are untouched.
 
 ### Candidates contract (2.4.1)
 

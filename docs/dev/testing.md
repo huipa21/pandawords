@@ -99,6 +99,22 @@ Final fixture-backed E2E can use `AUDIO_NETWORK_ENABLED=false` on its API/worker
 audio jobs then complete as explicitly unavailable unless shared cached files already exist.
 This does not fabricate audio or alter the add response. Live Wikimedia/Edge availability
 and audio playback through production nginx are not claimed by the mocked backend suite.
+### Enrichment worker (2.4.3)
+
+`tests/integration/test_enrichment.py` exercises the registered `enrich` handler through actual
+`run_once` claim/dispatch/completion, not a direct service substitute. Isolated migrated `job_db`
+databases on the existing test server at 8101 cover semantic direction/type/source/owner,
+frequency and exam-tag provenance, repeat processing, preserved user overrides/custom edges,
+missing/private related endpoints, both derivation arrival orders, source-identity mismatch,
+and retry/recovery after a missing artifact. Optional absence uses a production core-only build
+of the synthetic fixture, without metadata mocks; its unique project-local artifact is removed
+in `finally`. It asserts absence logging and retained existing metadata.
+
+The reader's existing affix test also checks typed normalized/language-filtered reverse-root
+lookup. Focused command from backend:
+`uv run --no-sync pytest -q tests\integration\test_enrichment.py tests\integration\test_dictionary.py tests\integration\test_worker_live.py tests\unit\test_lexicon_reader.py`.
+Migration `0010` adds optional lemma frequency/tag provenance and derivation source fields;
+regenerate/compare the full schema snapshot using the normal backend runner.
 
 ### Add to project (2.4.2)
 
