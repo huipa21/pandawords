@@ -64,6 +64,22 @@ string expiry/boolean values are rejected. UTC expiry/revocation datetimes and r
 record IDs round-trip. All writes use fresh harness databases, removed individually on teardown;
 the dev database is untouched. The snapshot runner captures the accepted field/index definitions.
 
+Task **1.5.2**, **2026-11-14**, verified auth repositories on the same isolated **8101**
+server/SDK (**3.3.5 / 3.0.0**). `tests/integration/test_auth.py` exercises bound record targets,
+`UPDATE ... WHERE user = $user AND id IN $family`, atomic multi-statement CREATE/UPDATE,
+and explicit SDK transactions. `$token` is a **protected variable** in 3.3.5 and binding it
+fails; use `$refresh_id` instead. Forced simultaneous reads on independent WebSocket
+connections produce a structured server error with
+`details.kind == QueryDetailKind.TRANSACTION_CONFLICT` (`"TransactionConflict"`); cancel,
+start a new transaction and reread the credential. A conflict can already terminate the server
+transaction, so a failed cancellation must be safely logged, not prevent that structured retry.
+The regression requires a retry and proves
+that exactly one rotation wins, the replay fails generically, and its committed revocation
+includes the winning replacement. Whole-family tests also prove reverse-link ancestry,
+independent-login and cross-user isolation. Bootstrap's stable `user:bootstrap_admin` CREATE
+inside a transaction, followed by conflict retry/recheck, creates one admin on concurrent
+starts without updating an existing password. No migration or snapshot change was needed.
+
 All snippets below target **server 3.3.5 / Python SDK 3.0.0**. Executable versions live in
 `app.db.spike_support`, `spike_records`, `spike_graph`, and `spike_operations`; do not move
 SurrealQL into scripts, API handlers, or services.

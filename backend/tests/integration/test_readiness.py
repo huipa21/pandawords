@@ -1,7 +1,6 @@
 import asyncio
 from collections.abc import AsyncIterator
 from typing import cast
-from uuid import uuid4
 
 import httpx
 import pytest
@@ -20,16 +19,10 @@ class _TestSettings(Settings):
 
 
 @pytest.fixture
-async def db() -> AsyncIterator[FastAPI]:
-    settings = Settings()
-    app = create_app(
-        settings.model_copy(
-            update={
-                "surreal_url": settings.surreal_test_url,
-                "surreal_database": f"test_{uuid4().hex}",
-            }
-        )
-    )
+async def db(
+    session_db: AsyncWsSurrealConnection, test_settings: Settings
+) -> AsyncIterator[FastAPI]:
+    app = create_app(test_settings)
     async with app.router.lifespan_context(app):
         yield app
 
@@ -50,11 +43,11 @@ async def test_readyz_queries_database_and_reuses_connection(db: FastAPI) -> Non
 
 
 @pytest.mark.integration
-async def test_readyz_accepts_legacy_localhost_configuration() -> None:
-    settings = Settings(
-        surreal_url="ws://localhost:8101/rpc",
-        surreal_test_url="ws://localhost:8101/rpc",
-        surreal_database=f"test_{uuid4().hex}",
+async def test_readyz_accepts_legacy_localhost_configuration(
+    session_db: AsyncWsSurrealConnection, test_settings: Settings
+) -> None:
+    settings = Settings.model_validate(
+        {**test_settings.model_dump(), "surreal_url": "ws://localhost:8101/rpc"}
     )
     app = create_app(settings)
     async with app.router.lifespan_context(app):
@@ -92,6 +85,9 @@ def test_unreachable_database_preserves_startup_health_and_openapi() -> None:
         surreal_url="ws://127.0.0.1:1/rpc",
         surreal_timeout_seconds=0.1,
         surreal_pass="must-not-appear-in-responses",
+        jwt_secret="readiness-test-secret-at-least-32-bytes",
+        admin_username="readiness_admin",
+        admin_password="test-admin-password-123",
     )
     with TestClient(create_app(settings)) as client:
         assert client.get("/api/healthz").status_code == 200
@@ -107,14 +103,13 @@ def test_unreachable_database_preserves_startup_health_and_openapi() -> None:
 
 
 @pytest.mark.integration
-async def test_invalid_credentials_do_not_make_database_ready() -> None:
-    settings = Settings()
+async def test_invalid_credentials_do_not_make_database_ready(test_settings: Settings) -> None:
+    settings = test_settings
     app = create_app(
         settings.model_copy(
             update={
                 "surreal_url": settings.surreal_test_url,
-                "surreal_database": f"test_{uuid4().hex}",
-                "surreal_pass": f"invalid_{uuid4().hex}",
+                "surreal_pass": "invalid-test-password",
                 "surreal_timeout_seconds": 0.3,
             }
         )

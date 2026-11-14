@@ -41,9 +41,15 @@ failure output.
   `session_db_settings` explicitly access the shared migrated database.
 - `app`: a test-configured FastAPI application with its real lifespan running. `client` is an
   async httpx client using that application through `ASGITransport`.
-- `make_user`: async factory hook only; it raises `NotImplementedError`. Completion is deferred
-  to 1.5.2 so it can use the real password hashing/security implementation rather than inventing
-  one in the schema task. Do not share a single user between tests.
+- `make_user`: typed async factory (`UserFactory`) using the auth service and repository, with
+  unique usernames/IDs and real salted argon2id hashes on every call. Accepts keyword overrides
+  for username, password, role, disabled and must-change-password. Its default test password is
+  `test-password-123`. Do not share a single user between tests. Test settings supply test-only
+  signing/bootstrap credentials; they never change the private development environment file.
+- Auth service integration tests cover rotation/reuse, concurrent refresh on independent server
+  connections, family-only revocation (including other-user isolation), logout, expiry, disabled
+  users, and repeated/concurrent startup bootstrap. Readiness tests use the migrated harness
+  database and its exact teardown rather than leaving ad hoc databases behind.
 - Auth schema integration tests use `fresh_db`, apply the real migrations, and exercise username
   and token-hash uniqueness, field constraints and rotation metadata against the test server.
   Their opaque test password hashes are schema inputs, not usable login credentials. Teardown

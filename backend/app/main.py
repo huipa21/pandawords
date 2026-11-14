@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import asyncio
 from collections.abc import AsyncIterator
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 
+import structlog
 from fastapi import APIRouter, Depends, FastAPI
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -19,6 +21,7 @@ from app.core.errors import (
 )
 from app.core.logging import RequestIdMiddleware, configure_logging
 from app.db.client import database_lifespan
+from app.services.auth import bootstrap_admin
 from app.services.system import check_readiness
 
 
@@ -35,7 +38,31 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         configure_logging(app_settings.app_env)
         async with database_lifespan(app_settings) as database:
             _app.state.database = database
-            yield
+
+            async def initialize_auth() -> None:
+                await database.connected.wait()
+                await bootstrap_admin(database.connection, app_settings)
+
+            def report_failure(task: asyncio.Task[None]) -> None:
+                if not task.cancelled() and (error := task.exception()) is not None:
+                    structlog.get_logger().error(
+                        "auth_bootstrap_failed", error_type=type(error).__name__
+                    )
+
+            task = asyncio.create_task(initialize_auth(), name="auth_bootstrap")
+            task.add_done_callback(report_failure)
+            _app.state.auth_initialization = task
+            try:
+                done, _ = await asyncio.wait([task], timeout=app_settings.surreal_timeout_seconds)
+                if done:
+                    await task
+                # DB outages preserve health/OpenAPI, but not authentication readiness.
+                yield
+            finally:
+                if not task.done():
+                    task.cancel()
+                    with suppress(asyncio.CancelledError):
+                        await task
 
     app = _GuardedFastAPI(
         title="PandaWords API",

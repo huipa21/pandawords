@@ -66,8 +66,8 @@ class Settings(BaseSettings):
     app_version: str = "dev"
 
     jwt_secret: str = "replace-with-a-long-random-secret"
-    jwt_access_ttl_minutes: int = 15
-    jwt_refresh_ttl_days: int = 30
+    jwt_access_ttl_minutes: int = Field(default=60, gt=0)
+    jwt_refresh_ttl_days: int = Field(default=30, gt=0)
     admin_username: str = "admin"
     admin_password: str = "change-me"
 
