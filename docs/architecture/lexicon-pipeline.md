@@ -5,7 +5,7 @@
 | Source | Gives us | License / note |
 |---|---|---|
 | Wiktionary via kaikki.org (wiktextract English JSONL) | lemma → etymology/POS → senses, glosses, examples, IPA (US/UK tags), audio URLs, forms/inflections, derived/related terms, synonyms/antonyms, etymology templates (affixes) | CC BY-SA. Keep attribution on sense/media `source` and in exports |
-| Open English WordNet (`wn` package, latest `oewn`) | synonym/antonym/hypernym/hyponym relations, lexnames (concept tags) | CC BY 4.0 |
+| Open English WordNet (2025 WN-LMF XML, compatible with `wn`) | synonym/antonym/hypernym/hyponym relations, lexnames (concept tags) | CC BY 4.0 + inherited Princeton WordNet license; attribute both teams |
 | ECDICT (skywind3000/ECDICT csv) | Chinese glosses, exam tags (`zk gk cet4 cet6 ky toefl ielts gre`), Collins/Oxford flags, BNC/COCA frequency, inflections (`exchange`) | MIT |
 | wordfreq | Zipf frequency (used to pre-check "common" senses and band words) | Apache-2.0 / data CC BY-SA |
 | spaCy `en_core_web_sm` | lemmatizing user input, sentences and passages | MIT |
@@ -17,9 +17,27 @@ Field names in kaikki and ECDICT must be checked against the real files in task 
 ## Build (offline, `dev.ps1 lexicon`)
 
 ```
-download → data/lexicon/raw/   (kaikki .jsonl, ecdict.csv, oewn via wn data dir; versions in manifest.json)
+download → data/lexicon/raw/   (kaikki .jsonl, ecdict.csv, OEWN .xml.gz; manifest.json)
 build    → data/lexicon/lexicon.sqlite   (read-only at runtime)
 ```
+
+Downloads are independent of the builder: from `backend`, run
+`uv run --no-sync python -m scripts.download_lexicon <kaikki|ecdict|oewn>`.
+The default raw directory belongs to the main worktree and is shared, gitignored data.
+Official sources are always attempted before an explicitly supplied `--fallback-url`.
+The manifest records URLs/origin, version or UTC retrieval date, licenses, exact-byte SHA-256,
+size and available HTTP metadata. OEWN 2025 is pinned to the official release asset checksum;
+mutable sources can be pinned with `--sha256`. Cached files are verified offline, never silently
+overwritten; missing files must still match their existing manifest. Complete payload validation
+and staged publication prevent failed transfers from becoming final artifacts. A directory lock
+serializes shared manifest updates. Use a separate `--raw-dir` for intentional snapshot upgrades.
+
+Observed fields, exact source URLs, licenses, recovery instructions and commands are in
+[`backend/scripts/README.md`](../../backend/scripts/README.md). Bounded upstream checks on
+2026-11-14 confirmed the ECDICT CSV header, English wiktextract records and OEWN 2025 WN-LMF XML.
+The English-only kaikki endpoint is deprecated upstream; the proposed raw replacement is
+multilingual, so it must not be silently substituted. Full dataset downloads are not test inputs.
+The SQLite builder and `dev.ps1 lexicon` orchestration remain subsequent tasks.
 
 - `lexicon.sqlite` tables: `lemma`, `lexeme`, `sense`, `pron`, `form`, `relation`, `zh_gloss`,
   `exam_tag`, `freq`, `affix`, plus `form_index(form → lemma)` for inflection lookup.
