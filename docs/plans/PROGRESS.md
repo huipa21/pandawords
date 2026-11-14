@@ -12,7 +12,7 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 Request: implement Phases 4 and 5 with dependency-driven parallel agents (global maximum five), merge all
 task branches to main, commit all task files and remove task branches/worktree folders.
 Interpretation: "phase-34md" means the supplied Phase 4 detail document; Phase 3 is complete.
-Status: starting. Main was clean at `a1c8849`; all external Phase 1-3 dependencies are ✅.
+Status: implementing/integrating. Main was clean at `a1c8849`; all external Phase 1-3 dependencies are ✅.
 Start internal dependents only after prerequisites are merged and verified. Serialize integration,
 API contract regeneration and snapshot conflict resolution. No dependency junctions or symlinks
 between worktrees; never traverse reparse points during cleanup. Shared services/ports must not be
@@ -34,13 +34,12 @@ The images agent was notified before integration. Other additions require coordi
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 4.3.2 | task/4.3.2-morphology | ../pandawords.worktrees/4.3.2 | Agent running |
-| 4.2.3 | task/4.2.3-reading | ../pandawords.worktrees/4.2.3 | Agent running |
+| 4.3.2 | task/4.3.2-morphology | ../pandawords.worktrees/4.3.2 | Committed 1c219be; awaiting integration |
+| 4.2.3 | task/4.2.3-reading | ../pandawords.worktrees/4.2.3 | Committed 865a5ae; awaiting integration |
 | 4.4.2 | task/4.4.2-graph-ui | ../pandawords.worktrees/4.4.2 | Agent running |
 | 4.4.4 | task/4.4.4-context-exercises | ../pandawords.worktrees/4.4.4 | Waiting for 4.2.2, 4.3.2 |
 | 4.4.3 | task/4.4.3-relations | ../pandawords.worktrees/4.4.3 | Waiting for 4.4.2 |
-| 5.1.1 | task/5.1.1-images | ../pandawords.worktrees/5.1.1 | Merged af3820b; proxy storage failure under investigation |
-| 5.1.3 | task/5.1.3-image-review | ../pandawords.worktrees/5.1.3 | Waiting for 5.1.1 |
+| 5.1.3 | task/5.1.3-image-review | ../pandawords.worktrees/5.1.3 | Ready; prerequisite 5.1.1 verified |
 
 ## Blocked
 
@@ -67,6 +66,21 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
 
+### 2026-11-15 — 5.1.1 Deployed-proxy acceptance complete
+- Result / completed: follow-up `948d211` merged; fresh API-owned media volumes now retain
+  their ownership when the later nginx mount encounters an otherwise empty directory. Dockerfile
+  seeds `.initialized` before the existing non-root ownership setup; no root API or chmod workaround.
+- Dependencies: unchanged and checked ✅.
+- Verification: agent reproduced original 500 and verified actual Dockerfile/proxy fix. Main
+  check passed, rebuilt integrated API image, ran `test-image-proxy.ps1` against actual deployed
+  nginx config: exact 10 MiB upload 200, byte-identical protected delivery 200 (10,485,760 bytes),
+  10 MiB + 1 rejected 413, delete 204, removed delivery 404. Isolated media UID/GID remained 10001.
+- Failures / causes / corrections: initial empty-volume copy-up by nginx reset ownership to 0:0;
+  `nocopy` alone did not resolve it. Regression script and existing deployment/testing docs retained.
+- Skipped / deferred: none for image acceptance; live providers deliberately mocked/offline.
+- Blockers / follow-ups: none; 5.1.1 complete, image exercise ready. Scratch resources removed;
+  task branch/folder cleanup pending.
+
 ### 2026-11-15 — 5.1.2 Mnemonic notes and optional suggestions
 - Result / completed: `42981cc` merged as `30c5caa`; kind-separated retained mnemonic drafts,
   explicit save-only suggestions, owner-bound worker/cache, late-result/cancel safeguards and
@@ -78,7 +92,8 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
   mismatch and formatting fixed. Worker registry/locale/docs conflicts resolved preserving
   image handlers, all feature labels and every existing document section.
 - Skipped / deferred: final full suites/browser sweep; no live provider call required.
-- Blockers / follow-ups: none; branch/folder cleanup pending.
+- Blockers / follow-ups: none; task branch/folder safely removed after unlinking 1,631 reparse points
+  without following targets.
 
 ### 2026-11-15 — 4.4.1 Bounded graph API
 - Result / completed: `6108e07` merged as `e0d7bd2`; owner-safe effective typed graph with
@@ -89,7 +104,8 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: initial fixture/parser/dense seed-timeout issues fixed.
   Import/docs conflicts resolved preserving every feature; API regenerated, not hand-merged.
 - Skipped / deferred: final full suites/browser sweep; no migration/provider needed.
-- Blockers / follow-ups: none; graph UI ready. Cleanup pending.
+- Blockers / follow-ups: none; graph UI running. Task branch/folder safely removed after unlinking
+  1,631 reparse points without following targets.
 
 ### 2026-11-15 — 5.1.1 Image integration and deployed-proxy finding
 - Result / completed: `fbe0c1f` merged as `af3820b`; private images, validated bounded upload,

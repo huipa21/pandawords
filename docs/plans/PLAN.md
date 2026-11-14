@@ -116,7 +116,7 @@ are in `phase-N.md`. If a phase file doesn't exist yet, the agent asks before wr
 
 | ID | Task | Depends on | Wave | Size | Status |
 |---|---|---|---|---|---|
-| 5.1.1 | Image upload + Pixabay search/download, attach to sense | 2.5.1, 2.6.5 | 1 | M | 🟡 |
+| 5.1.1 | Image upload + Pixabay search/download, attach to sense | 2.5.1, 2.6.5 | 1 | M | ✅ |
 | 5.1.2 | Mnemonic notes UI + DeepSeek suggestions | 3.2.5, 2.6.5 | 1 | S | ✅ |
 | 5.1.3 | `image2word` exercise + media preferences in review | 5.1.1, 3.3.2 | 2 | M | 🟡 |
 
