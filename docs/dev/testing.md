@@ -33,6 +33,29 @@ warning. The first check found missing ruff; manifest-based `uv sync` and `pnpm 
 restored this worktree's tools without dependency changes. No E2E, stack lifecycle operation,
 dev-database mutation or bulk cleanup was performed.
 
+## Optional DeepSeek client (3.2.5)
+
+From `backend`: `uv run --no-sync pytest -q tests\integration\test_llm.py`.
+The real OpenAI SDK uses `httpx.MockTransport`; no test contacts DeepSeek. Isolated migrated
+8101 databases cover strict valid/invalid JSON, caller rejection on fresh/cached results,
+canonical cache reuse, prompt/schema/model/input versioning, disabled keys, HTTP/network
+failures, timeouts, retry accounting, zero/exhausted budgets, concurrent reservations, UTC
+reset with offset-aware times, owner isolation, shared source provenance and debug log hygiene.
+Migration `0014` must be included when regenerating/comparing the schema snapshot.
+Run `dev.ps1 test -Backend -UpdateSnapshot`, then normal backend tests and `dev.ps1 check`.
+Exercise-level fallback is intentionally owned by tasks 3.2.6 and 3.3.2.
+
+Verification on 2026-11-14: full backend snapshot regeneration passed **581 tests**,
+then normal migration/LLM regression comparison passed **35 tests**; `dev.ps1 check` passed.
+After adding actual-schema invalidation, zero-budget cache reuse and non-standard JSON-number
+regressions, the final normal full backend suite passed **584 tests** (28 LLM cases), and
+`dev.ps1 check` passed again. Pylance syntax validation, basedpyright and Ruff passed.
+An initial overly short mock timeout hit the SDK's cold startup and was increased for normal
+mock calls while keeping a dedicated short timeout case. Initial missing tooling was restored
+with `uv sync`; the dependency lock only adds OpenAI and its required transitive packages.
+The existing Starlette/httpx deprecation warning remains. No live provider, E2E or dev-stack
+commands were run.
+
 ## Project tree API (2.3.4)
 
 From `backend`, run `uv run --no-sync pytest -q tests\api\test_project_tree.py

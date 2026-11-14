@@ -68,6 +68,19 @@ and ownership contract rather than inventing scalar IDs.
 
 ## Backend modules
 
+### Optional LLM boundary
+
+Only `services/llm.py` contacts DeepSeek through the approved OpenAI SDK JSON mode.
+Forward migration `0014` adds `llm_cache` (owner/key) and `llm_budget` (owner/UTC day).
+Caches survive process restarts and remain available without a provider key or with a zero
+budget. Private inputs never share cache entries; shared generation derives inputs directly
+from verified shared dictionary records. Prompt/schema/model/input changes invalidate keys.
+Every dispatch reserves an attempt in a conflict-retried DB transaction **before** contacting
+the provider, including retries. Failures consume reservations; cache hits do not.
+SDK retries are disabled; application retries/timeouts and output tokens are bounded.
+Logs contain only unavailable reason and attempt count, not prompts, responses or keys;
+SDK payload-bearing debug events are filtered even when debug logging is enabled.
+
 | Module | Responsibility |
 |---|---|
 | `app/main.py` | App factory, routers, lifespan (DB connect, admin bootstrap) |

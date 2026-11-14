@@ -34,6 +34,21 @@ The card field contract was checked against upstream
 The dependency/wrapper are task 3.1.2; no package installation or runtime scheduler behavior
 is claimed by these schema tests.
 
+### Optional LLM cache and budget (3.2.5) ✅
+
+Verified 2026-11-14 against isolated migrated databases on existing **8101**, SurrealDB
+**3.3.5** / SDK **3.0.0** (no dev database or stack lifecycle operations):
+`0014`'s unique `(owner,key)` cache index accepts shared `owner=NONE` and distinct owner rows.
+Deterministic `llm_budget:[user,UTC-day]` records and owner/day-filtered SELECT followed by
+conditional `UPDATE ... SET attempts += 1 ... AND attempts < $limit RETURN AFTER` inside
+the existing conflict-retried UUID transaction reserve attempts atomically, including first
+CREATE races. Concurrent reservation and concurrent mock-provider dispatch tests both enforce
+the cap. UTC offset conversion/reset and independent owners are retained regressions.
+Cache reads explicitly match the exact owner (NONE only for shared generation); shared source
+reads use `owner = NONE` and only approved dictionary fields enter prompts.
+The full backend snapshot-update suite passed 581 tests; the final normal backend suite passed
+584 tests with the snapshot unchanged. Repository `check` passed. Tests use SDK MockTransport only.
+
 ### Project tree visibility (2.3.4) ✅
 
 Verified **2026-11-14**, SurrealDB **3.3.5** / SDK **3.0.0**, using only random migrated

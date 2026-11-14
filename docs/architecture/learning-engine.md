@@ -54,6 +54,28 @@ are skipped.
 
 ## Daily plan (per project)
 
+### Optional JSON generation (3.2.5)
+
+`services.llm.generate_json(db, settings, user=..., response_model=..., prompt=...,
+prompt_version=..., schema_version=..., inputs=..., validate=...)` returns typed
+`LlmResult(value, cached)`. Prompts and versions are trusted application constants; private
+notes, overlays and learner context belong only in `inputs`, which is owner-scoped by default.
+For reusable scenarios pass `inputs=None, shared_sources=(lemma_record, sense_record)`:
+the service reads only shared dictionary lemma/lexeme/sense fields, never user overlays.
+Missing/private sources or mixing shared sources with arbitrary inputs is `invalid_scope`.
+
+Always supply a caller validator for scenario constraints (answer leakage, target/form
+compatibility, etc.). It runs before caching **and** before returning a cache hit. Rejected,
+malformed, extra/incorrectly typed fields, truncated and failed responses never enter the cache.
+Version prompt/schema changes explicitly; the canonical key also includes actual input,
+prompt, model, base URL and generated JSON schema.
+
+Catch `core.errors.LlmUnavailable` and inspect `.reason`: `disabled`, `budget_exhausted`,
+`timeout`, `provider_error`, `invalid_response`, `rejected_response`, `storage_error`,
+or `invalid_scope`. Workers should skip/fall back rather than make learning depend on the LLM.
+This task provides the client contract; scenario job registration and exercise fallback are
+implemented by 3.2.6/3.3.2.
+
 - `plan.daily_new`: the maximum number of new senses introduced per day.
 - `plan.exam_date` (optional): suggested daily new = ceil(remaining new ÷ max(1, days left − 7)),
   capped by `daily_new`. The UI shows when the plan can't finish before the exam.

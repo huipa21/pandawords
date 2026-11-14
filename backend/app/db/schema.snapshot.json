@@ -22,6 +22,8 @@
       "job": "DEFINE TABLE job TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "lemma": "DEFINE TABLE lemma TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "lexeme": "DEFINE TABLE lexeme TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
+      "llm_budget": "DEFINE TABLE llm_budget TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
+      "llm_cache": "DEFINE TABLE llm_cache TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "media": "DEFINE TABLE media TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "member_of": "DEFINE TABLE member_of TYPE RELATION IN sense | morpheme | tag OUT tag ENFORCED SCHEMAFULL PERMISSIONS NONE",
       "memory": "DEFINE TABLE memory TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
@@ -211,6 +213,33 @@
         "pron.*.ipa": "DEFINE FIELD pron.*.ipa ON lexeme TYPE string PERMISSIONS FULL"
       },
       "indexes": {},
+      "lives": {},
+      "tables": {}
+    },
+    "llm_budget": {
+      "events": {},
+      "fields": {
+        "attempts": "DEFINE FIELD attempts ON llm_budget TYPE int ASSERT $value >= 0 PERMISSIONS FULL",
+        "day": "DEFINE FIELD day ON llm_budget TYPE string PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON llm_budget TYPE record<user> PERMISSIONS FULL"
+      },
+      "indexes": {
+        "llm_budget_owner_day": "DEFINE INDEX llm_budget_owner_day ON llm_budget FIELDS owner, day UNIQUE"
+      },
+      "lives": {},
+      "tables": {}
+    },
+    "llm_cache": {
+      "events": {},
+      "fields": {
+        "created_at": "DEFINE FIELD created_at ON llm_cache TYPE datetime DEFAULT time::now() PERMISSIONS FULL",
+        "key": "DEFINE FIELD key ON llm_cache TYPE string PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON llm_cache TYPE none | record<user> PERMISSIONS FULL",
+        "response_json": "DEFINE FIELD response_json ON llm_cache TYPE string PERMISSIONS FULL"
+      },
+      "indexes": {
+        "llm_cache_owner_key": "DEFINE INDEX llm_cache_owner_key ON llm_cache FIELDS owner, key UNIQUE"
+      },
       "lives": {},
       "tables": {}
     },
