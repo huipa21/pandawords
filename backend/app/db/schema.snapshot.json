@@ -368,6 +368,7 @@
         "plan.exam_date": "DEFINE FIELD plan.exam_date ON project TYPE none | datetime PERMISSIONS FULL",
         "plan.review_cap": "DEFINE FIELD plan.review_cap ON project TYPE none | int PERMISSIONS FULL",
         "source_lang": "DEFINE FIELD source_lang ON project TYPE string PERMISSIONS FULL",
+        "srs_revision": "DEFINE FIELD srs_revision ON project TYPE int DEFAULT 0 PERMISSIONS FULL",
         "target_lang": "DEFINE FIELD target_lang ON project TYPE string PERMISSIONS FULL"
       },
       "indexes": {
@@ -420,7 +421,9 @@
         "memory": "DEFINE FIELD memory ON review_log TYPE record<memory> PERMISSIONS FULL",
         "owner": "DEFINE FIELD owner ON review_log TYPE record<user> ASSERT $value = record::id($this.memory)[0] PERMISSIONS FULL",
         "project": "DEFINE FIELD project ON review_log TYPE record<project> PERMISSIONS FULL",
-        "rating": "DEFINE FIELD rating ON review_log TYPE int ASSERT $value INSIDE [1, 2, 3, 4] PERMISSIONS FULL"
+        "rating": "DEFINE FIELD rating ON review_log TYPE int ASSERT $value INSIDE [1, 2, 3, 4] PERMISSIONS FULL",
+        "receipt": "DEFINE FIELD receipt ON review_log TYPE none | object FLEXIBLE PERMISSIONS FULL",
+        "request_fingerprint": "DEFINE FIELD request_fingerprint ON review_log TYPE none | string PERMISSIONS FULL"
       },
       "indexes": {
         "review_log_owner_at": "DEFINE INDEX review_log_owner_at ON review_log FIELDS owner, at",
@@ -496,6 +499,7 @@
         "password_hash": "DEFINE FIELD password_hash ON user TYPE string PERMISSIONS FULL",
         "prefs": "DEFINE FIELD prefs ON user TYPE object PERMISSIONS FULL",
         "prefs.accent": "DEFINE FIELD prefs.accent ON user TYPE 'US' | 'UK' PERMISSIONS FULL",
+        "prefs.desired_retention": "DEFINE FIELD prefs.desired_retention ON user TYPE float DEFAULT 0.9f ASSERT $value > 0 AND $value < 1 PERMISSIONS FULL",
         "prefs.locale": "DEFINE FIELD prefs.locale ON user TYPE string PERMISSIONS FULL",
         "prefs.theme": "DEFINE FIELD prefs.theme ON user TYPE 'system' | 'light' | 'dark' PERMISSIONS FULL",
         "role": "DEFINE FIELD role ON user TYPE 'admin' | 'user' PERMISSIONS FULL",

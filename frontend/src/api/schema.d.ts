@@ -123,6 +123,24 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/auth/me/srs-preferences': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Srs Preferences */
+    get: operations['srs_preferences_api_auth_me_srs_preferences_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Patch Srs Preferences */
+    patch: operations['patch_srs_preferences_api_auth_me_srs_preferences_patch']
+    trace?: never
+  }
   '/api/jobs/{id}': {
     parameters: {
       query?: never
@@ -968,6 +986,19 @@ export interface components {
       ipa: components['schemas']['Text-Output']
     }
     'Rank': number
+    /** SrsPreferences */
+    'SrsPreferences': {
+      /**
+       * Desired Retention
+       * @default 0.9
+       */
+      desired_retention: number
+    }
+    /** SrsPreferencesUpdate */
+    'SrsPreferencesUpdate': {
+      /** Desired Retention */
+      desired_retention: number
+    }
     'Text-Output': string
     /** UserPreferences */
     'UserPreferences': {
@@ -988,6 +1019,11 @@ export interface components {
        * @enum {string}
        */
       accent: 'US' | 'UK'
+      /**
+       * Desired Retention
+       * @default 0.9
+       */
+      desired_retention: number
     }
     /** UserRead */
     'UserRead': {
@@ -1213,6 +1249,59 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['AuthRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  srs_preferences_api_auth_me_srs_preferences_get: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SrsPreferences']
+        }
+      }
+    }
+  }
+  patch_srs_preferences_api_auth_me_srs_preferences_patch: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SrsPreferencesUpdate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SrsPreferences']
         }
       }
       /** @description Validation Error */

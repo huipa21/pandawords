@@ -7,7 +7,8 @@ from app.core.config import Settings
 from app.core.errors import AppError
 from app.core.security import invalid_credentials
 from app.domain.auth import AuthRead, AuthTokens, LoginRequest, PasswordChange, User, UserRead
-from app.services import auth
+from app.domain.srs import SrsPreferences, SrsPreferencesUpdate
+from app.services import auth, srs
 from app.services.login_backoff import LoginBackoff
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
@@ -106,3 +107,17 @@ async def password(
 ) -> AuthRead:
     tokens = await auth.change_password(db, settings, user, data)
     return _response(tokens, response, settings)
+
+
+@router.get("/me/srs-preferences")
+async def srs_preferences(response: Response, db: Db, user: CurrentUser) -> SrsPreferences:
+    response.headers["Cache-Control"] = "no-store"
+    return await srs.read_preferences(db, user.id)
+
+
+@router.patch("/me/srs-preferences")
+async def patch_srs_preferences(
+    data: SrsPreferencesUpdate, response: Response, db: Db, user: CurrentUser
+) -> SrsPreferences:
+    response.headers["Cache-Control"] = "no-store"
+    return await srs.update_preferences(db, user.id, data)

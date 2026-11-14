@@ -1,5 +1,39 @@
 # Testing
 
+## Scheduling service (3.1.2)
+
+Focused command from `backend`, using isolated random databases on the healthy existing
+`127.0.0.1:8101` server:
+
+```powershell
+uv run --no-sync pytest -q tests\unit\test_srs.py tests\integration\test_srs_memberships.py tests\integration\test_srs_reviews.py tests\integration\test_srs_limits.py tests\integration\test_srs_migration.py tests\integration\test_project_add_atomic.py tests\api\test_srs_preferences.py
+```
+
+Tests execute py-fsrs 6.x, checking complete card round-trips, first/repeat/second-project adds,
+hidden legacy reconciliation, cross-owner cards and preferences, add/review rollback,
+manual ratings and retention-dependent scheduling. Real concurrent confirmations cover
+identical retries, conflicting final ratings, stale attempts and per-project capacity across
+different cards. Persisted receipts survive subsequent scheduling updates. Eligibility is
+revalidated after ancestor/sense hiding or project deletion; failures leave cards/logs intact.
+Timing tests cover wrong/give-up/hint, both kinds, exact fast/slow boundaries, 19/20 samples,
+last-100 history, type/user/correctness isolation and the integer 60-second cap. UTC boundary
+tests distinguish first introduction counts from later same-day/other-project review counts.
+New preferences API tests reject invalid retention and owner injection without overwriting
+other settings. `dev.ps1 test -Backend -UpdateSnapshot` regenerates migration `0015`'s schema;
+the normal backend runner checks it without rewriting.
+
+Verification on 2026-11-14: `dev.ps1 check`, frontend tests and API generation passed.
+The final normal backend suite passed 632 tests; the focused suite including auth/schema-drift
+regressions passed 55 tests. The snapshot-update run generated the schema but initially failed
+one old auth-schema assertion that omitted the new default; that assertion was updated to
+verify preserved old fields plus retention. API generation also exposed two typed frontend
+auth/admin fixtures missing retention; their fixture values were updated and linted.
+The legacy migration test initially tried the new service model against the old SCHEMAFULL
+schema; it now inserts the authoritative old shape before testing the forward backfill.
+Pylance could not resolve the worktree's new file; ruff, basedpyright and actual runtime tests
+provide validation. The existing Starlette/httpx deprecation warning remains. No E2E,
+dev-database mutation or stack lifecycle operations were performed.
+
 ## Memory and completed review schema (3.1.1)
 
 From `backend`, with the existing loopback SurrealDB 3.3 server on **8101**, run:

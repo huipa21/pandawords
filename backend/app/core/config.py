@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Literal
 from urllib.parse import urlsplit, urlunsplit
 
-from pydantic import Field, field_validator
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -77,6 +77,20 @@ class Settings(BaseSettings):
     llm_daily_budget: int = Field(default=20, ge=0)
     llm_timeout_seconds: float = Field(default=15.0, gt=0, le=60)
     llm_max_retries: int = Field(default=1, ge=0, le=3)
+
+    srs_recognition_fast_ms: int = Field(default=3000, ge=0, le=60000)
+    srs_recognition_slow_ms: int = Field(default=12000, ge=0, le=60000)
+    srs_recall_fast_ms: int = Field(default=5000, ge=0, le=60000)
+    srs_recall_slow_ms: int = Field(default=20000, ge=0, le=60000)
+
+    @model_validator(mode="after")
+    def validate_srs_thresholds(self) -> Settings:
+        if (
+            self.srs_recognition_fast_ms > self.srs_recognition_slow_ms
+            or self.srs_recall_fast_ms > self.srs_recall_slow_ms
+        ):
+            raise ValueError("SRS fast thresholds must not exceed slow thresholds")
+        return self
 
     target_language: str = "en"
     source_language: str = "zh"

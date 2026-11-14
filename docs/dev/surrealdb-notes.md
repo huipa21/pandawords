@@ -4,6 +4,30 @@ Check here before writing SurrealQL. **Status:** ✅ verified on the version sho
 form is wrong (a working, verified replacement is given). New, unverified beliefs must be
 tested before being used.
 
+### Atomic scheduling and preferences (3.1.2) ✅
+
+Verified 2026-11-14 against SurrealDB 3.3.5 / SDK 3.0.0, isolated random harness databases
+on existing loopback 8101:
+
+- Flexible receipts use `DEFINE FIELD ... TYPE option<object> FLEXIBLE`, not
+  `... FLEXIBLE TYPE ...` (the latter parser error was observed and corrected).
+- Nested `prefs.desired_retention` defaults/backfills preserve existing preference fields.
+  A bound nested `UPDATE` changes only retention. Optional fingerprint/receipt fields allow
+  old logs to retain their schema-compatible data.
+- **A no-op project UPDATE does not serialize review capacity.** The concurrent different-card
+  limit test initially allowed both commits. A real `srs_revision += 1` write causes the
+  existing transaction-conflict retry to rerun owner/tree/count checks; only one introduction
+  commits when capacity is one.
+- Bound owner/exercise/correct history reads ordered by `at DESC, id DESC LIMIT 100` retain
+  the intended prior sample window. UTC `[start, next_day)` count filters distinguish
+  introductions from later reviews in the project where each occurred.
+- SDK transactions atomically persist complete cards, flexible JSON receipts and completed
+  logs. Tests force failure after both writes and observe rollback; same-attempt concurrent
+  retries yield one update/log, distinct stale attempts reject and conflicting retry data fails.
+
+Retained probes: `test_srs_reviews.py`, `test_srs_limits.py`, `test_srs_preferences.py`,
+`test_srs_memberships.py` and the schema snapshot tests.
+
 ### Memory and completed review history (3.1.1) ✅
 
 Verified **2026-11-14**, SurrealDB **3.3.5** / SDK **3.0.0**, against fresh isolated

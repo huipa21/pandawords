@@ -13,7 +13,12 @@ export function authPayload(overrides: Partial<components['schemas']['UserRead']
       must_change_password: false,
       source_lang: 'zh',
       target_lang: 'en',
-      prefs: { theme: 'system', locale: 'zh-CN', accent: 'US' },
+      prefs: {
+        theme: 'system',
+        locale: 'zh-CN',
+        accent: 'US',
+        desired_retention: 0.9,
+      },
       ...overrides,
     },
   }
