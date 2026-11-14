@@ -48,6 +48,19 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
 
+### 2026-11-14 — Phase 2 readiness-test timing correction
+- Result / completed: isolated the short application-startup deadline from the real database
+  connection deadline in two auth readiness tests. No production timeout or behavior changed.
+- Dependencies: observed while integrating 2.6.1 after the dictionary migration.
+- Verification: reproduced late-bootstrap failure with logged connection TimeoutError;
+  after correction all five bootstrap tests passed against real SurrealDB, Ruff check/format
+  and basedpyright passed. Full integrated suite still pending.
+- Failures / causes / corrections: tests reused a 100ms startup deadline for actual WebSocket
+  handshake and assumed connection finished before that deadline. Parallel real-DB load
+  invalidated that assumption. Tests now retain ordinary connection settings and explicitly
+  await the bootstrap-start event, while still testing the 100ms startup deadline.
+- Skipped / deferred: none. Blockers: none for this correction; 2.6.1 verification ongoing.
+
 ### 2026-11-14 — 2.2.1 Shared dictionary schema
 - Result / completed: seven SCHEMAFULL dictionary tables and nine enforced relations, nested
   field types, ownership and indexes; `d757d55` merged with generated schema snapshot.

@@ -250,10 +250,14 @@ async def test_slow_bootstrap_preserves_health_then_opens_readiness(
 
     settings = test_settings.model_copy(update={"surreal_timeout_seconds": 0.1})
     application = create_app(settings)
-    with patch("app.main.bootstrap_admin", side_effect=delayed_bootstrap):
+    database = DatabaseClient(test_settings)
+    with (
+        patch("app.main.bootstrap_admin", side_effect=delayed_bootstrap),
+        patch("app.db.client.DatabaseClient", return_value=database),
+    ):
         async with asyncio.timeout(5):
             async with application.router.lifespan_context(application):
-                assert started.is_set()
+                await started.wait()
                 async with AsyncClient(
                     transport=ASGITransport(app=application), base_url="http://test"
                 ) as client:
@@ -285,7 +289,11 @@ async def test_late_bootstrap_failure_keeps_readiness_closed(
         update={"admin_password": "", "surreal_timeout_seconds": 0.1}
     )
     application = create_app(settings)
-    with patch.object(DatabaseClient, "connect", delayed_connect):
+    database = DatabaseClient(test_settings)
+    with (
+        patch.object(DatabaseClient, "connect", delayed_connect),
+        patch("app.db.client.DatabaseClient", return_value=database),
+    ):
         async with application.router.lifespan_context(application):
             async with AsyncClient(
                 transport=ASGITransport(app=application), base_url="http://test"
