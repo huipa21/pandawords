@@ -44,6 +44,28 @@ The API exposes `/api/healthz` for liveness, `/api/readyz` for readiness, and it
 Backend settings resolve `.env.dev` from the main worktree (or the project root outside Git);
 inherited environment variables take precedence.
 
+### Project API
+
+Authenticated, enabled users who have completed the password change can use:
+
+| Route | Contract |
+|---|---|
+| `POST /api/projects` | `ProjectCreate` → `201 ProjectRead` |
+| `GET /api/projects?page=1&page_size=20` | `ProjectPage {items, total, page, page_size}` |
+| `GET /api/projects/{id}` | `ProjectRead` |
+| `PATCH /api/projects/{id}` | `ProjectUpdate` → `ProjectRead` |
+| `DELETE /api/projects/{id}` | `204`, no body |
+
+Project IDs use the strict opaque `rid` codec, not raw database IDs. Pagination follows the
+existing admin API: page ≥ 1 (maximum 2,147,483,647), page size 1–100, default 20; newest
+`created_at` first, with `id` as the stable tie-breaker. Counts and items are owner-scoped and
+read in one transaction. Successful responses use `Cache-Control: no-store`.
+Malformed/wrong-table IDs, missing projects and other users' projects all return the same
+`404 project.not_found`, including for administrators. Input validation returns
+`422 validation.invalid`. Contracts are generated in `frontend/src/api/{openapi.json,schema.d.ts}`.
+Project tree and word-add endpoints are separate tasks; they must reuse the same project `rid`
+and ownership contract rather than inventing scalar IDs.
+
 ## Backend modules
 
 | Module | Responsibility |

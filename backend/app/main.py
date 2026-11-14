@@ -14,6 +14,7 @@ from app.api.admin import router as admin_router
 from app.api.auth import router as auth_router
 from app.api.jobs import router as jobs_router
 from app.api.media import router as media_router
+from app.api.projects import router as projects_router
 from app.core.config import Settings
 from app.core.errors import (
     AppError,
@@ -97,6 +98,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(jobs_router)
     app.include_router(media_router)
     app.include_router(admin_router)
+    app.include_router(projects_router)
     return app
 
 

@@ -141,6 +141,29 @@ There is no separate override `target` field. Note `target` is a required `recor
 required string. The migration adds just `project_owner(owner)` and
 `note_owner_target(owner, target)` non-unique indexes. Media remains a separate migration.
 
+### Project API models and lifecycle
+
+`ProjectCreate` requires `name` (trimmed, 1–128 characters). `description` defaults to `""`
+(maximum 10,000 characters); `target_lang`/`source_lang` default to `en`/`zh` and accept trimmed
+nonblank language strings up to 35 characters. `plan` defaults to
+`{daily_new: 20, exam_date: null, review_cap: null}`. Daily-new and non-null review caps are
+strict nonnegative signed 64-bit integers (zero is allowed); an exam date must include a timezone and is
+normalized to UTC. The API rejects unknown fields, including client-supplied owner/ID/timestamps.
+
+`ProjectUpdate` accepts those same fields, all optional; omitted fields stay unchanged, but
+explicit top-level nulls are invalid. An empty patch is a no-op. Providing `plan` **replaces the
+whole plan**, applying the create defaults for omitted plan members. Nested `exam_date` and
+`review_cap` may be null to clear them (stored as database NONE, returned as JSON null).
+`ProjectRead` returns `id` (opaque project rid), name, description, languages, complete plan,
+and UTC `created_at`; owner is not exposed or mutable.
+
+Deleting a project atomically removes its owner-bound `includes` edges (including hidden ones)
+and the project itself. It never deletes dictionary/custom content, notes, overrides or another
+project's memberships; reusable personal content survives. Since SurrealDB removes connected
+relations when deleting an endpoint, inconsistent legacy data with another owner's membership
+attached to this project is rejected with `409 project.membership_conflict`, leaving all rows
+unchanged. Membership APIs must validate matching project/edge owners to prevent that state.
+
 ## Effective views
 
 - **Sense as seen by a user** = the shared sense record with `override:[user, sense].fields`

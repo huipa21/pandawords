@@ -104,6 +104,17 @@ running this flow. Normal Playwright reports/results remain gitignored.
   password-change gating and disabled accounts. No production services are started.
 - Run unit tests from the selected worktree; it needs that worktree's backend environment
   (`uv sync --locked`) and frontend dependencies (`pnpm install --frozen-lockfile`).
+- Project CRUD API coverage is in `tests/api/test_projects.py` and
+  `test_projects_cleanup.py`: defaults/full reads, persisted partial updates and whole-plan
+  replacement, deletion/not-found, owner-only admin-style pagination/counts, invalid fields,
+  strict plan validation and malformed/wrong-table rids. Every route requires enabled,
+  password-changed authentication; cross-user GET/PATCH/DELETE return the same 404 even for an
+  administrator. Cleanup tests retain shared/custom content, notes, overrides and both users'
+  unrelated memberships, including hidden membership removal. A foreign-owned edge attached
+  to the project produces 409 with no deletion, preventing implicit cross-owner edge cascades.
+  Focused command from `backend`: `uv run --no-sync pytest -q tests/api/test_projects.py
+  tests/api/test_projects_cleanup.py`. These use fresh users in the migrated harness database,
+  never dev data or a server lifecycle change.
 - `lexicon_small.sqlite`: about 50 words (polysemy: *run*, *bank*; phrase: *kick the bucket*,
   *give up*; US/UK: *schedule*, *tomato*; derivation: *decide → decision*). It is built by the
   lexicon script from `backend/tests/fixtures/words.txt`.
