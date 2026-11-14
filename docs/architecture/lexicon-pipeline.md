@@ -62,11 +62,35 @@ from `backend`; `dev.ps1 lexicon` orchestration remains task 2.1.6.
   reader lookups and callable/CLI contracts are in
   [`backend/scripts/README.md`](../../backend/scripts/README.md#sqlite-v1-and-extension-contract).
 - Senses are aligned across sources: Wiktionary is the backbone. ECDICT Chinese glosses attach at
-  POS level (`sense.gloss.zh` for the top sense, `lexeme`-level gloss list otherwise). OEWN
+  POS level (`sense.gloss_zh` for the top sense, `zh_gloss` lexeme-level list otherwise). OEWN
   relations attach by best gloss overlap (a token Jaccard score; below the threshold they attach to
   the lexeme's top sense with `source='oewn:approx'`).
 - Test fixture: `backend/tests/fixtures/lexicon_small.sqlite`, about 50 words covering polysemy,
   phrases, US/UK differences and derivations. It is built by the same script with `--words fixture.txt`.
+
+### ECDICT/wordfreq selection (2.1.3)
+
+The builder's independent `--ecdict PATH` / `--wordfreq` flags opt into offline enrichment.
+The typed `ecdict_enricher(path)` and `wordfreq_enricher()` factories expose callable hooks
+and result counters for fixture/release orchestration. Missing requested sources fail explicitly;
+neither flag implies a download. ECDICT attribution includes the CSV checksum/verified manifest;
+wordfreq attribution includes the locked package/data version and licensing.
+
+ECDICT matches normalized English lemma spelling exactly. POS-prefixed Chinese translations
+need a unique matching lexeme; an unlabeled translation needs a unique lexeme overall.
+Unknown POS, missing lemma/POS and multiple etymologies are logged and counted, not guessed.
+The first distinct aligned gloss becomes the primary translation on the lexeme's top sense;
+other Chinese glosses remain lexeme-level. This is a documented top-sense approximation, not
+a bilingual semantic alignment. Duplicate normalized CSV words use the first source row;
+glosses and recognized exam tags are deduplicated. BNC/COCA ranks retain ECDICT provenance.
+
+wordfreq supplies English `best` Zipf values, synchronized between `lemma.freq_zipf` and its
+own `freq` row (zero means unknown). For each lexeme, **Zipf >=5 selects two top senses**;
+**3 <= Zipf <5 selects one**; lower/missing values select none. An aligned primary ECDICT
+gloss additionally selects its top sense regardless of frequency. Ranking uses `(rank, id)`,
+so ties are deterministic. Both hooks recompute these flags; either hook order yields the
+same selection, with no selection from unresolved glosses. The full parser, result/logging
+and source contracts are in the scripts README's ECDICT/wordfreq section.
 
 ## Add-word flow
 
