@@ -9,5 +9,6 @@
   "water": 5.5, "food": 5.4, "house": 5.5, "home": 5.8, "school": 5.5,
   "work": 5.9, "play": 5.4, "light": 5.3, "dark": 4.9, "hot": 5.0,
   "cold": 4.9, "big": 5.7, "small": 5.5, "quick": 4.8, "slow": 4.5,
-  "good": 6.1, "bad": 5.5
+  "good": 6.1, "bad": 5.5,
+  "kick": 3.2, "the": 6.8, "bucket": 3.1, "heavy": 4.2, "rain": 4.1, "heavy rain": 3.5
 }

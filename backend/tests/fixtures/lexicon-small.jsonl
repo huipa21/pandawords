@@ -3,7 +3,7 @@
 {"word":"bank","lang_code":"en","pos":"noun","etymology_number":1,"etymology_text":"A financial institution.","senses":[{"id":"bank-finance","glosses":["An institution that keeps and lends money."],"topics":["finance"]},{"id":"bank-reserve","glosses":["A reserve of things for later use."]}],"forms":[{"form":"banks","tags":["plural"]}]}
 {"word":"bank","lang_code":"en","pos":"noun","etymology_number":2,"etymology_text":"The side of a river.","senses":[{"id":"bank-river","glosses":["Raised ground beside a river."]}]}
 {"word":"give up","lang_code":"en","pos":"verb","senses":[{"id":"give-up-stop","glosses":["Stop trying to do something."]}],"forms":[{"form":"gave up","tags":["past"]},{"form":"given up","tags":["past","participle"]}]}
-{"word":"kick the bucket","lang_code":"en","pos":"verb","senses":[{"id":"kick-bucket-die","glosses":["Die."],"tags":["idiomatic","informal"]}],"forms":[{"form":"kicked the bucket","tags":["past"]}]}
+{"word":"kick the bucket","lang_code":"en","pos":"verb","senses":[{"id":"kick-bucket-die","glosses":["Die."],"tags":["idiomatic","informal"]}],"forms":[{"form":"kicked the bucket","tags":["past"]}],"etymology_templates":[{"name":"compound","args":{"1":"en","2":"kick","3":"the","4":"bucket"}}]}
 {"word":"schedule","lang_code":"en","pos":"noun","senses":[{"id":"schedule-plan","glosses":["A plan listing times for activities."]}],"sounds":[{"ipa":"/ˈskɛdʒuːl/","tags":["US"]},{"ipa":"/ˈʃɛdjuːl/","tags":["UK"]}]}
 {"word":"tomato","lang_code":"en","pos":"noun","senses":[{"id":"tomato-fruit","glosses":["A soft red fruit used as food."]}],"forms":[{"form":"tomatoes","tags":["plural"]}],"sounds":[{"ipa":"/təˈmeɪtoʊ/","tags":["US"]},{"ipa":"/təˈmɑːtəʊ/","tags":["UK"]}]}
 {"word":"decide","lang_code":"en","pos":"verb","senses":[{"id":"decide-choose","glosses":["Choose after thinking."]}],"forms":[{"form":"decided","tags":["past"]}],"derived":[{"word":"decision"}]}
@@ -50,3 +50,9 @@
 {"word":"slow","lang_code":"en","pos":"adj","senses":[{"id":"slow-speed","glosses":["Moving without speed."]}]}
 {"word":"good","lang_code":"en","pos":"adj","senses":[{"id":"good-quality","glosses":["Having a desirable quality."]}]}
 {"word":"bad","lang_code":"en","pos":"adj","senses":[{"id":"bad-quality","glosses":["Having an undesirable quality."]}]}
+{"word":"kick","lang_code":"en","pos":"verb","senses":[{"id":"kick-strike","glosses":["Strike with the foot."],"examples":[{"text":"kick the bucket","tags":["idiomatic"]}]}]}
+{"word":"the","lang_code":"en","pos":"article","senses":[{"id":"the-definite","glosses":["The definite article."]}]}
+{"word":"bucket","lang_code":"en","pos":"noun","senses":[{"id":"bucket-container","glosses":["A container with a handle."]}]}
+{"word":"heavy","lang_code":"en","pos":"adj","senses":[{"id":"heavy-intense","glosses":["Intense or abundant."],"examples":[{"text":"heavy rain","tags":["literal"]}]},{"id":"heavy-weight","glosses":["Having great weight."],"examples":[{"text":"heavy rain"}]}]}
+{"word":"rain","lang_code":"en","pos":"noun","senses":[{"id":"rain-water","glosses":["Water falling from clouds."],"examples":[{"text":"heavy rain","tags":["literal"]}]}]}
+{"word":"heavy rain","lang_code":"en","pos":"noun","senses":[{"id":"heavy-rain","glosses":["Intense rainfall."]}],"etymology_templates":[{"name":"compound","args":{"1":"en","2":"heavy","3":"rain"}}]}

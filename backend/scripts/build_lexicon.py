@@ -13,6 +13,7 @@ from app.domain.dictionary_keys import lemma_key
 
 from .download_lexicon import checked_record, checksum, default_raw_dir, read_manifest
 from .lexicon_kaikki import entries, import_entry, json_text
+from .lexicon_phrases import resolve_phrases
 from .lexicon_schema import initialize, validate
 from .lexicon_sources import SOURCES
 
@@ -23,6 +24,7 @@ type Enricher = Callable[[sqlite3.Connection], None]
 class BuildResult:
     records: int
     skipped_senses: int
+    skipped_phrase_mappings: int = 0
 
 
 def build(
@@ -85,6 +87,7 @@ def build(
                     records += 1
                 except ValueError as error:
                     raise ValueError(f"kaikki line {number}: {error}") from error
+            skipped_phrases = resolve_phrases(connection, kaikki)
             for enrich in enrichers:
                 enrich(connection)
             validate(connection)
@@ -94,7 +97,7 @@ def build(
         os.replace(stage, output)
     finally:
         stage.unlink(missing_ok=True)
-    return BuildResult(records, skipped)
+    return BuildResult(records, skipped, skipped_phrases)
 
 
 def main() -> None:
@@ -131,7 +134,9 @@ def main() -> None:
     except (OSError, ValueError, sqlite3.Error) as error:
         parser.exit(1, f"lexicon build failed: {error}\n")
     print(
-        f"Built {output}: {result.records} records; {result.skipped_senses} unusable senses skipped"
+        f"Built {output}: {result.records} records; "
+        f"{result.skipped_senses} unusable senses skipped; "
+        f"{result.skipped_phrase_mappings} phrase mappings skipped"
     )
 
 

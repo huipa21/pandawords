@@ -179,7 +179,7 @@ async def test_invalid_database_errors(tmp_path: Path, kind: str) -> None:
         shutil.copyfile(FIXTURES / "lexicon_small.sqlite", output)
         with closing(sqlite3.connect(output)) as connection:
             if kind == "wrong-version":
-                connection.execute("PRAGMA user_version = 2")
+                connection.execute("PRAGMA user_version = 1")
             else:
                 connection.execute("ALTER TABLE lemma RENAME COLUMN cefr TO unexpected")
             connection.commit()
@@ -202,10 +202,10 @@ async def test_invalid_record_data_becomes_domain_error(tmp_path: Path) -> None:
 def test_fixture_rebuild_matches_committed_logical_database(tmp_path: Path) -> None:
     output = tmp_path / "rebuilt.sqlite"
     result = build_fixture(output)
-    assert result.records == 52 and result.skipped_senses == 0
+    assert result.records == 58 and result.skipped_senses == 0
     with (
         closing(sqlite3.connect(output)) as rebuilt,
         closing(sqlite3.connect(FIXTURES / "lexicon_small.sqlite")) as committed,
     ):
-        assert rebuilt.execute("SELECT COUNT(*) FROM lemma").fetchone() == (50,)
+        assert rebuilt.execute("SELECT COUNT(*) FROM lemma").fetchone() == (56,)
         assert list(rebuilt.iterdump()) == list(committed.iterdump())

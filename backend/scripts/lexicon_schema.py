@@ -2,11 +2,11 @@
 
 import sqlite3
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 SCHEMA = """
 PRAGMA foreign_keys = ON;
-PRAGMA user_version = 1;
+PRAGMA user_version = 2;
 CREATE TABLE source (
     name TEXT PRIMARY KEY, metadata TEXT NOT NULL CHECK(json_valid(metadata))
 );
@@ -88,6 +88,20 @@ CREATE TABLE affix (
     type TEXT NOT NULL CHECK(type IN ('prefix', 'root', 'suffix', 'infix')),
     source TEXT NOT NULL REFERENCES source(name),
     PRIMARY KEY(lexeme_id, position, source)
+);
+CREATE TABLE phrase_component (
+    phrase_id TEXT NOT NULL REFERENCES lemma(id),
+    lexeme_id TEXT NOT NULL REFERENCES lexeme(id),
+    position INTEGER NOT NULL CHECK(position >= 0),
+    source TEXT NOT NULL REFERENCES source(name),
+    PRIMARY KEY(phrase_id, position)
+);
+CREATE INDEX phrase_component_lexeme ON phrase_component(lexeme_id, phrase_id);
+CREATE TABLE phrase_usage (
+    phrase_id TEXT NOT NULL REFERENCES lemma(id),
+    sense_id TEXT NOT NULL REFERENCES sense(id),
+    source TEXT NOT NULL REFERENCES source(name),
+    PRIMARY KEY(phrase_id, sense_id, source)
 );
 """
 

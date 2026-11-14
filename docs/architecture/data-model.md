@@ -106,9 +106,25 @@ directions), and visible `has_sense`/`has_lexeme` ancestry for POS and lemma `fr
 It introduces no persisted fields or migration. The internal `domain.distractors` pool
 contains only owner-visible effective display fields and ranking tiers, not raw graph rows.
 
-Phrase rule: `contains` always exists, even for idioms. `sense used_in phrase` exists only when a
+Phrase rule: source-backed `contains` represents composition even for idioms. `sense used_in phrase` exists only when a
 word's sense applies literally (e.g. *heavy rain*, not *kick the bucket*). A phrase's own meaning
 lives under its own lexeme/sense, like any lemma.
+
+Task 4.1.1 materializes `contains` only for complete source-backed decompositions whose
+components each resolve to a unique English word lexeme; unknown or ambiguous components
+remain unlinked rather than being inferred from whitespace. `position` is zero-based, and
+the deterministic edge ID is `[phrase lemma record, component lexeme record, position]`;
+repeated component lexemes retain separate ordered edges. Shared source edges and endpoints
+have `owner = NONE`. Offline component/usage records preserve source attribution; existing
+`contains`/`used_in` schema has no extra provenance field.
+
+Explicitly literal source associations produce `[component sense record, phrase lemma record]`
+`used_in` IDs. The phrase's own selected senses remain separate from component senses.
+Materialization is atomic and insert-only: repeat adds preserve existing shared content and all
+user rows/edges; private deterministic-ID collisions fail rather than overwrite. Existing
+owner-filtered record/edge reads independently authorize both endpoints and the edge, including
+shared edges attached to foreign private endpoints. Migration `0005` already supports these
+contracts and is unchanged; only the offline SQLite artifact advances to schema v2.
 
 Dictionary field types: textual fields (including `source`, POS, CEFR and tag kind) are strings;
 `freq_zipf` is a number; etymology number, ranks, orders and positions are integers; `common`

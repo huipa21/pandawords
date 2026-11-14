@@ -153,4 +153,36 @@ async def prepare(
         raise AppError(
             "dictionary.invalid_selection", 422, "Selected senses must belong to this lemma."
         )
+    if lemma.kind == "phrase":
+        usages = await reader.phrase_usages(lemma.id)
+        components = await reader.phrase_components(lemma.id)
+        seen: list[DictionaryKey] = []
+        for component in components:
+            if component.lexeme_id not in seen:
+                seen.append(component.lexeme_id)
+                word_lexeme = await reader.get_lexeme(component.lexeme_id)
+                if word_lexeme is None:
+                    raise AppError("lexicon.invalid", 503, "Missing phrase component lexeme.")
+                word = await reader.get_lemma_by_id(word_lexeme.lemma_id)
+                if word is None or word.lang != "en" or word.kind != "word":
+                    raise AppError("lexicon.invalid", 503, "Invalid English phrase component.")
+                literal_senses = []
+                for usage in usages:
+                    sense = await reader.get_sense(usage.sense_id)
+                    if sense is not None and sense.lexeme_id == component.lexeme_id:
+                        literal_senses.append(sense.id)
+                word_plan = await prepare(reader, word.id, literal_senses)
+                plan.rows.extend(word_plan.rows)
+                plan.edges.extend(word_plan.edges)
+            plan.edges.append(
+                SharedEdge(
+                    "contains",
+                    lemma_id,
+                    RecordID("lexeme", component.lexeme_id),
+                    {"position": component.position},
+                    [component.position],
+                )
+            )
+        for usage in usages:
+            plan.edges.append(SharedEdge("used_in", RecordID("sense", usage.sense_id), lemma_id))
     return plan

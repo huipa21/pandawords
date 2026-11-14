@@ -1,5 +1,36 @@
 # Testing
 
+## Phrase lexicon and shared composition (4.1.1)
+
+From `backend`, against the existing isolated random-database harness on loopback **8101**:
+
+```powershell
+$env:NO_PROXY = '127.0.0.1,localhost'
+$env:SURREAL_TEST_URL = 'ws://127.0.0.1:8101/rpc'
+uv run --no-sync pytest -q --basetemp=.pytest_phrase tests\unit\test_lexicon_phrases.py tests\unit\test_build_lexicon.py tests\unit\test_lexicon_reader.py tests\unit\test_candidates.py tests\integration\test_phrase_materialization.py tests\integration\test_dictionary.py
+```
+
+The production-built synthetic fixture now has 56 lemmas/58 input records and SQLite schema v2;
+rebuild older artifacts with `python -m scripts.build_fixture_lexicon` (no network required).
+Phrase cases cover ordered/repeated component identities and provenance, source-order-independent
+builds, exact phrase versus inflected word lookup, missing words, POS/etymology ambiguity,
+conflicting/foreign/markup/oversized templates and no inferred whitespace decomposition.
+Separate idiomatic meanings and explicitly tagged literal examples exercise `contains` versus
+`used_in`; unlabelled examples do not create usage links. Real graph tests cover repeat and
+concurrent materialization, repeated-component positions, unchanged shared/private content,
+shared graph visibility and independent edge/endpoint owner filtering.
+
+Verification on 2026-11-14: `dev.ps1 check` passed; the final focused run passed 63 cases,
+and 106 additional lexicon affix/ECDICT/OEWN/release, dictionary schema and candidate/add API
+regressions passed. The focused run includes repeated-component concurrency and
+oversized-template cases. The initial check failed
+because worktree-local Ruff was missing; `uv sync --frozen --quiet` restored locked dependencies.
+Subsequent line-length, import-placement and a test-only unhashable-JSON type finding were
+fixed before the final passing check. Pylance's syntax MCP
+request timed out; executable imports/tests, Ruff and basedpyright provided validation.
+No new API, migration, frontend/E2E or full backend suite, external LLM, shared database reset,
+dependency symlink/junction or development-stack lifecycle operation is part of this task.
+
 ## Project review session (3.3.2)
 
 `frontend/src/features/study/ReviewSessionPage.test.ts` exercises recognition IDs, generic typed

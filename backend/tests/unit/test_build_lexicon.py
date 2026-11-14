@@ -95,6 +95,8 @@ def test_core_schema_keys_senses_forms_and_attribution(tmp_path: Path) -> None:
             "freq",
             "relation",
             "affix",
+            "phrase_component",
+            "phrase_usage",
         }
         lemma_id = key_text(lemma_key("en", "run"))
         lexeme_id = key_text(lexeme_key("en", "run", "verb", 1))

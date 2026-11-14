@@ -107,3 +107,16 @@ class LexiconAffix(LexiconRecord):
 class LexiconSource(LexiconRecord):
     name: str
     metadata: dict[str, JsonValue]
+
+
+class LexiconPhraseComponent(LexiconRecord):
+    phrase_id: DictionaryKey
+    lexeme_id: DictionaryKey
+    position: int = Field(ge=0, lt=32)
+    source: str
+
+
+class LexiconPhraseUsage(LexiconRecord):
+    phrase_id: DictionaryKey
+    sense_id: DictionaryKey
+    source: str
