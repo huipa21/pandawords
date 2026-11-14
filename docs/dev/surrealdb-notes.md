@@ -54,6 +54,42 @@ the script only imports the runner. Assertions are the checks: run without Pytho
 
 ## Verified snippets
 
+Task **2.2.3**, **2026-11-14**, verified dictionary materialization/effective reads against
+the existing loopback **test** server (**8101**, **surrealdb-3.3.5 / Python 3.14.3 / SDK 3.0.0**),
+using the migrated harness database, fixture lexicon and fresh users:
+
+- ✅ Bound deterministic relation IDs (`RELATE $start->$edge->$end CONTENT $fields`) accept
+  nested start/end RecordIDs plus position or relation-type/source identity components.
+  Point reads followed by CREATE/RELATE inside a UUID SDK transaction are insert-only and
+  idempotent. Concurrent first imports converge through the existing transaction-conflict
+  retry helper; composition positions and reciprocal semantic edges remain distinct.
+- ✅ `SELECT id FROM $record WHERE owner = NONE` plus
+  `RETURN [{exists: record::exists($record)}]` distinguishes a missing shared identity from an
+  occupied private identity **without reading private fields**. A private collision causes
+  409 and rolls back earlier shared rows in that transaction.
+- ✅ `SELECT ->(? WHERE (owner = NONE OR owner = $user)
+  AND (in.owner = NONE OR in.owner = $user)
+  AND (out.owner = NONE OR out.owner = $user)).* AS edges
+  FROM $target WHERE owner = NONE OR owner = $user` returns direct outgoing relation records;
+  `<-(? WHERE ...)` is the incoming counterpart. These are graph-adjacency lookups, not
+  relation-table scans. Python bounds results to dictionary relation tables, deduplicates
+  IDs across directions and separately checks endpoint existence/ownership. Shared or
+  matching-owner edges cannot expose a foreign endpoint, nor can a foreign edge between
+  shared endpoints become visible. Existing graph storage suffices; no new indexes or
+  migrations were introduced.
+- ✅ Point reads of `override:[user, target]` with `WHERE owner = $user` reject a mismatched
+  owner even when the nested ID names the requester. Effective nested-map merging is
+  read-only Python projection in the same SDK transaction; shared rows, both users' overrides
+  and custom content remain unchanged across repeat imports and reads.
+
+The focused suite `tests/integration/test_dictionary.py` passes **4 tests**, including
+selection preflight, incremental sense enrichment, concurrent/repeated imports, retained
+custom content/overlays, source affixes/relations and both-direction cross-user isolation.
+Initial required check/test attempts reported missing `ruff`/`pytest`; `uv sync --frozen`
+restored the locked backend environment. The full backend run passed **456 tests** with the
+existing Starlette/httpx deprecation warning; `dev.ps1 check` passed. No dev database access,
+server lifecycle changes, schema changes or API regeneration were needed.
+
 Task **2.3.2**, **2026-11-14**, verified project repository queries against the existing
 loopback **test** server (**8101**, **surrealdb-3.3.5 / Python 3.14.3 / SDK 3.0.0**)
 using the migrated harness database and unique users/records:

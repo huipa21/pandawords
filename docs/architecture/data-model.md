@@ -166,6 +166,62 @@ unchanged. Membership APIs must validate matching project/edge owners to prevent
 
 ## Effective views
 
+### Dictionary repository and service facade
+
+API layers use `app.services.dictionary`, not database imports:
+
+- `materialize_lemma(db, reader, text, *, lang="en", selected_senses=None)` returns
+  `MaterializedDictionary(lemma_id, lexeme_ids, selected_sense_ids)`. `reader` is the typed async
+  `LexiconReader`. Text/language use `lemma_key`; source lemma/lexeme/sense structured keys are
+  retained unchanged. Returned IDs are canonical `encode_rid` transport strings, not record text
+  or SQLite JSON strings. Explicit selections are **structured sense keys**, not transport IDs.
+- `selected_senses=None` selects source `common` senses; `[]` selects no senses; an explicit list
+  selects exactly those senses, deduplicated and returned in source lexeme/rank order. Every
+  lexeme is materialized even when none of its senses is selected. Missing/foreign-lemma sense
+  keys fail with `dictionary.invalid_selection` (422) before writes; an absent lemma is 404.
+  Selection broadens the shared cache but never prunes previously materialized senses.
+  `selected_sense_ids` describes this call, **not all cached senses**. Project add APIs must
+  create their own owner-bound `includes` edges to these selected senses.
+- `read_record(db, owner, rid, table)` returns `DictionaryRecordRead | None`;
+  `read_records(db, owner, targets)` accepts `(table, rid)` pairs, preserves request order and
+  omits missing/invisible targets. `owner` is the authenticated `user:<key>` subject.
+- `read_entry(db, owner, lemma_id)` returns `DictionaryEntryRead | None`: an effective lemma and
+  `DictionaryLexemeRead(lexeme, senses)` entries. It contains **all cached visible senses**,
+  deduplicated and sorted by effective rank/ID, not a project's membership/hiding selection.
+  The tree API must intersect this view with its owner-bound memberships.
+- `read_edges(db, owner, rid, table, *, relation=None, direction="both")` returns sorted
+  `DictionaryEdgeRead` neighbours. `relation` optionally selects any of the nine dictionary
+  relation tables; direction is `incoming`, `outgoing` or `both`. Discovery/enrichment can use
+  the endpoint IDs with `read_records`; no unrelated graph expansion occurs.
+
+`DictionaryRecordRead` has `id`, bounded `table`, `owner` (subject or None), and `fields`
+(JSON schema fields). `DictionaryEdgeRead` has `id`, `table`, `start`, `end`, `owner`, and
+relation `fields`. Record-valued fields/endpoints also use encoded IDs. Effective reads use
+one SDK transaction, independently filter both endpoint rows and relation ownership, and
+apply only `override:[requester, target]` with matching owner. Overlay objects merge
+recursively (e.g. language maps); arrays/scalars replace. Identity/ownership/unknown top-level
+fields are ignored. These readers do not create, update or delete overlays or shared data;
+the override API remains responsible for validating permitted field types on writes.
+
+Materialization is atomic and insert-only: existing shared rows/edges, all user-owned rows and
+all overrides remain unchanged. A deterministic identity occupied by user content causes 409
+and rolls back the whole write rather than taking ownership. Shared edge IDs are
+`<relation>:[start, end, ...identity]`; composition adds the position, semantic relations add
+their type and source. This preserves repeated morphemes and distinct relation provenance.
+No new schema/migration is needed.
+
+Supported source edges are `has_lexeme`, `has_sense`, affix `composed_of`, sense-domain
+`member_of` (to `tag:['domain', normalized_name]`), and directional `relates_to`. Semantic
+edges connect only already-materialized shared endpoints; incoming and outgoing source
+relations are considered so either endpoint import order works, without importing unselected
+or recursively related senses. The reader does not provide authoritative phrase-component,
+literal-usage, derivation-edge, sentence or passage associations; this repository does not
+guess `contains`, `used_in`, `derives_to` or `part_of`. Graph/content tasks must supply those
+associations (including the phrase rule above); all nine edge types are already readable.
+Pronunciations retain known US/UK IPA only: external audio metadata is not a `media` record
+and is deferred to media ingestion. Source examples retain their text, Chinese glosses map to
+`gloss.zh`, exam tags remain on the lemma, and absent source frequency maps to numeric 0.
+
 - **Sense as seen by a user** = the shared sense record with `override:[user, sense].fields`
   merged on top. "Reset" deletes the override.
 - **Project tree** = lemmas included in the project → their lexemes → senses that are included and

@@ -77,6 +77,21 @@ running this flow. Normal Playwright reports/results remain gitignored.
 
 ## Fixtures
 
+### Dictionary repository (2.2.3)
+
+`backend/tests/integration/test_dictionary.py` uses the real migrated `db`, fresh users and
+`lexicon_reader` small SQLite fixture. Run the focused suite from `backend` with
+`uv run --no-sync pytest -q tests\integration\test_dictionary.py`.
+
+It verifies explicit/default-common/empty selections, repeated/concurrent imports without duplicate rows or
+edges, preserved custom content and overlays, invalid-selection preflight and transactional
+rollback on shared-ID collisions. Owner-isolation probes cover foreign edges with shared
+endpoints, shared/own edges to foreign endpoints, private parent lexemes and direct/batch/
+incoming/outgoing reads. Shared records remain visible; applying nested requester overrides
+neither changes shared data nor exposes identity/ownership fields. Affix composition and
+directional semantic edges are idempotent and do not recursively materialize related senses.
+The existing server on 8101 is reused; no dev database or server lifecycle changes are needed.
+
 - `db`: async WebSocket connection to the migrated session database, or the empty database for
   a `fresh_db` test. `test_settings` selects the same database; `session_db` and
   `session_db_settings` explicitly access the shared migrated database.
