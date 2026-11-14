@@ -143,6 +143,13 @@ All components are previewed under both token themes at `/dev/design`; grids col
 
 ### Framework contract for the study shell (3.2.1)
 
+`features/study/ReviewSessionPage.vue` composes `ExerciseShell`, `ReviewProgress` and
+`AudioButton` using generated attempt/plan types. Its `useReviewSession` owns transport,
+owner/project-scoped tab persistence and receipt-only queue advancement; shared exercise controls
+remain presentation-only. The existing authenticated pronunciation adapter exposes `failed`
+alongside loading/playing state so the page can show a persistent, localized unavailable-audio
+notice while retaining give-up/exit. Navigation guards are page-owned, not global keyboard hooks.
+
 Use generated `components['schemas']['AttemptRead']` and its `status` discriminator; do not
 hand-write API shapes. Render `prompt.text`, `prompt.input`, `choices[{id,label}]` and optional
 protected `media_id`; media IDs still require the authenticated blob adapter, not direct URLs.

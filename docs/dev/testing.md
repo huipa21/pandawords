@@ -1,5 +1,23 @@
 # Testing
 
+## Project review session (3.3.2)
+
+`frontend/src/features/study/ReviewSessionPage.test.ts` exercises recognition IDs, generic typed
+recall/scenario prompts, server-owned hints/unavailable hints, give-up, manual Easy, receipt-only
+progress and exhaustion, empty/loading, no-usable/stale/expired/unavailable/recoverable errors,
+duplicate protection, exact-body retry, refresh recovery, storage failures, protected-audio
+failure, navigation confirmation, owner scoping and both locales.
+`useReviewSession.test.ts` additionally verifies uncertain confirmation recovery, non-receipt
+responses, progress refresh failure after confirmation, and invalidating late owner/disposal
+responses. These are mocked frontend tests, not real-stack browser verification.
+
+Run `./scripts/dev.ps1 test -Frontend`, `./scripts/dev.ps1 check`, and `pnpm --dir frontend build`.
+For the separate real-stack E2E task, open a project's review link, select a choice (or type in
+the labelled input), submit, inspect server feedback, optionally select `[data-rating="easy"]`,
+then confirm. Wait for a new `review-exercise` attempt ID or `review-empty` only after a receipt,
+reload, and verify persisted queue/progress. See the review-session browser selectors in
+`docs/ui/patterns.md`; no external LLM or audio availability is required.
+
 The token-enforcement suite initializes the ESLint configuration in a dedicated 60-second
 setup hook. This keeps cold plugin/configuration loading out of the first assertion's
 20-second budget; normal frontend tests need no retry or temporary timeout edits.

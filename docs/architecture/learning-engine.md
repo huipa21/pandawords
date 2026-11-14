@@ -279,6 +279,29 @@ or zero at/past the instant. `impossible` compares remaining new with exam capac
 For 20 remaining/10 daily/12 windows the suggestion is 4; 20/3/10 suggests 3 and risks only
 the buffer. A future midnight contributes no window on that midnight's date.
 
+## Project review session (3.3.2)
+
+`/projects/:id/review` reads the first queue entry from the authenticated study-plan endpoint,
+then creates a durable attempt for its sense. The page renders only the generated prompt contract:
+ordered opaque choice IDs for recognition, or literal prompt text and typed input for recall
+(including optional scenario prompts). It never grades, constructs answer keys, or requires DeepSeek.
+Protected media uses the existing authenticated blob/playback adapter; unavailable playback is
+explicit and does not prevent retry, give-up or exit.
+
+Answers/give-ups persist their exact body, including monotonic duration, before transport.
+Feedback and suggested ratings come exclusively from the server. Manual overrides are persisted
+before confirmation, and only a confirmed receipt advances to a refreshed queue/progress snapshot.
+An uncertain confirmation retries the same rating; a recovered confirmed receipt never posts a
+second review. Completed attempt IDs and the active attempt/pending request live in owner/project
+scoped **sessionStorage**, not localStorage, and survive navigation/reload in the same tab.
+Storage failures block mutations rather than losing retry identity. No credentials or private
+answer specifications are stored; pending learner answers remain until resolved.
+
+No-usable exercises stay on the selected card without silently advancing. Expiry, stale/conflicting
+state and unavailable membership require explicitly reloading the queue for a fresh attempt.
+Recoverable failures retain the request and retry action. Exiting an active session requires
+confirmation; disposal/project/owner changes invalidate late responses and stop protected audio.
+
 ## Dashboard
 
 ### Frontend planning surfaces (3.3.3)

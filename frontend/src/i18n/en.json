@@ -1,4 +1,26 @@
 {
+  "session": {
+    "title": "Project review",
+    "exit": "Exit review",
+    "stay": "Keep studying",
+    "leaveTitle": "Leave this review?",
+    "leaveDescription": "Your attempt is kept in this browser tab. Unconfirmed answers do not update your schedule. Return to this project to resume or retry an uncertain request.",
+    "restart": "Reload queue and start a fresh attempt",
+    "complete": "Review complete",
+    "empty": "Nothing to study now",
+    "emptyDescription": "The current queue is empty. Daily limits, due times and project visibility determine what is available.",
+    "audioUnavailable": "Audio unavailable. Retry playback, give up, or exit; no answer is revealed.",
+    "timing": "Answer time: {duration} ms · Server elapsed: {elapsed} ms",
+    "errors": {
+      "recoverable": "The request could not be completed. Retry safely; a pending answer or rating will be sent unchanged.",
+      "unusable": "No usable exercise is available for this card. Nothing was skipped or graded. Retry after adding suitable content, or exit.",
+      "expired": "This attempt has expired. Reload the queue to start a fresh attempt; no unconfirmed answer updates your schedule.",
+      "stale": "This attempt conflicts with the latest study state. Reload the queue instead of applying an outdated answer.",
+      "unavailable": "This attempt or project content is no longer available. Check project access and visibility, then reload the queue.",
+      "storage": "This tab cannot safely save the review session. Enable session storage and retry before continuing.",
+      "hintUnavailable": "No hint is available for this exercise. You can still answer or give up."
+    }
+  },
   "study": {
     "dashboard": "Review dashboard",
     "refresh": "Refresh",

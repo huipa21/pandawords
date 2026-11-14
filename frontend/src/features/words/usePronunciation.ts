@@ -12,6 +12,7 @@ export function usePronunciation(id: () => string) {
   const audio = useWordAudio()
   const owner = Symbol('lemma-pronunciation')
   const loading = ref(false)
+  const failed = ref(false)
   const current = ref<string>()
   const playing = computed(() => audio.active.value === owner)
   let url: string | undefined
@@ -27,6 +28,7 @@ export function usePronunciation(id: () => string) {
       URL.revokeObjectURL(url)
     url = undefined
     loading.value = false
+    failed.value = false
     current.value = undefined
   }
 
@@ -37,6 +39,7 @@ export function usePronunciation(id: () => string) {
     }
     clear()
     if (!mediaId) {
+      failed.value = true
       message.info(t('lemmaDetail.missingAudio'))
       return
     }
@@ -55,21 +58,28 @@ export function usePronunciation(id: () => string) {
       if (request !== generation)
         return
       if (!result.response.ok) {
+        failed.value = true
         message.error(result.response.status === 404
           ? t('lemmaDetail.missingAudio')
           : errorText(result.error, result.response.status))
         return
       }
       if (!(result.data instanceof Blob) || result.data.size === 0) {
+        failed.value = true
         message.error(t('word.audio.error'))
         return
       }
       url = URL.createObjectURL(result.data)
-      await audio.play(owner, url, () => message.error(t('word.audio.error')))
+      await audio.play(owner, url, () => {
+        failed.value = true
+        message.error(t('word.audio.error'))
+      })
     }
     catch {
-      if (request === generation)
+      if (request === generation) {
+        failed.value = true
         message.error(t('word.audio.error'))
+      }
     }
     finally {
       if (request === generation)
@@ -79,5 +89,11 @@ export function usePronunciation(id: () => string) {
 
   watch(id, clear)
   onScopeDispose(clear)
-  return { current, loading, playing, play }
+  return {
+    current,
+    loading,
+    playing,
+    failed,
+    play,
+  }
 }
