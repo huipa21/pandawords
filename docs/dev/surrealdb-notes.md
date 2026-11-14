@@ -1,5 +1,29 @@
 # SurrealDB 3.3 notes
 
+### Sentence and passage schema contract (4.2.1) ✅
+
+Verified 2026-11-14 against **SurrealDB 3.3.5 / SDK 3.0**, using fresh random databases on
+the existing loopback **8101** server:
+
+- The immutable `0005_dictionary.surql` already supplies SCHEMAFULL sentence/passage and
+  ENFORCED `used_in` (sense → lemma/sentence/passage), `part_of` (sentence → passage).
+  No new migration or snapshot change is required.
+- Required context text/language/source/title/translation fields reject omission and NULL.
+  Flexible sentence translation preserves multiple language keys, but each value must be a
+  string. Undeclared top-level fields cause an error rather than being silently discarded.
+- Optional `used_in.span` accepts NONE or exactly two integers, rejecting NULL, fractional and
+  boolean elements. `part_of.order` is a required integer and rejects NULL/strings/booleans.
+  Persisted order survives out-of-order insertion and direct replay of migration 0005.
+- A no-op migration run and direct 0005 replay preserve populated context records, relation
+  IDs, spans, ownership, order and the full schema. Normal snapshot comparison and synthetic
+  drift detection pass without regenerating the committed snapshot.
+- ENFORCED endpoints do **not** require matching owners: an Alice-owned `used_in` or `part_of`
+  can point at Bob's existing private record. Edge-owner filtering alone does not authorize
+  endpoint content; repositories/APIs must validate each endpoint and the edge independently.
+
+Retained probes: `test_context_schema.py`, `test_dictionary_schema.py`,
+`test_schema_snapshot.py`, `test_migrations.py`. No persistent dev database was changed.
+
 ### Recognition relation reads (3.2.3) ✅
 
 Verified against the migrated isolated harness on existing loopback **8101**: owner-filtered

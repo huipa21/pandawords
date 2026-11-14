@@ -131,6 +131,23 @@ not require a media record to exist. No media table/index, project, includes, ov
 schema is introduced by `0005`; sentence/passage and their edges are already present, so later
 content tasks should reuse them rather than redefine this migration.
 
+### Sentence and passage contract (4.2.1)
+
+The existing immutable `0005_dictionary.surql` and committed snapshot satisfy the context
+storage requirements; **no additional migration or duplicate definitions are needed**.
+Sentence `text`, `lang`, `source` and string-valued multilingual `translation` are required;
+an empty translation object is valid. Passage `title`, `text`, `lang` and `source` are required.
+Both tables reject undeclared fields and accept shared or user ownership.
+
+`used_in` remains sense → lemma/sentence/passage, with an omitted span allowed or an exact
+two-integer array; `NULL`, fractional/boolean elements and other array lengths are rejected.
+`part_of` remains sentence → passage with a required integer `order`, independent of insertion
+order. Text/span bounds, semantic sense resolution, ordering policy, uniqueness/idempotency and
+matching record/edge owners are repository/API obligations, not additional schema assertions.
+In particular, an Alice-owned edge can reference Bob's existing private endpoint at the storage
+level: checking only the edge owner is insufficient. Reads and writes must authorize both
+endpoints as well as the edge; `ENFORCED` checks existence and table types, not authorization.
+
 ## Per-user tables
 
 | Table | Fields | Notes |
