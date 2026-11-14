@@ -24,8 +24,8 @@ async function fillCredential(input: Locator, value: string) {
 }
 
 async function login(page: Page, username: string, password: string) {
-  await fillCredential(page.getByLabel('Username', { exact: true }), username)
-  await fillCredential(page.getByLabel('Password', { exact: true }), password)
+  await fillCredential(page.getByLabel(/^Username\b/), username)
+  await fillCredential(page.getByLabel(/^Password\b/), password)
   const response = page.waitForResponse(response =>
     response.url().endsWith('/api/auth/login') && response.request().method() === 'POST',
   )
@@ -61,7 +61,7 @@ test('administrator creates a learner who must change their temporary password',
     await page.getByRole('link', { name: 'User management', exact: true }).click()
     await page.getByRole('button', { name: 'Create user', exact: true }).click()
     const createDialog = page.getByRole('dialog', { name: 'Create user', exact: true })
-    await createDialog.getByLabel('Username', { exact: true }).fill(username)
+    await createDialog.getByLabel(/^Username\b/).fill(username)
     const creation = page.waitForResponse(response =>
       response.url().endsWith('/api/admin/users') && response.request().method() === 'POST',
     )
@@ -87,10 +87,10 @@ test('administrator creates a learner who must change their temporary password',
     expect(learner.user.must_change_password, 'Public login must expose the forced-change flag.').toBe(true)
     await expect(page).toHaveURL('/change-password')
     await expect(page.getByText('Change your temporary password before continuing.', { exact: true })).toBeVisible()
-    await page.goto('/projects')
+    await page.getByRole('link', { name: 'PandaWords', exact: true }).click()
     await expect(page).toHaveURL('/change-password')
-    await fillCredential(page.getByLabel('Current password', { exact: true }), temporaryPassword)
-    await fillCredential(page.getByLabel('New password', { exact: true }), newPassword)
+    await fillCredential(page.getByLabel(/^Current password\b/), temporaryPassword)
+    await fillCredential(page.getByLabel(/^New password\b/), newPassword)
     await page.getByRole('button', { name: 'Change password', exact: true }).click()
     await expect(page).toHaveURL('/projects')
     await expect(page.getByRole('heading', { name: 'Projects', exact: true })).toBeVisible()
