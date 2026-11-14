@@ -40,12 +40,21 @@ function render() {
     })),
     ...props.elements.edges.map(edge => ({ data: edge })),
   ])
-  const options = { name: props.layout, animate: false }
+  const options = {
+    name: props.layout,
+    animate: false,
+    fit: false,
+    stop: fit,
+  }
   cy.layout(options).run()
 }
 function fit() {
   cy?.resize()
   cy?.fit()
+  if (cy && cy.zoom() > graphMetrics.maxFitZoom) {
+    cy.zoom(graphMetrics.maxFitZoom)
+    cy.center()
+  }
 }
 onMounted(() => {
   cy = cytoscape({

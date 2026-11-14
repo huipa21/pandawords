@@ -2,6 +2,11 @@
 
 ## Scoped graph seed discovery (4.4.2) ✅
 
+Visible selected senses also authorize their implicit lexeme/lemma ancestors, even without
+lexeme `includes` markers (the normal add API writes only lemma and selected-sense markers).
+A hidden selection cannot authorize these ancestors; project-local hidden ancestry still
+wins. The real-database graph regression covers depth-1 lexemes and depth-2 selected senses.
+
 Verified against the throwaway 8101 instance by `tests/api/test_graph.py`:
 binding optional project IDs in `($project = NONE OR in = $project)` preserves global
 project-union visibility and restricts project discovery when supplied. Project ownership is

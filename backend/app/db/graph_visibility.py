@@ -84,7 +84,7 @@ async def visible(
         ancestors = parents.get(target, set())
         grandparents = {parent for ancestor in ancestors for parent in parents.get(ancestor, set())}
         if not ({target} | ancestors | grandparents) & blocked:
-            authorized.add(target)
+            authorized.update({target} | ancestors | grandparents)
     for table in () if project is not None else TABLE_FIELDS:
         owned = await bounded_rows(
             db,

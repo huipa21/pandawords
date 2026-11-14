@@ -17,13 +17,15 @@ const { t } = useI18n()
 
 <template>
   <div class="flex flex-wrap items-end gap-3" role="group" :aria-label="t('graph.toolbar')">
-    <label class="min-w-0 flex-1 space-y-2">
-      <span>{{ t('graph.search') }}</span>
-      <NInput :value="search" size="large" :input-props="{ 'aria-label': t('graph.search') }" @update:value="emit('update:search', $event)" @keyup.enter="emit('search')" />
-    </label>
-    <NButton size="large" @click="emit('search')">
-      {{ t('graph.search') }}
-    </NButton>
+    <div class="w-full flex flex-col gap-3 sm:flex-row sm:items-end">
+      <label class="min-w-0 flex-1 space-y-2">
+        <span class="block">{{ t('graph.search') }}</span>
+        <NInput :value="search" size="large" :input-props="{ 'aria-label': t('graph.search') }" @update:value="emit('update:search', $event)" @keyup.enter="emit('search')" />
+      </label>
+      <NButton size="large" @click="emit('search')">
+        {{ t('graph.search') }}
+      </NButton>
+    </div>
     <label class="space-y-2">
       <span>{{ t('graph.layout') }}</span>
       <NSelect :style="{ width: graphMetrics.controlWidth }" size="large" :aria-label="t('graph.layout')" :value="layout" :options="['fcose', 'dagre'].map(value => ({ value, label: t(`graph.layouts.${value}`) }))" @update:value="emit('update:layout', $event)" />
