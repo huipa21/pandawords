@@ -6,8 +6,10 @@ from anyio import to_thread
 from surrealdb import AsyncSurrealConnection
 
 from app.core.config import Settings
+from app.core.errors import AppError
 from app.core.security import (
     create_access_token,
+    decode_access_token,
     generate_refresh_token,
     hash_password,
     hash_refresh_token,
@@ -16,7 +18,8 @@ from app.core.security import (
     verify_password,
 )
 from app.db import auth as repository
-from app.domain.auth import AuthTokens, User, UserCreate
+from app.db import auth_password
+from app.domain.auth import AuthTokens, PasswordChange, User, UserCreate
 
 
 @lru_cache(maxsize=1)
@@ -66,6 +69,7 @@ async def login(
         user.id,
         hash_refresh_token(refresh),
         datetime.now(UTC) + timedelta(days=settings.jwt_refresh_ttl_days),
+        expected_password_hash=user.password_hash,
     )
     if current is None:
         raise invalid_credentials()
@@ -88,13 +92,53 @@ async def refresh(db: AsyncSurrealConnection, settings: Settings, token: str) ->
         now,
         hash_refresh_token(replacement),
         now + timedelta(days=settings.jwt_refresh_ttl_days),
+        reject_forced=True,
     )
     # Reuse revocation must commit before the generic authentication error is raised.
     if user is None:
         raise invalid_credentials()
+    if user.must_change_password:
+        raise password_change_required()
     return _tokens(user, replacement, settings)
 
 
-async def logout(db: AsyncSurrealConnection, token: str) -> None:
+async def logout(db: AsyncSurrealConnection, token: str, subject: str | None = None) -> None:
     _validate_refresh(token)
-    await repository.consume_refresh(db, hash_refresh_token(token), datetime.now(UTC))
+    await repository.consume_refresh(
+        db, hash_refresh_token(token), datetime.now(UTC), subject=subject
+    )
+
+
+def password_change_required() -> AppError:
+    return AppError("auth.password_change_required", 403, "Password change required.")
+
+
+async def current_user(db: AsyncSurrealConnection, settings: Settings, token: str) -> User:
+    claims = decode_access_token(token, settings)
+    user = await repository.find_user(db, claims.sub)
+    if user is None or user.disabled:
+        raise invalid_credentials()
+    return user
+
+
+async def change_password(
+    db: AsyncSurrealConnection, settings: Settings, user: User, data: PasswordChange
+) -> AuthTokens:
+    valid = await to_thread.run_sync(verify_password, data.current_password, user.password_hash)
+    if not valid:
+        raise invalid_credentials()
+    password_hash = await to_thread.run_sync(hash_password, data.new_password)
+    refresh = generate_refresh_token()
+    now = datetime.now(UTC)
+    updated = await auth_password.change_password(
+        db,
+        user.id,
+        user.password_hash,
+        password_hash,
+        hash_refresh_token(refresh),
+        now,
+        now + timedelta(days=settings.jwt_refresh_ttl_days),
+    )
+    if updated is None:
+        raise invalid_credentials()
+    return _tokens(updated, refresh, settings)

@@ -20,12 +20,14 @@ class AppError(Exception):
         status: int,
         message: str,
         field: str | None = None,
+        headers: Mapping[str, str] | None = None,
     ) -> None:
         super().__init__(message)
         self.code = code
         self.status = status
         self.message = message
         self.field = field
+        self.headers = headers
 
 
 def _error_response(
@@ -46,7 +48,7 @@ async def app_error_handler(_request: Request, exc: Exception) -> JSONResponse:
     if not isinstance(exc, AppError):
         raise TypeError(f"Expected AppError, received {type(exc).__name__}.")
 
-    return _error_response(exc.code, exc.status, exc.message, exc.field)
+    return _error_response(exc.code, exc.status, exc.message, exc.field, exc.headers)
 
 
 async def validation_error_handler(

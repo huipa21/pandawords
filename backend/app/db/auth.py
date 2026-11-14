@@ -159,7 +159,11 @@ async def has_admin(db: AsyncSurrealConnection) -> bool:
 
 
 async def issue_refresh(
-    db: AsyncSurrealConnection, subject: str, token_hash: str, expires_at: datetime
+    db: AsyncSurrealConnection,
+    subject: str,
+    token_hash: str,
+    expires_at: datetime,
+    expected_password_hash: str | None = None,
 ) -> User | None:
     async def operation(txn: UUID) -> User | None:
         owner = RecordID("user", user_key(subject))
@@ -170,6 +174,11 @@ async def issue_refresh(
             txn_id=txn,
         )
         if not rows:
+            return None
+        if (
+            expected_password_hash is not None
+            and rows[0]["password_hash"] != expected_password_hash
+        ):
             return None
         await _rows(
             db,
@@ -208,6 +217,8 @@ async def consume_refresh(
     now: datetime,
     replacement_hash: str | None = None,
     expires_at: datetime | None = None,
+    subject: str | None = None,
+    reject_forced: bool = False,
 ) -> User | None:
     async def operation(txn: UUID) -> User | None:
         # A hash is itself the bearer credential. All subsequent operations bind its user.
@@ -221,6 +232,8 @@ async def consume_refresh(
             return None
         token = matches[0]
         owner = token["user"]
+        if subject is not None and owner != RecordID("user", user_key(subject)):
+            return None
         rows = await _rows(
             db, "SELECT * FROM refresh_token WHERE user = $user;", {"user": owner}, txn_id=txn
         )
@@ -243,6 +256,8 @@ async def consume_refresh(
                 txn_id=txn,
             )
             return None
+        if reject_forced and users[0]["must_change_password"]:
+            return _user(users[0])
         replacement = RecordID("refresh_token", uuid4().hex)
         await _rows(
             db,

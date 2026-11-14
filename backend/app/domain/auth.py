@@ -35,6 +35,33 @@ class User(BaseModel):
     prefs: UserPreferences
 
 
+class UserRead(BaseModel):
+    id: str
+    username: str
+    role: Role
+    disabled: bool
+    must_change_password: bool
+    source_lang: str
+    target_lang: str
+    prefs: UserPreferences
+
+
+class LoginRequest(BaseModel):
+    username: str = Field(min_length=1, max_length=128)
+    password: str = Field(min_length=1, max_length=1024, repr=False)
+
+
+class PasswordChange(BaseModel):
+    current_password: str = Field(min_length=1, max_length=1024, repr=False)
+    new_password: str = Field(min_length=10, max_length=1024, repr=False)
+
+
+class AuthRead(BaseModel):
+    access_token: str = Field(repr=False)
+    token_type: Literal["bearer"] = "bearer"
+    user: UserRead
+
+
 @dataclass(frozen=True)
 class AccessClaims:
     sub: str
