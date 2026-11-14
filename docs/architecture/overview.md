@@ -16,6 +16,17 @@ and HTTPS provider hosts on every redirect, bounds streamed responses and decode
 preserves creator/source-page/Content License attribution. Terminal errors are public-safe;
 resubmitting the same selection retries a failed job without duplicating an attachment.
 
+## Optional mnemonic workflow (5.1.2)
+
+The existing notes router exposes explicit suggestion request/status operations; mnemonic
+generation never runs during page load and never writes a note. Owner-bound `mnemonic` jobs
+reload visible canonical target/ancestry context, reject changed content, and call only
+`services.llm.generate_json`. Its existing private cache, daily budget, JSON validation and
+timeout/retry boundary apply. Notes and personal overrides never enter the prompt or shared
+cache. The UI displays suggestions separately, requires confirmation before replacing a draft,
+and persists a note only on Save. Manual drafting works with generation disabled or offline;
+owner-scoped tab drafts survive refresh/navigation with an in-memory storage fallback.
+
 ## Containers (production, `deploy/compose.yml`)
 
 ```

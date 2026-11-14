@@ -22,7 +22,7 @@ const { t } = useI18n()
   <NForm @submit.prevent="!disabled && !saving && emit('save', { target, kind, text: modelValue })">
     <NFormItem :label="t(`word.${kind}`)" :label-props="{ for: id }">
       <NInput
-        :value="modelValue" type="textarea" :input-props="{ id }" :disabled="disabled || saving"
+        :value="modelValue" type="textarea" :input-props="{ id }" :disabled="disabled || saving" :maxlength="10000"
         :placeholder="t('word.notePlaceholder')" @update:value="emit('update:modelValue', $event)"
       />
     </NFormItem>

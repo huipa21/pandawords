@@ -75,7 +75,7 @@ models while preserving structured keys for submission.
 | `SenseSelectList` | Checklist of candidate senses, grouped by lexeme, with common ones pre-checked. `v-model:selected`, `candidates` |
 | `LexemeBlock` | POS + pronunciation chips + its SenseItems |
 | `LemmaTree` | Presentational NTree of `items: LemmaBranch[]`; controlled `expandedKeys` / `selectedKeys` and update events, optional `defaultExpandAll`, and an `actions` slot with `table` and `id` for page-owned controls. Word headers, lexeme labels and effective senses; no project fetching |
-| `NoteEditor` | Controlled `modelValue` text, `target`, `kind: note \| mnemonic`, `saving`, `disabled`; emits model update, `save({target, kind, text})`, `cancel`. Persistence belongs to pages |
+| `NoteEditor` | Controlled `modelValue` text (10,000-character input limit), `target`, `kind: note \| mnemonic`, `saving`, `disabled`; emits model update, `save({target, kind, text})`, `cancel`. Persistence and suggestion acceptance belong to pages |
 
 Implemented word components live in `src/components/word/`. `types.ts` defines presentation
 models only: `LemmaView`, `LexemeView`, `SenseView`, `Pronunciation`, `LemmaBranch` and badge

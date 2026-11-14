@@ -4,6 +4,7 @@ from app.domain.jobs import Job
 from app.worker.audio import audio
 from app.worker.enrich import enrich
 from app.worker.images import image
+from app.worker.mnemonic import mnemonic
 from app.worker.scenario import scenario
 
 type Handler = Callable[[Job], Awaitable[None]]
@@ -19,4 +20,5 @@ HANDLERS: dict[str, Handler] = {
     "enrich": enrich,
     "scenario": scenario,
     "image": image,
+    "mnemonic": mnemonic,
 }

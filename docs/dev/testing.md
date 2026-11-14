@@ -107,6 +107,41 @@ the coordinator runs integrated suites. Initial worktree Ruff absence was resolv
 Initial fixture schema/SDK assumptions, the boolean parser form and dense seed query timeout
 were corrected before the final clean runs. No dependencies were symlinked.
 
+## Mnemonic notes and optional suggestions (5.1.2)
+
+Against the existing loopback **8101** server (each pytest process uses an isolated random DB):
+
+```powershell
+cd backend
+$env:NO_PROXY = '127.0.0.1,localhost'
+$env:SURREAL_TEST_URL = 'ws://127.0.0.1:8101/rpc'
+uv run --no-sync pytest -q tests\api\test_mnemonics.py tests\integration\test_mnemonic_context.py tests\api\test_notes.py tests\api\test_jobs_endpoints.py tests\integration\test_llm.py tests\integration\test_jobs.py --tb=short
+cd ..\frontend
+pnpm exec vitest run src\features\words\MnemonicNotes.test.ts src\features\words\LemmaDetailPage.test.ts --maxWorkers=2 --testTimeout=60000
+cd ..
+.\scripts\dev.ps1 gen-api
+.\scripts\dev.ps1 check
+pnpm --dir frontend build
+```
+
+Real note/suggestion API and worker tests use an in-process mocked OpenAI transport, never live
+DeepSeek. They cover all three target tables, note-kind preservation, explicit-save-only behavior,
+private targets/jobs/cache, canonical visible ancestry, excluded notes/overrides, changed/deleted
+targets, malformed/oversized/markup output, disabled/timeout/provider failures, real budget
+exhaustion and retry. UI tests cover both locales, separate suggestions, accept/edit/save,
+replacement confirmation, reject/cancel, polling, late target/user responses, failed requests,
+tab-draft restoration and storage/offline fallback. These are isolated API/component tests,
+not live-provider or real-stack browser verification. No service lifecycle operation is needed.
+
+Verification on 2026-11-14: **58 backend cases passed**, **22 frontend cases passed**;
+`gen-api`, final `dev.ps1 check`, production frontend build and `git diff --check` passed.
+The first check failed because worktree-local Ruff was absent; `uv sync --locked` and
+`pnpm install --frozen-lockfile --silent` restored local locked dependencies (no symlinks).
+Initial test-only login failures came from replacing the test application's signing settings
+with unrelated defaults; using a copy of the isolated test settings fixed them. Intermediate
+format/lint failures were corrected before the final clean check. No full backend/frontend
+suite, E2E, live-provider call, migration or development-stack lifecycle action was performed.
+
 ## Sentence and passage schema contract (4.2.1)
 
 From `backend`, with the existing healthy loopback **8101** test server:

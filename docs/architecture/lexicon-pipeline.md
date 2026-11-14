@@ -434,11 +434,19 @@ and its separate model selection remain later work.
 |---|---|---|
 | Scenario descriptions for scenario→word | `note`-like `generated` record on the shared sense (`owner = NONE`) | Exercise type skipped |
 | Linking passage words to senses | `used_in` edge (`source='llm'`) | Most common included sense, marked `uncertain` |
-| Mnemonic suggestions | user `note` (kind mnemonic), only when the user accepts | None |
+| Mnemonic suggestions | owner-scoped `llm_cache`; user `note` (kind mnemonic) only on explicit Save | Manual mnemonic editing |
 | Morpheme decomposition when Wiktionary has no affix template | `composed_of` with `source='llm'` | None |
 
 Rules: a stable system prompt prefix (for DeepSeek's automatic prefix cache), JSON output mode,
 batching where possible, and a per-user daily request budget (setting).
+
+Mnemonic suggestions are explicit worker jobs, not an enrichment or page-load side effect.
+Only canonical target text/POS/forms/definition/gloss and visible canonical ancestry needed
+to identify the word are sent; notes, personal overrides and unrelated context are excluded.
+Job payloads carry IDs and a versioned content key, never note text. Plain-text output
+(1–2000 characters) is validated before caching and again on cache reads. Budget, disabled,
+provider and timeout failures leave the user's editable draft unchanged. Accepting a suggestion
+fills a draft (with replacement confirmation), not a persistent note.
 
 ## External fetch etiquette
 

@@ -625,6 +625,40 @@ export interface paths {
     patch: operations['update_override_api_dictionary__table___id__override_patch']
     trace?: never
   }
+  '/api/notes/suggestions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Suggest Mnemonic */
+    post: operations['suggest_mnemonic_api_notes_suggestions_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/notes/suggestions/{job_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Read Mnemonic */
+    get: operations['read_mnemonic_api_notes_suggestions__job_id__get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/notes': {
     parameters: {
       query?: never
@@ -1730,6 +1764,30 @@ export interface components {
       /** Introduced */
       introduced: boolean
       card: components['schemas']['CardState']
+    }
+    /** MnemonicRequest */
+    'MnemonicRequest': {
+      /**
+       * Target Table
+       * @enum {string}
+       */
+      target_table: 'lemma' | 'lexeme' | 'sense'
+      /** Target Id */
+      target_id: string
+    }
+    /** MnemonicSuggestion */
+    'MnemonicSuggestion': {
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: 'pending' | 'ready' | 'unavailable'
+      /** Job Id */
+      job_id?: string | null
+      /** Text */
+      text?: string | null
+      /** Reason */
+      reason?: string | null
     }
     /** MorphemeFields */
     'MorphemeFields': {
@@ -3847,6 +3905,70 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['OverrideRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  suggest_mnemonic_api_notes_suggestions_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['MnemonicRequest']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['MnemonicSuggestion']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  read_mnemonic_api_notes_suggestions__job_id__get: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        job_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['MnemonicSuggestion']
         }
       }
       /** @description Validation Error */

@@ -39,6 +39,18 @@ The dialog still searches the dictionary and asks for explicit senses before the
 project add request; no discovery or navigation automatically adds memberships.
 Missing projects and project-fetch failures are localized and recoverable.
 
+## Mnemonics
+
+The selected lemma, lexeme or sense notes section labels both ordinary notes and mnemonics.
+New-note kind controls keep separate drafts; editing an existing note does not change its kind.
+`MnemonicSuggestion` is feature-local: its explicit action displays a separate text-only
+result with Use in draft and Cancel. A nonempty draft requires `ConfirmAction` before
+replacement. Acceptance remains editable and never calls the notes API; only Save persists.
+Disabled/budget/provider/timeout states have localized retry feedback and never disable manual
+editing. Cancellation, disposal and target/user changes invalidate pending responses and polling.
+Drafts use owner-scoped tab session storage; failed requests retain text, and storage failure
+falls back to memory. Auth identity/tokens remain exclusively in the auth store.
+
 ## Forms
 
 ### Tags (4.3.1)

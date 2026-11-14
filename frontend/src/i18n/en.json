@@ -57,6 +57,21 @@
     "rateLimit": "The image provider or download queue is busy. Wait before retrying.",
     "error": "Image operation failed. Upload remains available without Pixabay. Check the image or provider configuration and retry."
   },
+  "mnemonics": {
+    "suggestion": "Optional mnemonic suggestion",
+    "privacy": "Only this target's dictionary text is sent to DeepSeek. Notes and personal overrides are not sent. Nothing is saved until you choose Save.",
+    "generate": "Suggest a mnemonic",
+    "retry": "Retry suggestion",
+    "loading": "Preparing a suggestion. You can keep editing or cancel.",
+    "accept": "Use in draft",
+    "replace": "Replace this draft?",
+    "replaceConfirm": "Your unsaved mnemonic text will be replaced. The suggestion remains editable and is not saved automatically.",
+    "unavailable": "Suggestions are disabled or unavailable. You can still write and save your own mnemonic.",
+    "budget": "The daily suggestion budget is exhausted. You can still edit manually; try again tomorrow.",
+    "timeout": "The suggestion timed out. Your draft is unchanged. Retry when ready.",
+    "provider": "The suggestion could not be prepared. Your draft is unchanged. Please retry.",
+    "stale": "This target has changed or is no longer available. Refresh it before requesting another suggestion."
+  },
   "session": {
     "title": "Project review",
     "exit": "Exit review",
