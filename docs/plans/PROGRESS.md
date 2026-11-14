@@ -18,7 +18,6 @@ browser logs will be committed as source.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 2.1.3 | task/2.1.3-ecdict-frequency | ../pandawords.worktrees/2.1.3 | Starting; Chinese/frequency enrichment |
 | 2.1.4 | task/2.1.4-oewn | ../pandawords.worktrees/2.1.4 | Starting; sense relation alignment |
 | 2.6.2 | task/2.6.2-project-pages | ../pandawords.worktrees/2.6.2 | Starting; project CRUD UI |
 
@@ -46,6 +45,18 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 2.1.3 ECDICT and frequency enrichment
+- Result / completed: deterministic Chinese gloss/exam matching, Zipf frequencies, common
+  selection rules, unresolved-entry reporting and callable builder hooks; `1202da7` merged.
+- Dependencies: 2.1.2 checked ✅.
+- Verification: agent focused 23, backend 366 and `check` passed. Main merge `check`,
+  locked environment sync after manifest change and combined backend/frontend passed
+  (392 backend); new wordfreq dependencies restored successfully.
+- Skipped / deferred: full-source build and packaging belong to 2.1.6.
+- Failures / causes / corrections: initial environment, scratch-directory and type/import
+  issues corrected. No unresolved failures or blockers.
+- Follow-ups: fixture and packaging wait only for OEWN integration; branch/worktree removed.
 
 ### 2026-11-14 — 2.3.2 Project CRUD API
 - Result / completed: owner-scoped validated CRUD and pagination, safe membership cleanup,
