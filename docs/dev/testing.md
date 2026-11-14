@@ -59,6 +59,25 @@ timeout); that exact migration-replay case passed in the final retry. A full bac
 interrupted at coordinator request in favor of one integrated main-branch run; it is not a pass.
 No live provider, frontend/E2E execution, migration or service lifecycle operation was performed.
 
+## Private image attachments (5.1.1)
+
+Against the existing loopback 8101 server, from `backend`:
+
+```powershell
+uv run --no-sync pytest tests\unit\test_image_validation.py tests\api\test_image_endpoints.py tests\integration\test_pixabay.py -q
+```
+
+Fixtures use a random migrated database and per-test media directories under the worktree.
+Provider calls are mocked: no live Pixabay requests or keys are required. Tests cover supported
+decoders, malformed/spoofed data, encoded/pixel/animation limits, private/shared/foreign senses,
+concurrent retries, conflicting identities, removal/missing files and persistence rollback.
+Provider tests cover owner caches, result identity selection, attribution, local worker storage,
+disabled search, empty results, throttling, host/redirect checks, timeout and oversized bodies.
+Frontend: `pnpm exec vitest run src\features\words\SenseImages.test.ts
+src\features\words\LemmaDetailPage.test.ts --maxWorkers=2 --testTimeout=60000`.
+Nginx's 11 MiB allowance is configuration coverage; a deployed-proxy near-limit smoke test
+requires the deployed nginx stack and is not implied by the in-process API tests.
+
 ## Sentence and passage schema contract (4.2.1)
 
 From `backend`, with the existing healthy loopback **8101** test server:

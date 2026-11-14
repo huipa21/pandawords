@@ -1,5 +1,15 @@
 # Deployment
 
+## Image request limits
+
+Nginx permits **11 MiB** request bodies (`client_max_body_size 11m`), leaving 1 MiB
+headroom over the **10 MiB encoded image** ceiling for proxy/multipart overhead. The
+image upload API itself accepts raw encoded JPEG/PNG/WebP/GIF bytes, not multipart, and
+enforces its ceiling while streaming irrespective of `Content-Length`. Pillow decodes every
+frame: at most 25 million pixels/frame, 100 frames and 50 million total pixels.
+Do not expose `/_media/` publicly or replace protected media delivery with provider hotlinks.
+`PIXABAY_API_KEY` stays server-side; omitting it leaves ordinary upload fully functional.
+
 There is no CI and nothing is built on the server. Images are built on the Windows laptop with
 Podman, transferred manually, and loaded with Docker on the server (Korea, 2 vCPU / 4 GB / 60 GB).
 

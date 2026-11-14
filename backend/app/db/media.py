@@ -1,8 +1,10 @@
 from typing import Any, cast
+from uuid import UUID
 
 from surrealdb import AsyncSurrealConnection, RecordID
 from surrealdb.types import Value
 
+from app.db.auth import _rows
 from app.domain.identity import user_key, user_subject
 from app.domain.media import Media, MediaCreate
 
@@ -20,7 +22,12 @@ async def target_visible(db: AsyncSurrealConnection, target: RecordID, owner: st
 
 
 async def create(
-    db: AsyncSurrealConnection, record: RecordID, data: MediaCreate, path: str
+    db: AsyncSurrealConnection,
+    record: RecordID,
+    data: MediaCreate,
+    path: str,
+    *,
+    txn_id: UUID | None = None,
 ) -> Media:
     content: dict[str, Value] = {
         "target": data.target,
@@ -34,7 +41,9 @@ async def create(
         value = getattr(data, key)
         if value is not None:
             content[key] = value
-    rows = await db.query("CREATE $id CONTENT $data;", {"id": record, "data": content}).first()
+    rows = await _rows(
+        db, "CREATE $id CONTENT $data;", {"id": record, "data": content}, txn_id=txn_id
+    )
     if not isinstance(rows, list) or not rows:
         raise ValueError("Invalid media query result")
     return _media(cast(dict[str, Any], rows[0]))

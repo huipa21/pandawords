@@ -175,6 +175,75 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/images/senses/{sense_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List Images */
+    get: operations['list_images_api_images_senses__sense_id__get']
+    put?: never
+    /** Upload */
+    post: operations['upload_api_images_senses__sense_id__post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/images/senses/{sense_id}/{image_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Remove */
+    delete: operations['remove_api_images_senses__sense_id___image_id__delete']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/images/pixabay/search': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Search */
+    get: operations['search_api_images_pixabay_search_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/images/senses/{sense_id}/pixabay': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Select */
+    post: operations['select_api_images_senses__sense_id__pixabay_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/admin/users': {
     parameters: {
       query?: never
@@ -1318,6 +1387,15 @@ export interface components {
       /** Detail */
       detail?: components['schemas']['ValidationError'][]
     }
+    /** ImageSelection */
+    'ImageSelection': {
+      /** Request Id */
+      request_id: string
+      /** Search Id */
+      search_id: string
+      /** Result Id */
+      result_id: number
+    }
     /** JobRead */
     'JobRead': {
       /** Id */
@@ -1445,6 +1523,32 @@ export interface components {
       username: string
       /** Password */
       password: string
+    }
+    /**
+     * MediaRead
+     * @description Safe metadata for internal callers; filesystem paths are deliberately omitted.
+     */
+    'MediaRead': {
+      /** Id */
+      id: string
+      /** Target */
+      target: string
+      /**
+       * Kind
+       * @enum {string}
+       */
+      kind: 'audio' | 'image'
+      /** Mime */
+      mime: string
+      /**
+       * Source
+       * @enum {string}
+       */
+      source: 'wiktionary' | 'edge_tts' | 'pixabay' | 'upload'
+      /** Attribution */
+      attribution: string | null
+      /** Accent */
+      accent: ('US' | 'UK') | null
     }
     /** MemoryRead */
     'MemoryRead': {
@@ -1609,6 +1713,24 @@ export interface components {
       current_password: string
       /** New Password */
       new_password: string
+    }
+    /** PixabayResult */
+    'PixabayResult': {
+      /** Id */
+      id: number
+      /** Creator */
+      creator: string
+      /** Source Page */
+      source_page: string
+      /** Attribution */
+      attribution: string
+    }
+    /** PixabaySearch */
+    'PixabaySearch': {
+      /** Search Id */
+      search_id: string
+      /** Results */
+      results: components['schemas']['PixabayResult'][]
     }
     /** ProjectCreate */
     'ProjectCreate': {
@@ -2310,6 +2432,173 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  list_images_api_images_senses__sense_id__get: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        sense_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['MediaRead'][]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  upload_api_images_senses__sense_id__post: {
+    parameters: {
+      query?: never
+      header: {
+        'request-id': string
+      }
+      path: {
+        sense_id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'image/jpeg': string
+        'image/png': string
+        'image/webp': string
+        'image/gif': string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['MediaRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  remove_api_images_senses__sense_id___image_id__delete: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        sense_id: string
+        image_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  search_api_images_pixabay_search_get: {
+    parameters: {
+      query: {
+        q: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PixabaySearch']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  select_api_images_senses__sense_id__pixabay_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        sense_id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ImageSelection']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['JobRead']
+        }
       }
       /** @description Validation Error */
       422: {

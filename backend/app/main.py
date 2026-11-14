@@ -16,6 +16,7 @@ from app.api.auth import router as auth_router
 from app.api.candidates import router as candidates_router
 from app.api.content import router as content_router
 from app.api.exercise_attempts import router as exercise_attempts_router
+from app.api.images import router as images_router
 from app.api.jobs import router as jobs_router
 from app.api.media import router as media_router
 from app.api.notes import router as notes_router
@@ -108,6 +109,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(auth_router)
     app.include_router(jobs_router)
     app.include_router(media_router)
+    app.include_router(images_router)
     app.include_router(admin_router)
     app.include_router(projects_router)
     app.include_router(study_plan_router)

@@ -19,6 +19,19 @@ receive private input only through the authenticated owner's LLM scope, never sh
 and cannot introduce candidate IDs/spans outside the supplied set. They do not confirm a sense.
 No provider, spaCy model download or network lexicon query is required for this path.
 
+## Optional Pixabay images (5.1.1)
+
+Image searches are never part of lexicon materialization or ordinary study. An explicit search
+sends only its normalized query to Pixabay with safe search and a maximum of 20 photo results.
+Successful results, including empty results, are cached per owner for 24 hours; no query or
+result cache is shared across users. A missing key disables search but not manual upload.
+Searches are owner-throttled; a transactionally coordinated global window permits at most 80
+provider requests/minute. A provider 429 conservatively pauses calls for an hour. At most ten
+image jobs per owner can be pending. Downloads use selected, unexpired server-cached identities,
+never client URLs; no previews are hotlinked or automatically fetched. Local delivery uses
+authenticated media IDs. Stored attribution includes creator, source page and the Pixabay
+Content License link; original provider URLs remain internal cache data.
+
 ## Distractor consumers (3.2.2)
 
 The learning service consumes already-materialized Phase 2 concept/domain tags and semantic

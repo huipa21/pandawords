@@ -17,6 +17,7 @@ import { entryRecords, lemmaView, posView, pronunciations, senseView, text } fro
 import LemmaNotes from './LemmaNotes.vue'
 import OverrideEditor from './OverrideEditor.vue'
 import PhraseAddAction from './PhraseAddAction.vue'
+import SenseImages from './SenseImages.vue'
 import { useLemmaDetail } from './useLemmaDetail'
 import { usePronunciation } from './usePronunciation'
 import { useWordDrafts } from './useWordDrafts'
@@ -128,6 +129,7 @@ async function reset() {
           <EmptyState v-if="!item.senses.length" title-key="lemmaDetail.emptySenses" />
           <div v-for="sense in item.senses" :key="sense.id" class="space-y-3" data-testid="word-sense" :data-sense-id="sense.id">
             <SenseItem :sense="senseView(sense, !!overrides[sense.id])" />
+            <SenseImages :sense-id="sense.id" />
             <div class="flex flex-wrap gap-3">
               <NButton size="large" :disabled="busy" data-testid="word-sense-edit" @click="edit(sense)">
                 {{ t('word.edit') }}

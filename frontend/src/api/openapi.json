@@ -421,6 +421,296 @@
         }
       }
     },
+    "/api/images/senses/{sense_id}": {
+      "get": {
+        "tags": [
+          "images"
+        ],
+        "summary": "List Images",
+        "operationId": "list_images_api_images_senses__sense_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "sense_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sense Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MediaRead"
+                  },
+                  "title": "Response List Images Api Images Senses  Sense Id  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "images"
+        ],
+        "summary": "Upload",
+        "operationId": "upload_api_images_senses__sense_id__post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "sense_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sense Id"
+            }
+          },
+          {
+            "name": "request-id",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[a-zA-Z0-9_-]{16,80}$",
+              "title": "Request-Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MediaRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "image/jpeg": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            },
+            "image/png": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            },
+            "image/webp": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            },
+            "image/gif": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/images/senses/{sense_id}/{image_id}": {
+      "delete": {
+        "tags": [
+          "images"
+        ],
+        "summary": "Remove",
+        "operationId": "remove_api_images_senses__sense_id___image_id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "sense_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sense Id"
+            }
+          },
+          {
+            "name": "image_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Image Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/images/pixabay/search": {
+      "get": {
+        "tags": [
+          "images"
+        ],
+        "summary": "Search",
+        "operationId": "search_api_images_pixabay_search_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100,
+              "title": "Q"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PixabaySearch"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/images/senses/{sense_id}/pixabay": {
+      "post": {
+        "tags": [
+          "images"
+        ],
+        "summary": "Select",
+        "operationId": "select_api_images_senses__sense_id__pixabay_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "sense_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Sense Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImageSelection"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/admin/users": {
       "get": {
         "tags": [
@@ -4760,6 +5050,33 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
+      "ImageSelection": {
+        "properties": {
+          "request_id": {
+            "type": "string",
+            "pattern": "^[a-zA-Z0-9_-]{16,80}$",
+            "title": "Request Id"
+          },
+          "search_id": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Search Id"
+          },
+          "result_id": {
+            "type": "integer",
+            "exclusiveMinimum": 0.0,
+            "title": "Result Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "request_id",
+          "search_id",
+          "result_id"
+        ],
+        "title": "ImageSelection"
+      },
       "JobRead": {
         "properties": {
           "id": {
@@ -5176,6 +5493,78 @@
           "password"
         ],
         "title": "LoginRequest"
+      },
+      "MediaRead": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "target": {
+            "type": "string",
+            "title": "Target"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "audio",
+              "image"
+            ],
+            "title": "Kind"
+          },
+          "mime": {
+            "type": "string",
+            "title": "Mime"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "wiktionary",
+              "edge_tts",
+              "pixabay",
+              "upload"
+            ],
+            "title": "Source"
+          },
+          "attribution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attribution"
+          },
+          "accent": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "US",
+                  "UK"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accent"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "target",
+          "kind",
+          "mime",
+          "source",
+          "attribution",
+          "accent"
+        ],
+        "title": "MediaRead",
+        "description": "Safe metadata for internal callers; filesystem paths are deliberately omitted."
       },
       "MemoryRead": {
         "properties": {
@@ -5915,6 +6304,55 @@
           "new_password"
         ],
         "title": "PasswordChange"
+      },
+      "PixabayResult": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "creator": {
+            "type": "string",
+            "title": "Creator"
+          },
+          "source_page": {
+            "type": "string",
+            "title": "Source Page"
+          },
+          "attribution": {
+            "type": "string",
+            "title": "Attribution"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "creator",
+          "source_page",
+          "attribution"
+        ],
+        "title": "PixabayResult"
+      },
+      "PixabaySearch": {
+        "properties": {
+          "search_id": {
+            "type": "string",
+            "title": "Search Id"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/PixabayResult"
+            },
+            "type": "array",
+            "title": "Results"
+          }
+        },
+        "type": "object",
+        "required": [
+          "search_id",
+          "results"
+        ],
+        "title": "PixabaySearch"
       },
       "ProjectCreate": {
         "properties": {
