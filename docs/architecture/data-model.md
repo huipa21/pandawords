@@ -217,6 +217,12 @@ matching edge is hidden; an explicit update sets all matching own edges consiste
 deleting history. An existing foreign-owned deterministic marker yields 409
 `project.membership_conflict`, not an ownership takeover.
 
+The project UI paginates the restore-management response and distinguishes own `hidden` from
+inherited `effective_hidden`. Its default view filters effective visibility without changing
+membership; its hidden-management view can restore direct flags, and Undo sends the previous
+own flag. Because pages count all included lemmas, a page can have no visible items even when
+other pages or hidden items exist.
+
 Each request admits at most 10,000 owner-visible memberships, 2,000 returned content nodes
 per page and 2,000 matching edges per parent lookup. Oversized results fail explicitly with
 413 `project.tree_too_large`; nothing is silently truncated. Request a smaller page for

@@ -79,9 +79,20 @@
   Optional review cap and exam date clear to null; dates display locally and submit as UTC.
   Edits preserve untouched plan fields because supplying `plan` replaces the full plan.
   Numeric inputs accept safe non-negative integers; server field errors remain beside inputs.
-- `/projects/:id` loads project metadata and reserves the tree area for task 2.6.4. It does not
-  fetch or infer tree membership. Missing and other-owner IDs share the localized unavailable
-  state. Raw server messages are never displayed.
+- `/projects/:id` loads project metadata and the paginated project vocabulary tree separately.
+  Missing and other-owner IDs share the localized unavailable state. Raw server messages are
+  never displayed. Refreshes and failed page changes retain the last confirmed tree; Retry
+  repeats the failed page. Add and settled enrichment jobs refresh the tree, not metadata.
+- The tree reads `include_hidden=true` so hidden nodes remain recoverable. The default view
+  excludes effectively hidden nodes; **Manage hidden items** exposes directly hidden and
+  ancestor-hidden nodes separately. Hide/restore changes only the chosen membership flag, and
+  Undo reverses the last successful visibility change, even after changing pages. Restoring a
+  descendant does not restore its ancestor. Pagination counts all included lemmas, so a page
+  may contain no visible words. Each lemma links to `/words/:lemmaId`.
+- Tree browser selectors: `project-tree`, `project-tree-show-hidden`, `project-tree-visibility`,
+  `project-tree-undo`, `project-tree-action-error`, `project-tree-word-link`,
+  `project-tree-previous`, and `project-tree-next` (`data-testid`). Actions have
+  `data-tree-table` and `data-tree-id` on their container and localized accessible names.
 - The project header opens a token-sized, scrollable add-word modal that fits mobile viewports.
   Input searches authenticated `POST /api/dictionary/candidates`; choose a candidate and explicit
   senses through `SenseSelectList` (common senses initially selected). With no common senses,

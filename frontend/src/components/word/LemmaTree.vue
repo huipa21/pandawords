@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { TreeOption } from 'naive-ui'
 import type { LemmaBranch, LexemeView, Pronunciation, SenseView } from './types'
-import { computed, h } from 'vue'
+import { computed, h, useSlots } from 'vue'
 import { useI18n } from 'vue-i18n'
 import LexemeBlock from './LexemeBlock.vue'
 import SenseItem from './SenseItem.vue'
@@ -12,6 +12,7 @@ const props = defineProps<{
   expandedKeys?: string[]
   selectedKeys?: string[]
   editable?: boolean
+  defaultExpandAll?: boolean
 }>()
 const emit = defineEmits<{
   'update:expandedKeys': [keys: string[]]
@@ -22,6 +23,7 @@ const emit = defineEmits<{
   'play': [pronunciation: Pronunciation]
 }>()
 const { t } = useI18n()
+const slots = useSlots()
 interface WordTreeOption extends TreeOption {
   lemma?: LemmaBranch['lemma']
   lexeme?: LexemeView
@@ -40,29 +42,39 @@ const data = computed<WordTreeOption[]>(() => props.items.map(({ lemma, lexemes 
 })))
 function renderLabel({ option }: { option: TreeOption }) {
   const node = option as WordTreeOption
-  if (node.lemma)
-    return h(WordHeader, { lemma: node.lemma, size: 'md' })
-  if (node.lexeme) {
-    return h(LexemeBlock, {
+  const table = node.lemma
+    ? 'lemma'
+    : node.lexeme ? 'lexeme' : 'sense'
+  const id = String(node.key)
+  let content
+  if (node.lemma) {
+    content = h(WordHeader, { lemma: node.lemma, size: 'md' })
+  }
+  else if (node.lexeme) {
+    content = h(LexemeBlock, {
       lexeme: { ...node.lexeme, senses: [] },
       onPlay: pronunciation => emit('play', pronunciation),
-      onClick: (event: MouseEvent) => {
-        if ((event.target as HTMLElement).closest('button'))
-          event.stopPropagation()
-      },
     })
   }
-  return h(SenseItem, {
-    sense: node.sense!,
-    editable: props.editable,
-    onEdit: id => emit('edit', id),
-    onHide: (id, hidden) => emit('hide', id, hidden),
-    onNote: id => emit('note', id),
+  else {
+    content = h(SenseItem, {
+      sense: node.sense!,
+      editable: props.editable,
+      onEdit: id => emit('edit', id),
+      onHide: (id, hidden) => emit('hide', id, hidden),
+      onNote: id => emit('note', id),
+    })
+  }
+  return h('div', {
+    class: 'min-w-0 space-y-2',
     onClick: (event: MouseEvent) => {
-      if ((event.target as HTMLElement).closest('button'))
+      if ((event.target as HTMLElement).closest('button, a'))
         event.stopPropagation()
     },
-  })
+  }, [
+    content,
+    ...slots.actions?.({ table, id }) ?? [],
+  ])
 }
 </script>
 
@@ -73,6 +85,7 @@ function renderLabel({ option }: { option: TreeOption }) {
     </p>
     <NTree
       v-else block-line :data="data" :render-label="renderLabel"
+      :default-expand-all="defaultExpandAll"
       :expanded-keys="expandedKeys" :selected-keys="selectedKeys"
       @update:expanded-keys="emit('update:expandedKeys', $event.map(String))"
       @update:selected-keys="emit('update:selectedKeys', $event.map(String))"
