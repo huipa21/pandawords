@@ -37,8 +37,15 @@ size (`text-base` = 16, `text-lg` = 20, `text-xl` = 24).
 | `ConfirmAction` | Implemented: controlled destructive dialog; `show`, `titleKey`, `contentKey`, `params?`, `loading?`, `@confirm`, `@cancel`. Parent closes after success; loading blocks dismissal |
 | `ThemeToggle` | Implemented: accessible icon button cycles system → light → dark; persists via preferences store |
 | `LocaleSwitch` | Implemented: accessible icon button toggles zh-CN / en, including Naive locale and document language |
-| `JobStatus` | Inline progress for background jobs. `jobId` or `jobs[]` |
+| `JobStatus` | Implemented: inline owner-job progress; generated `jobs: JobRead[]`, `active?` (default true), `update:jobs`, `settled`. Polls only queued/running rows; done/failed are terminal. Query failures preserve the last status and offer Retry. Disabling/unmounting aborts requests and timers. Preview includes every status without polling |
 | `SourceAttribution` | License attribution line for dictionary content |
+
+Project-only `AddWordDialog` lives in `src/features/projects/`. Props: `projectId`, `show`;
+events: `update:show`, `added(AddToProjectRead)` and `jobsSettled(JobRead[])`
+(`@jobs-settled` in templates). The tree page can refresh membership on `added` and enriched
+content on `jobsSettled`; failed jobs remain terminal and do not invalidate successful adds.
+Its adapter maps generated nested candidates into `WordHeader` / `SenseSelectList` presentation
+models while preserving structured keys for submission.
 
 ## Word components (`src/components/word/`)
 

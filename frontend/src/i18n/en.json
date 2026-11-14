@@ -1,4 +1,25 @@
 {
+  "addWord": {
+    "title": "Add word",
+    "input": "English word or phrase",
+    "placeholder": "Enter a word, phrase, or inflected form",
+    "search": "Find candidates",
+    "candidates": "Choose a candidate",
+    "noMatches": "No matches. Check the spelling or try another form.",
+    "submit": "Add selected senses",
+    "added": "Added to this project. Adding again is safe; existing entries are reused.",
+    "close": "Close"
+  },
+  "jobs": {
+    "title": "Background jobs",
+    "queued": "Queued",
+    "running": "Running",
+    "done": "Complete",
+    "failed": "Failed",
+    "failedHelp": "This background job failed. Your word is still added; you can keep using the project.",
+    "pollError": "Could not check this job. Retry to refresh its status.",
+    "preview": "Background job states (preview only; no polling)"
+  },
   "word": {
     "frequency": "Frequency: {band}",
     "common": "Common",
