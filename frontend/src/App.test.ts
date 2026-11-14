@@ -59,6 +59,7 @@ describe('app', () => {
           createAppI18n(),
           router,
         ],
+        stubs: { GraphCanvas: true },
       },
     })
     try {

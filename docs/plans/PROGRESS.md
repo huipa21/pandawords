@@ -34,8 +34,7 @@ The images agent was notified before integration. Other additions require coordi
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 4.4.4 | task/4.4.4-context-exercises | ../pandawords.worktrees/4.4.4 | Agent running |
-| 4.4.3 | task/4.4.3-relations | ../pandawords.worktrees/4.4.3 | Ready; prerequisite 4.4.2 verified |
+| 4.4.3 | task/4.4.3-relations | ../pandawords.worktrees/4.4.3 | Agent running; prerequisite 4.4.2 verified |
 | 5.1.3 | task/5.1.3-image-review | ../pandawords.worktrees/5.1.3 | Merged c13322c; focused verification passed, browser pending |
 
 ### Phase 6 run (separate coordinator)
@@ -93,6 +92,29 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Findings: offline review criteria preserve server-authoritative grading and receipts, and require
   an explicit bounded lease for prefetched attempts.
 - Blockers / follow-ups: none.
+
+### 2026-11-15 — 4.4.4 Context-aware exercises and integrated test corrections
+- Result / completed: `108fd78` merged as `cc2c99f`; owner-safe user-sentence cloze and
+  bounded tag/morphology distractor tiers reuse existing grading, receipts and fallback contracts.
+  Merge preserves both the database-backed cloze provider and image exercise registration.
+- Dependencies: 4.2.2, 4.3.2, 3.2.3 and 3.2.4 checked ✅.
+- Verification: agent check and 129 focused context/recall/distractor/attempt/framework tests passed.
+  Integrated check passed; all 28 selected context/cloze/distractor/recall cases passed.
+  Its concurrently running image-only regression failed because it had loaded the pre-closeout
+  empty-gloss fixture; the explicit `zh` reset is now merged, pending integrated rerun.
+- Failures / causes / corrections: agent full suite twice reached 1083 passes and one mnemonic
+  helper failure from draining a shared queue. Phase 5 closeout `bb8f1b2` merged as `9a6d73d`
+  isolates those fixtures, clears the effective image-only gloss explicitly, and creates a
+  historically accurate pre-0018 user; targeted 19 tests passed in that worktree.
+  Closeout merge required additive testing-doc resolution and ESLint formatting; check then passed.
+  App preview unit test incorrectly initialized a real Canvas2D renderer in jsdom; it now stubs
+  only GraphCanvas at the preview boundary. The real renderer remains covered by graph component
+  tests and Chromium acceptance; app/graph regression selection passed 10 tests.
+- Skipped / deferred: final full suites and integrated image browser remain pending; no context
+  acceptance cases skipped. No API shape change or migration was needed.
+- Blockers / follow-ups: none for 4.4.4; relation editing running, image browser coordinated with
+  the Phase 5 session during a stable main-source window. Phase 6 worktrees are unrelated and
+  must not be deleted or included in this run's commits.
 
 ### 2026-11-15 — 4.4.2 Graph exploration and visual acceptance
 - Result / completed: `1d4940` merged as `e1edc02`, follow-up `f554bb1` merged; Cytoscape catalogue,

@@ -110,7 +110,7 @@ are in `phase-N.md`. If a phase file doesn't exist yet, the agent asks before wr
 | 4.4.1 | Graph API: subgraph by focus/depth/filters, node cap | 2.3.4, 4.1.1, 4.2.1, 4.3.1 | 2 | M | ✅ |
 | 4.4.2 | GraphCanvas, legend, toolbar, all-words page, tree/graph toggle | 4.4.1, 2.6.4 | 3 | L | ✅ |
 | 4.4.3 | Relation editing (user `relates_to` create/delete) | 4.4.2 | 4 | S | 🟡 |
-| 4.4.4 | Exercises use context: cloze from user sentences, tag/morph distractors | 4.2.2, 4.3.2, 3.2.3, 3.2.4 | 3 | M | 🟡 |
+| 4.4.4 | Exercises use context: cloze from user sentences, tag/morph distractors | 4.2.2, 4.3.2, 3.2.3, 3.2.4 | 3 | M | ✅ |
 
 ## Phase 5 — Dual coding & mnemonics
 
