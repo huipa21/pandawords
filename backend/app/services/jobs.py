@@ -1,5 +1,6 @@
 import re
 from datetime import UTC, datetime, timedelta
+from uuid import UUID
 
 from surrealdb import AsyncSurrealConnection
 
@@ -10,8 +11,15 @@ from app.domain.jobs import Job, JobCreate, JobRead
 MAX_ATTEMPTS = 5
 
 
-async def enqueue(db: AsyncSurrealConnection, data: JobCreate) -> Job:
-    return await repository.enqueue(db, data)
+async def enqueue(
+    db: AsyncSurrealConnection,
+    data: JobCreate,
+    *,
+    dedup_key: str | None = None,
+    txn_id: UUID | None = None,
+) -> Job:
+    """A dedup key reuses the owner's existing job, including terminal statuses."""
+    return await repository.enqueue(db, data, dedup_key=dedup_key, txn_id=txn_id)
 
 
 async def claim(db: AsyncSurrealConnection) -> Job | None:

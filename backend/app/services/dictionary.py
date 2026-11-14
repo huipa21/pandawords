@@ -1,6 +1,7 @@
 """Dictionary facade for API/services; routers need not import repositories."""
 
 from typing import Literal
+from uuid import UUID
 
 from surrealdb import AsyncSurrealConnection
 
@@ -27,9 +28,12 @@ async def materialize_lemma(
     *,
     lang: str = "en",
     selected_senses: list[DictionaryKey] | None = None,
+    txn_id: UUID | None = None,
 ) -> MaterializedDictionary:
     """None selects common senses; [] selects none; explicit keys select exactly those senses."""
-    return await materialize(db, await prepare(reader, lemma_key(lang, text), selected_senses))
+    return await materialize(
+        db, await prepare(reader, lemma_key(lang, text), selected_senses), txn_id=txn_id
+    )
 
 
 async def read_record(

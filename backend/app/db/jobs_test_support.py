@@ -31,3 +31,13 @@ async def worker_read(db: AsyncSurrealConnection, job: Job) -> Job:
         },
     )
     return _job(rows[0])
+
+
+async def mark_running(db: AsyncSurrealConnection, job: Job) -> None:
+    await db.query(
+        "UPDATE $id SET status = 'running' WHERE owner = $owner;",
+        {
+            "id": RecordID("job", job.id),
+            "owner": RecordID("user", user_key(job.owner)) if job.owner else None,
+        },
+    )

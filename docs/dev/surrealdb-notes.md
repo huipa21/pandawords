@@ -54,6 +54,20 @@ the script only imports the runner. Assertions are the checks: run without Pytho
 
 ## Verified snippets
 
+### Atomic add-to-project boundary (2.4.2) ✅
+
+Verified on SurrealDB 3.3.5 / SDK 3.0.0 using isolated migrated databases on test port
+8101 (no dev database changes): owner-filtered project validation, dictionary materialization,
+bound `RELATE $project->$edge->$target CONTENT $content` with
+`includes:[project, target]`, matching-owner `UPDATE includes SET hidden = false`, and
+job inserts/owner-filtered dedup reads all share the same SDK `txn_id`.
+Injecting an enqueue failure after a prior job insert rolls back dictionary records,
+memberships and jobs together. Concurrent adds exercise the existing transaction-conflict
+retry helper without duplicate memberships/jobs. Migration `0008`'s
+`DEFINE INDEX IF NOT EXISTS includes_owner_project_target ON includes FIELDS owner, in, out`
+is accepted and captured in the schema snapshot. Restoring selected hidden edges preserves
+their original IDs and `added_at`; omitted hidden edges remain unchanged.
+
 Task **2.2.3**, **2026-11-14**, verified dictionary materialization/effective reads against
 the existing loopback **test** server (**8101**, **surrealdb-3.3.5 / Python 3.14.3 / SDK 3.0.0**),
 using the migrated harness database, fixture lexicon and fresh users:

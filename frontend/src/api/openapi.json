@@ -804,6 +804,63 @@
           }
         ]
       }
+    },
+    "/api/projects/{id}/dictionary": {
+      "post": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "Add Dictionary Candidate",
+        "operationId": "add_dictionary_candidate_api_projects__id__dictionary_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddToProjectCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddToProjectRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -814,6 +871,77 @@
           "US",
           "UK"
         ]
+      },
+      "AddToProjectCreate": {
+        "properties": {
+          "lemma_key": {
+            "$ref": "#/components/schemas/app__domain__dictionary_keys__DictionaryKey__1"
+          },
+          "selected_senses": {
+            "items": {
+              "$ref": "#/components/schemas/app__domain__dictionary_keys__DictionaryKey__2"
+            },
+            "type": "array",
+            "maxItems": 1000,
+            "title": "Selected Senses"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "lemma_key",
+          "selected_senses"
+        ],
+        "title": "AddToProjectCreate"
+      },
+      "AddToProjectRead": {
+        "properties": {
+          "lemma_id": {
+            "type": "string",
+            "title": "Lemma Id"
+          },
+          "lexeme_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Lexeme Ids"
+          },
+          "selected_sense_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Selected Sense Ids"
+          },
+          "project_id": {
+            "type": "string",
+            "title": "Project Id"
+          },
+          "membership_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Membership Ids"
+          },
+          "jobs": {
+            "items": {
+              "$ref": "#/components/schemas/JobRead"
+            },
+            "type": "array",
+            "title": "Jobs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lemma_id",
+          "lexeme_ids",
+          "project_id",
+          "membership_ids",
+          "jobs"
+        ],
+        "title": "AddToProjectRead"
       },
       "AdminUserCreate": {
         "properties": {
@@ -1055,7 +1183,7 @@
         ],
         "title": "CandidateResponse"
       },
-      "DictionaryKey": {
+      "DictionaryKey-Output": {
         "items": {
           "anyOf": [
             {
@@ -1136,7 +1264,7 @@
       "LexiconGloss": {
         "properties": {
           "lexeme_id": {
-            "$ref": "#/components/schemas/DictionaryKey"
+            "$ref": "#/components/schemas/DictionaryKey-Output"
           },
           "gloss": {
             "type": "string",
@@ -1149,7 +1277,7 @@
           "sense_id": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/DictionaryKey"
+                "$ref": "#/components/schemas/DictionaryKey-Output"
               },
               {
                 "type": "null"
@@ -1170,7 +1298,7 @@
       "LexiconLemma": {
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/DictionaryKey"
+            "$ref": "#/components/schemas/DictionaryKey-Output"
           },
           "text": {
             "type": "string",
@@ -1231,10 +1359,10 @@
       "LexiconLexeme": {
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/DictionaryKey"
+            "$ref": "#/components/schemas/DictionaryKey-Output"
           },
           "lemma_id": {
-            "$ref": "#/components/schemas/DictionaryKey"
+            "$ref": "#/components/schemas/DictionaryKey-Output"
           },
           "pos": {
             "type": "string",
@@ -1279,7 +1407,7 @@
             "title": "Id"
           },
           "lexeme_id": {
-            "$ref": "#/components/schemas/DictionaryKey"
+            "$ref": "#/components/schemas/DictionaryKey-Output"
           },
           "accent": {
             "anyOf": [
@@ -1337,10 +1465,10 @@
       "LexiconSense": {
         "properties": {
           "id": {
-            "$ref": "#/components/schemas/DictionaryKey"
+            "$ref": "#/components/schemas/DictionaryKey-Output"
           },
           "lexeme_id": {
-            "$ref": "#/components/schemas/DictionaryKey"
+            "$ref": "#/components/schemas/DictionaryKey-Output"
           },
           "definition": {
             "type": "string",
@@ -1822,6 +1950,34 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "app__domain__dictionary_keys__DictionaryKey__1": {
+        "items": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ]
+        },
+        "type": "array",
+        "maxItems": 2,
+        "minItems": 2
+      },
+      "app__domain__dictionary_keys__DictionaryKey__2": {
+        "items": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ]
+        },
+        "type": "array"
       }
     },
     "securitySchemes": {
