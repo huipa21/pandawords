@@ -10,6 +10,7 @@ from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.types import ASGIApp
 
+from app.api.add_to_project import router as add_to_project_router
 from app.api.admin import router as admin_router
 from app.api.auth import router as auth_router
 from app.api.candidates import router as candidates_router
@@ -101,6 +102,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(admin_router)
     app.include_router(projects_router)
     app.include_router(candidates_router)
+    app.include_router(add_to_project_router)
     return app
 
 

@@ -13,7 +13,9 @@ from app.db.dictionary_source import Materialization
 from app.domain.dictionary import MaterializedDictionary
 
 
-async def materialize(db: AsyncSurrealConnection, plan: Materialization) -> MaterializedDictionary:
+async def materialize(
+    db: AsyncSurrealConnection, plan: Materialization, *, txn_id: UUID | None = None
+) -> MaterializedDictionary:
     async def operation(txn: UUID) -> MaterializedDictionary:
         async def shared_exists(record: RecordID) -> bool:
             rows = await _rows(
@@ -62,4 +64,4 @@ async def materialize(db: AsyncSurrealConnection, plan: Materialization) -> Mate
             selected_sense_ids=[encode_rid(record, "sense") for record in plan.senses],
         )
 
-    return await _atomic(db, operation)
+    return await operation(txn_id) if txn_id is not None else await _atomic(db, operation)

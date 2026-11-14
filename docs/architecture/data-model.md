@@ -126,6 +126,16 @@ required integer `daily_new`, optional datetime `exam_date`, and optional intege
 by callers; `hidden` is a required boolean, not deletion. Restore updates the same membership
 edge, preserving its ID and `added_at`.
 
+Add-to-project (`2.4.2`) creates new membership IDs as
+`includes:[project:<id>, <target record>]`, with the project's owner, `hidden = false` and
+the initial `added_at`. Targets are exactly the lemma plus explicitly selected senses;
+lexemes have no memberships. A repeat reuses any existing matching owner/project/target
+memberships (including legacy IDs), sets only their `hidden` flag to false, and preserves
+IDs/timestamps. Omitted senses and their hidden flags remain untouched; additions accumulate
+instead of replacing selections. No shared content, overrides, notes or memory is rewritten.
+Migration `0008_includes_lookup.surql` adds the nonunique `(owner, in, out)` lookup index;
+deterministic IDs and the retryable add transaction prevent new duplicate memberships.
+
 `includes` is ENFORCED from an existing project to an existing lemma, sense, sentence or passage;
 it does **not** accept lexeme endpoints. The tree API must derive ancestor visibility within this
 contract; direct lexeme membership would require a later migration. Owners on projects, edges

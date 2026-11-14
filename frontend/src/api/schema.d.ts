@@ -246,14 +246,52 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/projects/{id}/dictionary': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Add Dictionary Candidate */
+    post: operations['add_dictionary_candidate_api_projects__id__dictionary_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
   schemas: {
     /** @enum {string} */
-    Accent: 'US' | 'UK'
+    'Accent': 'US' | 'UK'
+    /** AddToProjectCreate */
+    'AddToProjectCreate': {
+      lemma_key: components['schemas']['app__domain__dictionary_keys__DictionaryKey__1']
+      /** Selected Senses */
+      selected_senses: components['schemas']['app__domain__dictionary_keys__DictionaryKey__2'][]
+    }
+    /** AddToProjectRead */
+    'AddToProjectRead': {
+      /** Lemma Id */
+      lemma_id: string
+      /** Lexeme Ids */
+      lexeme_ids: string[]
+      /** Selected Sense Ids */
+      selected_sense_ids?: string[]
+      /** Project Id */
+      project_id: string
+      /** Membership Ids */
+      membership_ids: string[]
+      /** Jobs */
+      jobs: components['schemas']['JobRead'][]
+    }
     /** AdminUserCreate */
-    AdminUserCreate: {
+    'AdminUserCreate': {
       /** Username */
       username: string
       /**
@@ -264,7 +302,7 @@ export interface components {
       role: 'admin' | 'user'
     }
     /** AdminUserPage */
-    AdminUserPage: {
+    'AdminUserPage': {
       /** Items */
       items: components['schemas']['UserRead'][]
       /** Total */
@@ -275,13 +313,13 @@ export interface components {
       page_size: number
     }
     /** AdminUserResult */
-    AdminUserResult: {
+    'AdminUserResult': {
       user: components['schemas']['UserRead']
       /** Temporary Password */
       temporary_password?: string | null
     }
     /** AdminUserUpdate */
-    AdminUserUpdate: {
+    'AdminUserUpdate': {
       /** Disabled */
       disabled?: boolean
       /**
@@ -296,7 +334,7 @@ export interface components {
       reset_password: boolean
     }
     /** AuthRead */
-    AuthRead: {
+    'AuthRead': {
       /** Access Token */
       access_token: string
       /**
@@ -308,7 +346,7 @@ export interface components {
       user: components['schemas']['UserRead']
     }
     /** Candidate */
-    Candidate: {
+    'Candidate': {
       lemma: components['schemas']['LexiconLemma']
       /** Matched By */
       matched_by: ('exact' | 'form' | 'spacy')[]
@@ -316,7 +354,7 @@ export interface components {
       lexemes: components['schemas']['CandidateLexeme'][]
     }
     /** CandidateLexeme */
-    CandidateLexeme: {
+    'CandidateLexeme': {
       lexeme: components['schemas']['LexiconLexeme']
       /** Senses */
       senses: components['schemas']['LexiconSense'][]
@@ -326,12 +364,12 @@ export interface components {
       glosses: components['schemas']['LexiconGloss'][]
     }
     /** CandidateRequest */
-    CandidateRequest: {
+    'CandidateRequest': {
       /** Text */
       text: string
     }
     /** CandidateResponse */
-    CandidateResponse: {
+    'CandidateResponse': {
       /** Normalized */
       normalized: string
       /** Candidates */
@@ -339,14 +377,14 @@ export interface components {
       /** Sources */
       sources: components['schemas']['LexiconSource'][]
     }
-    DictionaryKey: (string | number)[]
+    'DictionaryKey-Output': (string | number)[]
     /** HTTPValidationError */
-    HTTPValidationError: {
+    'HTTPValidationError': {
       /** Detail */
       detail?: components['schemas']['ValidationError'][]
     }
     /** JobRead */
-    JobRead: {
+    'JobRead': {
       /** Id */
       id: string
       /** Type */
@@ -366,19 +404,19 @@ export interface components {
       /** Error */
       error?: string | null
     }
-    JsonValue: unknown
+    'JsonValue': unknown
     /** LexiconGloss */
-    LexiconGloss: {
-      lexeme_id: components['schemas']['DictionaryKey']
+    'LexiconGloss': {
+      lexeme_id: components['schemas']['DictionaryKey-Output']
       /** Gloss */
       gloss: string
       /** Source */
       source: string
-      sense_id: components['schemas']['DictionaryKey'] | null
+      sense_id: components['schemas']['DictionaryKey-Output'] | null
     }
     /** LexiconLemma */
-    LexiconLemma: {
-      id: components['schemas']['DictionaryKey']
+    'LexiconLemma': {
+      id: components['schemas']['DictionaryKey-Output']
       /** Text */
       text: string
       /** Lang */
@@ -396,9 +434,9 @@ export interface components {
       source: string
     }
     /** LexiconLexeme */
-    LexiconLexeme: {
-      id: components['schemas']['DictionaryKey']
-      lemma_id: components['schemas']['DictionaryKey']
+    'LexiconLexeme': {
+      id: components['schemas']['DictionaryKey-Output']
+      lemma_id: components['schemas']['DictionaryKey-Output']
       /** Pos */
       pos: string
       /** Etymology No */
@@ -409,10 +447,10 @@ export interface components {
       source: string
     }
     /** LexiconPronunciation */
-    LexiconPronunciation: {
+    'LexiconPronunciation': {
       /** Id */
       id: string
-      lexeme_id: components['schemas']['DictionaryKey']
+      lexeme_id: components['schemas']['DictionaryKey-Output']
       accent: components['schemas']['Accent'] | null
       /** Ipa */
       ipa: string | null
@@ -426,9 +464,9 @@ export interface components {
       source: string
     }
     /** LexiconSense */
-    LexiconSense: {
-      id: components['schemas']['DictionaryKey']
-      lexeme_id: components['schemas']['DictionaryKey']
+    'LexiconSense': {
+      id: components['schemas']['DictionaryKey-Output']
+      lexeme_id: components['schemas']['DictionaryKey-Output']
       /** Definition */
       definition: string
       /** Glosses */
@@ -457,7 +495,7 @@ export interface components {
       lexname: string | null
     }
     /** LexiconSource */
-    LexiconSource: {
+    'LexiconSource': {
       /** Name */
       name: string
       /** Metadata */
@@ -466,21 +504,21 @@ export interface components {
       }
     }
     /** LoginRequest */
-    LoginRequest: {
+    'LoginRequest': {
       /** Username */
       username: string
       /** Password */
       password: string
     }
     /** PasswordChange */
-    PasswordChange: {
+    'PasswordChange': {
       /** Current Password */
       current_password: string
       /** New Password */
       new_password: string
     }
     /** ProjectCreate */
-    ProjectCreate: {
+    'ProjectCreate': {
       /** Name */
       name: string
       /**
@@ -501,7 +539,7 @@ export interface components {
       plan?: components['schemas']['ProjectPlan']
     }
     /** ProjectPage */
-    ProjectPage: {
+    'ProjectPage': {
       /** Items */
       items: components['schemas']['ProjectRead'][]
       /** Total */
@@ -512,7 +550,7 @@ export interface components {
       page_size: number
     }
     /** ProjectPlan */
-    ProjectPlan: {
+    'ProjectPlan': {
       /**
        * Daily New
        * @default 20
@@ -524,7 +562,7 @@ export interface components {
       review_cap?: number | null
     }
     /** ProjectRead */
-    ProjectRead: {
+    'ProjectRead': {
       /** Id */
       id: string
       /** Name */
@@ -543,7 +581,7 @@ export interface components {
       created_at: string
     }
     /** ProjectUpdate */
-    ProjectUpdate: {
+    'ProjectUpdate': {
       /** Name */
       name?: string
       /** Description */
@@ -556,7 +594,7 @@ export interface components {
       plan?: components['schemas']['ProjectPlan']
     }
     /** UserPreferences */
-    UserPreferences: {
+    'UserPreferences': {
       /**
        * Theme
        * @default system
@@ -576,7 +614,7 @@ export interface components {
       accent: 'US' | 'UK'
     }
     /** UserRead */
-    UserRead: {
+    'UserRead': {
       /** Id */
       id: string
       /** Username */
@@ -597,7 +635,7 @@ export interface components {
       prefs: components['schemas']['UserPreferences']
     }
     /** ValidationError */
-    ValidationError: {
+    'ValidationError': {
       /** Location */
       loc: (string | number)[]
       /** Message */
@@ -609,6 +647,8 @@ export interface components {
       /** Context */
       ctx?: Record<string, never>
     }
+    'app__domain__dictionary_keys__DictionaryKey__1': (string | number)[]
+    'app__domain__dictionary_keys__DictionaryKey__2': (string | number)[]
   }
   responses: never
   parameters: never
@@ -1148,6 +1188,41 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['CandidateResponse']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  add_dictionary_candidate_api_projects__id__dictionary_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AddToProjectCreate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AddToProjectRead']
         }
       }
       /** @description Validation Error */

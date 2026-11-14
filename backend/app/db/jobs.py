@@ -1,25 +1,18 @@
 """Job persistence; worker-only scans deliberately cover every owner."""
 
 import asyncio
+import hashlib
+import json
 from datetime import UTC, datetime
-from typing import Any, cast
-from uuid import uuid4
+from typing import Any
+from uuid import UUID, uuid4
 
 from surrealdb import AsyncSurrealConnection, RecordID
 from surrealdb.errors import QueryDetailKind, ServerError
-from surrealdb.types import Value
 
+from app.db.auth import _atomic, _rows
 from app.domain.identity import user_key, user_subject
 from app.domain.jobs import Job, JobCreate, JobStatus
-
-
-async def _rows(
-    db: AsyncSurrealConnection, query: str, params: dict[str, Value]
-) -> list[dict[str, Any]]:
-    result = await db.query(query, params).first()
-    if not isinstance(result, list) or not all(isinstance(row, dict) for row in result):
-        raise ValueError("Invalid job query result")
-    return cast(list[dict[str, Any]], result)
 
 
 def _job(row: dict[str, Any]) -> Job:
@@ -36,21 +29,52 @@ def _job(row: dict[str, Any]) -> Job:
     )
 
 
-async def enqueue(db: AsyncSurrealConnection, data: JobCreate) -> Job:
+async def enqueue(
+    db: AsyncSurrealConnection,
+    data: JobCreate,
+    *,
+    dedup_key: str | None = None,
+    txn_id: UUID | None = None,
+) -> Job:
+    if dedup_key is not None and txn_id is None:
+
+        async def operation(txn: UUID) -> Job:
+            return await enqueue(db, data, dedup_key=dedup_key, txn_id=txn)
+
+        return await _atomic(db, operation)
+    owner = RecordID("user", user_key(data.owner)) if data.owner else None
+    key = (
+        uuid4().hex
+        if dedup_key is None
+        else hashlib.sha256(
+            json.dumps([data.owner, data.type, dedup_key], separators=(",", ":")).encode()
+        ).hexdigest()[:32]
+    )
+    record = RecordID("job", key)
+    if dedup_key is not None:
+        existing = await _rows(
+            db,
+            "SELECT * FROM $id WHERE owner = $owner;",
+            {"id": record, "owner": owner},
+            txn_id=txn_id,
+        )
+        if existing:
+            return _job(existing[0])
     rows = await _rows(
         db,
         "CREATE $id CONTENT $data;",
         {
-            "id": RecordID("job", uuid4().hex),
+            "id": record,
             "data": {
                 "type": data.type,
                 "payload": data.payload,
-                "owner": RecordID("user", user_key(data.owner)) if data.owner else None,
+                "owner": owner,
                 "status": "queued",
                 "attempts": 0,
                 "run_after": data.run_after or datetime.now(UTC),
             },
         },
+        txn_id=txn_id,
     )
     return _job(rows[0])
 

@@ -132,7 +132,9 @@
         "out": "DEFINE FIELD out ON includes TYPE record<lemma | sense | sentence | passage> PERMISSIONS FULL",
         "owner": "DEFINE FIELD owner ON includes TYPE record<user> PERMISSIONS FULL"
       },
-      "indexes": {},
+      "indexes": {
+        "includes_owner_project_target": "DEFINE INDEX includes_owner_project_target ON includes FIELDS owner, in, out"
+      },
       "lives": {},
       "tables": {}
     },

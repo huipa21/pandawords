@@ -77,6 +77,18 @@ running this flow. Normal Playwright reports/results remain gitignored.
 
 ## Fixtures
 
+### Add to project (2.4.2)
+
+`tests/api/test_add_to_project.py` and `tests/integration/test_project_add_atomic.py`
+cover authenticated new/repeat/subset/empty adds, exact selected senses, malformed and
+foreign projects, invalid candidate selections, cross-user job access, preserved overlays,
+hidden-membership restore without resetting timestamps, owner-scoped job deduplication
+across projects, concurrent adds, terminal-job reuse and complete rollback after an enqueue
+failure. They use the typed small lexicon and separate migrated `job_db` databases on the
+existing test server at 8101 so shared deterministic dictionary fixtures cannot leak into
+other tests. No external work or worker claiming is performed. Focused command from backend:
+`uv run --no-sync pytest -q tests\api\test_add_to_project.py tests\integration\test_project_add_atomic.py`.
+
 ### Dictionary repository (2.2.3)
 
 `backend/tests/integration/test_dictionary.py` uses the real migrated `db`, fresh users and

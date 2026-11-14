@@ -181,7 +181,8 @@ and source contracts are in the scripts README's ECDICT/wordfreq section.
    matching ECDICT's primary gloss).
 3. **Add** → materialize the chosen lemma/lexeme/senses into the shared dictionary (idempotent
    upsert by deterministic ID). Create `includes` edges for the lemma and selected senses, create
-   `memory` rows as new cards, and enqueue `enrich` and `audio` jobs.
+   enqueue `enrich` and `audio` jobs. New `memory` cards are deferred to the SRS tasks;
+   add-to-project does not create or reset review state.
 4. **`enrich` job**:
    - materializes relations (`relates_to`, `derives_to`) between the new senses/lexemes and anything
      already materialized
@@ -190,6 +191,56 @@ and source contracts are in the scripts README's ECDICT/wordfreq section.
 5. **`audio` job** (per lexeme × accent): Wiktionary audio URL → download → `media`. If there is no
    recording, use edge-tts (`EDGE_TTS_VOICE_US` / `EDGE_TTS_VOICE_UK`) on the lemma text. Shared
    audio has `owner = NONE` and is generated once for all users.
+
+### Add-to-project contract (2.4.2)
+
+`POST /api/projects/{id}/dictionary` requires an enabled, password-ready bearer user.
+`id` is the project's opaque API ID. Request example:
+
+```json
+{"lemma_key":["en","run"],"selected_senses":[["en","run","verb",1,"run-move"]]}
+```
+
+Use the structured `lemma.id` and `sense.id` arrays from candidates, not opaque database IDs.
+Both fields are required; `selected_senses: []` adds only the lemma. Keys must be canonical
+English identities, and every selected sense must actually belong to that lemma in the
+configured typed `LexiconReader`. Duplicate keys are collapsed by materialization.
+Unknown lemmas return `404 dictionary.not_found`; invalid selections return
+`422 dictionary.invalid_selection`. Missing, malformed and foreign projects all return
+`404 project.not_found`, without changing dictionary rows or enqueueing jobs.
+
+The `200` response has `project_id`, opaque `lemma_id`, `lexeme_ids`,
+`selected_sense_ids`, `membership_ids`, and `jobs` (`JobRead`: `id`, `type`, `status`,
+`attempts`, `run_after`, `error`). The selected IDs describe this request, not the project's
+whole accumulated selection. Membership IDs use the same opaque record transport.
+Returned job IDs are readable only by the requester through `GET /api/jobs/{id}`.
+Responses are `Cache-Control: no-store`.
+
+The owner check, insert-only shared materialization, membership changes and job enqueues
+share one retryable database transaction. Enqueue failure rolls everything back. No LLM,
+audio download, TTS or other external work runs in the request. Repeating an add restores
+only the lemma and explicitly selected senses; it does not deselect or unhide omitted
+senses, reset timestamps, modify notes/overrides or alter review state.
+
+Worker payload models live in `app.domain.add_to_project`:
+
+- `EnrichJobPayload`: `{version: 1, lemma_key, lemma_id, lexeme_id, sense_id}`.
+  One `enrich` job per selected sense.
+- `AudioJobPayload`: `{version: 1, lemma_key, lemma_id, lexeme_id, accent: "US" | "UK"}`.
+  One `audio` job per materialized lexeme and accent, including lexemes without selected
+  senses (the materializer always imports the lemma's lexemes).
+
+Payload record IDs are opaque transport strings; `lemma_key` remains the structured
+candidate identity for source lookup. Jobs belong to the requester, while dictionary rows
+and eventual audio remain shared. `jobs.enqueue(..., dedup_key=..., txn_id=...)` reuses a
+job for `(owner, type, dedup_key)`, including running/done/failed jobs without resetting
+attempts or status. Keys are `dictionary:v1:sense:{sense_id}` for enrichment and
+`dictionary:v1:lexeme:{lexeme_id}:{accent}` for audio. Thus repeat/subset requests and other
+projects of the same owner reuse jobs. Different owners get independently readable jobs;
+future audio handlers must still reuse shared media across users.
+The existing worker registry does not yet implement these handlers: executing such a job
+currently yields the worker's terminal `unknown_handler` failure. Enrichment/audio handler
+tasks must register `enrich`/`audio`; this task only persists work and exposes its status.
 
 ### Candidates contract (2.4.1)
 
