@@ -1,5 +1,24 @@
 # SurrealDB 3.3 notes
 
+### Private reading transactions (4.2.2) ✅
+
+Verified against the existing isolated 8101 SurrealDB 3.3 test server:
+bound `SELECT * FROM type::table($table) ... LIMIT $limit START $offset`,
+owner-filtered point `CREATE/DELETE`, deterministic bound edge records in
+`RELATE $sentence->$edge->$passage CONTENT $fields`, and
+`used_in` filtering by both `owner = $user` and
+`(in.owner = NONE OR in.owner = $user)` work with SDK transactions.
+Two identical sentences can share a sentence row while using separate `part_of` edges with
+distinct order values. Concurrent identical ingestion serializes through deterministic
+passage/edge records with the existing `_atomic` conflict retry.
+Injected failure after the first `used_in` write rolls back content, associations and dictionary
+materialization. ENFORCED does not check owners: tests explicitly insert mismatched-owner edges
+and show why repositories also recheck both endpoints. No migration/snapshot change is needed.
+Observed edge-deletion caveat: deleting an endpoint automatically cascades **all** graph edges,
+including foreign-owned edges. Content DELETE therefore checks foreign associations and returns
+409 before mutation when any exist; replacements use UPDATE rather than DELETE/recreate.
+The regression test proves foreign edge counts remain unchanged.
+
 ### Sentence and passage schema contract (4.2.1) ✅
 
 Verified 2026-11-14 against **SurrealDB 3.3.5 / SDK 3.0**, using fresh random databases on

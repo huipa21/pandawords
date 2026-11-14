@@ -44,6 +44,47 @@ The API exposes `/api/healthz` for liveness, `/api/readyz` for readiness, and it
 Backend settings resolve `.env.dev` from the main worktree (or the project root outside Git);
 inherited environment variables take precedence.
 
+### Private sentence/passage API (4.2.2)
+
+All routes below require the current user, use opaque IDs, return `Cache-Control: no-store`,
+and treat foreign/missing/malformed record IDs alike (404).
+
+| Route under `/api/content` | Contract |
+|---|---|
+| `POST /{kind}` | `ContentCreate` → 201 `ContentRead`; kind is `sentence` or `passage` |
+| `GET /{kind}?limit=50&offset=0` | Owner-only list; limit 1–100, offset 0–10000 |
+| `GET /{kind}/{id}` | `ContentRead` |
+| `PUT /{kind}/{id}` | Full `ContentCreate` replacement; invalidates owned associations |
+| `DELETE /{kind}/{id}` | 204; no cascading sentence/dictionary deletion |
+| `POST /ingest` | Passage `ContentCreate` → 201 `PassageRead`, atomic and retry-safe |
+| `GET /passage/{id}/reading` | `PassageRead` with ordered `SentencePart` spans and occurrences |
+| `PUT /passage/{id}/sentences/{order}` | `{sentence_id}` → 204; assign/replace an owned sentence |
+| `DELETE /passage/{id}/sentences/{order}` | 204; remove only the owned association |
+| `GET /sentence/{id}/occurrences?assist=false` | `AnalysisRead`; offline by default |
+| `PUT /sentence/{id}/occurrences` | `Resolution {span, sense_id}` → `AnalysisRead` |
+| `DELETE /sentence/{id}/occurrences/{edge_id}` | 204; owner-only used_in unlink |
+
+`ContentCreate` requires nonblank exact `text` (≤20000 code points, ≤2000 tokens), defaults
+`lang=en`, `source=""`, `title=""`, `translation={}`. Language keys use a bounded language-tag
+pattern. Sentence titles and passage translations are rejected when nonempty. Translation values
+are strict strings (≤20000, ≤20 languages), source ≤2000 and title ≤300. Unknown fields are rejected.
+Ingestion permits ≤200 sentences and bounds per-token candidate expansion; excessive ambiguity
+returns 422, never an arbitrarily chosen sense. Repeated occurrences have distinct local spans.
+Resolution requires a full token span and a visible sense; explicit confirmation may select a
+visible custom sense outside the lexicon. Suggestions never create associations automatically.
+Manual sentence assignment requires both endpoints owned by the actor, order 0–199 identifying
+an original split segment, and matching exact sentence text/language. Missing associations leave
+gaps without shifting other original spans. DELETE returns 409 if foreign/shared graph edges
+would otherwise be removed by the database's automatic endpoint cascade.
+
+`AnalysisRead` contains `sentence`, `occurrences`, `assistance`, `suggestions`. Each occurrence has
+original `text`, `span`, candidates (`lemma`, opaque `sense_id`, `definition`), `status`
+(`unmatched`, `unresolved` for one unconfirmed candidate, `ambiguous`, `resolved`), nullable
+`sense_id` and `edge_id`.
+Optional assistance uses the validated LLM service with authenticated owner-scoped inputs and no
+shared sources/cache scope. States are `not_requested`, `not_needed`, `available`, or explicit
+`unavailable:<reason>`; all core CRUD/ingestion/resolution works without a provider.
+
 ### Project API
 
 Authenticated, enabled users who have completed the password change can use:

@@ -1,5 +1,32 @@
 # Testing
 
+## Private sentence/passage ingestion (4.2.2)
+
+Using the already-running loopback 8101 server and random isolated database harness, from backend:
+
+```powershell
+uv run --no-sync pytest -q tests\unit\test_content_analysis.py tests\api\test_content.py
+```
+
+The small offline lexicon covers inflections, repeated words, ambiguous and unmatched occurrences.
+Tests exercise Unicode/punctuation/combining-character spans and exact whitespace preservation,
+CRUD/auth/admin cross-user isolation, pagination and malformed spans, ordered/reused sentences,
+retry-safe manual resolution, foreign-owned/mismatched-endpoint associations, passage deletion
+without sentence deletion, and injected mid-ingestion rollback. Optional unavailable/invalid
+LLM results use mocks and check private owner input scope and candidate/span validation.
+Concurrent retry and manual part assignment/removal cases preserve repeated-sentence order and
+original offsets even when an association is removed. Foreign-owned incident edges fail deletion
+closed (409) because the database would otherwise cascade them.
+No live provider or service lifecycle command is needed. Generated contracts are refreshed by
+`dev.ps1 gen-api`; `dev.ps1 check` validates both stacks.
+
+Verification on 2026-11-14: API generation and `dev.ps1 check` passed; the final focused content
+suite plus the migration-replay regression passed **31 tests in 10.94 seconds**. The wider
+content/context/dictionary run had **106 passed, 1 setup error** (existing 2-second DB transport
+timeout); that exact migration-replay case passed in the final retry. A full backend run was
+interrupted at coordinator request in favor of one integrated main-branch run; it is not a pass.
+No live provider, frontend/E2E execution, migration or service lifecycle operation was performed.
+
 ## Sentence and passage schema contract (4.2.1)
 
 From `backend`, with the existing healthy loopback **8101** test server:

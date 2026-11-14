@@ -2181,6 +2181,687 @@
           }
         }
       }
+    },
+    "/api/content/passage/{id}/sentences/{order}": {
+      "put": {
+        "tags": [
+          "content"
+        ],
+        "summary": "Assign Part",
+        "operationId": "assign_part_api_content_passage__id__sentences__order__put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          },
+          {
+            "name": "order",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "maximum": 199,
+              "minimum": 0,
+              "title": "Order"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PartAssignment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "content"
+        ],
+        "summary": "Remove Part",
+        "operationId": "remove_part_api_content_passage__id__sentences__order__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          },
+          {
+            "name": "order",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "maximum": 199,
+              "minimum": 0,
+              "title": "Order"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/content/ingest": {
+      "post": {
+        "tags": [
+          "content"
+        ],
+        "summary": "Ingest",
+        "operationId": "ingest_api_content_ingest_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContentCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PassageRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/content/passage/{id}/reading": {
+      "get": {
+        "tags": [
+          "content"
+        ],
+        "summary": "Reading",
+        "operationId": "reading_api_content_passage__id__reading_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PassageRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/content/sentence/{id}/occurrences": {
+      "get": {
+        "tags": [
+          "content"
+        ],
+        "summary": "Occurrences",
+        "operationId": "occurrences_api_content_sentence__id__occurrences_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          },
+          {
+            "name": "assist",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Assist"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "content"
+        ],
+        "summary": "Resolve",
+        "operationId": "resolve_api_content_sentence__id__occurrences_put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Resolution"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/content/sentence/{id}/occurrences/{edge_id}": {
+      "delete": {
+        "tags": [
+          "content"
+        ],
+        "summary": "Remove Occurrence",
+        "operationId": "remove_occurrence_api_content_sentence__id__occurrences__edge_id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          },
+          {
+            "name": "edge_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Edge Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/content/{kind}": {
+      "post": {
+        "tags": [
+          "content"
+        ],
+        "summary": "Create",
+        "operationId": "create_api_content__kind__post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "sentence",
+                "passage"
+              ],
+              "type": "string",
+              "title": "Kind"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContentCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "content"
+        ],
+        "summary": "Listing",
+        "operationId": "listing_api_content__kind__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "sentence",
+                "passage"
+              ],
+              "type": "string",
+              "title": "Kind"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 10000,
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ContentRead"
+                  },
+                  "title": "Response Listing Api Content  Kind  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/content/{kind}/{id}": {
+      "get": {
+        "tags": [
+          "content"
+        ],
+        "summary": "Read",
+        "operationId": "read_api_content__kind___id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "sentence",
+                "passage"
+              ],
+              "type": "string",
+              "title": "Kind"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "content"
+        ],
+        "summary": "Update",
+        "operationId": "update_api_content__kind___id__put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "sentence",
+                "passage"
+              ],
+              "type": "string",
+              "title": "Kind"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContentCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "content"
+        ],
+        "summary": "Delete",
+        "operationId": "delete_api_content__kind___id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "sentence",
+                "passage"
+              ],
+              "type": "string",
+              "title": "Kind"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -2365,6 +3046,38 @@
         "additionalProperties": false,
         "type": "object",
         "title": "AdminUserUpdate"
+      },
+      "AnalysisRead": {
+        "properties": {
+          "sentence": {
+            "$ref": "#/components/schemas/ContentRead"
+          },
+          "occurrences": {
+            "items": {
+              "$ref": "#/components/schemas/Occurrence"
+            },
+            "type": "array",
+            "title": "Occurrences"
+          },
+          "assistance": {
+            "type": "string",
+            "title": "Assistance",
+            "default": "not_requested"
+          },
+          "suggestions": {
+            "items": {
+              "$ref": "#/components/schemas/Resolution"
+            },
+            "type": "array",
+            "title": "Suggestions"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sentence",
+          "occurrences"
+        ],
+        "title": "AnalysisRead"
       },
       "AttemptAnswer": {
         "properties": {
@@ -2987,6 +3700,143 @@
         },
         "type": "object",
         "title": "CompletedCounts"
+      },
+      "ContentCandidate": {
+        "properties": {
+          "lemma": {
+            "type": "string",
+            "title": "Lemma"
+          },
+          "sense_id": {
+            "type": "string",
+            "title": "Sense Id"
+          },
+          "definition": {
+            "type": "string",
+            "title": "Definition"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lemma",
+          "sense_id",
+          "definition"
+        ],
+        "title": "ContentCandidate"
+      },
+      "ContentCreate": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 20000,
+            "minLength": 1,
+            "title": "Text"
+          },
+          "lang": {
+            "type": "string",
+            "maxLength": 35,
+            "pattern": "^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$",
+            "title": "Lang",
+            "default": "en"
+          },
+          "source": {
+            "type": "string",
+            "maxLength": 2000,
+            "title": "Source",
+            "default": ""
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 300,
+            "title": "Title",
+            "default": ""
+          },
+          "translation": {
+            "patternProperties": {
+              "^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$": {
+                "type": "string",
+                "maxLength": 20000
+              }
+            },
+            "propertyNames": {
+              "maxLength": 35
+            },
+            "type": "object",
+            "maxProperties": 20,
+            "title": "Translation"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "ContentCreate"
+      },
+      "ContentKind": {
+        "type": "string",
+        "enum": [
+          "sentence",
+          "passage"
+        ]
+      },
+      "ContentRead": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 20000,
+            "minLength": 1,
+            "title": "Text"
+          },
+          "lang": {
+            "type": "string",
+            "maxLength": 35,
+            "pattern": "^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$",
+            "title": "Lang",
+            "default": "en"
+          },
+          "source": {
+            "type": "string",
+            "maxLength": 2000,
+            "title": "Source",
+            "default": ""
+          },
+          "title": {
+            "type": "string",
+            "maxLength": 300,
+            "title": "Title",
+            "default": ""
+          },
+          "translation": {
+            "patternProperties": {
+              "^[a-z]{2,3}(-[A-Za-z0-9]{2,8})*$": {
+                "type": "string",
+                "maxLength": 20000
+              }
+            },
+            "propertyNames": {
+              "maxLength": 35
+            },
+            "type": "object",
+            "maxProperties": 20,
+            "title": "Translation"
+          },
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ContentKind"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text",
+          "id",
+          "kind"
+        ],
+        "title": "ContentRead"
       },
       "CustomSenseCreate": {
         "properties": {
@@ -3927,6 +4777,75 @@
         "type": "object",
         "title": "NoteUpdate"
       },
+      "Occurrence": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "span": {
+            "prefixItems": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "Span"
+          },
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/ContentCandidate"
+            },
+            "type": "array",
+            "title": "Candidates"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "unmatched",
+              "unresolved",
+              "ambiguous",
+              "resolved"
+            ],
+            "title": "Status"
+          },
+          "sense_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sense Id"
+          },
+          "edge_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Edge Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text",
+          "span",
+          "candidates",
+          "status"
+        ],
+        "title": "Occurrence"
+      },
       "OverrideFields-Input": {
         "properties": {
           "text": {
@@ -4411,6 +5330,47 @@
         ],
         "title": "OverrideUpdate"
       },
+      "PartAssignment": {
+        "properties": {
+          "sentence_id": {
+            "type": "string",
+            "maxLength": 16384,
+            "minLength": 1,
+            "title": "Sentence Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "sentence_id"
+        ],
+        "title": "PartAssignment"
+      },
+      "PassageRead": {
+        "properties": {
+          "passage": {
+            "$ref": "#/components/schemas/ContentRead"
+          },
+          "sentences": {
+            "items": {
+              "$ref": "#/components/schemas/SentencePart"
+            },
+            "type": "array",
+            "title": "Sentences"
+          },
+          "assistance": {
+            "type": "string",
+            "title": "Assistance",
+            "default": "not_requested"
+          }
+        },
+        "type": "object",
+        "required": [
+          "passage",
+          "sentences"
+        ],
+        "title": "PassageRead"
+      },
       "PasswordChange": {
         "properties": {
           "current_password": {
@@ -4886,6 +5846,35 @@
         "title": "Rating",
         "description": "Enum representing the four possible ratings when reviewing a card."
       },
+      "Resolution": {
+        "properties": {
+          "span": {
+            "prefixItems": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "Span"
+          },
+          "sense_id": {
+            "type": "string",
+            "title": "Sense Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "span",
+          "sense_id"
+        ],
+        "title": "Resolution"
+      },
       "ReviewReceipt": {
         "properties": {
           "attempt_id": {
@@ -4970,6 +5959,45 @@
           "sense_ids"
         ],
         "title": "SenseOrderUpdate"
+      },
+      "SentencePart": {
+        "properties": {
+          "sentence": {
+            "$ref": "#/components/schemas/ContentRead"
+          },
+          "order": {
+            "type": "integer",
+            "title": "Order"
+          },
+          "span": {
+            "prefixItems": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "Span"
+          },
+          "occurrences": {
+            "items": {
+              "$ref": "#/components/schemas/Occurrence"
+            },
+            "type": "array",
+            "title": "Occurrences"
+          }
+        },
+        "type": "object",
+        "required": [
+          "sentence",
+          "order",
+          "span"
+        ],
+        "title": "SentencePart"
       },
       "SrsPreferences": {
         "properties": {
