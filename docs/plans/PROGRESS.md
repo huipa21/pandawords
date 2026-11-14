@@ -20,7 +20,6 @@ browser logs will be committed as source.
 |---|---|---|---|
 | 2.1.1 | task/2.1.1-downloads | ../pandawords.worktrees/2.1.1 | Starting; sources and manifest |
 | 2.2.1 | task/2.2.1-dictionary-schema | ../pandawords.worktrees/2.2.1 | Starting; dictionary schema |
-| 2.2.2 | task/2.2.2-identifiers | ../pandawords.worktrees/2.2.2 | Starting; deterministic keys and rid |
 | 2.6.1 | task/2.6.1-word-components | ../pandawords.worktrees/2.6.1 | Starting; shared word UI |
 
 ## Blocked
@@ -47,6 +46,18 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 2.2.2 Dictionary identity helpers
+- Result / completed: deterministic normalized dictionary keys and strict URL-safe structured
+  record-ID conversion; `1614668` merged to main. Existing jobs unchanged.
+- Dependencies: 1.2.3 checked ✅.
+- Verification: agent `check` passed; 61 new tests and isolated readiness rerun passed after
+  two timing failures in the concurrent full run. Main merge `check` and combined
+  `test -Backend -Frontend` passed (252 backend tests).
+- Skipped / deferred: UUID/range/tuple record keys unsupported and explicitly documented;
+  no requested dictionary ID shape deferred. No unresolved failures or blockers.
+- Findings / follow-ups: dictionary repository and API tasks can reuse the new helpers;
+  remaining prerequisites still pending. Task branch/worktree removed after verification.
 
 ### 2026-11-14 — Phase 2 preparation and baseline
 - Result / completed: included the existing Phase 2 details and plan link in `b88db12`;
