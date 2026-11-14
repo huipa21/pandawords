@@ -1,6 +1,6 @@
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { NConfigProvider } from 'naive-ui'
-import { createPinia, disposePinia } from 'pinia'
+import { createPinia, disposePinia, setActivePinia } from 'pinia'
 import { describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
 import { createMemoryHistory } from 'vue-router'
@@ -9,7 +9,9 @@ import { createAppRouter } from '@/app/router'
 import LocaleSwitch from '@/components/app/LocaleSwitch.vue'
 import ThemeToggle from '@/components/app/ThemeToggle.vue'
 import { darkThemeOverrides, themeOverrides } from '@/design/naive-theme'
+import { mockSession } from '@/features/auth/testHarness'
 import { createAppI18n } from '@/i18n'
+import { useAuthStore } from '@/stores/auth'
 import { usePreferencesStore } from '@/stores/preferences'
 
 describe('app', () => {
@@ -30,6 +32,8 @@ describe('app', () => {
   it('renders both preview themes and translates its local messages with the app', async () => {
     localStorage.clear()
     const pinia = createPinia()
+    setActivePinia(pinia)
+    mockSession()
     const router = createAppRouter(createMemoryHistory())
     await router.push('/dev/design')
     await router.isReady()
@@ -57,6 +61,7 @@ describe('app', () => {
     finally {
       wrapper.unmount()
       disposePinia(pinia)
+      vi.unstubAllGlobals()
     }
   })
 
@@ -64,6 +69,8 @@ describe('app', () => {
     localStorage.clear()
     const i18n = createAppI18n()
     const pinia = createPinia()
+    setActivePinia(pinia)
+    mockSession()
     const router = createAppRouter(createMemoryHistory())
     await router.push('/projects')
     await router.isReady()
@@ -92,10 +99,13 @@ describe('app', () => {
     expect(document.documentElement.dataset.theme).toBe('dark')
     expect(wrapper.findComponent(NConfigProvider).props('theme')).toBeTruthy()
     expect(wrapper.findComponent(NConfigProvider).props('themeOverrides')).toEqual(darkThemeOverrides)
+    useAuthStore(pinia).reset()
+    await flushPromises()
     await router.push('/login')
     expect(wrapper.find('aside').exists()).toBe(false)
     expect(wrapper.get('h1').text()).toBe('Sign in')
     wrapper.unmount()
     disposePinia(pinia)
+    vi.unstubAllGlobals()
   })
 })

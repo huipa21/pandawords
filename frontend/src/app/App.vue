@@ -3,6 +3,7 @@ import { darkTheme, dateEnUS, dateZhCN, enUS, zhCN } from 'naive-ui'
 import { watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { darkThemeOverrides, themeOverrides } from '@/design/naive-theme'
+import AuthFeedback from '@/features/auth/AuthFeedback.vue'
 import { usePreferencesStore } from '@/stores/preferences'
 
 const preferences = usePreferencesStore()
@@ -27,7 +28,9 @@ watchEffect(() => {
     <NMessageProvider>
       <NDialogProvider>
         <NNotificationProvider>
-          <RouterView />
+          <AuthFeedback>
+            <RouterView />
+          </AuthFeedback>
         </NNotificationProvider>
       </NDialogProvider>
     </NMessageProvider>

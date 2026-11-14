@@ -10,8 +10,10 @@
   (`lg:grid-cols-[...]` is not allowed; use named grid template classes defined in the uno config).
 - `src/app/router.ts` separates `/login` (auth layout) from the app layout. Documented routes
   have localized placeholders until their feature tasks land; `/review` is the global review
-  entry. `/dev/design` is registered only in development. Admin links and auth/role guards await
-  the auth task; the admin placeholders expose no data.
+  entry. `/dev/design` is registered only in development and requires authentication.
+  Admin links are visible only to admins; both admin routes have role guards.
+  All app routes require authentication. Users with temporary passwords are redirected to
+  `/change-password` until a successful change issues fresh credentials.
 - The root provides Naive config, message, dialog and notification contexts to both layouts.
   Bottom navigation reserves token-based space plus the device safe area.
 
@@ -21,6 +23,22 @@
   while the request runs. Fields are disabled while submitting.
 - Server errors: the API returns `{ code, message, field? }`. A `field` error is shown on that
   form item; anything else becomes a `message.error(t('errors.' + code))`.
+- Login and password change use generated API payloads, localized required-field rules,
+  and disabled/loading submit controls. Unknown error codes use a localized fallback, never
+  raw server text. Transport failures are visible messages.
+- Access tokens and user identity live only in the Pinia auth store. Refresh credentials are
+  httpOnly cookies, sent with `credentials: include`; no auth state enters browser storage.
+  Navigation waits for one initial refresh. A forced-change refresh returns
+  `403 auth.password_change_required` and clears the cookie: return to login with a localized
+  message; logging in supplies the token needed for password change.
+- Protected API 401s share one refresh and retry once. Login, refresh, password change and logout
+  never trigger recovery. Recovery resets local state rather than recursively calling logout.
+  Cookie-changing operations wait for in-flight refresh, and session versions prevent stale
+  results from restoring tokens after logout or a newer login.
+- Explicit logout with an expired bearer uses the independent auth transport to refresh once
+  and retry revocation with the rotated access token, without restoring visible auth.
+  Refresh 401/403 clears the cookie server-side and completes local logout; transport/server
+  failures remain visible errors. Queued logins wait until this cookie cleanup finishes.
 - Destructive actions (delete project, reset override) use `ConfirmAction`. Hiding a sense is
   reversible, so it doesn't need a confirm. Instead it shows a message with **Undo**.
 

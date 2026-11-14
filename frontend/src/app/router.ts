@@ -1,6 +1,7 @@
 import type { RouteRecordRaw, RouterHistory } from 'vue-router'
 import { createRouter, createWebHistory } from 'vue-router'
 import AppShell from '@/components/app/AppShell.vue'
+import { useAuthStore } from '@/stores/auth'
 import AuthLayout from './layouts/AuthLayout.vue'
 
 const placeholder = () => import('./pages/PlaceholderPage.vue')
@@ -26,7 +27,10 @@ export function createAppRouter(history: RouterHistory = createWebHistory()) {
       path,
       name,
       component: placeholder,
-      meta: { title },
+      meta: {
+        title,
+        admin: path.startsWith('admin/'),
+      },
     })),
   ]
   if (import.meta.env.DEV) {
@@ -43,7 +47,7 @@ export function createAppRouter(history: RouterHistory = createWebHistory()) {
     component: placeholder,
     meta: { title: 'notFound' },
   })
-  return createRouter({
+  const router = createRouter({
     history,
     routes: [
       {
@@ -53,13 +57,50 @@ export function createAppRouter(history: RouterHistory = createWebHistory()) {
           {
             path: '',
             name: 'login',
-            component: placeholder,
+            component: () => import('@/features/auth/LoginPage.vue'),
             meta: { title: 'login' },
           },
         ],
       },
-      { path: '/', component: AppShell, children },
+      {
+        path: '/change-password',
+        component: AuthLayout,
+        children: [
+          {
+            path: '',
+            name: 'change-password',
+            component: () => import('@/features/auth/ChangePasswordPage.vue'),
+            meta: { title: 'changePassword', authenticated: true },
+          },
+        ],
+      },
+      {
+        path: '/',
+        component: AppShell,
+        meta: { authenticated: true },
+        children,
+      },
     ],
     scrollBehavior: () => ({ top: 0 }),
   })
+  router.beforeEach(async (to) => {
+    const auth = useAuthStore()
+    await auth.restore()
+    if (!auth.accessToken) {
+      return to.name === 'login'
+        ? true
+        : { name: 'login' }
+    }
+    if (auth.user?.must_change_password) {
+      return to.name === 'change-password'
+        ? true
+        : { name: 'change-password' }
+    }
+    if (to.name === 'login')
+      return { name: 'projects' }
+    if (to.meta.admin && !auth.isAdmin)
+      return { name: 'projects' }
+    return true
+  })
+  return router
 }

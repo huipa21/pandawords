@@ -139,6 +139,23 @@ describe('aPI authentication lifecycle', () => {
     expect(fetch).toHaveBeenCalledTimes(2)
     expect(new Request(fetch.mock.calls[0]![0]).headers.has('Authorization')).toBe(false)
   })
+
+  it('excludes auth endpoints from recovery even on the shared authenticated client', async () => {
+    const auth = authLifecycle(async () => 'new-token')
+    const fetch = vi.fn<typeof globalThis.fetch>(async () => new Response(null, { status: 401 }))
+    const client = clientWith(fetch, auth)
+    await client.POST('/api/auth/login', {
+      body: { username: 'user', password: 'password' },
+    })
+    await client.POST('/api/auth/refresh')
+    await client.POST('/api/auth/logout')
+    await client.POST('/api/auth/password', {
+      body: { current_password: 'old', new_password: 'new' },
+    })
+    expect(auth.refresh).not.toHaveBeenCalled()
+    expect(auth.logout).not.toHaveBeenCalled()
+    expect(fetch).toHaveBeenCalledTimes(4)
+  })
 })
 
 describe('aPI error normalization', () => {

@@ -12,9 +12,13 @@ export async function readApiError(response: Response): Promise<ApiError> {
   catch {
     body = null
   }
+  return normalizeApiError(body, response.status, response.statusText)
+}
+
+export function normalizeApiError(body: unknown, status: number, statusText = ''): ApiError {
   const error: ApiError = {
-    code: `http.${response.status}`,
-    message: response.statusText || 'Request failed.',
+    code: `http.${status}`,
+    message: statusText || 'Request failed.',
     field: null,
   }
   if (typeof body !== 'object' || body === null)
