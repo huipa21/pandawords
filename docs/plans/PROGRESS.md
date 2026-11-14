@@ -18,8 +18,8 @@ Migration allocations: 0013 memory/history; 0014 LLM; 0015 SRS preferences;
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 3.2.6 | task/3.2.6-scenario | ../pandawords.worktrees/3.2.6 | Agent running |
-| 3.3.2 | task/3.3.2-review | ../pandawords.worktrees/3.3.2 | Ready |
+| 3.2.6 | task/3.2.6-scenario | ../pandawords.worktrees/3.2.6 | Merged; repairing integration fixture |
+| 3.3.2 | task/3.3.2-review | ../pandawords.worktrees/3.3.2 | Agent running |
 | 3.3.4 | task/3.3.4-e2e | ../pandawords.worktrees/3.3.4 | Waiting for 3.3.2 and 3.3.3 |
 
 ## Blocked
@@ -59,6 +59,24 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Findings: sentence, passage, phrase, tag, morpheme and related edge schemas already exist in
   migration 0005; task 4.2.1 requires verification and only additive migration if needed.
 - Blockers / follow-ups: none.
+
+### 2026-11-14 — Integration recovery during scenario verification
+- Result / completed: scenario `07aab06` merged as `6af7608` and registered in the production
+  request registry. Check and gen-api passed; full tests initially 871 passed/23 failed.
+- Dependencies: 3.2.1 and 3.2.5 checked ✅.
+- Verification: 32 previously failing system/media/migration/audio regressions passed after
+  dependency repair. Full-suite rerun pending; scenario not yet marked complete.
+- Failures / causes / corrections: recognition agent disclosed an unreported worktree
+  `.venv` junction to main. Recursive cleanup traversed the junction and removed main
+  dependency files during validation. Owned dev stack stopped; `uv sync --frozen --reinstall`
+  restored locked packages. Remaining worktree top-level dependency paths inspected as
+  normal directories; future cleanup will unlink nested reparse points without traversing
+  them. No source changes lost; recognition/recall branches and folders are removed.
+- Separate failure: scenario fixture claimed from a shared global queue and stopped before
+  reaching its own job; agent correcting test isolation on main, without changing production.
+- Skipped / deferred: final full suites/E2E pending recovery; none reported as passed.
+- Blockers / follow-ups: finish scenario fixture verification; review UI agent continues
+  independently. No shared dependency links permitted.
 
 ### 2026-11-14 — 3.2.3 Recognition plugins
 - Result / completed: `a39e2b8` merged; definition/word/relation recognition, effective
