@@ -326,6 +326,17 @@ scoped **sessionStorage**, not localStorage, and survive navigation/reload in th
 Storage failures block mutations rather than losing retry identity. No credentials or private
 answer specifications are stored; pending learner answers remain until resolved.
 
+The fixture-backed real-stack browser contract (`frontend/e2e/review-session.spec.ts`, 3.3.4)
+starts review through the project plan and answers a new `schedule` sense using known fixture
+content plus the public exercise type. Same-POS/frequency-band fixture nouns supply safe
+distractors with LLM and external audio disabled. It verifies server feedback/auto-rating,
+a different final rating, and the same durable receipt after reload and identical confirmation
+retry. A one-new-card allowance makes queue exhaustion and exactly one completed introduction
+observable even though three unintroduced senses remain. Session progress survives reload;
+public attempt readback proves receipt retention independently of sessionStorage. Existing SRS
+integration tests additionally assert the single review-log row under retry/concurrency.
+The browser flow's execution status is recorded separately in `docs/dev/testing.md`.
+
 No-usable exercises stay on the selected card without silently advancing. Expiry, stale/conflicting
 state and unavailable membership require explicitly reloading the queue for a fresh attempt.
 Recoverable failures retain the request and retry action. Exiting an active session requires

@@ -393,7 +393,48 @@ $env:AUDIO_NETWORK_ENABLED = 'false'
 Only Chromium runs, with one worker, no retries, and no skipped/fallback cases.
 Vitest's `src/**/*.test.ts` include keeps `e2e/**/*.spec.ts` out of unit runs.
 
-The single flow selects English via the existing browser preference format, signs in as
+### Review-session E2E (3.3.4)
+
+`frontend/e2e/review-session.spec.ts` uses a unique learner and project, completes the forced
+password change, and adds fixture nouns `schedule`, `bank`, `decision` and `cat`. These have
+POS noun and Zipf band 4, providing safe offline distractors. Explicit sense priority puts
+`schedule` first; its fixture definition is “A plan listing times for activities.” New cards
+use recognition: the test answers either public `def2word` or `word2def` with fixture knowledge,
+not a private answer specification. No provider, database inspection or mocked transport is used.
+
+The flow opens **Study plan** and **Start review** through the UI, checks server feedback and
+the selected suggested rating, overrides it, and confirms. A daily-new limit of one makes the
+updated queue empty while three unintroduced senses remain. It checks the completed count,
+reloads, reads the same public attempt and receipt, repeats the identical confirmation through
+the generated-type API client, and verifies the unchanged receipt/count/queue and reloaded UI.
+The existing integration test
+`test_srs_reviews.py::test_identical_retry_concurrency_stale_conflict_and_durable_receipt`
+already verifies concurrent/retried completion produces one review-log row, including a manual
+rating override; no duplicate backend test is needed.
+
+Use the ready fixture-backed stack on **main** (8100/8000/5173). Set `LEXICON_PATH` to the
+absolute `backend\tests\fixtures\lexicon_small.sqlite` path, `LLM_DAILY_BUDGET=0`,
+`AUDIO_NETWORK_ENABLED=false`, and a placeholder `DEEPSEEK_API_KEY` in main's gitignored
+`.env.dev` before starting the API/worker. Keep administrator credentials only there as well;
+`dev.ps1` loads them. The test checks the two offline environment flags, but the runner's
+environment is not proof of the already-running API/worker configuration. Do not download
+providers/models/audio or start/stop the stack from a task worktree.
+
+After merging, run `.\scripts\dev.ps1 test -E2E` on main. For just this flow, with the same
+environment already loaded, use `pnpm --dir frontend exec playwright test review-session.spec.ts`.
+`pnpm --dir frontend exec playwright test review-session.spec.ts --list` is discovery only.
+Tracing, video, screenshots and automatic error snapshots remain disabled by the existing
+Playwright configuration; credential entry uses the evaluation helper, not logged fill arguments.
+Nested `finally` blocks delete only the captured project and disable only the captured learner
+even if project deletion fails. Disabled learner/history retention is intentional; no user-delete
+endpoint or development-database reset is involved.
+
+Worktree validation: `dev.ps1 check`, `dev.ps1 test -Frontend`, explicit E2E TypeScript checking
+and Playwright discovery passed. Initial checks required restoring missing worktree-local
+dependencies; no main environment links were created. **Actual browser E2E execution is pending
+the main-worktree run**, not implied by discovery or mocked frontend tests.
+
+The first-login flow selects English via the existing browser preference format, signs in as
 the administrator, creates a unique `e2e_<UUID>` learner, reads the temporary-password
 dialog, signs out, and signs in as that learner. It verifies the public forced-change
 flag and the `/change-password` guard, including an in-app attempt to reach Projects
