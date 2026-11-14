@@ -18,8 +18,7 @@ Migration allocations: 0013 memory/history; 0014 LLM; 0015 SRS preferences;
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 3.3.2 | task/3.3.2-review | ../pandawords.worktrees/3.3.2 | Agent running |
-| 3.3.4 | task/3.3.4-e2e | ../pandawords.worktrees/3.3.4 | Waiting for 3.3.2 and 3.3.3 |
+| 3.3.4 | task/3.3.4-e2e | ../pandawords.worktrees/3.3.4 | Ready |
 
 ## Blocked
 
@@ -59,6 +58,17 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
   migration 0005; task 4.2.1 requires verification and only additive migration if needed.
 - Blockers / follow-ups: none.
 
+### 2026-11-14 — 3.3.2 Durable review session
+- Result / completed: `6fda8e4` merged; project queue/attempt/grade/confirm session,
+  exact-body recovery, durable receipt-driven advancement, protected media and explicit
+  unavailable/stale/expired/recoverable states.
+- Dependencies: 3.3.1, 3.1.3, 3.2.3 and 3.2.4 checked ✅.
+- Verification: agent check, standard frontend suite, 25 focused tests and build passed;
+  integrated main check and standard frontend suite passed.
+- Skipped / deferred: real-stack E2E is the next task, not implied by unit tests.
+- Failures / causes / corrections: none reported or observed.
+- Blockers / follow-ups: none; 3.3.4 ready; cleanup follows.
+
 ### 2026-11-14 — 3.2.6 Optional cached scenario exercises
 - Result / completed: `07aab06` merged as `6af7608`; validated cached local-graded scenario
   plugin, bounded optional provider job, worker registration, observable non-LLM fallback
@@ -71,7 +81,8 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: initial failed full run and environment recovery recorded
   below. Scenario fixtures now share a per-test migrated database for auth/cards/jobs,
   eliminating unrelated shared-queue interference without changing production behavior.
-- Blockers / follow-ups: none; review UI ready to merge; cleanup follows.
+- Blockers / follow-ups: none; review UI merged. Scenario branch/folder removed safely
+  after unlinking 1,631 reparse points without traversing their targets.
 
 ### 2026-11-14 — Integration recovery during scenario verification
 - Result / completed: scenario `07aab06` merged as `6af7608` and registered in the production
