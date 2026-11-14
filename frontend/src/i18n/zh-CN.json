@@ -1,4 +1,25 @@
 {
+  "addWord": {
+    "title": "添加单词",
+    "input": "英语单词或短语",
+    "placeholder": "输入单词、短语或词形变化",
+    "search": "查找候选词",
+    "candidates": "选择候选词",
+    "noMatches": "未找到匹配项。请检查拼写或尝试其他词形。",
+    "submit": "添加所选词义",
+    "added": "已添加到此项目。可以安全地重复添加，已有条目将被复用。",
+    "close": "关闭"
+  },
+  "jobs": {
+    "title": "后台任务",
+    "queued": "排队中",
+    "running": "运行中",
+    "done": "已完成",
+    "failed": "失败",
+    "failedHelp": "此后台任务失败。单词仍已添加，你可以继续使用项目。",
+    "pollError": "无法查询此任务。请重试以刷新状态。",
+    "preview": "后台任务状态（仅预览，不轮询）"
+  },
   "word": {
     "frequency": "词频：{band}",
     "common": "常用",

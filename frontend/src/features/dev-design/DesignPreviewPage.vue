@@ -13,6 +13,7 @@ import { darkThemeOverrides, themeOverrides } from '@/design/naive-theme'
 import { radius, spacing, themes, typography } from '@/design/tokens'
 import en from '@/i18n/dev-design/en.json'
 import zhCN from '@/i18n/dev-design/zh-CN.json'
+import JobStatusPreview from './JobStatusPreview.vue'
 import WordComponentsPreview from './WordComponentsPreview.vue'
 
 const { t } = useI18n({
@@ -201,6 +202,7 @@ function colorVariable(group: typeof groups[number], name: string) {
         </section>
       </NConfigProvider>
     </div>
+    <JobStatusPreview />
     <section class="space-y-4">
       <h2 class="text-xl font-semibold">
         {{ t('components') }}

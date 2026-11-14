@@ -82,6 +82,23 @@
 - `/projects/:id` loads project metadata and reserves the tree area for task 2.6.4. It does not
   fetch or infer tree membership. Missing and other-owner IDs share the localized unavailable
   state. Raw server messages are never displayed.
+- The project header opens a token-sized, scrollable add-word modal that fits mobile viewports.
+  Input searches authenticated `POST /api/dictionary/candidates`; choose a candidate and explicit
+  senses through `SenseSelectList` (common senses initially selected). With no common senses,
+  selection is required. Editing input invalidates old candidates; empty/error results permit
+  another search. Only the search/submit region is busy, and the modal can always be closed.
+  `POST /api/projects/{id}/dictionary` sends original structured lemma/sense keys, not display IDs.
+  Success retains selections for safe repeat adds, deduplicates job IDs and preserves terminal
+  statuses. Inline `JobStatus` polls owner-visible `GET /api/jobs/{id}`; polling failures have Retry,
+  whereas failed jobs remain terminal without undoing an add. Closing aborts requests/polling;
+  reopening retains results and job statuses and resumes only pending jobs. Unmounting cancels
+  requests/timers. An interrupted add may already have committed; repeating it is safe.
+  Tree integration listens to `added` and `jobsSettled` rather than refetching project metadata.
+- Add-flow browser selectors: `project-add-word`, `add-word-dialog`, `add-word-input`,
+  `add-word-search`, `add-word-candidate`, `add-word-submit`, `add-word-error`,
+  `add-word-success`, `add-word-close`, `job-status`, `job-retry` (`data-testid`).
+  Senses are checkbox roles labelled by their English definitions; job rows expose
+  `data-job-id` and `data-job-status`.
 - Browser test contracts: `projects-page`, `project-list`, `project-card`, `project-create`,
   `project-edit`, `project-delete`, `project-editor`, `project-form`, `project-save` and
   `project-detail` are `data-testid` selectors. Inputs use `project-name`,
