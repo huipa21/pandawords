@@ -18,11 +18,11 @@ Migration allocations: 0013 memory/history; 0014 LLM; 0015 SRS preferences;
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 3.2.2 | task/3.2.2-distractors | ../pandawords.worktrees/3.2.2 | Ready |
+| 3.2.2 | task/3.2.2-distractors | ../pandawords.worktrees/3.2.2 | Agent running |
 | 3.2.3 | task/3.2.3-recognition | ../pandawords.worktrees/3.2.3 | Waiting for 3.2.2 |
-| 3.2.4 | task/3.2.4-recall | ../pandawords.worktrees/3.2.4 | Ready |
-| 3.2.6 | task/3.2.6-scenario | ../pandawords.worktrees/3.2.6 | Ready |
-| 3.3.1 | task/3.3.1-components | ../pandawords.worktrees/3.3.1 | Ready |
+| 3.2.4 | task/3.2.4-recall | ../pandawords.worktrees/3.2.4 | Agent running |
+| 3.2.6 | task/3.2.6-scenario | ../pandawords.worktrees/3.2.6 | Agent running |
+| 3.3.1 | task/3.3.1-components | ../pandawords.worktrees/3.3.1 | Agent running |
 | 3.3.2 | task/3.3.2-review | ../pandawords.worktrees/3.3.2 | Waiting for review prerequisites |
 | 3.3.3 | task/3.3.3-dashboard | ../pandawords.worktrees/3.3.3 | Agent running |
 | 3.3.4 | task/3.3.4-e2e | ../pandawords.worktrees/3.3.4 | Waiting for 3.3.2 and 3.3.3 |
@@ -76,8 +76,10 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: additive docs conflicts preserved both sections;
   conflicting generated API artifacts regenerated from combined backend. Agent default token
   test timeout resolved with 60-second timeout; main default suite passed.
-- Blockers / follow-ups: none; distractors, recall, scenario and components now ready,
-  alongside running dashboard UI (five-agent ceiling). Cleanup follows.
+- Blockers / follow-ups: none; distractors, recall, scenario and components started,
+  alongside running dashboard UI (five-agent ceiling). Framework branch/folder removed,
+  inspected dependency leftovers cleaned. Owned dev DB migrated through 0017;
+  API and Vite readiness HTTP 200.
 
 ### 2026-11-14 — 3.1.3 Study plans and dashboard API
 - Result / completed: `b25660f` merged; owner-scoped bounded queues, preserved hidden order,
