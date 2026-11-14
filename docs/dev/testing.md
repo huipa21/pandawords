@@ -134,6 +134,34 @@ warning. The first check found missing ruff; manifest-based `uv sync` and `pnpm 
 restored this worktree's tools without dependency changes. No E2E, stack lifecycle operation,
 dev-database mutation or bulk cleanup was performed.
 
+## Scenario recall (3.2.6)
+
+From `backend`, run `uv run --no-sync pytest -q tests\unit\test_exercise_scenario.py
+tests\integration\test_scenario.py tests\integration\test_scenario_contracts.py`.
+These use the existing isolated 8101 harness and a real OpenAI SDK with `httpx.MockTransport`;
+no live provider, dev database, E2E or stack lifecycle operation is needed.
+Fake registry types independently verify fallback selection and local accepted-form grading.
+Coverage includes strict/malformed/answer-leaking JSON, Unicode and separated-spelling leaks,
+nonblocking misses, concurrent deduplication and worker claims, validated disabled/zero-budget
+cache reuse across shared owners, prompt-version invalidation, private overlay/custom scopes,
+note exclusion, stale content, terminal job reuse, positive/zero exhausted budgets and every
+optional-provider fallback. Real durable attempts verify owner-only reads/submissions,
+server-bounded timing, local normalization and idempotent confirmation.
+Normal mocked calls allow SDK cold startup; a separate case keeps a short provider timeout.
+No API or database schema changes require regeneration.
+
+Verification on 2026-11-14: `dev.ps1 check` passed; the final combined scenario/framework/
+LLM/job selection passed **106 tests** (48 scenario cases). Final backend Ruff formatting,
+lint and basedpyright passed. Initial missing pytest was resolved by `uv sync --frozen`.
+Five-second normal mock timeouts proved too short under concurrent worktree load and were
+raised to 30 seconds; the explicit short-timeout case remains. The durable-attempt fixture
+was corrected to create auth preferences in the same database as its card.
+An optional full backend run was deliberately stopped under concurrent worktree load, not
+reported as passing; the focused combined run passed afterward. No task-prefixed test database
+remained after the completed runs/cancellation. Pylance signature inspection timed out; actual
+runtime tests and basedpyright validated the backward-compatible optional job keyword.
+No live DeepSeek, frontend test sweep, E2E or stack lifecycle operation was performed.
+
 ## Optional DeepSeek client (3.2.5)
 
 From `backend`: `uv run --no-sync pytest -q tests\integration\test_llm.py`.

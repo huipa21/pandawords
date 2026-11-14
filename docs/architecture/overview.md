@@ -132,6 +132,16 @@ SDK retries are disabled; application retries/timeouts and output tokens are bou
 Logs contain only unavailable reason and attempt count, not prompts, responses or keys;
 SDK payload-bearing debug events are filtered even when debug logging is enabled.
 
+Scenario recall composes `exercise_scenario.register` with the DB/settings-bound
+`scenario.acquire` provider. Review requests perform validated cache reads only; misses enqueue
+deduplicated owner-scoped `scenario` jobs and expose skip reasons while another eligible type
+is selected. `worker.handlers.HANDLERS["scenario"]` reloads the authorized selected content and
+checks its version before provider dispatch. Verified shared sources may share cache entries;
+effective private/custom definitions remain owner-scoped, and notes are never sent.
+Expected provider failures use the generic `JobRejected` terminal-failure contract, preserving
+public-safe reason codes through the existing owner-only job status API. No new endpoint,
+job-type enum, migration or generated API shape is needed.
+
 | Module | Responsibility |
 |---|---|
 | `app/main.py` | App factory, routers, lifespan (DB connect, admin bootstrap) |

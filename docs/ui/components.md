@@ -130,3 +130,11 @@ Handle `exercise.no_usable`, expiry, unavailable hints, hidden/removed membershi
 attempt errors explicitly. Receipt-backed completed retries survive expiry; abandoned attempts
 require a new issuance. Concrete Vue shell implementation remains the study-UI task; these
 transport contracts do not import generators or expose their private answer specifications.
+
+For `scenario`, render `prompt.text` as plain text with `TypedAnswerInput`; it contains no
+answer key or accepted-form list. Do not fetch/generate scenarios or grade answers in the
+browser. A cache miss or optional-provider failure appears in the attempt's `skipped` list
+while the server selects another eligible exercise (for example `generation_pending`,
+`disabled`, `budget_exhausted` or `rejected_response`). A valid cached scenario still works
+with the provider disabled. The same timing, give-up, feedback and rating controls apply;
+scenario currently offers no hint.

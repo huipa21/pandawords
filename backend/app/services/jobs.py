@@ -45,7 +45,12 @@ async def complete(db: AsyncSurrealConnection, job: Job) -> None:
 
 
 async def fail(
-    db: AsyncSurrealConnection, job: Job, *, terminal: bool = False, cancelled: bool = False
+    db: AsyncSurrealConnection,
+    job: Job,
+    *,
+    terminal: bool = False,
+    cancelled: bool = False,
+    error_code: str | None = None,
 ) -> None:
     exhausted = terminal or job.attempts >= MAX_ATTEMPTS
     error = "unknown_handler" if terminal else "worker_cancelled" if cancelled else "handler_failed"
@@ -54,5 +59,5 @@ async def fail(
         job,
         "failed" if exhausted else "queued",
         datetime.now(UTC) + timedelta(seconds=retry_delay(job.attempts)),
-        error,
+        error_code or error,
     )

@@ -8,7 +8,7 @@ from surrealdb import AsyncSurrealConnection
 
 from app.core.config import Settings
 from app.db.client import database_lifespan
-from app.domain.jobs import Job
+from app.domain.jobs import Job, JobRejected
 from app.services import jobs
 from app.worker.context import HANDLER_CONTEXT, HandlerContext
 from app.worker.handlers import HANDLERS, Handler
@@ -46,6 +46,8 @@ async def execute(
     except asyncio.CancelledError:
         await _settle(jobs.fail(db, job, cancelled=True))
         raise
+    except JobRejected as exc:
+        await _settle(jobs.fail(db, job, terminal=True, error_code=exc.code))
     except Exception as exc:
         structlog.get_logger().warning(
             "worker_handler_failed", job_id=job.id, error_type=type(exc).__name__
