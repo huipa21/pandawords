@@ -104,11 +104,29 @@ word/phrase trees and empty states at responsive widths.
 
 | Component | Purpose / key props |
 |---|---|
-| `ExerciseShell` | Planned common frame: prompt/answer slots, server hint, submit/give up, feedback, hidden monotonic timer. Uses generated `AttemptRead`; emits answer + duration only, never client correctness |
-| `ChoiceGrid` | 2–4 options for recognition exercises. Keys 1–4 select; Enter submits |
-| `TypedAnswerInput` | Recall input. Accepts any valid form. Shows a diff highlight on a wrong answer |
-| `RatingBar` | Again / Hard / Good / Easy in `--pw-rating-*` colors, with the auto-rating preselected. Keys 1–4; Space/Enter confirms |
-| `ReviewProgress` | Done / remaining, new vs review counts |
+| `ExerciseShell` | `attemptId`, generated `prompt`, optional server `feedback`, `autoRating`, `hint`; `hintAvailable`, `hintLoading`, `disabled`, `submitting`. Prompt/answer/feedback/progress slots; hidden monotonic timer |
+| `ChoiceGrid` | Generated `choices` (2–4), `v-model` opaque answer ID, `disabled`; emits `submit`. Scoped keys 1–4 select; Enter submits |
+| `TypedAnswerInput` | `v-model` original answer, `disabled`, optional generated `feedback`; emits `submit` on non-IME Enter. Wrong server feedback shows deleted input and inserted expected answer; no local normalization/grading |
+| `RatingBar` | Generated `autoRating`, `disabled`, `loading`. Emits `change(rating)` and `confirm(rating)`; auto-rating preselected, user can override. Token rating colors; scoped 1–4 and Space/Enter |
+| `ReviewProgress` | Required `done`, `remaining`, `newCount`, `reviewCount` display counts; labelled native progress, including empty/complete sessions |
+
+`ExerciseShell` emits `answered(AttemptAnswer)` with `{answer, duration_ms}`,
+`giveUp({duration_ms})`, `hint()` intent, `confirm(Rating)`, `exit()` and `audio()` intents.
+These replace the original proposed `answered {correct, usedHint, ...}` contract: only the
+server can establish correctness, hint use or auto-rating. Types are aliases of generated API
+schemas. The parent maps `AttemptRead` to these props, persists hint intent through the API,
+sets busy props during requests, handles errors/retries, and advances only on a confirmed receipt.
+Changing `attemptId` resets answer and monotonic timing. Keep an attempt ID stable across retries;
+cache emitted request bodies and retry those exact bodies rather than timing a second submission.
+The answer slot receives `answer`, `disabled`, `submit` and `updateAnswer`; feedback gets `feedback`.
+
+Default controls receive focus on a new attempt; server feedback transfers focus to the
+preselected rating. Keyboard handlers live on the focused group, never on `document`; handled
+events stop propagation and ignore repeat, IME and modifier chords. Choice controls lock after
+feedback so a choice key cannot also select a rating. H requests a hint outside editable fields;
+Escape requests an exit (the page owns confirmation), and Space on the focused shell frame
+requests audio (the page owns playback). Native button Space activation is preserved.
+All components are previewed under both token themes at `/dev/design`; grids collapse on mobile.
 
 ### Framework contract for the study shell (3.2.1)
 
@@ -128,5 +146,5 @@ never updates the card. Retry the same confirmation after network uncertainty.
 
 Handle `exercise.no_usable`, expiry, unavailable hints, hidden/removed membership and stale
 attempt errors explicitly. Receipt-backed completed retries survive expiry; abandoned attempts
-require a new issuance. Concrete Vue shell implementation remains the study-UI task; these
-transport contracts do not import generators or expose their private answer specifications.
+require a new issuance. Transport orchestration remains the study-page task; the shared controls
+do not make API calls, import generators or expose their private answer specifications.
