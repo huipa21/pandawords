@@ -17,12 +17,15 @@ Start internal dependents only after prerequisites are merged and verified. Seri
 API contract regeneration and snapshot conflict resolution. No dependency junctions or symlinks
 between worktrees; never traverse reparse points during cleanup. Shared services/ports must not be
 stopped or reset by agents. Agents use existing isolated random-database tests on port 8101.
+Main baseline `dev.ps1 check` passed; backend/frontend baseline tests are running.
+Coordination: another session is drafting `phase-5.md` only. Preserve that unrelated document
+without staging it; no Phase 5 implementation or cross-phase concurrent integration is authorized.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 4.1.1 | task/4.1.1-phrases | ../pandawords.worktrees/4.1.1 | Ready, wave 1 |
-| 4.2.1 | task/4.2.1-context-schema | ../pandawords.worktrees/4.2.1 | Ready, wave 1 |
-| 4.3.1 | task/4.3.1-tags | ../pandawords.worktrees/4.3.1 | Ready, wave 1 |
+| 4.1.1 | task/4.1.1-phrases | ../pandawords.worktrees/4.1.1 | Agent running, wave 1 |
+| 4.2.1 | task/4.2.1-context-schema | ../pandawords.worktrees/4.2.1 | Agent running, wave 1 |
+| 4.3.1 | task/4.3.1-tags | ../pandawords.worktrees/4.3.1 | Agent running, wave 1 |
 | 4.1.2 | task/4.1.2-phrase-flow | ../pandawords.worktrees/4.1.2 | Waiting for 4.1.1 |
 | 4.2.2 | task/4.2.2-ingestion | ../pandawords.worktrees/4.2.2 | Waiting for 4.2.1 |
 | 4.3.2 | task/4.3.2-morphology | ../pandawords.worktrees/4.3.2 | Waiting for 4.3.1 |
