@@ -7,7 +7,8 @@ export { readApiError } from './errors'
 
 export interface AuthLifecycle {
   getAccessToken: () => string | null
-  /** Persist the new token before resolving; use a separate client to avoid refresh recursion. */
+  getSessionVersion?: () => number
+  /** Store the new token in memory before resolving; avoid refresh recursion. */
   refresh: () => Promise<string | null>
   logout: () => void | Promise<void>
 }
@@ -16,7 +17,7 @@ export interface ApiClientOptions {
   baseUrl?: string
   fetch?: typeof globalThis.fetch
   auth?: AuthLifecycle
-  /** Exclude login/refresh endpoints from recovery when they become available. */
+  /** Additional exclusions from recovery beyond the built-in auth endpoint exclusions. */
   shouldRefresh?: (request: Request) => boolean
 }
 
@@ -27,6 +28,7 @@ export function createApiClient(options: ApiClientOptions = {}) {
   let refreshedToken: string | null = null
 
   function refresh(auth: AuthLifecycle) {
+    const session = auth.getSessionVersion?.()
     refreshing ??= (async () => {
       try {
         const token = await auth.refresh()
@@ -36,7 +38,8 @@ export function createApiClient(options: ApiClientOptions = {}) {
       catch {
         // A refresh rejection (including a network error) invalidates the session.
       }
-      await auth.logout()
+      if (session === auth.getSessionVersion?.())
+        await auth.logout()
       return null
     })().then((token) => {
       refreshedToken = token
@@ -52,6 +55,7 @@ export function createApiClient(options: ApiClientOptions = {}) {
     const request = new Request(input, init)
     const auth = options.auth
     const startedGeneration = generation
+    const session = auth?.getSessionVersion?.()
     const token = auth?.getAccessToken()
     if (token)
       request.headers.set('Authorization', `Bearer ${token}`)
@@ -59,12 +63,13 @@ export function createApiClient(options: ApiClientOptions = {}) {
     // Keep an unconsumed copy so body-bearing requests can be retried once.
     const retry = request.clone()
     let response = await transport(request)
-    if (response.status === 401 && auth && (options.shouldRefresh?.(request) ?? true)) {
+    const authEndpoint = /\/api\/auth\/(?:login|refresh|logout|password)$/.test(new URL(request.url).pathname)
+    if (response.status === 401 && token && auth && !authEndpoint && (options.shouldRefresh?.(request) ?? true) && session === auth.getSessionVersion?.()) {
       // A late 401 from an older token shares the already-completed refresh too.
       const nextToken = startedGeneration === generation
         ? await refresh(auth)
         : refreshedToken
-      if (nextToken) {
+      if (nextToken && session === auth.getSessionVersion?.()) {
         retry.headers.set('Authorization', `Bearer ${nextToken}`)
         response = await transport(retry)
       }
@@ -84,7 +89,12 @@ export function createApiClient(options: ApiClientOptions = {}) {
     })
   }
 
-  return createClient<paths>({ baseUrl: options.baseUrl ?? '', fetch: authenticatedFetch })
+  return createClient<paths>({ baseUrl: options.baseUrl ?? '', credentials: 'include', fetch: authenticatedFetch })
 }
 
-export const api = createApiClient()
+const appOptions: ApiClientOptions = {}
+export const api = createApiClient(appOptions)
+
+export function configureApiAuth(auth: AuthLifecycle) {
+  appOptions.auth = auth
+}

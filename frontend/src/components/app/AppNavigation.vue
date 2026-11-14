@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useAuthStore } from '@/stores/auth'
 
 const props = defineProps<{ mobile?: boolean }>()
 const { t } = useI18n()
+const auth = useAuthStore()
 const links = computed(() => props.mobile
   ? [
       { to: '/projects', key: 'projects' },
@@ -16,6 +18,12 @@ const links = computed(() => props.mobile
       { to: '/words', key: 'words' },
       { to: '/review', key: 'review' },
       { to: '/settings', key: 'settings' },
+      ...(auth.isAdmin
+        ? [
+            { to: '/admin/users', key: 'users' },
+            { to: '/admin/backup', key: 'backup' },
+          ]
+        : []),
     ])
 </script>
 

@@ -12,7 +12,9 @@
     "review": "复习",
     "words": "单词",
     "me": "我的",
-    "settings": "设置"
+    "settings": "设置",
+    "users": "用户管理",
+    "backup": "备份"
   },
   "preferences": {
     "themeAction": "主题：{mode}。切换到下一个主题",
@@ -34,6 +36,40 @@
     "backup": "备份",
     "design": "设计预览",
     "login": "登录",
+    "changePassword": "修改密码",
     "notFound": "页面不存在"
+  },
+  "auth": {
+    "username": "用户名",
+    "password": "密码",
+    "login": "登录",
+    "logout": "退出登录",
+    "currentPassword": "当前密码",
+    "newPassword": "新密码",
+    "changePassword": "修改密码",
+    "changeRequired": "请先修改临时密码，再继续使用。",
+    "required": "此项不能为空。",
+    "passwordLength": "请输入 10–1024 个字符。",
+    "passwordChanged": "密码已修改。"
+  },
+  "errors": {
+    "generic": "请求失败，请重试。",
+    "transport": "无法连接服务器，请检查网络后重试。",
+    "auth_invalid_credentials": "用户名或密码不正确。",
+    "auth_password_change_required": "必须修改临时密码，请重新登录。",
+    "auth_forbidden": "你没有执行此操作的权限。",
+    "auth_unauthorized": "登录已失效，请重新登录。",
+    "auth_invalid_token": "登录已失效，请重新登录。",
+    "auth_invalid_refresh_token": "登录已失效，请重新登录。",
+    "auth_disabled": "此账号已被停用。",
+    "auth_password_reused": "请使用不同的密码。",
+    "validation_invalid": "请检查此项后重试。",
+    "http_401": "登录已失效，请重新登录。",
+    "http_403": "你没有执行此操作的权限。",
+    "http_422": "请检查表单内容后重试。",
+    "http_429": "请求过于频繁，请稍后重试。",
+    "http_500": "服务器无法完成请求，请重试。",
+    "http_502": "服务器暂时不可用，请重试。",
+    "http_503": "服务器暂时不可用，请重试。"
   }
 }
