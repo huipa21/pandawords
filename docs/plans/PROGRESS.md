@@ -18,8 +18,7 @@ Migration allocations: 0013 memory/history; 0014 LLM; 0015 SRS preferences;
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 3.2.2 | task/3.2.2-distractors | ../pandawords.worktrees/3.2.2 | Agent running |
-| 3.2.3 | task/3.2.3-recognition | ../pandawords.worktrees/3.2.3 | Waiting for 3.2.2 |
+| 3.2.3 | task/3.2.3-recognition | ../pandawords.worktrees/3.2.3 | Ready |
 | 3.2.4 | task/3.2.4-recall | ../pandawords.worktrees/3.2.4 | Agent running |
 | 3.2.6 | task/3.2.6-scenario | ../pandawords.worktrees/3.2.6 | Agent running |
 | 3.3.1 | task/3.3.1-components | ../pandawords.worktrees/3.3.1 | Agent running |
@@ -64,6 +63,19 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Findings: sentence, passage, phrase, tag, morpheme and related edge schemas already exist in
   migration 0005; task 4.2.1 requires verification and only additive migration if needed.
 - Blockers / follow-ups: none.
+
+### 2026-11-14 — 3.2.2 Safe ranked distractors
+- Result / completed: `15441c2` merged; owner-filtered bounded graph discovery, ranked
+  optional graph/frequency tiers, bidirectional synonym filtering, label deduplication
+  and explicit unavailable results.
+- Dependencies: 3.2.1 and 2.4.3 checked ✅.
+- Verification: agent focused 33/regression 98/check passed; main backend 787 passed,
+  frontend and check passed after separating cold ESLint initialization into test setup.
+- Skipped / deferred: none. Failures / causes / corrections: frontend first token assertion
+  repeatedly exhausted 20 seconds loading the lint configuration, including single-worker
+  run. Added explicit 60-second `beforeAll` configuration initialization; original assertions
+  and their time limits unchanged. Normal frontend runner then passed, without retries.
+- Blockers / follow-ups: none; recognition ready. Cleanup follows.
 
 ### 2026-11-14 — 3.2.1 Durable exercise attempt framework
 - Result / completed: `029c23d` merged as `af3c4e8`; typed registry/weighted selector,

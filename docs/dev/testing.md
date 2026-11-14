@@ -1,5 +1,9 @@
 # Testing
 
+The token-enforcement suite initializes the ESLint configuration in a dedicated 60-second
+setup hook. This keeps cold plugin/configuration loading out of the first assertion's
+20-second budget; normal frontend tests need no retry or temporary timeout edits.
+
 ## Distractor provider (3.2.2)
 
 From `backend`, against the existing isolated-database test server:

@@ -3,7 +3,7 @@
 import { join } from 'node:path'
 import process from 'node:process'
 import { ESLint } from 'eslint'
-import { describe, expect, it } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 
 const eslint = new ESLint({
   cwd: process.cwd(),
@@ -20,6 +20,10 @@ async function tokenMessages(source: string) {
 }
 
 describe('token enforcement', () => {
+  beforeAll(async () => {
+    await eslint.calculateConfigForFile(join('src', 'design', 'TokenFixture.vue'))
+  }, 60_000)
+
   it('rejects hex, rgb, and pixel literals in SFC declarations, media queries, and inline styles', async () => {
     const messages = await tokenMessages(`
       <template>
