@@ -10,12 +10,11 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 ## Current run
 
 Request: resume and complete Phase 1, proceeding through waves in dependency order.
-Next step: implement wave 11 admin UI and complete development commands in parallel;
-verify integrated UI/lifecycle, then implement wave 12 E2E.
+Next step: finish wave 11 development commands and verify main up/check/test/down;
+admin UI is integrated and browser-verified, then implement wave 12 E2E.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 1.5.6 | `task/1.5.6-admin-ui` | `../pandawords.worktrees/1.5.6` | Starting; dependencies1.5.4/1.5.5 are ✅ |
 | 1.6.1 | `task/1.6.1-dev-lifecycle` | `../pandawords.worktrees/1.6.1` | Starting; dependencies1.3.3/1.4.3/1.6.2 are ✅ |
 
 ## Blocked
@@ -42,6 +41,35 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 1.5.6 Responsive admin users UI
+- Result / completed: desktop table/mobile cards, pagination/load/empty/error states, create/reset
+  temporary-password dialogs and copy feedback, confirm actions, self protection, bilingual errors,
+  required shared app components and preview entries; `efc0244` merged.
+- Dependencies:1.5.4/1.5.5 are ✅.
+- Verification: main lint/typecheck,65 default frontend tests, build and backend checks passed.
+  Real API browser1280px: create, display/copy password, disable/enable, promote/demote, confirmed
+  reset and self-action protection passed. At375px: cards instead of table, create/toggle/confirmation,
+  password dialog, no horizontal/modal overflow, and action targets≥44px passed.
+- Skipped / deferred: E2E runner still1.6.6; no unrelated shared catalogue components implemented.
+- Failures / causes / corrections: browser harness initially expected input instead of output
+  for password and confirmation for non-destructive enable; corrected harness, actual actions passed.
+- Findings: responsive action wrapping preserves target size and desktop navigation.
+- Blockers / follow-ups: none; waiting on1.6.1 for wave12.
+
+### 2026-11-14 — Integrated worker/image/production acceptance
+- Result / completed: API/worker and full admin frontend linux/amd64 images built; image worker
+  processed noop exactly once as UID10001 and gracefully stopped, disposable database removed.
+- Dependencies: completed1.6.2/1.5.4/1.5.5/1.5.6 and existing1.6.3/1.6.4.
+- Verification: isolated production compose `config --quiet`/`up --pull never`, successful migration,
+  worker/API UID10001 and Caddy-network proxy200 readiness passed. All smoke project containers,
+  volumes and networks removed, without changing shared dev/test data.
+- Skipped / deferred: live Docker/server deployment not run; final archive build still pending.
+- Failures / causes / corrections: exact Compose validation exposed worker accidentally nested in
+  API depends_on; moved it to top-level services (`3401f88`), reran validation and real production
+  startup successfully. No silent acceptance claim from backend tests alone.
+- Findings: backend runtime needs no dev dependencies; full service dependency ordering works.
+- Blockers / follow-ups: none. Wave10 task branches/worktrees are removed; UI/API helpers closed.
 
 ### 2026-11-14 — 1.5.4 Admin users API
 - Result / completed: paginated credential-free list, create/reset temporary passwords, role and
