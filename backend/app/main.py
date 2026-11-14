@@ -15,7 +15,10 @@ from app.api.auth import router as auth_router
 from app.api.candidates import router as candidates_router
 from app.api.jobs import router as jobs_router
 from app.api.media import router as media_router
+from app.api.notes import router as notes_router
+from app.api.overrides import router as overrides_router
 from app.api.projects import router as projects_router
+from app.api.user_dictionary import router as user_dictionary_router
 from app.core.config import Settings
 from app.core.errors import (
     AppError,
@@ -101,6 +104,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(admin_router)
     app.include_router(projects_router)
     app.include_router(candidates_router)
+    app.include_router(user_dictionary_router)
+    app.include_router(overrides_router)
+    app.include_router(notes_router)
     return app
 
 

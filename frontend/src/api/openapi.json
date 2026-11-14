@@ -804,6 +804,630 @@
           }
         ]
       }
+    },
+    "/api/dictionary/lemmas/{lemma_id}/entry": {
+      "get": {
+        "tags": [
+          "dictionary"
+        ],
+        "summary": "Read Entry",
+        "operationId": "read_entry_api_dictionary_lemmas__lemma_id__entry_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "lemma_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Lemma Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DictionaryEntryRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dictionary/lexemes/{lexeme_id}/senses": {
+      "post": {
+        "tags": [
+          "dictionary"
+        ],
+        "summary": "Create Sense",
+        "operationId": "create_sense_api_dictionary_lexemes__lexeme_id__senses_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "lexeme_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Lexeme Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CustomSenseCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DictionaryRecordRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/dictionary/{table}/{id}/override": {
+      "get": {
+        "tags": [
+          "overrides"
+        ],
+        "summary": "Read Override",
+        "operationId": "read_override_api_dictionary__table___id__override_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "table",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "lemma",
+                "lexeme",
+                "sense",
+                "morpheme",
+                "tag",
+                "sentence",
+                "passage"
+              ],
+              "type": "string",
+              "title": "Table"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OverrideRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "overrides"
+        ],
+        "summary": "Replace Override",
+        "operationId": "replace_override_api_dictionary__table___id__override_put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "table",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "lemma",
+                "lexeme",
+                "sense",
+                "morpheme",
+                "tag",
+                "sentence",
+                "passage"
+              ],
+              "type": "string",
+              "title": "Table"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OverrideUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OverrideRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "overrides"
+        ],
+        "summary": "Update Override",
+        "operationId": "update_override_api_dictionary__table___id__override_patch",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "table",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "lemma",
+                "lexeme",
+                "sense",
+                "morpheme",
+                "tag",
+                "sentence",
+                "passage"
+              ],
+              "type": "string",
+              "title": "Table"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OverrideUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OverrideRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "overrides"
+        ],
+        "summary": "Reset Override",
+        "operationId": "reset_override_api_dictionary__table___id__override_delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "table",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "lemma",
+                "lexeme",
+                "sense",
+                "morpheme",
+                "tag",
+                "sentence",
+                "passage"
+              ],
+              "type": "string",
+              "title": "Table"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notes": {
+      "post": {
+        "tags": [
+          "notes"
+        ],
+        "summary": "Create Note",
+        "operationId": "create_note_api_notes_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NoteCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoteRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "notes"
+        ],
+        "summary": "List Notes",
+        "operationId": "list_notes_api_notes_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "target_table",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "enum": [
+                "lemma",
+                "lexeme",
+                "sense",
+                "morpheme",
+                "tag",
+                "sentence",
+                "passage"
+              ],
+              "type": "string",
+              "title": "Target Table"
+            }
+          },
+          {
+            "name": "target_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Target Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NoteRead"
+                  },
+                  "title": "Response List Notes Api Notes Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notes/{id}": {
+      "get": {
+        "tags": [
+          "notes"
+        ],
+        "summary": "Read Note",
+        "operationId": "read_note_api_notes__id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoteRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "notes"
+        ],
+        "summary": "Update Note",
+        "operationId": "update_note_api_notes__id__patch",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NoteUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoteRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "notes"
+        ],
+        "summary": "Delete Note",
+        "operationId": "delete_note_api_notes__id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1055,6 +1679,82 @@
         ],
         "title": "CandidateResponse"
       },
+      "CustomSenseCreate": {
+        "properties": {
+          "definition": {
+            "$ref": "#/components/schemas/app__domain__overrides__Text__2"
+          },
+          "gloss": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/app__domain__overrides__Text__1"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/Language"
+            },
+            "type": "object",
+            "title": "Gloss"
+          },
+          "register": {
+            "items": {
+              "$ref": "#/components/schemas/app__domain__overrides__Text__1"
+            },
+            "type": "array",
+            "maxItems": 100,
+            "title": "Register"
+          },
+          "domain": {
+            "items": {
+              "$ref": "#/components/schemas/app__domain__overrides__Text__1"
+            },
+            "type": "array",
+            "maxItems": 100,
+            "title": "Domain"
+          },
+          "examples": {
+            "items": {
+              "$ref": "#/components/schemas/app__domain__overrides__Text__1"
+            },
+            "type": "array",
+            "maxItems": 100,
+            "title": "Examples"
+          },
+          "rank": {
+            "$ref": "#/components/schemas/Rank",
+            "default": 0
+          },
+          "common": {
+            "type": "boolean",
+            "title": "Common",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "definition"
+        ],
+        "title": "CustomSenseCreate"
+      },
+      "DictionaryEntryRead": {
+        "properties": {
+          "lemma": {
+            "$ref": "#/components/schemas/DictionaryRecordRead"
+          },
+          "lexemes": {
+            "items": {
+              "$ref": "#/components/schemas/DictionaryLexemeRead"
+            },
+            "type": "array",
+            "title": "Lexemes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lemma",
+          "lexemes"
+        ],
+        "title": "DictionaryEntryRead"
+      },
       "DictionaryKey": {
         "items": {
           "anyOf": [
@@ -1067,6 +1767,119 @@
           ]
         },
         "type": "array"
+      },
+      "DictionaryLexemeRead": {
+        "properties": {
+          "lexeme": {
+            "$ref": "#/components/schemas/DictionaryRecordRead"
+          },
+          "senses": {
+            "items": {
+              "$ref": "#/components/schemas/DictionaryRecordRead"
+            },
+            "type": "array",
+            "title": "Senses"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lexeme",
+          "senses"
+        ],
+        "title": "DictionaryLexemeRead"
+      },
+      "DictionaryRecordRead": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "table": {
+            "$ref": "#/components/schemas/DictionaryTable"
+          },
+          "owner": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner"
+          },
+          "fields": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "type": "object",
+            "title": "Fields"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "table",
+          "owner",
+          "fields"
+        ],
+        "title": "DictionaryRecordRead",
+        "description": "Transport-safe record; fields are schema fields, never ownership or identity."
+      },
+      "DictionaryTable": {
+        "type": "string",
+        "enum": [
+          "lemma",
+          "lexeme",
+          "sense",
+          "morpheme",
+          "tag",
+          "sentence",
+          "passage"
+        ]
+      },
+      "Form-Input": {
+        "properties": {
+          "form": {
+            "$ref": "#/components/schemas/app__domain__overrides__Text__1"
+          },
+          "tags": {
+            "items": {
+              "$ref": "#/components/schemas/app__domain__overrides__Text__1"
+            },
+            "type": "array",
+            "maxItems": 100,
+            "title": "Tags"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "form"
+        ],
+        "title": "Form"
+      },
+      "Form-Output": {
+        "properties": {
+          "form": {
+            "$ref": "#/components/schemas/Text-Output"
+          },
+          "tags": {
+            "items": {
+              "$ref": "#/components/schemas/Text-Output"
+            },
+            "type": "array",
+            "maxItems": 100,
+            "title": "Tags"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "form"
+        ],
+        "title": "Form"
       },
       "HTTPValidationError": {
         "properties": {
@@ -1133,6 +1946,10 @@
         "title": "JobRead"
       },
       "JsonValue": {},
+      "Language": {
+        "type": "string",
+        "pattern": "^[a-zA-Z]{2,8}(-[a-zA-Z0-9]{1,8})*$"
+      },
       "LexiconGloss": {
         "properties": {
           "lexeme_id": {
@@ -1494,6 +2311,586 @@
         ],
         "title": "LoginRequest"
       },
+      "NoteCreate": {
+        "properties": {
+          "target_table": {
+            "$ref": "#/components/schemas/DictionaryTable"
+          },
+          "target_id": {
+            "type": "string",
+            "title": "Target Id"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/NoteKind",
+            "default": "note"
+          },
+          "text": {
+            "$ref": "#/components/schemas/NoteText"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "target_table",
+          "target_id",
+          "text"
+        ],
+        "title": "NoteCreate"
+      },
+      "NoteKind": {
+        "type": "string",
+        "enum": [
+          "note",
+          "mnemonic"
+        ]
+      },
+      "NoteRead": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "target_table": {
+            "$ref": "#/components/schemas/DictionaryTable"
+          },
+          "target_id": {
+            "type": "string",
+            "title": "Target Id"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/NoteKind"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "target_table",
+          "target_id",
+          "kind",
+          "text"
+        ],
+        "title": "NoteRead"
+      },
+      "NoteText": {
+        "type": "string",
+        "maxLength": 10000,
+        "minLength": 1
+      },
+      "NoteUpdate": {
+        "properties": {
+          "kind": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NoteKind"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "text": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NoteText"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "NoteUpdate"
+      },
+      "OverrideFields-Input": {
+        "properties": {
+          "text": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/app__domain__overrides__Text__1"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cefr": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/app__domain__overrides__Text__1"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "exam_tags": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/app__domain__overrides__Text__1"
+                },
+                "type": "array",
+                "maxItems": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exam Tags"
+          },
+          "etymology_text": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/app__domain__overrides__Text__1"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "forms": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Form-Input"
+                },
+                "type": "array",
+                "maxItems": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Forms"
+          },
+          "pron": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Pronunciation-Input"
+                },
+                "type": "array",
+                "maxItems": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pron"
+          },
+          "definition": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/app__domain__overrides__Text__1"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "gloss": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/app__domain__overrides__Text__1"
+                },
+                "propertyNames": {
+                  "$ref": "#/components/schemas/Language"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gloss"
+          },
+          "register": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/app__domain__overrides__Text__1"
+                },
+                "type": "array",
+                "maxItems": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Register"
+          },
+          "domain": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/app__domain__overrides__Text__1"
+                },
+                "type": "array",
+                "maxItems": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Domain"
+          },
+          "examples": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/app__domain__overrides__Text__1"
+                },
+                "type": "array",
+                "maxItems": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Examples"
+          },
+          "rank": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Rank"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "common": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Common"
+          },
+          "meaning": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/app__domain__overrides__Text__1"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "name": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/app__domain__overrides__Text__1"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "translation": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/app__domain__overrides__Text__1"
+                },
+                "propertyNames": {
+                  "$ref": "#/components/schemas/Language"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Translation"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/app__domain__overrides__Text__1"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "OverrideFields"
+      },
+      "OverrideFields-Output": {
+        "properties": {
+          "text": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Text-Output"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cefr": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Text-Output"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "exam_tags": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Text-Output"
+                },
+                "type": "array",
+                "maxItems": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exam Tags"
+          },
+          "etymology_text": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Text-Output"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "forms": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Form-Output"
+                },
+                "type": "array",
+                "maxItems": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Forms"
+          },
+          "pron": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Pronunciation-Output"
+                },
+                "type": "array",
+                "maxItems": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pron"
+          },
+          "definition": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Text-Output"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "gloss": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/Text-Output"
+                },
+                "propertyNames": {
+                  "$ref": "#/components/schemas/Language"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gloss"
+          },
+          "register": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Text-Output"
+                },
+                "type": "array",
+                "maxItems": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Register"
+          },
+          "domain": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Text-Output"
+                },
+                "type": "array",
+                "maxItems": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Domain"
+          },
+          "examples": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/Text-Output"
+                },
+                "type": "array",
+                "maxItems": 100
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Examples"
+          },
+          "rank": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Rank"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "common": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Common"
+          },
+          "meaning": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Text-Output"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "name": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Text-Output"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "translation": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/Text-Output"
+                },
+                "propertyNames": {
+                  "$ref": "#/components/schemas/Language"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Translation"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Text-Output"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "OverrideFields"
+      },
+      "OverrideRead": {
+        "properties": {
+          "target_table": {
+            "$ref": "#/components/schemas/DictionaryTable"
+          },
+          "target_id": {
+            "type": "string",
+            "title": "Target Id"
+          },
+          "fields": {
+            "$ref": "#/components/schemas/OverrideFields-Output"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "target_table",
+          "target_id",
+          "fields",
+          "updated_at"
+        ],
+        "title": "OverrideRead"
+      },
+      "OverrideUpdate": {
+        "properties": {
+          "fields": {
+            "$ref": "#/components/schemas/OverrideFields-Input"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "fields"
+        ],
+        "title": "OverrideUpdate"
+      },
       "PasswordChange": {
         "properties": {
           "current_password": {
@@ -1702,6 +3099,59 @@
         "type": "object",
         "title": "ProjectUpdate"
       },
+      "Pronunciation-Input": {
+        "properties": {
+          "accent": {
+            "type": "string",
+            "enum": [
+              "US",
+              "UK"
+            ],
+            "title": "Accent"
+          },
+          "ipa": {
+            "$ref": "#/components/schemas/app__domain__overrides__Text__1"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "accent",
+          "ipa"
+        ],
+        "title": "Pronunciation"
+      },
+      "Pronunciation-Output": {
+        "properties": {
+          "accent": {
+            "type": "string",
+            "enum": [
+              "US",
+              "UK"
+            ],
+            "title": "Accent"
+          },
+          "ipa": {
+            "$ref": "#/components/schemas/Text-Output"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "accent",
+          "ipa"
+        ],
+        "title": "Pronunciation"
+      },
+      "Rank": {
+        "type": "integer",
+        "maximum": 9.223372036854776e+18,
+        "minimum": 0.0
+      },
+      "Text-Output": {
+        "type": "string",
+        "maxLength": 10000
+      },
       "UserPreferences": {
         "properties": {
           "theme": {
@@ -1822,6 +3272,15 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "app__domain__overrides__Text__1": {
+        "type": "string",
+        "maxLength": 10000
+      },
+      "app__domain__overrides__Text__2": {
+        "type": "string",
+        "maxLength": 10000,
+        "minLength": 1
       }
     },
     "securitySchemes": {
