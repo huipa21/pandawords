@@ -34,10 +34,27 @@ The images agent was notified before integration. Other additions require coordi
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 4.4.2 | task/4.4.2-graph-ui | ../pandawords.worktrees/4.4.2 | Agent running |
+| 4.4.2 | task/4.4.2-graph-ui | ../pandawords.worktrees/4.4.2 | Merged e1edc02; visual follow-up for fit/search controls running |
 | 4.4.4 | task/4.4.4-context-exercises | ../pandawords.worktrees/4.4.4 | Agent running |
 | 4.4.3 | task/4.4.3-relations | ../pandawords.worktrees/4.4.3 | Waiting for 4.4.2 |
 | 5.1.3 | task/5.1.3-image-review | ../pandawords.worktrees/5.1.3 | Agent running |
+
+### Phase 6 run (separate coordinator)
+
+Request: implement Phase 6 ([phase-6.md](phase-6.md)) with dependency-driven parallel agents (max five
+concurrent), merge all task branches to main, then remove task branches/worktree folders.
+Dependency check: 3.1.1, 4.2.1, 4.3.1, 5.1.1, 1.6.4 are ✅, so 6.1.1 and 6.1.5 are ready.
+Main state at start (`2b84093`): uncommitted `ReadingPage.vue` and untracked `e2e/context-graph.spec.ts`
+plus 4.4.4/5.1.3 worktree changes belong to the concurrently active Phase 4/5 run (files modified
+minutes earlier). Decision (user unavailable; pragmatic option): leave that work untouched, commit only
+Phase 6 files by explicit path, and run Phase 6 in isolated worktrees. Migration allocation: Phase 6
+uses 0022 (6.1.1-6.1.4 chain) and 0023 (6.1.5) only if a concrete schema need arises; 0020 stays
+reserved for 5.1.3. Chain: 6.1.1 → 6.1.2 → 6.1.3 → 6.1.4; 6.1.5 parallel; 6.1.6 last.
+
+| Task | Branch | Worktree | State / notes |
+|---|---|---|---|
+| 6.1.1 | task/6.1.1-bundle-format | ../pandawords.worktrees/6.1.1 | Agent running |
+| 6.1.5 | task/6.1.5-site-backup | ../pandawords.worktrees/6.1.5 | Agent running |
 
 ## Blocked
 
@@ -78,6 +95,24 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
   an explicit bounded lease for prefetched attempts.
 - Blockers / follow-ups: none.
 
+### 2026-11-15 — Cross-feature desktop/mobile browser verification
+- Result / completed: `ac3de8b` adds real-stack isolated-learner passage ingestion, project-only
+  highlights, ambiguous unlinked state, project tree/graph switching, all-words focus and actual
+  mobile width assertions/screenshots. Cleanup deletes only its passage/project and disables learner.
+- Dependencies: reading, graph API/UI implementation and prior auth/project flows verified.
+- Verification: real Chromium flow passed (12.9 seconds); main check and 13 reading/router cases
+  passed. Desktop 1440 and mobile 390 screenshots inspected.
+- Failures / causes / corrections: initial browser test exposed reading grid intrinsic-track
+  overflow for long project names; `grid-cols-1` fixes that root cause. Missing navigation.reading
+  translations corrected in both locales during graph integration. Initial test typing and one
+  diagnostic expression syntax issue fixed before passing.
+- Findings: viewport-resizing a previously open Naive select can leave its hidden, empty desktop
+  overlay width in the document. Mobile acceptance loads each page at its target viewport; no
+  library internals or global overflow masking were changed.
+- Skipped / deferred: graph auto-fit/search mobile usability follow-up requested from graph agent;
+  final design-preview/theme screenshots and post-integration full sweep remain.
+- Blockers / follow-ups: graph follow-up before 4.4.2 is marked complete.
+
 ### 2026-11-15 — 4.2.3 Reading and inline vocabulary
 - Result / completed: `865a5ae` merged as `c56af3a`; reachable bilingual passage library/ingestion,
   effective project-only highlights, explicit sense selection and resumable add/link drafts.
@@ -86,7 +121,8 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
   combined API, check, same 10 backend and 16 reading/router/add-dialog frontend cases passed.
 - Failures / causes / corrections: initial typing/lint/mock issues fixed. No merge conflict.
 - Skipped / deferred: final full suites/real-browser visual verification later; no migration/provider.
-- Blockers / follow-ups: none; task cleanup pending.
+- Blockers / follow-ups: none; task branch/folder safely removed after unlinking 1,631 reparse points
+  without following targets.
 
 ### 2026-11-15 — 4.3.2 Evidenced morphology and groups
 - Result / completed: `1c219be` merged as `da068b4`; source-backed ordered morphemes/provenance,
