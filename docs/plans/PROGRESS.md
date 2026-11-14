@@ -19,7 +19,6 @@ browser logs will be committed as source.
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
 | 2.6.4 | task/2.6.4-project-tree-ui | ../pandawords.worktrees/2.6.4 | Starting; tree rendering, hide/unhide and undo |
-| 2.6.5 | task/2.6.5-lemma-detail | ../pandawords.worktrees/2.6.5 | Starting; effective values, edits, notes and audio |
 
 ## Blocked
 
@@ -45,6 +44,18 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 2.6.5 Lemma detail
+- Result / completed: effective lemma detail, override editing/reset, notes and authenticated
+  audio playback with object-URL cleanup; `8a53fa3` merged as `4388b00`.
+- Dependencies: 2.3.3, 2.5.2 and 2.6.1 checked ✅.
+- Verification: agent `check`, frontend suite and production build passed. Main merge `check`
+  and combined backend/frontend passed (556 backend, existing Starlette warning).
+- Failures / causes / corrections: interrupted uncommitted task resumed in its existing
+  worktree; parallel localization conflict resolved by retaining both languages and features.
+  Agent reran an initially timed-out concurrent test suite successfully.
+- Skipped / deferred: integrated browser flow belongs to 2.6.6; no blockers.
+  Branch/worktree removed after verification; tree UI links to `/words/:lemmaId`.
 
 ### 2026-11-14 — 2.3.4 Effective project tree API
 - Result / completed: owner-scoped paginated effective tree and reversible visibility API;
