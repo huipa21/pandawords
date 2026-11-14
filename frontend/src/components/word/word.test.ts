@@ -54,6 +54,32 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
+describe('controlled audio', () => {
+  it('only emits requests when playback is managed externally', async () => {
+    const play = vi.fn()
+    vi.stubGlobal('Audio', class {
+      play = play
+      pause = vi.fn()
+    })
+    const wrapper = render(PronunciationChip, {
+      ipa: 'rʌn',
+      accent: 'US',
+      audioUrl: 'blob:external',
+      playbackState: 'stopped',
+    })
+    await wrapper.get('button').trigger('click')
+    expect(wrapper.emitted('play')).toEqual([
+      ['blob:external'],
+    ])
+    expect(play).not.toHaveBeenCalled()
+    await wrapper.setProps({ playbackState: 'playing' })
+    expect(wrapper.get('button').attributes('aria-pressed')).toBe('true')
+    await wrapper.get('button').trigger('click')
+    expect(wrapper.emitted('play')).toHaveLength(2)
+    expect(play).not.toHaveBeenCalled()
+  })
+})
+
 describe('word sense selection', () => {
   it('defaults to common visible senses across lexemes and preserves explicit empty selection', async () => {
     const wrapper = render(SenseSelectList, { candidates })

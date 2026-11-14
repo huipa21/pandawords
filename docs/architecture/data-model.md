@@ -268,6 +268,25 @@ and rolls back the whole write rather than taking ownership. Shared edge IDs are
 their type and source. This preserves repeated morphemes and distinct relation provenance.
 No new schema/migration is needed.
 
+### Lemma detail frontend (2.6.5)
+
+The `word` route reads `DictionaryEntryRead` and treats its JSON `fields` as untrusted values,
+mapping only checked strings, arrays and objects into shared presentation models. It does not
+reconstruct effective values locally or infer project membership. Own override reads supply
+customization markers; a missing override (404) is normal. Edits PATCH the selected target
+without replacing unrelated overlay fields; Chinese gloss edits merge without deleting other
+languages. Reset DELETE removes the complete own overlay and re-reads effective data.
+
+Notes are queried and mutated for the selected visible lemma, lexeme or sense using generated
+contracts. Saved annotations are server-backed and therefore survive project navigation and
+reload; unsaved drafts survive in memory within the same signed-in session, never browser
+storage. Frontend controls do not substitute for backend owner checks.
+
+`lexemes[*].lexeme.fields.pron[*].audio` is an opaque media record ID. Protected media must be
+fetched with bearer authentication, not assigned directly to an HTML audio source. The detail
+page converts nonempty authenticated blobs into object URLs and disposes playback, requests
+and URLs when leaving the lemma.
+
 ### User dictionary HTTP contract (2.3.3)
 
 All routes below require an enabled, password-changed bearer user, return `Cache-Control:
