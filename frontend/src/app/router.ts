@@ -7,8 +7,6 @@ import AuthLayout from './layouts/AuthLayout.vue'
 const placeholder = () => import('./pages/PlaceholderPage.vue')
 
 const pages = [
-  ['projects', 'projects', 'projects'],
-  ['projects/:id', 'project', 'project'],
   ['projects/:id/review', 'project-review', 'review'],
   ['projects/:id/plan', 'project-plan', 'plan'],
   ['review', 'review', 'review'],
@@ -22,6 +20,30 @@ const pages = [
 export function createAppRouter(history: RouterHistory = createWebHistory()) {
   const children: RouteRecordRaw[] = [
     { path: '', redirect: '/projects' },
+    {
+      path: 'projects',
+      name: 'projects',
+      component: () => import('@/features/projects/ProjectsPage.vue'),
+      meta: { title: 'projects' },
+    },
+    {
+      path: 'projects/new',
+      name: 'project-create',
+      component: () => import('@/features/projects/ProjectEditorPage.vue'),
+      meta: { title: 'projectCreate' },
+    },
+    {
+      path: 'projects/:id/edit',
+      name: 'project-edit',
+      component: () => import('@/features/projects/ProjectEditorPage.vue'),
+      meta: { title: 'projectEdit' },
+    },
+    {
+      path: 'projects/:id',
+      name: 'project',
+      component: () => import('@/features/projects/ProjectPage.vue'),
+      meta: { title: 'project' },
+    },
     {
       path: 'admin/users',
       name: 'admin-users',
