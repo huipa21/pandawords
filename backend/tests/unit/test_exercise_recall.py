@@ -90,6 +90,7 @@ async def test_listen_restricts_to_spoken_form_and_no_pregrade_key() -> None:
         "input": "text",
         "choices": (),
         "media_id": "opaque",
+        "media_attribution": None,
     }
     for answer in ("run", " RUN\t", "Ｒｕｎ"):
         assert plugin.grade(result.private, answer).correct

@@ -7,8 +7,9 @@ from app.core.config import Settings
 from app.core.errors import AppError
 from app.core.security import invalid_credentials
 from app.domain.auth import AuthRead, AuthTokens, LoginRequest, PasswordChange, User, UserRead
+from app.domain.review_preferences import ReviewPreferences, ReviewPreferencesUpdate
 from app.domain.srs import SrsPreferences, SrsPreferencesUpdate
-from app.services import auth, srs
+from app.services import auth, review_preferences, srs
 from app.services.login_backoff import LoginBackoff
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
@@ -121,3 +122,19 @@ async def patch_srs_preferences(
 ) -> SrsPreferences:
     response.headers["Cache-Control"] = "no-store"
     return await srs.update_preferences(db, user.id, data)
+
+
+@router.get("/me/review-preferences")
+async def read_review_preferences(
+    response: Response, db: Db, user: CurrentUser
+) -> ReviewPreferences:
+    response.headers["Cache-Control"] = "no-store"
+    return await review_preferences.read(db, user.id)
+
+
+@router.patch("/me/review-preferences")
+async def patch_review_preferences(
+    data: ReviewPreferencesUpdate, response: Response, db: Db, user: CurrentUser
+) -> ReviewPreferences:
+    response.headers["Cache-Control"] = "no-store"
+    return await review_preferences.update(db, user.id, data)

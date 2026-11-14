@@ -24,6 +24,7 @@ class ExercisePrompt(ExerciseModel):
     input: Literal["choice", "text"]
     choices: tuple[Choice, ...] = ()
     media_id: str | None = None
+    media_attribution: str | None = None
 
 
 class AnswerSpec(ExerciseModel):

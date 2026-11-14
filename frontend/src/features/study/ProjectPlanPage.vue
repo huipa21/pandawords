@@ -11,6 +11,7 @@ import ProjectForm from '@/features/projects/ProjectForm.vue'
 import { useProject } from '@/features/projects/useProject'
 import ExamSummary from './ExamSummary.vue'
 import RetentionSettings from './RetentionSettings.vue'
+import ReviewMediaSettings from './ReviewMediaSettings.vue'
 import SenseOrderEditor from './SenseOrderEditor.vue'
 import StudyCounts from './StudyCounts.vue'
 import StudyForecast from './StudyForecast.vue'
@@ -86,6 +87,7 @@ async function submit(body: ProjectCreate) {
       </NCard>
       <SenseOrderEditor :key="id" :project-id="id" @saved="plan.load" />
       <RetentionSettings :key="id" />
+      <ReviewMediaSettings :key="id" />
     </template>
   </section>
 </template>

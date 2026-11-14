@@ -106,6 +106,63 @@ describe('project review session', () => {
       duration_ms: expect.any(Number),
     })
   })
+  it.each(['en', 'zh-CN'] as const)('renders protected image recall, retries unavailable media and releases blobs in %s', async (locale) => {
+    vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:review-image')
+    const revoke = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {})
+    let mediaCalls = 0
+    client.GET.mockImplementation(async (url: string) => {
+      if (url === '/api/media/{rid}') {
+        mediaCalls++
+        return mediaCalls === 1
+          ? failure('media.not_found', null, 404)
+          : success(new Blob(['image'], { type: 'image/png' }))
+      }
+      return success(queued)
+    })
+    client.POST.mockResolvedValueOnce(success({
+      ...open,
+      exercise: 'image2word',
+      kind: 'recall',
+      prompt: {
+        text: '',
+        input: 'text',
+        media_id: 'media:opaque',
+        media_attribution: 'Photo by Alice',
+      },
+    }))
+    const app = await render(locale)
+    expect(app.wrapper.findComponent({ name: 'AudioButton' }).exists()).toBe(false)
+    expect(app.wrapper.text()).not.toContain('bank')
+    expect(app.wrapper.get('[data-testid="review-image"]').text()).toContain(locale === 'en'
+      ? 'This image is unavailable.'
+      : '此图片暂不可用。')
+    await button(locale === 'en'
+      ? 'Retry'
+      : '重试').trigger('click')
+    await flushPromises()
+    expect(app.wrapper.get('img').attributes('src')).toBe('blob:review-image')
+    expect(app.wrapper.get('img').attributes('alt')).toBe(locale === 'en'
+      ? 'Private vocabulary image'
+      : '私人词汇图片')
+    expect(app.wrapper.get('[data-testid="review-image-attribution"]').text()).toContain('Photo by Alice')
+    expect(client.GET).toHaveBeenLastCalledWith('/api/media/{rid}', expect.objectContaining({
+      params: {
+        path: { rid: 'media:opaque' },
+      },
+      parseAs: 'blob',
+      signal: expect.any(AbortSignal),
+    }))
+    await app.wrapper.get('img').trigger('error')
+    expect(revoke).toHaveBeenCalledWith('blob:review-image')
+    await button(locale === 'en'
+      ? 'Retry'
+      : '重试').trigger('click')
+    await flushPromises()
+    cleanup?.()
+    cleanup = undefined
+    expect(revoke).toHaveBeenCalledTimes(2)
+    vi.restoreAllMocks()
+  })
 
   it('uses server-owned hints and permits give-up without an answer', async () => {
     client.POST.mockImplementation((url: string) => Promise.resolve(success(

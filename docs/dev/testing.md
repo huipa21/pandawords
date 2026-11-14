@@ -1,5 +1,58 @@
 # Testing
 
+## Image review and review media preferences (5.1.3)
+
+Against the already-running loopback 8101 server, from `backend`:
+
+```powershell
+uv run --no-sync pytest -q --basetemp=.pytest_image_regression tests\unit\test_exercise_image.py tests\unit\test_exercise_recall.py tests\unit\test_exercise_framework.py tests\api\test_image_review.py tests\api\test_review_preferences.py tests\api\test_recall_attempts.py tests\api\test_exercise_attempts.py tests\api\test_srs_preferences.py tests\integration\test_review_media_migration.py tests\integration\test_auth_schema.py tests\integration\test_srs_migration.py tests\integration\test_schema_snapshot.py
+uv run --no-sync pytest -q --basetemp=.pytest_production_image tests\api\test_production_image_review.py
+```
+
+These passed **119 + 1 tests**. The production-registry test uses the same legitimate fixture
+content as the browser: a mature `schedule` card, an answer-free local calendar image, private
+empty definition/gloss/examples, disabled audio and disabled LLM. Thus only image recall is
+eligible without altering production selection, adding a force-type endpoint or depending on RNG.
+Other cases cover exact target/owner, stable multiple-image selection, actual file-byte decode,
+missing/corrupt/deleted media, encoded attribution leaks, normalized selected forms, wrong/give-up
+answers, migration/replay/defaults, partial preferences, accent, isolation and already-issued
+image/audio grading after toggles. Existing weights and new/learning recognition are retained.
+
+From `frontend`, the affected regression run passed **73 tests**:
+
+```powershell
+pnpm exec vitest run src\features\study src\features\words\SenseImages.test.ts src\features\words\MnemonicNotes.test.ts src\features\admin\AdminUsersPage.test.ts src\features\auth --maxWorkers=2 --testTimeout=60000 --reporter=dot
+pnpm exec playwright test image-review.spec.ts --list
+```
+
+`dev.ps1 gen-api`, `dev.ps1 check`, production `pnpm run build`, browser-test TypeScript
+compilation and browser collection passed. Snapshot regeneration used the existing
+`--update-snapshot` option and subsequent comparison passed. Initial checks caught and corrected
+formatter/import issues, new required auth-fixture fields, an incorrectly nested frontend test,
+a misplaced decoder-error callback and a non-token spacing step. The migration test exposed
+the simultaneous-bool-backfill requirement recorded in `surrealdb-notes.md`.
+
+The browser selector is **`image-review.spec.ts`**, test name
+**`fixture image review authenticates blobs, persists preferences and confirms exactly once after retry`**.
+Run it against the coordinator's integrated fixture-backed dev stack with `LLM_DAILY_BUDGET=0`,
+`AUDIO_NETWORK_ENABLED=false`, the existing admin credentials and dev DB connection environment:
+
+```powershell
+pnpm exec playwright test image-review.spec.ts
+```
+
+It creates/disables its own `e2e_image_*` learner and removes its own image/project, completes
+mandatory password change, exercises keyboard toggles/accent and both preference states, verifies
+real authenticated calendar pixels after a failed delivery/retry, deletes/reloads the issued
+image, answers via Enter and retries a confirmation whose first response was lost **after** the
+server persisted it. The receipt and daily review count remain exactly one across reload.
+`backend\scripts\seed_image_review.py` only matures the named isolated learner's fixture card
+in a loopback development database; no HTTP/runtime test bypass exists. Frontend tests separately
+verify both locales, unavailable/retry states and object-URL revocation on decode failure/unmount.
+The branch did **not** execute the browser against the shared main-source stack or perform any
+8100 migration/service lifecycle/reset operation; final integrated browser execution is deferred
+to the coordinator. Full backend/frontend suites were not run.
+
 ## Phrase discovery and normal add flow (4.1.2)
 
 Using the existing healthy 8101 server, from `backend`:

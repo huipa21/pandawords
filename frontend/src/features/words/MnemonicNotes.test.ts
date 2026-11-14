@@ -34,6 +34,8 @@ const user: components['schemas']['UserRead'] = {
     locale: 'en',
     accent: 'US',
     desired_retention: 0.9,
+    review_images_enabled: true,
+    review_audio_enabled: true,
   },
 }
 let dispose: (() => void) | undefined

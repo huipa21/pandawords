@@ -430,6 +430,76 @@
         ]
       }
     },
+    "/api/auth/me/review-preferences": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Read Review Preferences",
+        "operationId": "read_review_preferences_api_auth_me_review_preferences_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewPreferences"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Patch Review Preferences",
+        "operationId": "patch_review_preferences_api_auth_me_review_preferences_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReviewPreferencesUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReviewPreferences"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/api/jobs/{id}": {
       "get": {
         "tags": [
@@ -5169,6 +5239,17 @@
               }
             ],
             "title": "Media Id"
+          },
+          "media_attribution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Media Attribution"
           }
         },
         "additionalProperties": false,
@@ -7754,6 +7835,76 @@
         ],
         "title": "Resolution"
       },
+      "ReviewPreferences": {
+        "properties": {
+          "review_images_enabled": {
+            "type": "boolean",
+            "title": "Review Images Enabled",
+            "default": true
+          },
+          "review_audio_enabled": {
+            "type": "boolean",
+            "title": "Review Audio Enabled",
+            "default": true
+          },
+          "accent": {
+            "type": "string",
+            "enum": [
+              "US",
+              "UK"
+            ],
+            "title": "Accent",
+            "default": "US"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ReviewPreferences"
+      },
+      "ReviewPreferencesUpdate": {
+        "properties": {
+          "review_images_enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review Images Enabled"
+          },
+          "review_audio_enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review Audio Enabled"
+          },
+          "accent": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "US",
+                  "UK"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accent"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "ReviewPreferencesUpdate"
+      },
       "ReviewReceipt": {
         "properties": {
           "attempt_id": {
@@ -8406,6 +8557,16 @@
             ],
             "title": "Accent",
             "default": "US"
+          },
+          "review_images_enabled": {
+            "type": "boolean",
+            "title": "Review Images Enabled",
+            "default": true
+          },
+          "review_audio_enabled": {
+            "type": "boolean",
+            "title": "Review Audio Enabled",
+            "default": true
           },
           "desired_retention": {
             "type": "number",

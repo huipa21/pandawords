@@ -167,6 +167,28 @@ normalized headword + that effective lexeme's forms. `grade_answer` compares who
 recall answers; choice IDs use exact matching. Listening's audio-form restriction is separate
 from this common normalization.
 
+### Optional image recall and review media (5.1.3)
+
+The request-bound production registry also registers `exercise_image` as recall `image2word`.
+It sorts the learner's exact-sense image IDs, reauthorizes each local record/path and validates
+the current encoded file and every frame using the upload validator. Missing, deleted, corrupt,
+foreign-owner or wrong-target candidates are skipped independently. No provider/LLM call occurs.
+The first usable image is stable until its eligibility changes. Grading reuses the selected
+lexeme's private normalized forms and local grader, including give-up and receipt semantics.
+
+The public image prompt contains an opaque protected media ID, blank generic text and optional
+safe attribution; the client supplies localized generic wording/alt text. Creator/source credit
+is retained verbatim only when it does not contain any selected answer form (including normalized
+Unicode, HTML entities and URL encoding). Otherwise the image is skipped rather than suppressing
+required credit. Pixabay rows without attribution are also unavailable.
+
+`GET/PATCH /api/auth/me/review-preferences` reads/updates only the current learner's strict boolean
+`review_images_enabled` / `review_audio_enabled` (default true), and existing `accent` (`US`/`UK`).
+PATCH is nonempty, non-null and partial; it preserves theme, locale and desired retention.
+New attempt selection skips `image2word`/`listen` when disabled; grading always retains the full
+registry, so toggling or deleting an image after issuance does not invalidate its private answer
+or confirmation. New/learning recognition and existing review-kind weights are unchanged.
+
 ### Offline recall (3.2.4)
 
 `exercise_cloze.register(registry)` uses effective selected-sense examples. It normalizes the

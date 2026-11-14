@@ -7,6 +7,7 @@ import PageHeader from '@/components/app/PageHeader.vue'
 import ExerciseShell from '@/components/exercise/ExerciseShell.vue'
 import ReviewProgress from '@/components/exercise/ReviewProgress.vue'
 import AudioButton from '@/components/word/AudioButton.vue'
+import ProtectedImage from '@/features/words/ProtectedImage.vue'
 import { usePronunciation } from '@/features/words/usePronunciation'
 import { useAuthStore } from '@/stores/auth'
 import { useReviewSession } from './useReviewSession'
@@ -61,7 +62,7 @@ function exit() {
   })
 }
 function play() {
-  if (attempt.value?.prompt.media_id)
+  if (attempt.value?.exercise !== 'image2word' && attempt.value?.prompt.media_id)
     void audio.play(attempt.value.prompt.media_id)
 }
 </script>
@@ -104,8 +105,14 @@ function play() {
       @hint="hint" @exit="exit" @audio="play"
     >
       <template #prompt>
-        <span>{{ attempt.prompt.text }}</span>
-        <div v-if="attempt.prompt.media_id" class="mt-4 flex flex-wrap items-center justify-center gap-3">
+        <span>{{ attempt.exercise === 'image2word' ? t('session.imagePrompt') : attempt.prompt.text }}</span>
+        <div v-if="attempt.exercise === 'image2word' && attempt.prompt.media_id" class="mt-4 grid gap-3" data-testid="review-image">
+          <ProtectedImage :media-id="attempt.prompt.media_id" />
+          <p v-if="attempt.prompt.media_attribution" class="text-sm text-muted" data-testid="review-image-attribution">
+            {{ t('session.imageAttribution', { attribution: attempt.prompt.media_attribution }) }}
+          </p>
+        </div>
+        <div v-else-if="attempt.prompt.media_id" class="mt-4 flex flex-wrap items-center justify-center gap-3">
           <AudioButton
             :playback-state="audio.playing.value ? 'playing' : 'stopped'"
             :disabled="audio.loading.value" @play="play"

@@ -24,7 +24,7 @@ from app.domain.exercises import (
     ExerciseFeedback,
 )
 from app.domain.srs import FrameworkGrade, fingerprint
-from app.services import srs
+from app.services import review_preferences, srs
 from app.services.exercise_answers import selected_lexeme_forms
 from app.services.exercise_registry import ExerciseRegistry, registry
 
@@ -99,7 +99,16 @@ async def create_attempt(
         update={"forms": selected_lexeme_forms(context.lemma, context.lexeme)}
     )
     memory = await srs.read_memory(db, owner, data.sense_id)
-    selection = await plugins.select(context, memory)
+    prefs = await review_preferences.read(db, owner)
+    disabled = frozenset(
+        exercise
+        for exercise, enabled in (
+            ("image2word", prefs.review_images_enabled),
+            ("listen", prefs.review_audio_enabled),
+        )
+        if not enabled
+    )
+    selection = await plugins.select(context, memory, disabled=disabled)
     issued = _now()
     attempt = Attempt(
         id=uuid4().hex,

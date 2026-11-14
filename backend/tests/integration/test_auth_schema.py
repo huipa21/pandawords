@@ -40,9 +40,13 @@ async def test_duplicate_username_rejected(
         key: value for key, value in user_attributes.items() if key != "prefs"
     }
     assert first["prefs"]["desired_retention"] == 0.9
-    assert {key: value for key, value in first["prefs"].items() if key != "desired_retention"} == (
-        user_attributes["prefs"]
-    )
+    assert first["prefs"]["review_images_enabled"] is True
+    assert first["prefs"]["review_audio_enabled"] is True
+    assert {
+        key: value
+        for key, value in first["prefs"].items()
+        if key not in {"desired_retention", "review_images_enabled", "review_audio_enabled"}
+    } == user_attributes["prefs"]
     with pytest.raises(MigrationError, match="user_username"):
         await create_user(auth_db, user_attributes)
     other = await create_user(auth_db, {**user_attributes, "username": "other", "role": "admin"})
