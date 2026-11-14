@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Response
+from starlette.responses import FileResponse
 
 from app.api.dependencies import Db, current_user, get_settings
 from app.core.config import Settings
@@ -21,12 +22,13 @@ async def get_media(
     settings: Annotated[Settings, Depends(get_settings)],
     user: Annotated[User, Depends(current_user)],
 ) -> Response:
-    internal_uri, mime = await media.delivery(db, settings, rid, user.id)
-    return Response(
-        headers={
-            "X-Accel-Redirect": internal_uri,
-            "Content-Type": mime,
-            "Cache-Control": "private, no-store",
-            "X-Content-Type-Options": "nosniff",
-        }
-    )
+    internal_uri, mime, path = await media.delivery(db, settings, rid, user.id)
+    headers = {
+        "X-Accel-Redirect": internal_uri,
+        "Content-Type": mime,
+        "Cache-Control": "private, no-store",
+        "X-Content-Type-Options": "nosniff",
+    }
+    if settings.app_env == "development":
+        return FileResponse(path, media_type=mime, headers=headers)
+    return Response(headers=headers)

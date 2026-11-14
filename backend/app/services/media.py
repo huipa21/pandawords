@@ -102,7 +102,8 @@ async def read(db: AsyncSurrealConnection, settings: Settings, rid: str, owner: 
 
 async def delivery(
     db: AsyncSurrealConnection, settings: Settings, rid: str, owner: str
-) -> tuple[str, str]:
-    """Return only the validated internal nginx URI and MIME type."""
+) -> tuple[str, str, Path]:
+    """Authorize delivery and resolve its contained file path."""
     media = await _load(db, settings, rid, owner)
-    return f"/_media/{media.path}", media.mime
+    path = await asyncio.to_thread(_file, settings.media_dir, media.path)
+    return f"/_media/{media.path}", media.mime, path

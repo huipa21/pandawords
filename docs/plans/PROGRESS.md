@@ -19,7 +19,6 @@ browser logs will be committed as source.
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
 | 2.3.4 | task/2.3.4-project-tree-api | ../pandawords.worktrees/2.3.4 | Starting; membership/effective tree and reversible visibility |
-| 2.4.3 | task/2.4.3-enrichment | ../pandawords.worktrees/2.4.3 | Starting; relation/tag/frequency worker |
 | 2.6.5 | task/2.6.5-lemma-detail | ../pandawords.worktrees/2.6.5 | Starting; effective values, edits, notes and audio |
 | 2.6.3 | task/2.6.3-add-dialog | ../pandawords.worktrees/2.6.3 | Starting; candidates, selection and job status |
 
@@ -47,6 +46,29 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — Development media playback integration
+- Result / completed: development media now streams authorized validated bytes without nginx;
+  production keeps X-Accel-only delivery. Authenticated blob/object-URL playback documented.
+- Dependencies: discovered while integrating 2.5.2 and starting 2.6.5.
+- Verification: existing passing test proved development responses had zero bytes; Pylance
+  references identified the sole delivery caller. After fix, both environment modes retain
+  target/owner/path isolation; 26 media/audio tests passed, Ruff format/check and basedpyright
+  passed. Production offload and privacy headers unchanged.
+- Failures / causes / corrections: original contract required nginx even for Vite-only dev
+  stack, so available audio could not play there. Added environment-gated file streaming.
+- Skipped / deferred: live external providers remain unrun; no blocker for offline UI.
+
+### 2026-11-14 — 2.4.3 Graph enrichment worker
+- Result / completed: registered enrichment with shared task-local worker context, idempotent
+  relations/derivations/frequency/exam provenance, migration 0010; `4638101` merged.
+- Dependencies: 2.4.2 checked ✅.
+- Verification: agent focused 29, backend 488, snapshot 10 and final enrichment 7 passed,
+  `check` passed. Main combined workers `check` and backend/frontend passed (551 backend).
+- Failures / causes / corrections: registry/docs conflicts resolved preserving both audio
+  and enrich handlers and verified findings. Shared context/runtime patches were identical.
+- Skipped / deferred: none for offline enrichment; E2E remains final task.
+  No blockers. Branch/worktree removed after verification.
 
 ### 2026-11-14 — 2.5.2 Pronunciation audio worker
 - Result / completed: registered context-aware audio handler, source-first/throttled Wikimedia,

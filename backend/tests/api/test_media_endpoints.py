@@ -2,6 +2,7 @@ import asyncio
 from collections.abc import Iterator
 from pathlib import Path
 from tempfile import TemporaryDirectory
+from typing import Literal
 
 import pytest
 from httpx import AsyncClient
@@ -28,12 +29,15 @@ def media_directory(test_settings: Settings, monkeypatch: pytest.MonkeyPatch) ->
         yield root
 
 
+@pytest.mark.parametrize("app_env", ["development", "production"])
 async def test_media_access_isolation_and_target_visibility(
     client: AsyncClient,
     db: AsyncWsSurrealConnection,
     make_user: UserFactory,
     test_settings: Settings,
+    app_env: Literal["development", "production"],
 ) -> None:
+    test_settings.app_env = app_env
     owner, other = await make_user(), await make_user()
     owner_headers = bearer(await login(client, owner.username))
     other_headers = bearer(await login(client, other.username))
@@ -71,7 +75,7 @@ async def test_media_access_isolation_and_target_visibility(
     ):
         response = await client.get(f"/api/media/{rid}", headers=headers)
         assert response.status_code == 200
-        assert response.content == b""
+        assert response.content == (b"recording" if app_env == "development" else b"")
         assert response.headers["x-accel-redirect"].startswith("/_media/audio/")
         assert response.headers["content-type"] == "audio/mpeg"
         assert response.headers["cache-control"] == "private, no-store"
