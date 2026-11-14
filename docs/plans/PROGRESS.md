@@ -20,7 +20,6 @@ browser logs will be committed as source.
 |---|---|---|---|
 | 2.3.4 | task/2.3.4-project-tree-api | ../pandawords.worktrees/2.3.4 | Starting; membership/effective tree and reversible visibility |
 | 2.6.5 | task/2.6.5-lemma-detail | ../pandawords.worktrees/2.6.5 | Starting; effective values, edits, notes and audio |
-| 2.6.3 | task/2.6.3-add-dialog | ../pandawords.worktrees/2.6.3 | Starting; candidates, selection and job status |
 
 ## Blocked
 
@@ -46,6 +45,18 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 2.6.3 Add-word dialog and asynchronous job status
+- Result / completed: responsive candidate search/selection/add, common defaults, recoverable
+  errors/repeat adds and cancellation-safe shared JobStatus; `f1edf70` merged.
+- Dependencies: 2.4.2, 2.6.1 and 2.6.2 checked ✅.
+- Verification: agent `check`, focused 6 and full frontend 91 passed with two workers after
+  an existing enforcement timeout. Main merge default `check` and combined backend/frontend
+  passed (552 backend), including development media correction.
+- Skipped / deferred: actual full project-word browser flow belongs to 2.6.6; no preview
+  processes started by this task. No unresolved code failures or blockers.
+- Follow-ups: dialog emits `added` and `jobsSettled` for tree refresh integration.
+  Branch/worktree removed after verification.
 
 ### 2026-11-14 — Development media playback integration
 - Result / completed: development media now streams authorized validated bytes without nginx;
