@@ -21,7 +21,6 @@ browser logs will be committed as source.
 | 2.1.2 | task/2.1.2-core-lexicon | ../pandawords.worktrees/2.1.2 | Starting; streaming SQLite builder |
 | 2.3.1 | task/2.3.1-project-schema | ../pandawords.worktrees/2.3.1 | Starting; project and overlays |
 | 2.5.1 | task/2.5.1-media | ../pandawords.worktrees/2.5.1 | Starting; authenticated media |
-| 2.6.1 | task/2.6.1-word-components | ../pandawords.worktrees/2.6.1 | Starting; shared word UI |
 
 ## Blocked
 
@@ -47,6 +46,20 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 2.6.1 Shared word components
+- Result / completed: all 12 requested word components, controlled presentation contracts,
+  bilingual strings and design previews; `9e7e70c` merged.
+- Dependencies: 1.4.4 and 1.4.5 checked ✅.
+- Verification: agent `check`, frontend suite and eight component tests passed. Browser
+  light/dark, 390/1440 widths, selection, local audio and minimum touch sizes verified.
+  Main final `check` and combined backend/frontend passed (321 backend); separate full frontend
+  single-worker run passed 73 tests.
+- Failures / causes / corrections: initial integrated backend failed readiness tests, fixed
+  below. Context-search results accidentally included historical pre-fix component failures;
+  exact current main/worktree focused reruns both passed 8/8; no speculative source change made.
+- Skipped / deferred: authenticated media and page adapters belong to later tasks.
+  No blockers. Branch/worktree removed after verification.
 
 ### 2026-11-14 — Phase 2 readiness-test timing correction
 - Result / completed: isolated the short application-startup deadline from the real database
