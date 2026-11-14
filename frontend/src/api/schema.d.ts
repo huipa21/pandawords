@@ -175,6 +175,43 @@ export interface paths {
     patch: operations['update_user_api_admin_users__id__patch']
     trace?: never
   }
+  '/api/projects': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List Projects */
+    get: operations['list_projects_api_projects_get']
+    put?: never
+    /** Create Project */
+    post: operations['create_project_api_projects_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/projects/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Read Project */
+    get: operations['read_project_api_projects__id__get']
+    put?: never
+    post?: never
+    /** Delete Project */
+    delete: operations['delete_project_api_projects__id__delete']
+    options?: never
+    head?: never
+    /** Update Project */
+    patch: operations['update_project_api_projects__id__patch']
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -273,6 +310,82 @@ export interface components {
       current_password: string
       /** New Password */
       new_password: string
+    }
+    /** ProjectCreate */
+    ProjectCreate: {
+      /** Name */
+      name: string
+      /**
+       * Description
+       * @default
+       */
+      description: string
+      /**
+       * Target Lang
+       * @default en
+       */
+      target_lang: string
+      /**
+       * Source Lang
+       * @default zh
+       */
+      source_lang: string
+      plan?: components['schemas']['ProjectPlan']
+    }
+    /** ProjectPage */
+    ProjectPage: {
+      /** Items */
+      items: components['schemas']['ProjectRead'][]
+      /** Total */
+      total: number
+      /** Page */
+      page: number
+      /** Page Size */
+      page_size: number
+    }
+    /** ProjectPlan */
+    ProjectPlan: {
+      /**
+       * Daily New
+       * @default 20
+       */
+      daily_new: number
+      /** Exam Date */
+      exam_date?: string | null
+      /** Review Cap */
+      review_cap?: number | null
+    }
+    /** ProjectRead */
+    ProjectRead: {
+      /** Id */
+      id: string
+      /** Name */
+      name: string
+      /** Description */
+      description: string
+      /** Target Lang */
+      target_lang: string
+      /** Source Lang */
+      source_lang: string
+      plan: components['schemas']['ProjectPlan']
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string
+    }
+    /** ProjectUpdate */
+    ProjectUpdate: {
+      /** Name */
+      name?: string
+      /** Description */
+      description?: string
+      /** Target Lang */
+      target_lang?: string
+      /** Source Lang */
+      source_lang?: string
+      /** Plan */
+      plan?: components['schemas']['ProjectPlan']
     }
     /** UserPreferences */
     UserPreferences: {
@@ -645,6 +758,166 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['AdminUserResult']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  list_projects_api_projects_get: {
+    parameters: {
+      query?: {
+        page?: number
+        page_size?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ProjectPage']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  create_project_api_projects_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ProjectCreate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ProjectRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  read_project_api_projects__id__get: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ProjectRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  delete_project_api_projects__id__delete: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  update_project_api_projects__id__patch: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ProjectUpdate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ProjectRead']
         }
       }
       /** @description Validation Error */

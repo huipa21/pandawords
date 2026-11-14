@@ -54,6 +54,34 @@ the script only imports the runner. Assertions are the checks: run without Pytho
 
 ## Verified snippets
 
+Task **2.3.2**, **2026-11-14**, verified project repository queries against the existing
+loopback **test** server (**8101**, **surrealdb-3.3.5 / Python 3.14.3 / SDK 3.0.0**)
+using the migrated harness database and unique users/records:
+
+- ✅ Owner-bound `SELECT * FROM project ... ORDER BY created_at DESC, id LIMIT $limit
+  START $start` and `SELECT count() ... WHERE owner = $user GROUP ALL` return isolated
+  pages/counts in one SDK transaction.
+- ✅ `CREATE $project CONTENT $content RETURN AFTER` accepts nested plans with optional
+  Python None fields (database NONE); `UPDATE $project MERGE $changes WHERE owner = $user
+  RETURN AFTER` replaces a supplied plan object and preserves omitted top-level fields.
+  Wrong-owner and absent-target updates return no rows, not new projects.
+- ✅ Inside a UUID SDK transaction, `DELETE includes WHERE in = $project AND owner = $user`
+  then `DELETE $project WHERE owner = $user RETURN BEFORE` removes only the target project and
+  its memberships. Shared/custom target records and reusable notes/overrides survive.
+  The preflight `SELECT id FROM includes WHERE in = $project AND in.owner = $user
+  AND owner != $user LIMIT 1` detects inconsistent cross-owner membership before endpoint
+  deletion can cascade it; the API rejects this state with 409 and no changes.
+
+The focused project API/cleanup suite passed **8 tests**, including validation, authentication,
+not-found, cross-user access, pagination and retained unrelated records. No schema migration,
+dev database access or shared server lifecycle change was needed.
+Final `dev.ps1 check`, `gen-api`, `test -Backend` (**351 passed**, no skips) and
+`test -Frontend` passed; the backend retains the existing Starlette/httpx deprecation warning.
+Initial check/test attempts failed because this new worktree lacked `ruff`/`pytest`;
+`uv sync --frozen` restored the locked backend environment. The existing generation command
+restored its missing local pnpm dependencies. Pylance's file check could not resolve the linked
+worktree file; Ruff and basedpyright successfully validated the Python sources instead.
+
 Task **2.3.1**, **2026-11-14**, verified `0006_project_overlays.surql` on the existing
 loopback **test** server (**8101**, **surrealdb-3.3.5 / Python 3.14.3 / SDK 3.0.0**).
 `tests/integration/test_project_schema.py` uses fresh harness databases, checks INFO field/index
