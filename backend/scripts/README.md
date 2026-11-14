@@ -94,7 +94,32 @@ uv run --no-sync python -m scripts.build_lexicon --ecdict path\ecdict.csv --word
 Default input/output are the main worktree's shared `data\lexicon\raw\kaikki-english.jsonl`
 and `data\lexicon\lexicon.sqlite`. `--words` is a UTF-8 list of lemmas, one per line,
 normalized with `lemma_key`; blank lines are ignored. Both explicit paths avoid needing Git.
-`.\scripts\dev.ps1 lexicon` orchestration/packaging is deferred to 2.1.6.
+`.\scripts\dev.ps1 lexicon` orchestrates downloading and combined enrichment/packaging;
+see [local setup](../../docs/dev/setup.md#lexicon-release). From `backend`, the equivalent
+entrypoint is `uv run --no-sync python -m scripts.lexicon_release` with optional
+`--raw-dir PATH --output PATH --dist-dir PATH --date yyyy-MM-dd`. All three path overrides
+avoid Git lookup; otherwise defaults resolve through the main worktree. Relative overrides
+are relative to the process working directory (`backend` via `dev.ps1`).
+
+The release always composes ECDICT, wordfreq and OEWN, in that order. It retains verified
+download records and database source metadata in the packaged manifest, includes internal
+`SHA256SUMS`, and writes an archive-specific external `.sha256` sidecar. It never replaces
+an existing archive/sidecar or a different existing database. A byte-identical database may
+be reused for another release date. All generated stages live under ignored output paths,
+not the system temporary directory; atomic exclusive publication requires hard-link support.
+Release failures identify the stage and exit nonzero, with stages/new publications removed
+but verified raw downloads preserved. Packaging tests use synthetic sources with a test-only
+OEWN pin and deny network; production retains the official pin.
+
+Focused offline acceptance (including real PowerShell dispatch in a synthetic main/linked
+Git worktree pair) from `backend`:
+
+```powershell
+New-Item -ItemType Directory -Force .dev | Out-Null
+uv run --no-sync pytest tests\unit\test_lexicon_release.py tests\unit\test_lexicon_release_command.py --basetemp=.dev\lexicon-release-tests -q
+```
+
+From the root: `pwsh -NoProfile -File .\scripts\tests\lexicon.Tests.ps1`.
 
 The builder hashes input without retaining it and reads JSONL one entry at a time with `orjson`.
 Lines larger than 16 MiB fail explicitly; SQLite has an 8 MiB page cache and disk-backed
@@ -264,8 +289,9 @@ An explicit-path production wrapper is also available from `backend`:
 uv run --no-sync python -m scripts.lexicon_oewn --kaikki path\kaikki.jsonl --oewn path\english-wordnet-2025.xml.gz --output path\lexicon.sqlite
 ```
 
-This wrapper does not change the core CLI or shared defaults. Combined enrichment and release
-orchestration can compose the hook with other enrichers; there are no new dependencies.
+The core CLI also accepts `--oewn PATH`; it runs OEWN after any requested ECDICT/wordfreq
+hooks. Without the flag the core builder retains its existing behavior. Combined enrichment
+and release orchestration use the same hook; there are no new dependencies.
 
 The parser consumes `LexicalEntry/Lemma` (`writtenForm`, `partOfSpeech`), `Sense`
 (`id`, `synset`), `SenseRelation` (`relType`, `target`), and `Synset`

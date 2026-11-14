@@ -14,11 +14,12 @@
 Field names in kaikki and ECDICT must be checked against the real files in task 2.1.x. Record them in
 `backend/scripts/README.md`.
 
-## Build (offline, `dev.ps1 lexicon`)
+## Download, offline build and release (`dev.ps1 lexicon`)
 
 ```
 download → data/lexicon/raw/   (kaikki .jsonl, ecdict.csv, OEWN .xml.gz; manifest.json)
 build    → data/lexicon/lexicon.sqlite   (read-only at runtime)
+package  → dist/pandawords-lexicon-yyyy-MM-dd.tar.gz + .tar.gz.sha256
 ```
 
 Downloads are independent of the builder: from `backend`, run
@@ -38,7 +39,25 @@ Observed fields, exact source URLs, licenses, recovery instructions and commands
 The English-only kaikki endpoint is deprecated upstream; the proposed raw replacement is
 multilingual, so it must not be silently substituted. Full dataset downloads are not test inputs.
 The core SQLite builder is available as `uv run --no-sync python -m scripts.build_lexicon`
-from `backend`; `dev.ps1 lexicon` orchestration remains task 2.1.6.
+from `backend`. `dev.ps1 lexicon` orchestrates the verified downloader and the ordered
+ECDICT → wordfreq → OEWN hooks, never disabling enrichment implicitly. Both main and linked
+worktrees share the main worktree's ignored raw data, SQLite output and `dist`. Explicit
+`-RawDir`, `-Output`, `-DistDir` and `-Date` flags isolate snapshots without editing `.env.dev`.
+The Python entrypoint is `python -m scripts.lexicon_release` with corresponding
+`--raw-dir`, `--output`, `--dist-dir` and `--date` options.
+
+The release archive contains exactly `lexicon.sqlite`, `manifest.json` and `SHA256SUMS`.
+The manifest preserves download records and all database source attributions, including
+wordfreq's installed version, plus database schema version, SHA-256, size and build counts.
+Internal checksums cover SQLite and the manifest; an adjacent archive-specific `.sha256`
+covers the compressed transfer bytes without changing application-release `SHA256SUMS`.
+No raw datasets or private environment files are packaged; the lexicon remains outside site
+backups. Publication uses private sibling stages and exclusive atomic hard links (the target
+filesystem must support them), with the archive published last as the completion marker.
+Existing archives/sidecars are refused, and a mismatched existing database is never replaced.
+Failures report `prepare`, `download:<source>`, `build`, `package` or `publish`, exit nonzero
+and remove private stages/new outputs; successfully downloaded raw inputs remain cached.
+Concurrent builds of the same output directory are refused by a release lock.
 
 - `lexicon.sqlite` tables: `lemma`, `lexeme`, `sense`, `pron`, `form`, `relation`, `zh_gloss`,
   `exam_tag`, `freq`, `affix`, plus `form_index(form → lemma)` for inflection lookup.
@@ -82,7 +101,8 @@ from `backend`; `dev.ps1 lexicon` orchestration remains task 2.1.6.
 
 ### ECDICT/wordfreq selection (2.1.3)
 
-The builder's independent `--ecdict PATH` / `--wordfreq` flags opt into offline enrichment.
+The builder's independent `--ecdict PATH` / `--wordfreq` / `--oewn PATH` flags opt into offline
+enrichment. The release command always enables all three, in that order.
 The typed `ecdict_enricher(path)` and `wordfreq_enricher()` factories expose callable hooks
 and result counters for fixture/release orchestration. Missing requested sources fail explicitly;
 neither flag implies a download. ECDICT attribution includes the CSV checksum/verified manifest;

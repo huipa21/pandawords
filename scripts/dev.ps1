@@ -244,6 +244,7 @@ Commands:
   reset-db  Stop the dev database and delete its data volume
   gen-api   Export OpenAPI offline and regenerate frontend API types in this worktree
   release -Version x.y.z  Build linux/amd64 images and deployment archives in dist
+  lexicon [-RawDir path] [-Output path] [-DistDir path] [-Date yyyy-MM-dd]  Build a lexicon release
   test [-Backend] [-Frontend] [-E2E] [-UpdateSnapshot]  Select tests; default excludes E2E
 '@ | Write-Host
 }
@@ -266,6 +267,10 @@ switch ($Command.ToLowerInvariant()) {
     'release' {
         . (Join-Path $PSScriptRoot 'release.ps1')
         Invoke-Release -Arguments $CommandArgs
+    }
+    'lexicon' {
+        . (Join-Path $PSScriptRoot 'lexicon.ps1')
+        Invoke-Lexicon -Arguments $CommandArgs
     }
     'test' {
         . (Join-Path $PSScriptRoot 'quality.ps1')
