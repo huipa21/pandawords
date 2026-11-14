@@ -9,13 +9,19 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 
 ## Current run
 
-Request: resume and complete Phase 1, proceeding through waves in dependency order.
-Result: Phase 1 is complete. All 29 tasks are ✅ and merged to main; independent wave
-components ran in parallel, with integrated verification and cleanup after each task.
-No active task remains. Phase 2 was not started; pre-existing Phase 2 edits are preserved.
+Request: implement all Phase 2 tasks with dependency-driven parallel agents (maximum five).
+Phase 1 dependencies are all ✅. Schedule ready tasks immediately after their prerequisites
+are merged and verified, without waiting for unrelated tasks in the same wave.
+Pre-existing Phase 2 plan/details are included unchanged except task statuses.
+Pre-existing browser output is preserved pending final artifact review; no secrets or transient
+browser logs will be committed as source.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
+| 2.1.1 | task/2.1.1-downloads | ../pandawords.worktrees/2.1.1 | Starting; sources and manifest |
+| 2.2.1 | task/2.2.1-dictionary-schema | ../pandawords.worktrees/2.2.1 | Starting; dictionary schema |
+| 2.2.2 | task/2.2.2-identifiers | ../pandawords.worktrees/2.2.2 | Starting; deterministic keys and rid |
+| 2.6.1 | task/2.6.1-word-components | ../pandawords.worktrees/2.6.1 | Starting; shared word UI |
 
 ## Blocked
 

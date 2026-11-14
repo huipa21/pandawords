@@ -49,18 +49,18 @@ are in `phase-N.md`. If a phase file doesn't exist yet, the agent asks before wr
 | 1.6.5 | `dev.ps1 release` (images → tar.gz, deploy bundle) | 1.6.4 | 7 | S | ✅ |
 | 1.6.6 | E2E: admin creates user → first login → forced password change | 1.5.6, 1.6.1 | 12 | S | ✅ |
 
-## Phase 2 — Dictionary & projects
+## Phase 2 — Dictionary & projects ([details](phase-2.md))
 
 | ID | Task | Depends on | Wave | Size | Status |
 |---|---|---|---|---|---|
-| 2.1.1 | Lexicon download scripts (kaikki, OEWN, ECDICT) + manifest | 1.2.1 | 1 | S | ⬜ |
+| 2.1.1 | Lexicon download scripts (kaikki, OEWN, ECDICT) + manifest | 1.2.1 | 1 | S | 🟡 |
 | 2.1.2 | Build `lexicon.sqlite` core from kaikki (lemma/lexeme/sense/pron/forms/audio/form_index) | 2.1.1 | 2 | L | ⬜ |
 | 2.1.3 | Merge ECDICT + wordfreq (zh gloss, exam tags, frequency, `common`) | 2.1.2 | 3 | M | ⬜ |
 | 2.1.4 | Align OEWN relations to senses | 2.1.2 | 3 | M | ⬜ |
 | 2.1.5 | Fixture lexicon (~50 words) + `LexiconReader` service | 2.1.3, 2.1.4 | 4 | M | ⬜ |
 | 2.1.6 | `dev.ps1 lexicon` + lexicon release artifact | 2.1.3, 2.1.4, 1.6.5 | 4 | S | ⬜ |
-| 2.2.1 | Migrations: dictionary tables and edges | 1.3.4, 1.3.5 | 1 | M | ⬜ |
-| 2.2.2 | ID helpers: deterministic keys, `rid` encode/decode | 1.2.3 | 1 | S | ⬜ |
+| 2.2.1 | Migrations: dictionary tables and edges | 1.3.4, 1.3.5 | 1 | M | 🟡 |
+| 2.2.2 | ID helpers: deterministic keys, `rid` encode/decode | 1.2.3 | 1 | S | 🟡 |
 | 2.2.3 | Dictionary repository: idempotent materialize, effective reads, owner filter | 2.2.1, 2.2.2, 2.1.5 | 5 | M | ⬜ |
 | 2.3.1 | Migrations: `project`, `includes`, `override`, `note` | 2.2.1, 1.5.1 | 2 | S | ⬜ |
 | 2.3.2 | Project CRUD API + isolation tests | 2.3.1, 1.5.3, 2.2.2 | 3 | M | ⬜ |
@@ -71,7 +71,7 @@ are in `phase-N.md`. If a phase file doesn't exist yet, the agent asks before wr
 | 2.4.3 | `enrich` job: relations among materialized items, tags, frequency | 2.4.2 | 7 | M | ⬜ |
 | 2.5.1 | Media storage + authenticated serving (X-Accel-Redirect) | 2.2.1, 1.6.3 | 2 | M | ⬜ |
 | 2.5.2 | `audio` job: Wiktionary → edge-tts fallback (US/UK) | 2.5.1, 2.4.2 | 7 | M | ⬜ |
-| 2.6.1 | Word components + previews | 1.4.4, 1.4.5 | 1 | M | ⬜ |
+| 2.6.1 | Word components + previews | 1.4.4, 1.4.5 | 1 | M | 🟡 |
 | 2.6.2 | Projects list/create/edit pages | 2.3.2, 1.5.5 | 4 | M | ⬜ |
 | 2.6.3 | Add-word dialog (SenseSelectList, JobStatus) | 2.4.2, 2.6.1, 2.6.2 | 7 | M | ⬜ |
 | 2.6.4 | Project tree view (LemmaTree, hide/unhide with undo) | 2.3.4, 2.6.1, 2.6.2 | 8 | M | ⬜ |
