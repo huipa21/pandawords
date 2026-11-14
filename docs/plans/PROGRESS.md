@@ -18,7 +18,8 @@ browser logs will be committed as source.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 2.1.5 | task/2.1.5-fixture-reader | ../pandawords.worktrees/2.1.5 | Starting; production-built fixture and typed reader |
+| 2.2.3 | task/2.2.3-dictionary-repository | ../pandawords.worktrees/2.2.3 | Starting; materialization/effective reads |
+| 2.4.1 | task/2.4.1-candidates | ../pandawords.worktrees/2.4.1 | Starting; normalization and candidates API |
 
 ## Blocked
 
@@ -44,6 +45,19 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 2.1.5 Fixture lexicon and typed reader
+- Result / completed: repeatable production-built 50-lemma fixture, read-only typed async
+  reader and structured decide/decision suffix extraction; `85e68a3` and `1c47502` merged.
+- Dependencies: 2.1.3 and 2.1.4 checked ✅; repository and candidates now ready and starting.
+- Verification: agent final `check`, backend 439 and focused importer/reader 47 passed.
+  Main merge `check` and combined backend/frontend passed (452 backend).
+- Failures / causes / corrections: initial agent mistook isolated shared-test harness for a
+  prohibited persistent-service change and ran only service-free tests. Clarified authorized
+  isolated DB testing, completed full validation. Initial fixture lacked structured derivation;
+  added minimal production Kaikki suffix extraction and verified reader association.
+- Skipped / deferred: none for the requested fixture/reader behavior. No blockers.
+  Branch/worktree removed after verification; every prerequisite is merged and verified.
 
 ### 2026-11-14 — 2.1.6 Lexicon command and transfer artifact
 - Result / completed: shared-root `dev.ps1 lexicon`, all enrichment hooks, dated atomic archive,
