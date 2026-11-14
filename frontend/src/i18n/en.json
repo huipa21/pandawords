@@ -99,6 +99,8 @@
     "localeAction": "Switch to Chinese"
   },
   "pages": {
+    "projectCreate": "Create project",
+    "projectEdit": "Edit project",
     "projects": "Projects",
     "project": "Project tree",
     "review": "Review",
@@ -164,7 +166,42 @@
     "copied": "Password copied.",
     "copyFailed": "Could not copy the password. Select it and copy manually."
   },
+  "projects": {
+    "create": "Create project",
+    "edit": "Edit project",
+    "delete": "Delete project",
+    "save": "Save project",
+    "saved": "Project saved.",
+    "deleted": "Project deleted.",
+    "empty": "No projects yet.",
+    "emptyHint": "Create a project to organize your vocabulary.",
+    "deleteNotice": "Permanently delete {name} and its project memberships? This cannot be undone. Your words are kept.",
+    "languages": "Learning: {target} · Translation: {source}",
+    "dailyNew": "New words per day: {count}",
+    "pagination": "Project list pages",
+    "page": "Page {page} of {pages} · {total} projects",
+    "treePending": "Project vocabulary",
+    "treeNotice": "The project is ready. The vocabulary tree will be available in a later update.",
+    "textValidation": "Enter 1–{max} characters (excluding surrounding spaces).",
+    "descriptionValidation": "Use at most 10,000 characters.",
+    "numberValidation": "Enter a non-negative whole number within the safe integer range.",
+    "unlimited": "No limit",
+    "noExamDate": "No exam date",
+    "planNotice": "Saving replaces the complete study plan. Clear the review limit or exam date to remove it. Dates use your local time.",
+    "fields": {
+      "name": "Project name",
+      "description": "Description",
+      "target_lang": "Learning language code",
+      "source_lang": "Translation language code",
+      "daily_new": "New words per day",
+      "review_cap": "Daily review limit (optional)",
+      "exam_date": "Exam date (optional)"
+    }
+  },
   "errors": {
+    "project_not_found": "This project is unavailable or no longer exists.",
+    "project_membership_conflict": "This project could not be deleted because its memberships are inconsistent. Please contact an administrator.",
+    "http_404": "This project is unavailable or no longer exists.",
     "admin_username_taken": "This username is already in use.",
     "admin_user_not_found": "This user no longer exists. Refresh the list.",
     "admin_self_protected": "You cannot disable or demote yourself.",

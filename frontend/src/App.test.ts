@@ -14,6 +14,21 @@ import { createAppI18n } from '@/i18n'
 import { useAuthStore } from '@/stores/auth'
 import { usePreferencesStore } from '@/stores/preferences'
 
+vi.mock('@/api/client', async original => ({
+  ...await original<typeof import('@/api/client')>(),
+  api: {
+    GET: vi.fn(async () => ({
+      data: {
+        items: [],
+        total: 0,
+        page: 1,
+        page_size: 20,
+      },
+      response: new Response(null, { status: 200 }),
+    })),
+  },
+}))
+
 describe('app', () => {
   it('only registers the design route in development', () => {
     try {

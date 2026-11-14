@@ -68,6 +68,28 @@
   backend and surfaced in both locales. New shared page-state/dialog components are previewed
   in `/dev/design`.
 
+## Projects
+
+- `/projects` uses responsive cards, paginated API data and shared loading/empty/error patterns.
+  Refresh and failed pagination keep confirmed rows; Retry repeats the failed page. Deletion uses
+  `ConfirmAction` and only removes a card after API success; deleting a page's final card returns
+  to the preceding page. Words remain in the personal collection.
+- `/projects/new` and `/projects/:id/edit` use full-page, top-labelled forms, including languages
+  and the complete study plan. Defaults match the generated contract (`en`, `zh`, daily new 20).
+  Optional review cap and exam date clear to null; dates display locally and submit as UTC.
+  Edits preserve untouched plan fields because supplying `plan` replaces the full plan.
+  Numeric inputs accept safe non-negative integers; server field errors remain beside inputs.
+- `/projects/:id` loads project metadata and reserves the tree area for task 2.6.4. It does not
+  fetch or infer tree membership. Missing and other-owner IDs share the localized unavailable
+  state. Raw server messages are never displayed.
+- Browser test contracts: `projects-page`, `project-list`, `project-card`, `project-create`,
+  `project-edit`, `project-delete`, `project-editor`, `project-form`, `project-save` and
+  `project-detail` are `data-testid` selectors. Inputs use `project-name`,
+  `project-description`, `project-target_lang`, `project-source_lang`, `project-daily-new`,
+  `project-review-cap` IDs; `#project-exam-date input` targets the implicitly labelled date input.
+  Route IDs are opaque record IDs passed via
+  named routes, not manually split or concatenated.
+
 ## Review session
 
 - Full-screen focus mode. The prompt is centered and the headword uses `text-3xl` on desktop and
