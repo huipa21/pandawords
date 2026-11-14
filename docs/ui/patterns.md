@@ -174,6 +174,23 @@ automatic side effect of reading a project.
 
 ## Review session
 
+- `/projects/:id/review` renders the server queue in a responsive focus region within the existing
+  app shell. Loading, initial-empty/completed, no-usable, unavailable, stale/expired and retryable
+  failures are distinct. A no-usable card is never silently skipped; only stale/expired/unavailable
+  attempts offer an explicit queue reload. Unavailable hints leave answer/give-up enabled.
+- Answer/give-up bodies and selected confirmation ratings are saved before sending. Failed requests
+  lock editing until retry/recovery, keeping the original answer/duration/rating. Feedback never
+  advances the queue: only the server's durable confirmed receipt does. Progress is then re-read.
+  Active attempts resume from owner/project-scoped tab storage; leaving via navigation requires a
+  dialog and tab reload warns while an attempt is active. Browser storage failures block submission.
+- Browser selectors: `review-session`, `review-loading`, `review-exercise` (`data-attempt-id`,
+  `data-status`), `review-error` (`data-error`), `review-retry`, `review-restart`, `review-empty`,
+  `review-audio-error`, `review-exit` are `data-testid` values. Choice/rating groups retain localized
+  accessible names and scoped keyboard shortcuts; ratings also expose `data-rating`. Submit,
+  hint, give-up and confirm use localized button names; typed answers use a labelled `input`.
+  Protected audio is explicitly unavailable on failure; retry playback, give-up and exit remain
+  available without revealing spelling.
+
 - Full-screen focus mode. The prompt is centered and the headword uses `text-3xl` on desktop and
   `text-2xl` on mobile.
 - Keyboard: in the focused choice/rating group, 1–4 select and Enter submits/confirms;

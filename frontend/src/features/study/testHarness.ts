@@ -8,6 +8,7 @@ import { project } from '@/features/projects/testHarness'
 import { createAppI18n } from '@/i18n'
 import DashboardPage from './DashboardPage.vue'
 import ProjectPlanPage from './ProjectPlanPage.vue'
+import ReviewSessionPage from './ReviewSessionPage.vue'
 
 export { button, failure, project, success } from '@/features/projects/testHarness'
 
@@ -106,7 +107,9 @@ export async function setup(path = '/review', locale: 'en' | 'zh-CN' = 'en') {
       {
         path: '/projects/:id/review',
         name: 'project-review',
-        component: { template: '<div />' },
+        component: path.endsWith('/review') && path !== '/review'
+          ? ReviewSessionPage
+          : { template: '<div />' },
       },
       {
         path: '/projects/:id',
