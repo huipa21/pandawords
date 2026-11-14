@@ -156,6 +156,27 @@ the buffer. A future midnight contributes no window on that midnight's date.
 
 ## Dashboard
 
+### Frontend planning surfaces (3.3.3)
+
+`/review` is the authenticated, owner-scoped dashboard/project picker. It distinguishes
+deduplicated due-today/available-new totals from each project's unintroduced count, shows
+completed UTC-today counts, nullable 30-day answer retention, the streak and seven scheduled
+UTC dates. Zero retention is a real result, not the no-history state. Each project links to its
+plan and review route.
+
+`/projects/:id/plan` uses the existing project form and complete replacement `plan` object.
+Untouched fields (including the original exam instant) survive saves; clearing the exam/review
+cap sends explicit nulls, and zero pauses a category. Exam capacity/buffer warnings come from
+the server rather than a second client calculation. Personal desired retention is a separate
+preferences form and PATCH; it never submits card/history changes.
+
+Priority editing loads **all** visible project-tree pages, independently of capped study queues,
+and submits every visible selected sense once. The existing API has no order-read endpoint:
+the UI explicitly starts a new draft in tree order, not a purported saved-priority readback.
+Only an explicit changed-draft save replaces priority. Returned hidden IDs are excluded from
+the editor; the server preserves hidden slots. Selection conflicts keep the draft and prompt
+an explicit reset/reload. Already introduced senses remain introduced.
+
 Due today, new today, retention over the last 30 days, a streak, and a per-project forecast for the
 next 7 days.
 

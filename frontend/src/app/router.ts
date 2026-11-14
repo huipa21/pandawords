@@ -8,8 +8,6 @@ const placeholder = () => import('./pages/PlaceholderPage.vue')
 
 const pages = [
   ['projects/:id/review', 'project-review', 'review'],
-  ['projects/:id/plan', 'project-plan', 'plan'],
-  ['review', 'review', 'review'],
   ['words', 'words', 'words'],
   ['reading/:passageId', 'reading', 'reading'],
   ['settings', 'settings', 'settings'],
@@ -19,6 +17,18 @@ const pages = [
 export function createAppRouter(history: RouterHistory = createWebHistory()) {
   const children: RouteRecordRaw[] = [
     { path: '', redirect: '/projects' },
+    {
+      path: 'projects/:id/plan',
+      name: 'project-plan',
+      component: () => import('@/features/study/ProjectPlanPage.vue'),
+      meta: { title: 'plan' },
+    },
+    {
+      path: 'review',
+      name: 'review',
+      component: () => import('@/features/study/DashboardPage.vue'),
+      meta: { title: 'review' },
+    },
     {
       path: 'words/:lemmaId',
       name: 'word',

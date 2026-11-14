@@ -42,6 +42,21 @@
 - Destructive actions (delete project, reset override) use `ConfirmAction`. Hiding a sense is
   reversible, so it doesn't need a confirm. Instead it shows a message with **Undo**.
 
+## Study plans and personal scheduling
+
+The project plan page reuses the project editor and preserves the full initial plan on
+replacement saves. Clearing optional exam/cap fields submits null; zero is a meaningful pause,
+not an omitted value. Desired retention has its own labeled form and API call, strictly between
+zero and one, and explains that only future scheduling changes.
+
+The review entry is a dashboard/project picker, not an implicitly chosen project. Counts,
+exam warnings and forecasts use server results. No answer history is distinct from 0% retention.
+Each resource has loading/retry feedback; refresh removes stale snapshots. Forecast headings
+explicitly label UTC dates and distinguish actual due dates from simulated review volume.
+Priority controls are large labeled buttons, work without dragging, and paginate the complete
+visible selection. Preparing/resetting a draft explicitly uses tree order; saving is never an
+automatic side effect of reading a project.
+
 ## Feedback
 
 | Situation | Pattern |

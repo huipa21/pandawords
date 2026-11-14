@@ -20,6 +20,12 @@ const tree = ref<InstanceType<typeof ProjectTree>>()
   <section class="grid gap-6" data-testid="project-detail">
     <PageHeader :title="project?.name ?? t('pages.project')">
       <template #actions>
+        <NButton v-if="project" size="large" @click="router.push({ name: 'project-plan', params: { id: project.id } })">
+          {{ t('pages.plan') }}
+        </NButton>
+        <NButton v-if="project" size="large" @click="router.push({ name: 'project-review', params: { id: project.id } })">
+          {{ t('study.startReview') }}
+        </NButton>
         <NButton v-if="project" size="large" type="primary" data-testid="project-add-word" @click="adding = true">
           {{ t('addWord.title') }}
         </NButton>
