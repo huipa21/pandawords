@@ -132,6 +132,25 @@ async def graph(
     )
 
 
+async def test_selected_sense_authorizes_its_implicit_lexeme(
+    graph: Fixture, client: AsyncClient, db: AsyncWsSurrealConnection
+) -> None:
+    # Normal add creates only lemma and selected-sense memberships, not lexeme markers.
+    await db.delete(graph.memberships["lexeme"])
+    one = await graph.get(client, depth=1)
+    assert one.status_code == 200, one.text
+    assert encode_rid(graph.nodes["lexeme"], "lexeme") in {
+        node["id"] for node in one.json()["nodes"]
+    }
+    two = await graph.get(client, depth=2)
+    assert encode_rid(graph.nodes["sense"], "sense") in {node["id"] for node in two.json()["nodes"]}
+    await db.update(graph.memberships["sense"]).merge({"hidden": True})
+    hidden = await graph.get(client, depth=1)
+    assert encode_rid(graph.nodes["lexeme"], "lexeme") not in {
+        node["id"] for node in hidden.json()["nodes"]
+    }
+
+
 async def test_seed_discovery_visibility_search_and_paging(
     graph: Fixture, client: AsyncClient, db: AsyncWsSurrealConnection
 ) -> None:
@@ -267,7 +286,7 @@ async def test_hidden_ancestors_and_project_union(
     assert (await graph.get(client, "sentence", depth=0)).status_code == 200
     project = RecordID("project", uuid4().hex)
     await create(db, project, {"owner": graph.user, **PROJECT_FIELDS})
-    await relate(
+    other_selection = await relate(
         db,
         "includes",
         project,
@@ -286,6 +305,9 @@ async def test_hidden_ancestors_and_project_union(
     )
     assert marker["hidden"]
     assert (await graph.get(client, "lemma", depth=0)).status_code == 200
+    # The second project's visible sense still supplies this implicit ancestor.
+    assert (await graph.get(client, "lexeme", depth=0)).status_code == 200
+    await db.update(other_selection["id"]).merge({"hidden": True})
     assert (await graph.get(client, "lexeme", depth=0)).status_code == 404
 
 

@@ -18,12 +18,18 @@ const renderer = vi.hoisted(() => ({
   resize: vi.fn(),
   destroy: vi.fn(),
   on: vi.fn(),
+  zoom: vi.fn(),
+  center: vi.fn(),
+  layout: vi.fn(),
 }))
 vi.mock('cytoscape', () => ({
   default: Object.assign(() => ({
     ...renderer,
     elements: () => ({ remove: renderer.remove }),
-    layout: () => ({ run: renderer.run }),
+    layout: (options: unknown) => {
+      renderer.layout(options)
+      return { run: renderer.run }
+    },
   }), {
     use: vi.fn(),
   }),
@@ -40,6 +46,27 @@ const node = { id: 'opaque/lemma', label: 'run', type: 'lemma' as const }
 afterEach(() => vi.clearAllMocks())
 
 describe('shared graph components', () => {
+  it('caps sparse automatic and explicit fitting without enlarging dense graph fits', () => {
+    const wrapper = mount(GraphCanvas, {
+      props: {
+        elements: {
+          nodes: [node],
+          edges: [],
+        },
+      },
+      global: global(),
+    })
+    const options = renderer.layout.mock.calls.at(-1)![0]
+    expect(options.fit).toBe(false)
+    renderer.zoom.mockReturnValue(6)
+    options.stop()
+    expect(renderer.zoom).toHaveBeenLastCalledWith(1)
+    expect(renderer.center).toHaveBeenCalledOnce()
+    renderer.zoom.mockClear().mockReturnValue(0.4)
+    wrapper.vm.fit()
+    expect(renderer.zoom.mock.calls).toEqual([[]])
+    wrapper.unmount()
+  })
   it('supports canvas pointer and accessible keyboard/touch selection, expansion, theme updates and cleanup', async () => {
     const wrapper = mount(GraphCanvas, {
       props: {

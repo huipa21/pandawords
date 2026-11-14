@@ -122,6 +122,9 @@ the adjacent disclosure lists every node, its type, selection and expansion cont
 `GraphToolbar` uses models for layout/depth/search/direction and emits search/fit.
 Both fcose and dagre run without animation. `/dev/design` includes sparse/dense samples in
 both theme columns; theme changes rebuild Cytoscape token styles.
+Automatic layout, resize and explicit Fit cap zoom at model scale 1, so sparse graphs retain
+token node/label dimensions; dense graphs can still fit below that scale, and manual zoom
+remains unrestricted. Search controls occupy their own row and stack on mobile.
 
 ## Exercise components (`src/components/exercise/`)
 

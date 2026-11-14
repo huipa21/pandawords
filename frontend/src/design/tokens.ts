@@ -84,6 +84,7 @@ export const graphNodes = {
 } as const satisfies Record<NodeName, { shape: string, size?: string }>
 
 export const graphMetrics = {
+  maxFitZoom: 1,
   nodeSize: 44,
   focusSize: 56,
   borderWidth: 3,
