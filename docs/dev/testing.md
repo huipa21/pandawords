@@ -54,6 +54,13 @@ failure output.
   and token-hash uniqueness, field constraints and rotation metadata against the test server.
   Their opaque test password hashes are schema inputs, not usable login credentials. Teardown
   removes exactly each generated database; no dev database or shared test rows are modified.
+- `job_db` / `job_settings` give each worker integration test its own migrated random database,
+  preventing another test's queued jobs from interfering with global worker scans. Job tests
+  synchronize candidate reads on two independent WebSocket connections before the conditional
+  UPDATE, check scheduled exponential retries and their terminal limit, and exercise LIVE
+  CREATE/UPDATE, socket loss/resubscription, polling without LIVE, and cancellation task cleanup.
+  API tests verify owner-only status reads (shared jobs are not public), malformed opaque IDs,
+  password-change gating and disabled accounts. No production services are started.
 - The backend runner currently implements only `test -Backend [-UpdateSnapshot]`; frontend,
   E2E and combined orchestration are deferred to 1.6.1. Run from the selected worktree; it needs
   that worktree's backend environment (`uv sync --locked`).

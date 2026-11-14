@@ -12,6 +12,7 @@
     "sequences": {},
     "tables": {
       "_migration": "DEFINE TABLE _migration TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
+      "job": "DEFINE TABLE job TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "refresh_token": "DEFINE TABLE refresh_token TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "user": "DEFINE TABLE user TYPE NORMAL SCHEMAFULL PERMISSIONS NONE"
     },
@@ -28,6 +29,24 @@
       },
       "indexes": {
         "migration_version": "DEFINE INDEX migration_version ON _migration FIELDS version UNIQUE"
+      },
+      "lives": {},
+      "tables": {}
+    },
+    "job": {
+      "events": {},
+      "fields": {
+        "attempts": "DEFINE FIELD attempts ON job TYPE int ASSERT $value >= 0 PERMISSIONS FULL",
+        "error": "DEFINE FIELD error ON job TYPE none | string PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON job TYPE none | record<user> PERMISSIONS FULL",
+        "payload": "DEFINE FIELD payload ON job TYPE object FLEXIBLE PERMISSIONS FULL",
+        "run_after": "DEFINE FIELD run_after ON job TYPE datetime PERMISSIONS FULL",
+        "status": "DEFINE FIELD status ON job TYPE 'queued' | 'running' | 'done' | 'failed' PERMISSIONS FULL",
+        "type": "DEFINE FIELD type ON job TYPE string ASSERT string::len($value) > 0 PERMISSIONS FULL"
+      },
+      "indexes": {
+        "job_due": "DEFINE INDEX job_due ON job FIELDS status, run_after",
+        "job_owner": "DEFINE INDEX job_owner ON job FIELDS owner"
       },
       "lives": {},
       "tables": {}

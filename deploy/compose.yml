@@ -31,6 +31,29 @@ services:
       MEDIA_DIR: /data/media
       LEXICON_DIR: /data/lexicon
     depends_on:
+      worker:
+        image: pandawords-api:${APP_VERSION:?Set APP_VERSION in .env}
+        restart: unless-stopped
+        env_file: .env
+        environment:
+          APP_ENV: production
+          SURREAL_URL: ws://surrealdb:8000/rpc
+          MEDIA_DIR: /data/media
+          LEXICON_DIR: /data/lexicon
+        command: ["python", "-m", "app.worker"]
+        depends_on:
+          migrate:
+            condition: service_completed_successfully
+          surrealdb:
+            condition: service_healthy
+        mem_limit: 768m
+        stop_grace_period: 30s
+        volumes:
+          - media:/data/media
+          - ./lexicon:/data/lexicon:ro
+        networks:
+          - internal
+
       migrate:
         condition: service_completed_successfully
       surrealdb:
