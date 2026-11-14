@@ -187,12 +187,62 @@ The canonical wordfreq `freq.zipf` and `lemma.freq_zipf` should be kept in sync 
 Enrichment-specific CLI flags may be added to `build_lexicon.main` as a small integration change;
 the core CLI currently imports no optional enrichment modules.
 
+### OEWN relation hook (2.1.4)
+
+`scripts.lexicon_oewn.oewn_enricher(path: Path) -> Callable[[sqlite3.Connection], None]`
+binds a local WN-LMF XML or `.xml.gz` file. Pass it to the core builder:
+
+```python
+from scripts.lexicon_oewn import oewn_enricher
+
+build(kaikki, output, enrichers=(oewn_enricher(oewn_path),))
+```
+
+An explicit-path production wrapper is also available from `backend`:
+
+```powershell
+uv run --no-sync python -m scripts.lexicon_oewn --kaikki path\kaikki.jsonl --oewn path\english-wordnet-2025.xml.gz --output path\lexicon.sqlite
+```
+
+This wrapper does not change the core CLI or shared defaults. Combined enrichment and release
+orchestration can compose the hook with other enrichers; there are no new dependencies.
+
+The parser consumes `LexicalEntry/Lemma` (`writtenForm`, `partOfSpeech`), `Sense`
+(`id`, `synset`), `SenseRelation` (`relType`, `target`), and `Synset`
+(`id`, `lexfile`, `Definition`, `SynsetRelation`). These names and the `lexfile` lexname
+attribute match the official WN-LMF 1.3 DTD (checked 2026-11-14). POS codes `n/v/a/s/r` map
+to `noun/verb/adj/adj/adv`; other POS codes are skipped. Three streaming passes first identify
+matching backbone entries, then align using synset definitions, then emit relations. Only
+matched IDs/alignments survive between passes; complete XML trees and unrelated relation
+graphs are not retained. The XML parser does not fetch the declared external DTD.
+
+Alignment uses the maximum Jaccard score between any individual backbone gloss and synset
+definition. Tokens are NFKC/case-folded Unicode alphanumeric words (underscore excluded),
+minus `a an the to of and or in on at for by with be is are that which`.
+At **0.30 or above**, select the highest score; ties use ascending etymology number,
+sense rank and ID. Below threshold, including missing/blank definitions or empty token sets,
+use the first etymology's top-ranked sense. A relation uses `oewn:approx` if either endpoint
+falls back; otherwise `oewn`. Synset membership supplies bidirectional synonyms. Explicit
+relations preserve direction; unsupported types (including instance/meronym/also/similar),
+unmatched/missing targets, and self-edges are ignored. No placeholder senses are created.
+`Synset.lexfile` fills only an empty aligned `sense.lexname`; first source-order assignment
+wins collisions, and existing domain tags/lexnames remain untouched.
+
+Both source records include OEWN/Princeton attribution, license, checksum and alignment policy.
+A sibling download manifest, if present, must match the OEWN filename, size and checksum;
+its original record is preserved. Plain XML fixtures without a manifest are supported.
+Imports are idempotent on an unchanged backbone and use only the caller's transaction:
+malformed XML, truncated gzip, non-English/empty input or manifest mismatch abort publication.
+The focused fixture `tests/fixtures/oewn-small.xml` is a small synthetic WN-LMF 1.3 document,
+not a full download; tests exercise both it and its gzip encoding.
+
 Focused, network-free tests from `backend`:
 
 ```powershell
 New-Item -ItemType Directory -Force .dev | Out-Null
 uv run --no-sync pytest tests\unit\test_download_lexicon.py --basetemp=.dev\lexicon-tests -q
 uv run --no-sync pytest tests\unit\test_build_lexicon.py --basetemp=.dev\lexicon-build-tests -q
+uv run --no-sync pytest tests\unit\test_lexicon_oewn.py --basetemp=.dev\lexicon-oewn-tests -q
 ```
 
 From the repository root, run `.\scripts\dev.ps1 check` and
