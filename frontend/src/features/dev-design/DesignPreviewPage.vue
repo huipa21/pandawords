@@ -13,6 +13,7 @@ import { darkThemeOverrides, themeOverrides } from '@/design/naive-theme'
 import { radius, spacing, themes, typography } from '@/design/tokens'
 import en from '@/i18n/dev-design/en.json'
 import zhCN from '@/i18n/dev-design/zh-CN.json'
+import ExerciseComponentsPreview from './ExerciseComponentsPreview.vue'
 import JobStatusPreview from './JobStatusPreview.vue'
 import WordComponentsPreview from './WordComponentsPreview.vue'
 
@@ -167,6 +168,7 @@ function colorVariable(group: typeof groups[number], name: string) {
             </div>
           </section>
           <WordComponentsPreview />
+          <ExerciseComponentsPreview />
           <section>
             <h4 class="text-base font-semibold">
               {{ t('naive') }}

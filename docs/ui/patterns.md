@@ -176,7 +176,12 @@ automatic side effect of reading a project.
 
 - Full-screen focus mode. The prompt is centered and the headword uses `text-3xl` on desktop and
   `text-2xl` on mobile.
-- Keyboard: 1–4 choose an option or rating · Enter submit/confirm · Space play audio · H hint · Esc exit (with confirm).
+- Keyboard: in the focused choice/rating group, 1–4 select and Enter submits/confirms;
+  Space confirms in ratings, activates focused buttons normally, or requests audio on the
+  focused exercise frame. H requests a hint outside editable fields; Esc outside editable
+  fields requests exit (the page confirms). Typed inputs retain normal H/Space/digit entry
+  and ignore IME-composition Enter. Handled shortcuts stop propagation; there are no global
+  key listeners. After grading choices are disabled and focus moves to the suggested rating.
 - After answering: show the correct answer, the sense, a pronunciation chip and a short context
   sentence, then `RatingBar` with the auto-rating preselected.
 
