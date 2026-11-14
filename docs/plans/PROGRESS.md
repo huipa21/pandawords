@@ -18,9 +18,8 @@ Migration allocations: 0013 memory/history; 0014 LLM; 0015 SRS preferences;
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 3.1.1 | task/3.1.1-memory | ../pandawords.worktrees/3.1.1 | Agent running; migration 0013 |
 | 3.2.5 | task/3.2.5-llm | ../pandawords.worktrees/3.2.5 | Agent running; migration 0014 |
-| 3.1.2 | task/3.1.2-srs | ../pandawords.worktrees/3.1.2 | Waiting for 3.1.1 |
+| 3.1.2 | task/3.1.2-srs | ../pandawords.worktrees/3.1.2 | Ready; migration 0015 |
 | 3.1.3 | task/3.1.3-plan | ../pandawords.worktrees/3.1.3 | Waiting for 3.1.2 |
 | 3.2.1 | task/3.2.1-exercises | ../pandawords.worktrees/3.2.1 | Waiting for 3.1.2 |
 | 3.2.2 | task/3.2.2-distractors | ../pandawords.worktrees/3.2.2 | Waiting for 3.2.1 |
@@ -56,6 +55,18 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 3.1.1 Memory and review history
+- Result / completed: `a63be3b` merged; migration 0013, full FSRS state, canonical owner/sense
+  memory identities, unique attempt history, indexes, snapshot and real-database tests.
+- Dependencies: 2.3.1 checked ✅.
+- Verification: agent check, 65 focused database tests and full backend 587 passed;
+  integrated main check and backend/frontend passed (587 backend; existing Starlette warning).
+- Skipped / deferred: none. Failures: Pylance worktree resolution unavailable; runtime,
+  ruff and basedpyright passed.
+- Findings: production project deletion preserves cards and history; cross-project/user
+  identities exercised against real SurrealDB.
+- Blockers / follow-ups: none; 3.1.2 now ready. Task branch/worktree cleanup follows.
 
 ### 2026-11-14 — Phase 3 start
 - Result / completed: execution set recorded; existing user-authored Phase 3 planning included.
