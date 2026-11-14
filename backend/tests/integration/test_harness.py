@@ -1,4 +1,3 @@
-from collections.abc import Callable
 from typing import Annotated, Any
 
 import pytest
@@ -7,11 +6,13 @@ from httpx import AsyncClient
 from surrealdb.connections.async_ws import AsyncWsSurrealConnection
 
 from app.core.config import Settings
+from app.db.auth import find_user
 from app.db.client import get_db
 from app.db.migrate import MIGRATIONS, discover, run_migrations
 from app.db.migration_test_support import history, probe_value, tables
 from app.db.test_support import database_names, isolated_database, write_probe
 from app.db.test_support import test_database_settings as database_settings
+from tests.conftest import UserFactory
 
 pytestmark = pytest.mark.integration
 
@@ -81,6 +82,10 @@ async def test_cleanup_removes_only_owned_database_even_on_failure() -> None:
         assert await history(other)
 
 
-async def test_user_factory_is_explicitly_unfinished(make_user: Callable[..., Any]) -> None:
-    with pytest.raises(NotImplementedError, match=r"unfinished until task 1\.5\.x"):
-        await make_user(username="fresh-owner")
+async def test_user_factory_persists_fresh_owners(
+    db: AsyncWsSurrealConnection, make_user: UserFactory
+) -> None:
+    first, second = await make_user(), await make_user()
+    assert first.id != second.id
+    assert await find_user(db, first.id) == first
+    assert await find_user(db, second.id) == second

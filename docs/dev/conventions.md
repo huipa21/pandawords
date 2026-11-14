@@ -47,7 +47,9 @@
 
 - Prefix `/api`. Resources are plural nouns: `/api/projects/{id}/words`.
 - **IDs in the API** are opaque URL-safe strings (`rid`): base64url of the SurrealDB record id,
-  produced by `app/db/ids.py` (`encode_rid` / `decode_rid`). Decoding validates the expected table.
+  without padding. General `app/db/ids.py` (`encode_rid` / `decode_rid`) is planned in 2.2.2;
+  auth currently uses the narrow typed `app/domain/identity.py` helpers for scalar user IDs.
+  Decoding validates the expected table and canonical encoding.
 - Lists use `?limit=&cursor=` and return `{ items, next_cursor }`.
 - Errors: HTTP status plus `{ "code": "project.not_found", "message": "...", "field": null }`. The
   frontend shows `t('errors.' + code)`.

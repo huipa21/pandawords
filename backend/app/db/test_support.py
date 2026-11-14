@@ -33,6 +33,9 @@ def test_database_settings() -> Settings:
             "surreal_url": settings.surreal_test_url,
             "surreal_namespace": "pandawords_test",
             "surreal_database": f"t_{short}_{uuid4().hex[:8]}",
+            "jwt_secret": "test-only-signing-secret-not-for-production",
+            "admin_username": "test_admin",
+            "admin_password": "test-admin-password-123",
         }
     )
 

@@ -12,3 +12,10 @@ database-level user.
 
 **Consequences.** Simpler, testable in Python. Every repository function must enforce ownership, and
 isolation tests are mandatory. SurrealDB is never exposed to clients.
+
+**Implementation (1.5.2).** Refresh families use the immutable auth schema's replacement links,
+not an additional family column. Rotation and whole-family revocation are server transactions;
+structured conflict retries make a concurrent replay revoke the successful replacement too.
+Bootstrap is create-once, never a password reset; readiness requires its successful completion.
+The [auth architecture](../architecture/auth.md#security-core-152) documents the service/identity
+contract and the initial-database-outage policy.

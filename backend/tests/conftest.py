@@ -1,5 +1,6 @@
-from collections.abc import AsyncIterator, Callable
-from typing import Any
+from collections.abc import AsyncIterator
+from typing import Protocol
+from uuid import uuid4
 
 import pytest
 from fastapi import FastAPI
@@ -8,7 +9,9 @@ from surrealdb.connections.async_ws import AsyncWsSurrealConnection
 
 from app.core.config import Settings
 from app.db.test_support import isolated_database, test_database_settings
+from app.domain.auth import Role, User, UserCreate
 from app.main import create_app
+from app.services.auth import create_user
 
 pytest_plugins = ["tests.snapshot_plugin"]
 
@@ -41,14 +44,16 @@ def test_settings(request: pytest.FixtureRequest, session_db_settings: Settings)
 
 @pytest.fixture
 async def db(
-    request: pytest.FixtureRequest, test_settings: Settings
+    request: pytest.FixtureRequest,
+    test_settings: Settings,
+    session_db: AsyncWsSurrealConnection,
 ) -> AsyncIterator[AsyncWsSurrealConnection]:
     """Shared migrated DB, or an empty per-test DB for @pytest.mark.fresh_db."""
     if request.node.get_closest_marker("fresh_db"):
         async with isolated_database(test_settings, migrate=False) as connection:
             yield connection
     else:
-        yield request.getfixturevalue("session_db")
+        yield session_db
 
 
 @pytest.fixture
@@ -65,12 +70,37 @@ async def client(app: FastAPI) -> AsyncIterator[AsyncClient]:
         yield client
 
 
+class UserFactory(Protocol):
+    async def __call__(
+        self,
+        *,
+        username: str | None = None,
+        password: str = "test-password-123",
+        role: Role = "user",
+        disabled: bool = False,
+        must_change_password: bool = False,
+    ) -> User: ...
+
+
 @pytest.fixture
-def make_user() -> Callable[..., Any]:
-    async def factory(**attributes: Any) -> Any:
-        raise NotImplementedError(
-            "make_user is unfinished until task 1.5.x provides the user schema and auth services; "
-            "the factory must create a fresh owner for each call."
+def make_user(db: AsyncWsSurrealConnection) -> UserFactory:
+    async def factory(
+        *,
+        username: str | None = None,
+        password: str = "test-password-123",
+        role: Role = "user",
+        disabled: bool = False,
+        must_change_password: bool = False,
+    ) -> User:
+        return await create_user(
+            db,
+            UserCreate(
+                username=username if username is not None else f"user_{uuid4().hex}",
+                password=password,
+                role=role,
+                disabled=disabled,
+                must_change_password=must_change_password,
+            ),
         )
 
     return factory
