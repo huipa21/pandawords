@@ -60,7 +60,7 @@ async function linked() {
 </script>
 
 <template>
-  <section class="grid min-w-0 gap-4">
+  <section class="grid grid-cols-1 min-w-0 gap-4">
     <PageHeader :title="t('reading.title')">
       <template #actions>
         <NButton v-if="passageId" size="large" @click="router.push({ name: 'reading' })">
