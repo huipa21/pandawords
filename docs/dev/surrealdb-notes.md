@@ -392,3 +392,15 @@ SELECT VALUE text FROM lemma WHERE owner = NONE AND text @@ $term;
 SELECT VALUE text FROM lemma
 WHERE owner = NONE AND string::starts_with(text, $prefix);
 ```
+
+### Media metadata (task 2.5.1) ✅
+
+Migration `0007_media.surql` and real API tests on isolated databases at test port 8101
+verify `record<lemma | lexeme | sense | morpheme | tag | sentence | passage>`,
+optional enum `option<'US' | 'UK'>`, typed optional user ownership and target indexing.
+Bound `CREATE $id CONTENT $data` persists SDK record references; bound
+`SELECT * FROM $id WHERE owner = NONE OR owner = $user` isolates media owners.
+An independent bound `SELECT id FROM $target WHERE owner = NONE OR owner = $user`
+checks current target existence/visibility. With `$user = NONE`, only shared targets
+match, so trusted shared writes cannot attach to a private target. Verified through
+the migrated backend suite (snapshot-update mode); no shared dev database was changed.

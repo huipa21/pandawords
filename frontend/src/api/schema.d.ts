@@ -140,6 +140,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/media/{rid}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Get Media */
+    get: operations['get_media_api_media__rid__get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/admin/users': {
     parameters: {
       query?: never
@@ -546,6 +563,35 @@ export interface operations {
         content: {
           'application/json': components['schemas']['JobRead']
         }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  get_media_api_media__rid__get: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        rid: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Authorized internal nginx media delivery. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Validation Error */
       422: {

@@ -1,0 +1,10 @@
+DEFINE TABLE IF NOT EXISTS media SCHEMAFULL;
+DEFINE FIELD IF NOT EXISTS owner ON media TYPE option<record<user>>;
+DEFINE FIELD IF NOT EXISTS target ON media TYPE record<lemma | lexeme | sense | morpheme | tag | sentence | passage>;
+DEFINE FIELD IF NOT EXISTS kind ON media TYPE 'audio' | 'image';
+DEFINE FIELD IF NOT EXISTS path ON media TYPE string;
+DEFINE FIELD IF NOT EXISTS mime ON media TYPE string;
+DEFINE FIELD IF NOT EXISTS source ON media TYPE 'wiktionary' | 'edge_tts' | 'pixabay' | 'upload';
+DEFINE FIELD IF NOT EXISTS attribution ON media TYPE option<string>;
+DEFINE FIELD IF NOT EXISTS accent ON media TYPE option<'US' | 'UK'>;
+DEFINE INDEX IF NOT EXISTS media_target ON media FIELDS target;

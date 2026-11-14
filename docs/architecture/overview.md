@@ -74,3 +74,23 @@ inherited environment variables take precedence.
 `/login` · `/projects` · `/projects/:id` (tree) · `/projects/:id/review` · `/projects/:id/plan` ·
 `/words` (all-words graph) · `/words/:lemmaId` · `/reading/:passageId` · `/settings` ·
 `/admin/users` · `/admin/backup` · `/dev/design` (dev only)
+
+## Media storage and delivery
+
+`api/media.py` → `services/media.py` → `db/media.py` serves authenticated
+`GET /api/media/{rid}` (canonical `encode_rid(record, "media")` token). Both the media
+record and its current target must be shared or owned by the requester; absent,
+inaccessible, unsafe and missing-file assets all return the same 404. Success has an
+empty application body and `X-Accel-Redirect: /_media/<relative path>`, an allowlisted
+content type, `nosniff` and `Cache-Control: private, no-store`.
+
+Trusted audio/image producers use
+`await media.store(db, settings, MediaCreate(...), content: bytes) -> MediaRead`.
+Input includes an SDK `RecordID` target, optional owner subject, kind, MIME, source,
+optional attribution and US/UK accent. Shared assets require a shared target.
+`await media.read(db, settings, rid, owner) -> MediaRead` validates access and file
+existence. Returned metadata includes opaque media/target IDs, kind, MIME, source,
+attribution and accent, never storage paths. Producers can retain the media ID for
+cache reuse; downloading, TTS, cache discovery and pronunciation linking are separate tasks.
+Storage creates generated exclusive filenames below configured `media_dir`, rejects
+links/traversal, and removes files when metadata persistence fails.
