@@ -175,3 +175,11 @@ prompt text and an opaque `media_id`: resolve it through the existing authentica
 adapter and `AudioButton`, not a direct unauthenticated media URL. Do not fetch dictionary
 headwords/inflections to construct a listening label or a client-side answer key. Playback
 failure is unavailable media, never permission to reveal the spelling before server grading.
+
+For `scenario`, render `prompt.text` as plain text with `TypedAnswerInput`; it contains no
+answer key or accepted-form list. Do not fetch/generate scenarios or grade answers in the
+browser. A cache miss or optional-provider failure appears in the attempt's `skipped` list
+while the server selects another eligible exercise (for example `generation_pending`,
+`disabled`, `budget_exhausted` or `rejected_response`). A valid cached scenario still works
+with the provider disabled. The same timing, give-up, feedback and rating controls apply;
+scenario currently offers no hint.

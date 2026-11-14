@@ -54,6 +54,11 @@ def _invalid_constant(_value: str) -> Never:
     raise ValueError("Non-standard JSON number")
 
 
+def provider_enabled(settings: Settings) -> bool:
+    """Whether configuration permits dispatch; cache reads do not require this."""
+    return _enabled(settings.deepseek_api_key)
+
+
 def _validate[T: BaseModel](raw: str, model: type[T], validate: Callable[[T], bool] | None) -> T:
     try:
         json.loads(raw, parse_constant=_invalid_constant)
@@ -120,7 +125,7 @@ async def generate_json[T: BaseModel](
         raise LlmUnavailable("storage_error") from None
     if cached is not None:
         return LlmResult(value=_validate(cached, response_model, validate), cached=True)
-    if not _enabled(settings.deepseek_api_key):
+    if not provider_enabled(settings):
         raise LlmUnavailable("disabled")
     if settings.llm_daily_budget == 0:
         raise LlmUnavailable("budget_exhausted")

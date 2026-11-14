@@ -219,7 +219,7 @@ more than server elapsed or exceed the one-minute cap. Identical retries do not 
 prompt_version=..., schema_version=..., inputs=..., validate=...)` returns typed
 `LlmResult(value, cached)`. Prompts and versions are trusted application constants; private
 notes, overlays and learner context belong only in `inputs`, which is owner-scoped by default.
-For reusable scenarios pass `inputs=None, shared_sources=(lemma_record, sense_record)`:
+For reusable scenarios pass `inputs=None, shared_sources=(lemma_record, lexeme_record, sense_record)`:
 the service reads only shared dictionary lemma/lexeme/sense fields, never user overlays.
 Missing/private sources or mixing shared sources with arbitrary inputs is `invalid_scope`.
 
@@ -232,8 +232,37 @@ prompt, model, base URL and generated JSON schema.
 Catch `core.errors.LlmUnavailable` and inspect `.reason`: `disabled`, `budget_exhausted`,
 `timeout`, `provider_error`, `invalid_response`, `rejected_response`, `storage_error`,
 or `invalid_scope`. Workers should skip/fall back rather than make learning depend on the LLM.
-This task provides the client contract; scenario job registration and exercise fallback are
-implemented by 3.2.6/3.3.2.
+### Cached scenario recall (3.2.6)
+
+`services.exercise_scenario.register(registry, provider)` installs `scenario` as recall.
+Bind `services.scenario.acquire(db, settings, context)` as its `ScenarioProvider` at registry
+composition. It probes the persistent, validated LLM cache with dispatch disabled; a cache hit
+works with a missing key or zero budget. A miss never calls the provider during a review.
+Instead, an owner/project/content-version/UTC-day-scoped, deduplicated `scenario` job is queued and
+selection skips this type with `generation_pending`, choosing another eligible exercise.
+
+The worker reloads owner-visible selected ancestry, rejects changed content (`stale_content`),
+and calls only `services.llm.generate_json`; its existing atomic budget and bounded retries
+apply. Expected unavailable results terminate the job with the public-safe LLM reason
+(`disabled`, `budget_exhausted`, `timeout`, `provider_error`, `invalid_response`, etc.).
+The same terminal job is reused for that UTC day rather than dispatching repeatedly; a later
+day can retry after budget reset or provider recovery without invalidating good cache entries.
+Unexpected failures retain
+the generic worker's bounded retries. The next selection reports that reason; jobs whose cache
+is missing despite completion report `cache_unavailable`. Storage failure skips only scenario.
+
+Shared caching is used only after effective selected fields match verified shared records;
+the LLM service independently rereads those shared sources. Custom senses and changed overlays
+use owner-scoped input/cache entries. Only headword, selected POS/forms and definition/gloss
+are copied into private inputs: no notes, unrelated learner context or foreign records.
+Jobs contain only project/sense IDs and a versioned digest, never prompt/input text.
+
+The response schema accepts only a 20–400-character scenario. Validation rejects malformed,
+markup/control/multiline/blank/clue content, overlong sentence sequences, and normalized
+headword or selected-lexeme form leaks, including separated spellings. Validation runs before
+caching and again on reuse. The public prompt is plain text; accepted forms remain private.
+All answers are graded locally by `grade_answer`, using `selected_lexeme_forms`; no LLM
+grading occurs. Durable ownership, timing, rating and confirmation rules remain unchanged.
 
 - `plan.daily_new`: the maximum number of new senses introduced per day.
 - `plan.exam_date` (optional): suggested daily new = ceil(remaining new ÷ max(1, days left − 7)),
