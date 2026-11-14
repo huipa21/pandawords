@@ -43,6 +43,21 @@ afterEach(() => {
 })
 
 describe('lemma detail', () => {
+  it('opens the sense tag panel with only the selected opaque sense target', async () => {
+    const { wrapper } = await setup()
+    expect(wrapper.find('[data-testid="tag-assignments"]').exists()).toBe(false)
+    await wrapper.get('[data-testid="word-sense-tags"]').trigger('click')
+    await flushPromises()
+    expect(wrapper.find('[data-testid="tag-assignments"]').exists()).toBe(true)
+    expect(client.GET).toHaveBeenCalledWith('/api/tags/assignments', {
+      params: {
+        query: { target_table: 'sense', target_id: 'sense:opaque' },
+      },
+    })
+    await wrapper.get('[data-testid="word-sense-tags"]').trigger('click')
+    expect(wrapper.find('[data-testid="tag-assignments"]').exists()).toBe(false)
+  })
+
   it('shows first-load skeletons and ignores late entry responses after changing lemmas', async () => {
     let resolve!: (value: unknown) => void
     client.GET.mockReturnValueOnce(new Promise(done => resolve = done))

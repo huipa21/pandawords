@@ -1,4 +1,32 @@
 {
+  "tags": {
+    "refresh": "Refresh tags",
+    "title": "Tags",
+    "manage": "Manage tags and parents",
+    "empty": "No tags yet.",
+    "source": "Read-only source",
+    "name": "Tag name",
+    "choose": "Choose a tag",
+    "assign": "Assign tag",
+    "create": "Create tag",
+    "remove": "Remove assignment",
+    "undo": "Restore {name}",
+    "edit": "Rename",
+    "delete": "Delete tag",
+    "deleteConfirm": "Delete this tag and all your assignments to and from it? Other content is kept.",
+    "parents": "Parent tags",
+    "save": "Save tag",
+    "cancel": "Cancel",
+    "failed": "Tags could not be updated or loaded. Your choices are kept; retry the action or reload.",
+    "cycle": "This parent would create a cycle. Choose another tag.",
+    "protected": "This tag has protected memberships and cannot be deleted.",
+    "kinds": {
+      "custom": "Custom",
+      "concept": "Concept",
+      "domain": "Domain",
+      "morph_group": "Morphology group"
+    }
+  },
   "session": {
     "title": "Project review",
     "exit": "Exit review",
@@ -260,6 +288,7 @@
     "localeAction": "Switch to Chinese"
   },
   "pages": {
+    "tags": "Tags",
     "projectCreate": "Create project",
     "projectEdit": "Edit project",
     "projects": "Projects",

@@ -19,6 +19,19 @@
 
 ## Forms
 
+### Tags (4.3.1)
+
+Word senses expose an expandable Tags panel without blocking the word itself. The feature-owned
+`features/tags/TagAssignments.vue` also accepts generated morpheme/tag targets for reuse by those
+surfaces. It lists source memberships read-only, creates a reusable custom tag, explicitly assigns
+it, removes only user memberships, and offers Restore for the last removed membership. Failed
+actions retain draft/selection/membership and restoration state; retries never create another tag
+after a successful creation. Loading, empty, retryable errors and cycle feedback are bilingual.
+The panel links to `/tags`, where learners rename/delete their tags and manage parent tags.
+Shared records have no rename/delete controls; tag deletion requires confirmation. Protected
+incident edges yield a localized conflict and leave the graph intact. All controls are labelled,
+keyboard accessible and use token-based layout and large touch targets.
+
 - `NForm` with `rules`. Labels sit on top. The submit button goes at the end and shows `loading`
   while the request runs. Fields are disabled while submitting.
 - Server errors: the API returns `{ code, message, field? }`. A `field` error is shown on that

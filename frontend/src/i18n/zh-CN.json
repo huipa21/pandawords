@@ -1,4 +1,32 @@
 {
+  "tags": {
+    "refresh": "刷新标签",
+    "title": "标签",
+    "manage": "管理标签和上级标签",
+    "empty": "暂无标签。",
+    "source": "只读来源",
+    "name": "标签名称",
+    "choose": "选择标签",
+    "assign": "添加标签",
+    "create": "创建标签",
+    "remove": "移除关联",
+    "undo": "恢复 {name}",
+    "edit": "重命名",
+    "delete": "删除标签",
+    "deleteConfirm": "删除此标签及你创建的所有相关关联？其他内容将保留。",
+    "parents": "上级标签",
+    "save": "保存标签",
+    "cancel": "取消",
+    "failed": "无法更新或加载标签。已保留你的选择，请重试操作或重新加载。",
+    "cycle": "此上级标签会形成循环，请选择其他标签。",
+    "protected": "此标签包含受保护的关联，无法删除。",
+    "kinds": {
+      "custom": "自定义",
+      "concept": "概念",
+      "domain": "领域",
+      "morph_group": "词素组"
+    }
+  },
   "session": {
     "title": "项目复习",
     "exit": "退出复习",
@@ -260,6 +288,7 @@
     "localeAction": "切换到英文"
   },
   "pages": {
+    "tags": "标签",
     "projectCreate": "创建项目",
     "projectEdit": "编辑项目",
     "projects": "项目",

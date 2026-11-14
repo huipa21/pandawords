@@ -1,5 +1,26 @@
 # Testing
 
+## Hierarchical tags (4.3.1)
+
+Against the already-running isolated loopback 8101 harness, from `backend`:
+`uv run --no-sync pytest -q tests\api\test_tags.py tests\integration\test_tag_migration.py tests\integration\test_schema_snapshot.py`.
+The real API/database cases cover owner/shared CRUD, strict fields/kinds/names/IDs, all three
+assignment target tables, independent endpoint and edge ownership, cross-user access including
+admin, duplicate assignment/removal retries, concurrent opposing parents and duplicate writes,
+multi-level cycles, rollback on delete failure, cleanup, and fail-closed foreign-edge protection.
+Migration 0018's schema is included in the committed snapshot.
+
+From `frontend`: `pnpm exec vitest run src\features\tags src\features\words\LemmaDetailPage.test.ts --maxWorkers=2`.
+Mocked UI tests cover bilingual create/assign/remove/restore, immutable source memberships,
+preserved drafts and selections on API/network failures, loading/empty/retry/cycle feedback,
+rename and confirmed deletion conflicts. These are not real-stack browser tests.
+Final focused results: **38 backend tests passed** (tag API, existing-user migration backfill,
+notes/overrides regressions and schema snapshot) and **13 frontend tests passed** (tag widgets/page
+plus word-detail regression). `dev.ps1 gen-api` regenerated contracts; final `dev.ps1 check` passed.
+Initial fixture/selector/typing failures were corrected; no full backend/frontend suite,
+E2E, LLM or network audio check is implied. Existing shared services were neither restarted
+nor reset; the 8100 syntax probe cleaned only its unique scratch records.
+
 ## Project review session (3.3.2)
 
 `frontend/src/features/study/ReviewSessionPage.test.ts` exercises recognition IDs, generic typed
