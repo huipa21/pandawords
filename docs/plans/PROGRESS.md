@@ -27,16 +27,16 @@ Coordination update: the user subsequently authorized Phase 5 implementation in 
 which handed off sole coordination here. The supplied `phase-5.md` is now explicitly in scope.
 All external Phase 5 dependencies are ✅; 5.1.3 waits for 5.1.1 integration/verification.
 Partition lemma-detail additions into separate components; preserve every locale/API contribution.
-Migration reservations: 0018 for image storage/search retry metadata only if required; 0019 for
-review media preferences (5.1.3); other schema additions require a coordinator allocation.
+Migration allocations: 0018 tag hierarchy (already committed before the initial reservation);
+0019 reserved for image storage/search retry metadata; 0020 reserved for review media preferences.
+The images agent was notified before integration. Other additions require coordinator allocation.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 4.3.1 | task/4.3.1-tags | ../pandawords.worktrees/4.3.1 | Agent running, wave 1 |
-| 4.1.2 | task/4.1.2-phrase-flow | ../pandawords.worktrees/4.1.2 | Ready; prerequisite 4.1.1 verified |
+| 4.1.2 | task/4.1.2-phrase-flow | ../pandawords.worktrees/4.1.2 | Agent running |
 | 4.2.2 | task/4.2.2-ingestion | ../pandawords.worktrees/4.2.2 | Agent running |
-| 4.3.2 | task/4.3.2-morphology | ../pandawords.worktrees/4.3.2 | Waiting for 4.3.1 |
-| 4.4.1 | task/4.4.1-graph-api | ../pandawords.worktrees/4.4.1 | Waiting for 4.1.1, 4.2.1, 4.3.1 |
+| 4.3.2 | task/4.3.2-morphology | ../pandawords.worktrees/4.3.2 | Ready; awaiting global agent slot |
+| 4.4.1 | task/4.4.1-graph-api | ../pandawords.worktrees/4.4.1 | Ready; all prerequisites verified |
 | 4.2.3 | task/4.2.3-reading | ../pandawords.worktrees/4.2.3 | Waiting for 4.2.2 |
 | 4.4.2 | task/4.4.2-graph-ui | ../pandawords.worktrees/4.4.2 | Waiting for 4.4.1 |
 | 4.4.4 | task/4.4.4-context-exercises | ../pandawords.worktrees/4.4.4 | Waiting for 4.2.2, 4.3.2 |
@@ -70,6 +70,20 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
 
+### 2026-11-14 — 4.3.1 Hierarchical tags and assignment
+- Result / completed: `a7086e3` merged as `be5afd3`; owner-safe CRUD/assignment, concurrent cycle
+  protection, localized management/detail UI, generated API, additive 0018 migration/snapshot.
+- Dependencies: 2.2.1 and 2.6.5 checked ✅.
+- Verification: agent check, gen-api, 38 backend and 13 frontend cases passed; main integrated
+  check, 11 API/migration/snapshot cases and 13 frontend cases passed.
+- Failures / causes / corrections: initial fixture/typing/selector/format issues fixed. Additive
+  docs conflicts resolved preserving all contributions. Agent's 0018 allocation preceded image
+  reservation; image reservation moved to 0019 and review preferences to 0020 before either merge.
+- Findings: SurrealDB cascades foreign edges on record deletion; tag delete fails closed (409)
+  if protected edges exist. Unique 8100 syntax probe cleaned without service changes.
+- Skipped / deferred: final full suites/browser verification later; no live providers required.
+- Blockers / follow-ups: none; graph API and morphology ready. Tag cleanup pending.
+
 ### 2026-11-14 — 4.1.1 Phrase lexicon and composition
 - Result / completed: `c4ef220` merged as `553612e`; attributed, source-backed ordered components,
   explicit literal usage, idempotent shared materialization and owner isolation. SQLite schema v2
@@ -81,7 +95,8 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
   Pylance timed out; runtime/Ruff/basedpyright passed. Testing-doc merge conflict resolved preserving
   both schema and phrase sections.
 - Skipped / deferred: final full suites/E2E later; no live providers required.
-- Blockers / follow-ups: none; 4.1.2 ready. Task worktree cleanup pending.
+- Blockers / follow-ups: none; 4.1.2 running. Branch/folder safely removed after unlinking
+  1,631 reparse points without following targets.
 
 ### 2026-11-14 — 4.2.1 Context schema contract
 - Result / completed: `a97632b` merged as `a266512`; 30 schema cases and three existing docs.
@@ -95,7 +110,8 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Skipped / deferred: frontend/E2E/API regeneration not applicable; final full-suite sweep later.
 - Findings: translation required (`{}` valid); spans are exactly two integers but bounds need
   application validation; `part_of.order` required. ENFORCED does not check matching owners.
-- Blockers / follow-ups: none; 4.2.2 ready. Task worktree cleanup pending.
+- Blockers / follow-ups: none; 4.2.2 running. Branch/folder safely removed after unlinking
+  1,631 reparse points without following targets.
 
 ### 2026-11-14 — Phase 4 task details
 - Result / completed: added [phase-4.md](phase-4.md) with goals, deliverables and acceptance
