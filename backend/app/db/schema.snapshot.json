@@ -24,6 +24,7 @@
       "lexeme": "DEFINE TABLE lexeme TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "media": "DEFINE TABLE media TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "member_of": "DEFINE TABLE member_of TYPE RELATION IN sense | morpheme | tag OUT tag ENFORCED SCHEMAFULL PERMISSIONS NONE",
+      "memory": "DEFINE TABLE memory TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "morpheme": "DEFINE TABLE morpheme TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "note": "DEFINE TABLE note TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "override": "DEFINE TABLE override TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
@@ -32,6 +33,7 @@
       "project": "DEFINE TABLE project TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "refresh_token": "DEFINE TABLE refresh_token TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "relates_to": "DEFINE TABLE relates_to TYPE RELATION IN sense OUT sense ENFORCED SCHEMAFULL PERMISSIONS NONE",
+      "review_log": "DEFINE TABLE review_log TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "sense": "DEFINE TABLE sense TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "sentence": "DEFINE TABLE sentence TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "tag": "DEFINE TABLE tag TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
@@ -241,6 +243,28 @@
       "lives": {},
       "tables": {}
     },
+    "memory": {
+      "events": {},
+      "fields": {
+        "card_id": "DEFINE FIELD card_id ON memory TYPE int PERMISSIONS FULL",
+        "difficulty": "DEFINE FIELD difficulty ON memory TYPE none | float PERMISSIONS FULL",
+        "due": "DEFINE FIELD due ON memory TYPE datetime PERMISSIONS FULL",
+        "id": "DEFINE FIELD id ON memory ASSERT $value = type::record('memory', [$this.owner, $this.sense]) PERMISSIONS FULL",
+        "introduced": "DEFINE FIELD introduced ON memory TYPE bool PERMISSIONS FULL",
+        "last_review": "DEFINE FIELD last_review ON memory TYPE none | datetime PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON memory TYPE record<user> ASSERT $value = record::id($this.id)[0] PERMISSIONS FULL",
+        "sense": "DEFINE FIELD sense ON memory TYPE record<sense> ASSERT $value = record::id($this.id)[1] PERMISSIONS FULL",
+        "stability": "DEFINE FIELD stability ON memory TYPE none | float PERMISSIONS FULL",
+        "state": "DEFINE FIELD state ON memory TYPE int ASSERT $value INSIDE [1, 2, 3] PERMISSIONS FULL",
+        "step": "DEFINE FIELD step ON memory TYPE none | int ASSERT $value = NONE OR $value >= 0 PERMISSIONS FULL"
+      },
+      "indexes": {
+        "memory_owner_due": "DEFINE INDEX memory_owner_due ON memory FIELDS owner, due",
+        "memory_owner_sense": "DEFINE INDEX memory_owner_sense ON memory FIELDS owner, sense UNIQUE"
+      },
+      "lives": {},
+      "tables": {}
+    },
     "morpheme": {
       "events": {},
       "fields": {
@@ -350,6 +374,29 @@
         "type": "DEFINE FIELD type ON relates_to TYPE 'synonym' | 'antonym' | 'hypernym' | 'hyponym' | 'confusable' | 'collocation' | 'default' PERMISSIONS FULL"
       },
       "indexes": {},
+      "lives": {},
+      "tables": {}
+    },
+    "review_log": {
+      "events": {},
+      "fields": {
+        "at": "DEFINE FIELD at ON review_log TYPE datetime PERMISSIONS FULL",
+        "attempt_id": "DEFINE FIELD attempt_id ON review_log TYPE string ASSERT string::len($value) > 0 PERMISSIONS FULL",
+        "auto_rating": "DEFINE FIELD auto_rating ON review_log TYPE int ASSERT $value INSIDE [1, 2, 3, 4] PERMISSIONS FULL",
+        "correct": "DEFINE FIELD correct ON review_log TYPE bool PERMISSIONS FULL",
+        "duration_ms": "DEFINE FIELD duration_ms ON review_log TYPE int ASSERT $value >= 0 AND $value <= 60000 PERMISSIONS FULL",
+        "exercise": "DEFINE FIELD exercise ON review_log TYPE string PERMISSIONS FULL",
+        "hint_used": "DEFINE FIELD hint_used ON review_log TYPE bool PERMISSIONS FULL",
+        "is_introduction": "DEFINE FIELD is_introduction ON review_log TYPE bool PERMISSIONS FULL",
+        "memory": "DEFINE FIELD memory ON review_log TYPE record<memory> PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON review_log TYPE record<user> ASSERT $value = record::id($this.memory)[0] PERMISSIONS FULL",
+        "project": "DEFINE FIELD project ON review_log TYPE record<project> PERMISSIONS FULL",
+        "rating": "DEFINE FIELD rating ON review_log TYPE int ASSERT $value INSIDE [1, 2, 3, 4] PERMISSIONS FULL"
+      },
+      "indexes": {
+        "review_log_owner_at": "DEFINE INDEX review_log_owner_at ON review_log FIELDS owner, at",
+        "review_log_owner_attempt": "DEFINE INDEX review_log_owner_attempt ON review_log FIELDS owner, attempt_id UNIQUE"
+      },
       "lives": {},
       "tables": {}
     },
