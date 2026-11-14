@@ -13,6 +13,7 @@ import { darkThemeOverrides, themeOverrides } from '@/design/naive-theme'
 import { radius, spacing, themes, typography } from '@/design/tokens'
 import en from '@/i18n/dev-design/en.json'
 import zhCN from '@/i18n/dev-design/zh-CN.json'
+import WordComponentsPreview from './WordComponentsPreview.vue'
 
 const { t } = useI18n({
   useScope: 'local',
@@ -164,6 +165,7 @@ function colorVariable(group: typeof groups[number], name: string) {
               </div>
             </div>
           </section>
+          <WordComponentsPreview />
           <section>
             <h4 class="text-base font-semibold">
               {{ t('naive') }}

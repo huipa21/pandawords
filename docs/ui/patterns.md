@@ -78,6 +78,19 @@
 
 ## Words & graph
 
+- Shared word components are presentation-only. Pages map generated API data into
+  `components/word/types.ts` and own fetching, persistence, permission checks and Undo feedback.
+  Supply effective sense content plus hidden/customized markers; do not resolve overrides twice.
+- Sense selection defaults only when the model is undefined; pass `[]` to explicitly clear it.
+  Mount with loaded candidates or leave the model undefined until candidates arrive. Controlled
+  selections survive candidate changes; page adapters reconcile removals and project changes.
+- Audio accepts a browser-playable source or emits an event-only request. Do not pass protected
+  URLs requiring bearer headers directly to native audio; later pages resolve authorized media.
+  Shared playback permits one sound at a time, with localized failure feedback. All controls
+  retain ≥44px touch targets, including visual small audio buttons and tree expanders.
+- Note editors emit controlled draft and save/cancel events, never write directly to the API.
+  Mark saving/disabled during persistence and present page-level feedback.
+
 - The project tree is the default view. Graph (dagre layout) is a toggle on the same page.
 - All-words graph: start from the focused lemma or a search, at depth 1, and expand on demand.
   Never render the whole graph at once (cap about 300 nodes, then ask the user to filter).

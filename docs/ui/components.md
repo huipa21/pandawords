@@ -54,8 +54,33 @@ size (`text-base` = 16, `text-lg` = 20, `text-xl` = 24).
 | `SenseItem` | Definition, zh gloss, register/domain tags, examples (collapsed), override marker, actions (edit, hide, note). `sense` (effective view), `selectable?`, `hidden?`, `editable?` |
 | `SenseSelectList` | Checklist of candidate senses, grouped by lexeme, with common ones pre-checked. `v-model:selected`, `candidates` |
 | `LexemeBlock` | POS + pronunciation chips + its SenseItems |
-| `LemmaTree` | Project tree (NTree with custom render of WordHeader, LexemeBlock, SenseItem). `projectId` |
-| `NoteEditor` | Note or mnemonic for any target. `target`, `kind` |
+| `LemmaTree` | Presentational NTree of `items: LemmaBranch[]`; controlled `expandedKeys` / `selectedKeys` and update events. Word headers, lexeme labels and effective senses; no project fetching |
+| `NoteEditor` | Controlled `modelValue` text, `target`, `kind: note \| mnemonic`, `saving`, `disabled`; emits model update, `save({target, kind, text})`, `cancel`. Persistence belongs to pages |
+
+Implemented word components live in `src/components/word/`. `types.ts` defines presentation
+models only: `LemmaView`, `LexemeView`, `SenseView`, `Pronunciation`, `LemmaBranch` and badge
+unions. Feature pages map generated API schemas to these models (no duplicate API schemas).
+`WordHeader` accepts a lemma's `text`, `kind`, optional frequency label and exam tags.
+`LexemeBlock` composes POS, pronunciations and senses and forwards edit/hide/note/play events.
+`SenseItem` consumes the **effective** definition/gloss supplied by its caller; `overridden`
+is a marker, not a local override resolver. `hidden` may explicitly override `sense.hidden`.
+With `editable`, actions emit `edit(id)`, `hide(id, hidden)`, `note(id)` without API calls.
+Examples are collapsed initially. Badge text is localized; graph colors use node/edge tokens.
+
+`SenseSelectList` takes lexeme-grouped `candidates` and `v-model:selected` sense IDs.
+An **undefined** selection initializes from common, non-hidden senses (and emits the defaults);
+an explicit `[]` means select none. Hidden senses remain visible but disabled. A controlled
+selection is never replaced when candidates change; callers reconcile stale IDs.
+
+`AudioButton` accepts optional `src`, `disabled` and visual `size`; touch area stays ≥44px.
+It emits `play(src | undefined)` on playback requests and `error` on media failure. Provided
+browser-playable URLs use one shared audio element; another play stops the preceding sound.
+An omitted URL is event-only (caller may resolve audio); use `disabled` for unavailable audio.
+`PronunciationChip` forwards play requests and accepts `ipa`, `accent: US | UK`, `audioUrl`.
+No bearer-token fetching is performed here; authenticated audio serving is a later integration.
+The design preview includes a locally generated tone, not a remote pronunciation dependency.
+Both theme panels demonstrate all word components, selection, hidden/customized senses,
+word/phrase trees and empty states at responsive widths.
 
 ## Graph components (`src/components/graph/`)
 
