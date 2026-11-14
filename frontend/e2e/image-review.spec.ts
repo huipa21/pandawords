@@ -101,7 +101,11 @@ test('fixture image review authenticates blobs, persists preferences and confirm
         path: { table: 'sense', id: senseId },
       },
       body: {
-        fields: { definition: '', gloss: {}, examples: [] },
+        fields: {
+          definition: '',
+          gloss: { zh: '' },
+          examples: [],
+        },
       },
     })
     expect(overridden.response.ok).toBe(true)

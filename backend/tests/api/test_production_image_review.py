@@ -55,7 +55,7 @@ async def test_real_production_registry_deterministic_fixture_image_only(
         overridden = await client.put(
             f"/api/dictionary/sense/{sense}/override",
             headers=headers,
-            json={"fields": {"definition": "", "gloss": {}, "examples": []}},
+            json={"fields": {"definition": "", "gloss": {"zh": ""}, "examples": []}},
         )
         assert overridden.status_code == 200, overridden.text
         memory = await srs.read_memory(db, user.id, sense)

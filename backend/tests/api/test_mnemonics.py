@@ -25,6 +25,16 @@ TEXT = "Imagine running shoes racing toward a bus to remember moving quickly."
 
 
 @pytest.fixture
+def test_settings(job_settings: Settings) -> Settings:
+    return job_settings
+
+
+@pytest.fixture
+async def db(job_db: AsyncWsSurrealConnection) -> AsyncWsSurrealConnection:
+    return job_db
+
+
+@pytest.fixture
 def settings(test_settings: Settings) -> Settings:
     return test_settings.model_copy(
         update={

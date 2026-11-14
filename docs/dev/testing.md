@@ -104,6 +104,13 @@ No provider, new migration, frontend change or generated API shape is needed.
 Context tests that add study data use isolated job databases, so their enrichment jobs
 cannot displace unrelated worker tests in the shared session database.
 
+Integrated regression fixtures must clear the fixture's `zh` gloss explicitly: an empty gloss
+object preserves existing translations under the effective-record recursive merge. Both the API
+and browser image-only fixtures use an empty `zh` value so recognition cannot become eligible.
+Mnemonic API tests use their own migrated job databases instead of draining other tests' queued
+jobs. The pre-0018 migration probe inserts a historical user record without post-0020 preference
+fields. After these integration corrections, the three affected backend files passed **19 tests**.
+
 ## Phrase discovery and normal add flow (4.1.2)
 
 Using the existing healthy 8101 server, from `backend`:
