@@ -1,5 +1,36 @@
 # Testing
 
+## Reading and inline vocabulary (4.2.3)
+
+Using the existing healthy 8101 server and random isolated database fixture, from `backend`:
+
+```powershell
+$env:NO_PROXY = '127.0.0.1,localhost'
+$env:SURREAL_TEST_URL = 'ws://127.0.0.1:8101/rpc'
+uv run --no-sync pytest -q --basetemp=.pytest_reading tests\api\test_reading.py tests\api\test_content.py
+```
+
+From `frontend`:
+
+```powershell
+pnpm exec vitest run src\features\reading src\app\router.test.ts src\features\projects\AddWordDialog.test.ts --maxWorkers=2 --testTimeout=60000 --reporter=dot
+```
+
+Coverage includes complete source/Unicode preservation with unordered sentence input and gaps,
+three occurrence states, effective definition/gloss overlays, no/hidden sense or ancestor
+memberships, ambiguous candidates with explicit-only sense choice, unavailable content in both
+locales, preserved ingestion/lookup drafts, dismissal, add/link failure and retry without repeating
+a successful project add. Real API tests independently reject foreign passages, sentences and
+project context; no cross-user content is embedded. The reading routes retain normal auth guards.
+
+Verification on 2026-11-15: **10 backend tests passed**, **16 frontend tests passed**;
+`dev.ps1 gen-api` and `dev.ps1 check` passed. Initial checks identified generated optional/tuple
+typing, token classes, a fixture connection annotation and formatting; these were corrected.
+A retry-test mock initially omitted the newly reloaded project page, causing two frontend test
+failures; its response was corrected and the complete focused command passed. No provider,
+migration, shared service lifecycle/reset, dependency symlink/junction, full suites or browser/E2E
+run was performed; integrated browser validation is reserved for the main coordinator.
+
 ## Phrase discovery and normal add flow (4.1.2)
 
 Using the existing healthy 8101 server, from `backend`:

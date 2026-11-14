@@ -5,6 +5,8 @@ from typing import Annotated, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, StrictInt, StringConstraints, model_validator
 
+from app.domain.dictionary import DictionaryRecordRead
+
 type ContentKind = Literal["sentence", "passage"]
 ContentText = Annotated[str, StringConstraints(strict=True, min_length=1, max_length=20000)]
 ContentLanguage = Annotated[
@@ -64,6 +66,7 @@ class PassageRead(BaseModel):
     passage: ContentRead
     sentences: list[SentencePart]
     assistance: str = "not_requested"
+    project_senses: list[DictionaryRecordRead] = Field(default_factory=list)
 
 
 class Resolution(BaseModel):

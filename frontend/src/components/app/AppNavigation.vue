@@ -11,11 +11,13 @@ const links = computed(() => props.mobile
       { to: '/projects', key: 'projects' },
       { to: '/review', key: 'review' },
       { to: '/words', key: 'words' },
+      { to: '/reading', key: 'reading' },
       { to: '/settings', key: 'me' },
     ]
   : [
       { to: '/projects', key: 'projects' },
       { to: '/words', key: 'words' },
+      { to: '/reading', key: 'reading' },
       { to: '/review', key: 'review' },
       { to: '/settings', key: 'settings' },
       ...(auth.isAdmin
@@ -39,7 +41,7 @@ const links = computed(() => props.mobile
         @click="navigate"
       >
         <i-lucide-folder v-if="link.key === 'projects'" class="navigation-icon" aria-hidden="true" />
-        <i-lucide-book-open v-else-if="link.key === 'words'" class="navigation-icon" aria-hidden="true" />
+        <i-lucide-book-open v-else-if="link.key === 'words' || link.key === 'reading'" class="navigation-icon" aria-hidden="true" />
         <i-lucide-graduation-cap v-else-if="link.key === 'review'" class="navigation-icon" aria-hidden="true" />
         <i-lucide-user v-else-if="link.key === 'me'" class="navigation-icon" aria-hidden="true" />
         <i-lucide-settings v-else class="navigation-icon" aria-hidden="true" />

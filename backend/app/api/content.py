@@ -50,10 +50,15 @@ async def ingest(
 
 @router.get("/passage/{id}/reading")
 async def reading(
-    id: str, db: Db, actor: Actor, reader: Lexicon, response: Response
+    id: str,
+    db: Db,
+    actor: Actor,
+    reader: Lexicon,
+    response: Response,
+    project_id: str | None = None,
 ) -> PassageRead:
     response.headers["Cache-Control"] = "no-store"
-    return await content.passage(db, reader, actor.id, id)
+    return await content.passage(db, reader, actor.id, id, project_id)
 
 
 @router.get("/sentence/{id}/occurrences")
