@@ -74,6 +74,9 @@ class Settings(BaseSettings):
     deepseek_api_key: str = "replace-with-your-api-key"
     deepseek_base_url: str = "https://api.deepseek.com"
     deepseek_model: str = "deepseek-chat"
+    llm_daily_budget: int = Field(default=20, ge=0)
+    llm_timeout_seconds: float = Field(default=15.0, gt=0, le=60)
+    llm_max_retries: int = Field(default=1, ge=0, le=3)
 
     target_language: str = "en"
     source_language: str = "zh"

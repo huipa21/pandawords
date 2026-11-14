@@ -88,6 +88,19 @@ remain cached. A release lock serializes builds targeting the same database dire
 an interrupted process, remove a stale `.lexicon-release.lock` only after confirming no build
 is running. See [deployment.md](deployment.md) for transfer verification.
 
+## Optional DeepSeek JSON generation
+
+Set `DEEPSEEK_API_KEY` to a real key to enable calls. Missing, blank and example/placeholder
+values disable calls without disabling cached results or non-LLM features.
+`DEEPSEEK_BASE_URL=https://api.deepseek.com` and `DEEPSEEK_MODEL=deepseek-chat` select the
+approved OpenAI-compatible provider. The locked backend dependency includes `openai` 2.x.
+`LLM_DAILY_BUDGET=20` limits provider **attempts per user per UTC day**, including retries
+and dispatched failures; `0` disables dispatch. UTC midnight starts a new accounting row.
+`LLM_TIMEOUT_SECONDS=15` bounds each attempt (maximum 60 seconds); `LLM_MAX_RETRIES=1`
+allows one application retry (maximum 3). SDK automatic retries are disabled. Caller fallback
+uses the explicit `LlmUnavailable.reason` contract documented in learning-engine.md.
+No test requires a real key; mocked transport prevents live provider traffic.
+
 ## Optional pronunciation audio
 
 The worker consumes version-1 `audio` jobs; requests never wait for external audio.

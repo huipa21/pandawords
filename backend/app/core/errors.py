@@ -1,5 +1,6 @@
 from collections.abc import Mapping
 from http import HTTPStatus
+from typing import Literal
 
 import structlog
 from fastapi import Request
@@ -28,6 +29,24 @@ class AppError(Exception):
         self.message = message
         self.field = field
         self.headers = headers
+
+
+type LlmUnavailableReason = Literal[
+    "disabled",
+    "budget_exhausted",
+    "timeout",
+    "provider_error",
+    "invalid_response",
+    "rejected_response",
+    "storage_error",
+    "invalid_scope",
+]
+
+
+class LlmUnavailable(AppError):
+    def __init__(self, reason: LlmUnavailableReason) -> None:
+        self.reason = reason
+        super().__init__("llm." + reason, 503, "Optional LLM is unavailable.")
 
 
 def _error_response(
