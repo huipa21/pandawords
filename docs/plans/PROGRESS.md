@@ -9,16 +9,28 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 
 ## Current run
 
-Request: implement all Phase 3 tasks with dependency-driven parallel agents (maximum five).
-Status: complete. All 13 tasks are merged and verified; no active task branches or worktrees.
-Phase 1 and Phase 2 dependencies are all ✅. Schedule ready tasks immediately after their prerequisites
-are merged and verified, without waiting for unrelated tasks in the same wave.
-Pre-existing Phase 3 plan/details are included unchanged except task statuses, as requested.
-Migration allocations: 0013 memory/history; 0014 LLM; 0015 SRS preferences;
-0016 project ordering; 0017 exercise attempts. Snapshot merges are serialized.
+Request: implement Phase 4 with dependency-driven parallel agents (maximum five), merge all
+task branches to main, commit all task files and remove task branches/worktree folders.
+Interpretation: "phase-34md" means the supplied Phase 4 detail document; Phase 3 is complete.
+Status: starting. Main was clean at `a1c8849`; all external Phase 1-3 dependencies are ✅.
+Start internal dependents only after prerequisites are merged and verified. Serialize integration,
+API contract regeneration and snapshot conflict resolution. No dependency junctions or symlinks
+between worktrees; never traverse reparse points during cleanup. Shared services/ports must not be
+stopped or reset by agents. Agents use existing isolated random-database tests on port 8101.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
+| 4.1.1 | task/4.1.1-phrases | ../pandawords.worktrees/4.1.1 | Ready, wave 1 |
+| 4.2.1 | task/4.2.1-context-schema | ../pandawords.worktrees/4.2.1 | Ready, wave 1 |
+| 4.3.1 | task/4.3.1-tags | ../pandawords.worktrees/4.3.1 | Ready, wave 1 |
+| 4.1.2 | task/4.1.2-phrase-flow | ../pandawords.worktrees/4.1.2 | Waiting for 4.1.1 |
+| 4.2.2 | task/4.2.2-ingestion | ../pandawords.worktrees/4.2.2 | Waiting for 4.2.1 |
+| 4.3.2 | task/4.3.2-morphology | ../pandawords.worktrees/4.3.2 | Waiting for 4.3.1 |
+| 4.4.1 | task/4.4.1-graph-api | ../pandawords.worktrees/4.4.1 | Waiting for 4.1.1, 4.2.1, 4.3.1 |
+| 4.2.3 | task/4.2.3-reading | ../pandawords.worktrees/4.2.3 | Waiting for 4.2.2 |
+| 4.4.2 | task/4.4.2-graph-ui | ../pandawords.worktrees/4.4.2 | Waiting for 4.4.1 |
+| 4.4.4 | task/4.4.4-context-exercises | ../pandawords.worktrees/4.4.4 | Waiting for 4.2.2, 4.3.2 |
+| 4.4.3 | task/4.4.3-relations | ../pandawords.worktrees/4.4.3 | Waiting for 4.4.2 |
 
 ## Blocked
 
