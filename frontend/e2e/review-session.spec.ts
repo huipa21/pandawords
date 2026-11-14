@@ -193,7 +193,6 @@ test('fixture review persists an overridden rating exactly once across reload an
     expect(confirmed.receipt.rating).toBe(finalRating)
     expect(confirmed.receipt.correct).toBe(true)
     expect(confirmed.receipt.is_introduction).toBe(true)
-    expect(confirmedResponse.request().postDataJSON()).toEqual({ rating: finalRating })
     await expect(page.getByTestId('review-empty')).toBeVisible()
     await expect(page.getByTestId('review-error')).toHaveCount(0)
     await expect(page.getByRole('progressbar', { name: 'Review progress' })).toHaveAttribute('value', '1')

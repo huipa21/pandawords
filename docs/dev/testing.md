@@ -431,8 +431,12 @@ endpoint or development-database reset is involved.
 
 Worktree validation: `dev.ps1 check`, `dev.ps1 test -Frontend`, explicit E2E TypeScript checking
 and Playwright discovery passed. Initial checks required restoring missing worktree-local
-dependencies; no main environment links were created. **Actual browser E2E execution is pending
-the main-worktree run**, not implied by discovery or mocked frontend tests.
+dependencies; no main environment links were created. The main-worktree
+`dev.ps1 test -E2E` run passed all three browser flows with providers disabled.
+The first review run reached the correct persisted overridden receipt but failed a redundant
+Chromium request-body inspection (`postDataJSON()` was unavailable for the fetch request).
+The test verifies the authoritative persisted rating, receipt and retry/count invariants
+instead; the subsequent complete browser run passed without retries.
 
 The first-login flow selects English via the existing browser preference format, signs in as
 the administrator, creates a unique `e2e_<UUID>` learner, reads the temporary-password
