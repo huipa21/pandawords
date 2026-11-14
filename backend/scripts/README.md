@@ -143,9 +143,10 @@ place. Any ordinary failure removes the stage and leaves existing output untouch
 process termination may leave a hidden stage/journal; never treat it as the final artifact.
 Use read-only runtime connections; close readers before replacement on Windows.
 
-### SQLite v1 and extension contract
+### SQLite v2 and extension contract
 
-`scripts.lexicon_schema` owns the DDL; `PRAGMA user_version = 1`. All IDs and foreign IDs are
+`scripts.lexicon_schema` owns the DDL; `PRAGMA user_version = 2`. Rebuild v1 artifacts before
+deploying the v2 runtime reader; the application database needs no migration. All IDs and foreign IDs are
 TEXT. Lemma/lexeme/sense IDs are **compact JSON arrays**, not prefixed record-ID strings:
 `["en","run"]`, `["en","run","verb",1]`, `["en","run","verb",1,"<sense-key>"]`.
 Decode the array for shared dictionary materialization. Keys come exclusively from
@@ -171,6 +172,8 @@ All `source` columns reference `source.name`.
 | `freq` | `lemma_id` FK, `zipf?` REAL, `bnc?` INTEGER, `coca?` INTEGER, `source`; PK(`lemma_id`,`source`) |
 | `relation` | `source_sense_id` FK, `target_sense_id` FK, `type` (`synonym`/`antonym`/`hypernym`/`hyponym`), `source`; PK(all four columns) |
 | `affix` | `lexeme_id` FK, `position` nonnegative INTEGER, `text`, `type` (`prefix`/`root`/`suffix`/`infix`), `source`; PK(`lexeme_id`,`position`,`source`) |
+| `phrase_component` | `phrase_id` lemma FK, `lexeme_id` FK, zero-based `position`, `source`; PK(`phrase_id`,`position`); reverse index (`lexeme_id`,`phrase_id`) |
+| `phrase_usage` | `phrase_id` lemma FK, `sense_id` FK, `source`; PK(`phrase_id`,`sense_id`,`source`) |
 
 Indexes cover lemma text/language, lexeme lemma/POS/etymology, sense lexeme/rank/ID,
 pron lexeme/accent, original form text, normalized form lookup and reverse lemma lookup,
@@ -197,7 +200,7 @@ schema**. Public builder interface:
 build(kaikki: Path, output: Path, *,
       words: collections.abc.Set[str] | None = None,
       enrichers: Iterable[Callable[[sqlite3.Connection], None]] = ()) -> BuildResult
-# BuildResult.records, BuildResult.skipped_senses: int
+# BuildResult.records, BuildResult.skipped_senses, BuildResult.skipped_phrase_mappings: int
 ```
 
 Hooks run in order after the entire core import, on the same writable transaction with foreign
@@ -208,6 +211,16 @@ Register attribution with `INSERT INTO source(name, metadata) VALUES (?, ?)` bef
 source-tagged rows (including a separate `oewn:approx` source for approximate alignments).
 Any exception aborts publication. ECDICT owns Chinese gloss/tag/frequency/common updates;
 OEWN owns relations and `sense.lexname` (append domain tags only if preserving existing ones).
+
+Core phrase resolution runs before enrichment, using a second streaming source pass and a
+disk-backed temporary candidate table. It accepts English `compound`/`com` etymology templates
+only, with contiguous numeric component arguments after the language argument (maximum 32).
+Every component must resolve uniquely to an English word lexeme; missing/ambiguous identities,
+foreign/markup components and conflicting templates are diagnosed, never partially linked.
+No arbitrary phrase tokenization is performed. Literal usage requires an exact phrase example
+on the component sense tagged `literal`; ordinary examples/derived terms do not qualify.
+More than 128 literal associations for one phrase fails the build. See
+[the runtime/graph contract](../../docs/architecture/lexicon-pipeline.md#source-backed-phrases-411).
 Frequency rows are per source: ECDICT ranks and wordfreq Zipf values need not share provenance.
 The canonical wordfreq `freq.zipf` and `lemma.freq_zipf` should be kept in sync by that enricher.
 Enrichment-specific CLI flags may be added to `build_lexicon.main` as a small integration change;

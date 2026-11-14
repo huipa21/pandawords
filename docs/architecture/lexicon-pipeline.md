@@ -69,11 +69,12 @@ and remove private stages/new outputs; successfully downloaded raw inputs remain
 Concurrent builds of the same output directory are refused by a release lock.
 
 - `lexicon.sqlite` tables: `lemma`, `lexeme`, `sense`, `pron`, `form`, `relation`, `zh_gloss`,
-  `exam_tag`, `freq`, `affix`, plus `form_index(form → lemma)` for inflection lookup.
+  `exam_tag`, `freq`, `affix`, `phrase_component`, `phrase_usage`, plus
+  `form_index(form → lemma)` for inflection lookup.
 - The build streams the input (orjson, line by line) so it stays within the server's 4 GB RAM. It
   normally runs on the laptop. The artifact is transferred to the server as
   `pandawords-lexicon-<date>.tar.gz` and mounted read-only.
-- SQLite schema v1 (`PRAGMA user_version=1`) uses compact JSON arrays from the shared
+- SQLite schema v2 (`PRAGMA user_version=2`) uses compact JSON arrays from the shared
   `app.domain.dictionary_keys` helpers as lemma/lexeme/sense TEXT primary keys. `source` holds
   attribution and input metadata; per-row source references preserve provenance. Inflection
   lookup includes normalized lemma spellings, forms and explicit `form_of` backlinks. US/UK
@@ -88,7 +89,7 @@ Concurrent builds of the same output directory are refused by a release lock.
   validation/atomic publication. They populate the predeclared enrichment tables without
   changing core transforms or schema. Exact columns, IDs, JSON encoding, constraints,
   reader lookups and callable/CLI contracts are in
-  [`backend/scripts/README.md`](../../backend/scripts/README.md#sqlite-v1-and-extension-contract).
+  [`backend/scripts/README.md`](../../backend/scripts/README.md#sqlite-v2-and-extension-contract).
 - Senses are aligned across sources: Wiktionary is the backbone. ECDICT Chinese glosses attach at
   POS level (`sense.gloss_zh` for the top sense, `zh_gloss` lexeme-level list otherwise). OEWN
   aligns only existing lemma/POS senses, using the maximum pairwise gloss token Jaccard
@@ -105,7 +106,7 @@ Concurrent builds of the same output directory are refused by a release lock.
   Three streaming XML passes retain only matched identities/alignments, not the XML tree or
   full source relation graph. Plain XML and the downloaded gzip artifact are supported without
   installing `wn`; source records retain OEWN and Princeton attribution and input checksum.
-- Test fixture: `backend/tests/fixtures/lexicon_small.sqlite`, exactly 50 lemmas (52 input
+- Test fixture: `backend/tests/fixtures/lexicon_small.sqlite`, exactly 56 lemmas (58 input
   records) covering polysemy, phrases, US/UK differences and derivation etymology. Rebuild
   offline from `backend` with `uv run --no-sync python -m scripts.build_fixture_lexicon`.
   The committed `lexicon-small.words`, `.jsonl`, `-ecdict.csv`, `-oewn.xml` and
@@ -129,7 +130,9 @@ Concurrent builds of the same output directory are refused by a release lock.
 `app.services.lexicon.LexiconReader(path: Path)` is an async read-only boundary for repositories,
 candidate selection and jobs. Pass the configured artifact path explicitly; it neither loads
 environment files nor imports build scripts. Call `await reader.validate()` at startup to check
-schema v1, required columns, integrity, foreign keys and nonempty senses.
+schema v2, required columns, integrity, foreign keys and nonempty senses. Rebuild older
+v1 artifacts before deploying this reader; this is an offline artifact upgrade, not a
+SurrealDB migration.
 
 All public reads are async and return `app.domain.lexicon` pydantic records, never SQLite rows,
 cursors or connections. Lemma/lexeme/sense IDs and foreign IDs are shared `DictionaryKey`
@@ -148,6 +151,8 @@ opaque strings. `LexiconSense.registers` holds source register labels.
 | `glosses(lexeme_id)`, `tags(lemma_id)`, `frequencies(lemma_id)` | `list[LexiconGloss]` / `list[LexiconTag]` / `list[LexiconFrequency]` |
 | `affixes(lexeme_id)`, `sources()` | `list[LexiconAffix]` / `list[LexiconSource]` |
 | `affixes_for_root(text, *, lang="en")` | `list[LexiconAffix]`; normalized exact root backlinks, language-filtered |
+| `phrase_components(lemma_id)` | ordered `list[LexiconPhraseComponent]` (`phrase_id`, English word `lexeme_id`, zero-based `position`, `source`) |
+| `phrase_usages(lemma_id)` | `list[LexiconPhraseUsage]` (`phrase_id`, explicitly literal component `sense_id`, `source`) |
 
 Exact lemma lookup does not fall back to inflections; use `lookup_form` explicitly. Text
 lookups use canonical normalization, IDs are exact, and all collections have deterministic
@@ -156,6 +161,35 @@ ordering. Absent records return `None`/`[]`. Missing/invalid artifacts raise `Ap
 errors do not escape the service. Reads use bound values and worker-thread-local connections
 with URI `mode=ro` and `query_only=ON`; no write API exists. Every operation closes its connection,
 so no lifecycle/close call is required and readers do not hold files open between operations.
+
+### Source-backed phrases (4.1.1)
+
+Phrase identity and exact/inflected lookup are unchanged. Composition is **not** inferred
+from spaces: the core build makes a second streaming pass over English `compound`/`com`
+etymology templates with `args["1"]="en"` and contiguous component arguments `2..N`.
+At most 32 components are admitted; markup and foreign-language components are rejected.
+Each explicit component spelling must resolve to exactly one existing English **word**
+lexeme. Missing words, multiple POS/etymologies and conflicting decompositions leave the
+entire phrase composition unlinked, with `phrase_mapping_skipped` reason diagnostics and
+`BuildResult.skipped_phrase_mappings`. Source order, including repeated components, is
+preserved; aliases/display alternatives are not guessed. Templates outside this conservative
+subset do not supply a decomposition.
+
+`phrase_usage` requires a component sense's source example with an explicit `literal` tag
+and text exactly matching the normalized phrase lemma. An ordinary example, derived term,
+phrase spelling or idiomatic tag is not evidence of literal sense usage. Usage is capped
+at 128 source associations per phrase; oversized data fails explicitly. Both tables retain
+Wiktionary provenance, whose source record retains license, attribution and input checksum.
+The synthetic fixture exercises *kick the bucket* (composition and separate idiomatic meaning,
+no literal usage) and *heavy rain* (two explicitly literal component senses).
+
+Shared materialization inserts the phrase's normal lemma/lexemes and selected phrase senses,
+the resolved component word records and ordered `contains` edges. Only explicitly literal
+component senses are additionally materialized and linked with `used_in`; they never become
+selected phrase senses/project memberships. Component words are not recursively expanded into
+other phrases. Deterministic edge IDs include position, allowing repeated words without
+duplicates. Existing shared or private rows/edges are never overwritten; identity conflicts
+fail atomically. No change to migration `0005` is required.
 
 ### ECDICT/wordfreq selection (2.1.3)
 

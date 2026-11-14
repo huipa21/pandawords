@@ -18,6 +18,8 @@ from app.domain.lexicon import (
     LexiconGloss,
     LexiconLemma,
     LexiconLexeme,
+    LexiconPhraseComponent,
+    LexiconPhraseUsage,
     LexiconPronunciation,
     LexiconRecord,
     LexiconRelation,
@@ -40,6 +42,8 @@ _TABLES: dict[str, type[LexiconRecord]] = {
     "freq": LexiconFrequency,
     "affix": LexiconAffix,
     "source": LexiconSource,
+    "phrase_component": LexiconPhraseComponent,
+    "phrase_usage": LexiconPhraseUsage,
 }
 _JSON_COLUMNS = {
     "glosses",
@@ -50,7 +54,14 @@ _JSON_COLUMNS = {
     "audio",
     "metadata",
 }
-_KEY_COLUMNS = {"lemma_id", "lexeme_id", "sense_id", "source_sense_id", "target_sense_id"}
+_KEY_COLUMNS = {
+    "lemma_id",
+    "lexeme_id",
+    "sense_id",
+    "source_sense_id",
+    "target_sense_id",
+    "phrase_id",
+}
 
 
 def _key(value: DictionaryKey) -> str:
@@ -74,8 +85,8 @@ class LexiconReader:
         connection = sqlite3.connect(f"{self._path.as_uri()}?mode=ro", uri=True)
         try:
             connection.execute("PRAGMA query_only = ON")
-            if connection.execute("PRAGMA user_version").fetchone()[0] != 1:
-                raise ValueError("unsupported schema version (expected 1)")
+            if connection.execute("PRAGMA user_version").fetchone()[0] != 2:
+                raise ValueError("unsupported schema version (expected 2; rebuild lexicon)")
         except Exception:
             connection.close()
             raise
@@ -269,3 +280,25 @@ class LexiconReader:
 
     async def sources(self) -> list[LexiconSource]:
         return await self._many(LexiconSource, "SELECT * FROM source ORDER BY name")
+
+    async def phrase_components(self, phrase_id: DictionaryKey) -> list[LexiconPhraseComponent]:
+        records = await self._many(
+            LexiconPhraseComponent,
+            "SELECT * FROM phrase_component WHERE phrase_id = ? ORDER BY position LIMIT 33",
+            _key(phrase_id),
+        )
+        if [record.position for record in records] != list(range(len(records))) or len(
+            records
+        ) > 32:
+            raise self._invalid(ValueError("invalid phrase component order or count"))
+        return records
+
+    async def phrase_usages(self, phrase_id: DictionaryKey) -> list[LexiconPhraseUsage]:
+        records = await self._many(
+            LexiconPhraseUsage,
+            "SELECT * FROM phrase_usage WHERE phrase_id = ? ORDER BY sense_id, source LIMIT 129",
+            _key(phrase_id),
+        )
+        if len(records) > 128:
+            raise self._invalid(ValueError("phrase literal usages exceed limit of 128"))
+        return records
