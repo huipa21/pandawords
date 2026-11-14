@@ -1,5 +1,40 @@
 # Testing
 
+## Exercise framework and attempts (3.2.1)
+
+From `backend`, using the existing healthy isolated-database server:
+
+```powershell
+$env:NO_PROXY = '127.0.0.1,localhost'
+$env:SURREAL_TEST_URL = 'ws://127.0.0.1:8101/rpc'
+uv run --no-sync pytest -q tests\unit\test_exercise_framework.py tests\integration\test_exercise_state.py tests\api\test_exercise_attempts.py tests\integration\test_schema_snapshot.py
+```
+
+Typed offline fake plugins exercise the registry before the later production generators exist.
+Coverage includes new/Learning/Relearning, exact seven-day kind weights independent of type
+counts, one eligible kind, explicit skip/no-usable reasons, deterministic normalization and
+selected effective forms with owner-overlay isolation, and listening's narrower audio-form rule.
+Real migrated database/API tests check no pregrade answer-key/correctness leakage, all owner
+boundaries, hints, correct/wrong/giveup, immutable submission retries, concurrency, manual final
+ratings, durable receipts and crash recovery between the SRS and attempt-confirmation commits.
+They also check hidden lemma/lexeme/sense, removed membership, deleted project, expiry, stale
+issuance versions, invalid durations and server-elapsed/60-second caps. Failed operations leave
+memory and review history unchanged.
+
+Regenerate the schema explicitly with the snapshot test's `--update-snapshot`, then compare
+normally. `dev.ps1 gen-api` regenerates OpenAPI and TypeScript; `dev.ps1 check` checks both stacks.
+No live provider, E2E, stack lifecycle operation or dev-database mutation is required.
+
+Verification on 2026-11-14: focused exercise + schema comparison passed **67 tests**;
+the final complete backend run passed **725 tests**
+with the existing Starlette/httpx deprecation warning. API generation and `dev.ps1 check`
+passed. The default frontend runner twice timed out the existing token-enforcement test's
+20-second budget (108 passed); the unchanged suite passed **109 tests** with
+`pnpm exec vitest run --reporter=dot --testTimeout=60000`. No timeout setting was committed.
+Initial pytest collection exposed duplicate API/integration module basenames; the integration
+test was renamed. Pylance cannot resolve this new worktree's file URI; Ruff, basedpyright and
+real runtime tests validate the implementation instead.
+
 ## Scheduling service (3.1.2)
 
 Focused command from `backend`, using isolated random databases on the healthy existing
