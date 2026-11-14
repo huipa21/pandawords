@@ -76,7 +76,7 @@ are in `phase-N.md`. If a phase file doesn't exist yet, the agent asks before wr
 | 2.6.3 | Add-word dialog (SenseSelectList, JobStatus) | 2.4.2, 2.6.1, 2.6.2 | 7 | M | ✅ |
 | 2.6.4 | Project tree view (LemmaTree, hide/unhide with undo) | 2.3.4, 2.6.1, 2.6.2 | 8 | M | ✅ |
 | 2.6.5 | Lemma detail page (overrides, notes, audio) | 2.3.3, 2.5.2, 2.6.1 | 8 | M | ✅ |
-| 2.6.6 | E2E: project → add word → edit sense → hide sense | 2.6.3, 2.6.4, 2.6.5 | 9 | S | 🟡 |
+| 2.6.6 | E2E: project → add word → edit sense → hide sense | 2.6.3, 2.6.4, 2.6.5 | 9 | S | ✅ |
 
 ## Phase 3 — Learning engine
 

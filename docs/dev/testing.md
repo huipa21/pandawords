@@ -58,6 +58,20 @@ The existing API, worker, database, and Vite stack must remain running. Playwrig
 Install the matching Chromium binary once from `frontend` with
 `pnpm exec playwright install chromium` if Playwright reports that it is missing.
 `pnpm test:e2e` runs the same test directly with the credentials already exported.
+
+### Project-to-word E2E
+
+`frontend/e2e/project-word.spec.ts` creates a uniquely named project, adds the fixture word
+`run`, overrides its first sense definition, hides that sense in the project tree, and checks
+through the API that the effective entry still contains the sense and override. It deletes its
+project in `finally`. Start the stack offline and fixture-backed before running it:
+
+```powershell
+$env:LEXICON_PATH = "$PWD\backend\tests\fixtures\lexicon_small.sqlite"
+$env:AUDIO_NETWORK_ENABLED = 'false'
+.\scripts\dev.ps1 up
+.\scripts\dev.ps1 test -E2E
+```
 `pnpm exec playwright test --list` checks discovery without credentials or a running stack.
 Only Chromium runs, with one worker, no retries, and no skipped/fallback cases.
 Vitest's `src/**/*.test.ts` include keeps `e2e/**/*.spec.ts` out of unit runs.

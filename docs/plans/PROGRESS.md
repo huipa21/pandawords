@@ -18,7 +18,6 @@ browser logs will be committed as source.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 2.6.6 | task/2.6.6-project-word-e2e | ../pandawords.worktrees/2.6.6 | Starting; fixture-only real browser workflow |
 
 ## Blocked
 
@@ -44,6 +43,29 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — Phase 2 complete
+- Result / completed: all Phase 2 tasks merged to `main`; every `task/*` branch and worktree
+  folder removed.
+- Dependencies: all Phase 2 rows ✅.
+- Verification: see 2.6.6 entry; final `check` and backend/frontend tests run on `main`.
+- Skipped / deferred: full real-source lexicon build (Kaikki ~3.4 GB; OEWN GitHub HEAD timed
+  out) remains a manual `dev.ps1 lexicon` run; fixture lexicon covers tests and E2E.
+- Failures / causes / corrections: none outstanding.
+- Blockers / follow-ups: none; Phase 3 tasks are next.
+
+### 2026-11-14 — 2.6.6 Project-to-word E2E
+- Result / completed: `frontend/e2e/project-word.spec.ts` (create project → add `run` → override
+  sense definition → hide sense → verify data retained via API → delete project); testing.md
+  documents the fixture/offline stack. Committed directly on `main` because the worktree
+  lacked lint-staged dependencies for the pre-commit hook; the empty task branch was deleted.
+- Dependencies: 2.6.3, 2.6.4, 2.6.5 checked ✅.
+- Verification: `dev.ps1 test -E2E` passed against the fixture-backed stack
+  (`LEXICON_PATH` fixture, `AUDIO_NETWORK_ENABLED=false`); Playwright reported 2 passed.
+- Skipped / deferred: none.
+- Failures / causes / corrections: the first delegated agent ended without changes; implemented
+  directly.
+- Blockers / follow-ups: none.
 
 ### 2026-11-14 — 2.6.4 Project tree UI
 - Result / completed: effective paginated tree, reversible visibility and Undo, restore-hidden
