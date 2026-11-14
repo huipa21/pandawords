@@ -18,6 +18,10 @@ Frontend: `pnpm exec vitest run src\features\words\SenseImages.test.ts
 src\features\words\LemmaDetailPage.test.ts --maxWorkers=2 --testTimeout=60000`.
 Nginx's 11 MiB allowance is configuration coverage; a deployed-proxy near-limit smoke test
 requires the deployed nginx stack and is not implied by the in-process API tests.
+`scripts\test-image-proxy.ps1 -ApiImage <local-api-image>` now provides that separate,
+isolated container regression using the actual production nginx configuration. Fresh empty
+Podman media volumes must remain API-owned after nginx mounts them; the API image's
+initialization marker prevents a second empty-volume copy-up from replacing ownership.
 
 ## Sentence and passage schema contract (4.2.1)
 
