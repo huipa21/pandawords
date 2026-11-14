@@ -18,14 +18,13 @@ Migration allocations: 0013 memory/history; 0014 LLM; 0015 SRS preferences;
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 3.2.1 | task/3.2.1-exercises | ../pandawords.worktrees/3.2.1 | Agent running; migration 0017 |
-| 3.2.2 | task/3.2.2-distractors | ../pandawords.worktrees/3.2.2 | Waiting for 3.2.1 |
+| 3.2.2 | task/3.2.2-distractors | ../pandawords.worktrees/3.2.2 | Ready |
 | 3.2.3 | task/3.2.3-recognition | ../pandawords.worktrees/3.2.3 | Waiting for 3.2.2 |
-| 3.2.4 | task/3.2.4-recall | ../pandawords.worktrees/3.2.4 | Waiting for 3.2.1 |
-| 3.2.6 | task/3.2.6-scenario | ../pandawords.worktrees/3.2.6 | Waiting for 3.2.1; 3.2.5 complete |
-| 3.3.1 | task/3.3.1-components | ../pandawords.worktrees/3.3.1 | Waiting for 3.2.1 |
+| 3.2.4 | task/3.2.4-recall | ../pandawords.worktrees/3.2.4 | Ready |
+| 3.2.6 | task/3.2.6-scenario | ../pandawords.worktrees/3.2.6 | Ready |
+| 3.3.1 | task/3.3.1-components | ../pandawords.worktrees/3.3.1 | Ready |
 | 3.3.2 | task/3.3.2-review | ../pandawords.worktrees/3.3.2 | Waiting for review prerequisites |
-| 3.3.3 | task/3.3.3-dashboard | ../pandawords.worktrees/3.3.3 | Ready |
+| 3.3.3 | task/3.3.3-dashboard | ../pandawords.worktrees/3.3.3 | Agent running |
 | 3.3.4 | task/3.3.4-e2e | ../pandawords.worktrees/3.3.4 | Waiting for 3.3.2 and 3.3.3 |
 
 ## Blocked
@@ -66,6 +65,20 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
   migration 0005; task 4.2.1 requires verification and only additive migration if needed.
 - Blockers / follow-ups: none.
 
+### 2026-11-14 — 3.2.1 Durable exercise attempt framework
+- Result / completed: `029c23d` merged as `af3c4e8`; typed registry/weighted selector,
+  shared normalization/form lookup, persisted owner-scoped attempts, grading/timing/hints,
+  atomic final confirmation and receipts, migration 0017 and generated contracts.
+- Dependencies: 3.1.2 checked ✅.
+- Verification: agent focused/schema 67, backend 725, frontend 109 and check passed.
+  Integrated main gen-api/check/backend/frontend passed (754 backend; existing warning).
+- Skipped / deferred: production exercise plugins intentionally belong to following tasks.
+- Failures / causes / corrections: additive docs conflicts preserved both sections;
+  conflicting generated API artifacts regenerated from combined backend. Agent default token
+  test timeout resolved with 60-second timeout; main default suite passed.
+- Blockers / follow-ups: none; distractors, recall, scenario and components now ready,
+  alongside running dashboard UI (five-agent ceiling). Cleanup follows.
+
 ### 2026-11-14 — 3.1.3 Study plans and dashboard API
 - Result / completed: `b25660f` merged; owner-scoped bounded queues, preserved hidden order,
   exact UTC exam pacing, retention/streak/forecasts, migration 0016 and generated contracts.
@@ -75,7 +88,8 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Skipped / deferred: none. Failures / causes / corrections: agent frontend token test
   timed out under concurrency; serial frontend run passed. Pylance worktree resolution
   unavailable; runtime and basedpyright passed.
-- Blockers / follow-ups: none; dashboard UI now ready; cleanup follows.
+- Blockers / follow-ups: none; dashboard UI running. Task branch and folder removed,
+  including inspected dependency leftovers after initial worktree removal.
 
 ### 2026-11-14 — 3.1.2 Atomic FSRS scheduling
 - Result / completed: `3045820` merged; FSRS 6.3.3 round-tripping, transaction card creation,
