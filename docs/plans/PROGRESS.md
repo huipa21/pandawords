@@ -18,7 +18,7 @@ Migration allocations: 0013 memory/history; 0014 LLM; 0015 SRS preferences;
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 3.3.4 | task/3.3.4-e2e | ../pandawords.worktrees/3.3.4 | Ready |
+| 3.3.4 | task/3.3.4-e2e | ../pandawords.worktrees/3.3.4 | Agent writing real-stack browser flow |
 
 ## Blocked
 
@@ -67,7 +67,9 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
   integrated main check and standard frontend suite passed.
 - Skipped / deferred: real-stack E2E is the next task, not implied by unit tests.
 - Failures / causes / corrections: none reported or observed.
-- Blockers / follow-ups: none; 3.3.4 ready; cleanup follows.
+- Blockers / follow-ups: none; 3.3.4 agent started. Review branch/folder safely removed
+  after unlinking 1,631 reparse points without traversing targets. Production frontend
+  build passed on integrated main; owned offline stack and test DB readiness HTTP 200.
 
 ### 2026-11-14 — 3.2.6 Optional cached scenario exercises
 - Result / completed: `07aab06` merged as `6af7608`; validated cached local-graded scenario
