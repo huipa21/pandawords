@@ -18,7 +18,7 @@ browser logs will be committed as source.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 2.3.4 | task/2.3.4-project-tree-api | ../pandawords.worktrees/2.3.4 | Starting; membership/effective tree and reversible visibility |
+| 2.6.4 | task/2.6.4-project-tree-ui | ../pandawords.worktrees/2.6.4 | Starting; tree rendering, hide/unhide and undo |
 | 2.6.5 | task/2.6.5-lemma-detail | ../pandawords.worktrees/2.6.5 | Starting; effective values, edits, notes and audio |
 
 ## Blocked
@@ -45,6 +45,20 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 2.3.4 Effective project tree API
+- Result / completed: owner-scoped paginated effective tree and reversible visibility API;
+  migration 0012 permits independent lexeme visibility without changing sense flags.
+  `a066e80` merged as `e723437`.
+- Dependencies: 2.3.2 and 2.3.3 checked ✅; tree UI prerequisites are now met.
+- Verification: agent reported 28 focused tests, backend 525, frontend and `check` passed.
+  After interruption main `gen-api` and `check` passed; combined backend/frontend passed
+  (556 backend, one existing Starlette warning).
+- Failures / causes / corrections: initial resumed test failed because the Podman VM was
+  stopped after interruption. Started the existing VM and reran successfully against the
+  isolated test database. No source changes were needed.
+- Skipped / deferred: browser tree flow belongs to 2.6.4/2.6.6; no blockers.
+  Branch/worktree removed after verification; tree UI starting.
 
 ### 2026-11-14 — 2.6.3 Add-word dialog and asynchronous job status
 - Result / completed: responsive candidate search/selection/add, common defaults, recoverable
