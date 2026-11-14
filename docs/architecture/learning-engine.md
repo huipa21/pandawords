@@ -84,8 +84,9 @@ never be a synonym of the answer.
 
 `services.distractors.choices(db, context, *, label="word" | "definition", count=4,
 rng=None)` implements this offline provider. Capture the DB and label in a closure for
-`DistractorProvider`; no recognition plugin is registered here. Definition labels use the
-effective English `definition`; word labels use the effective lemma `text`.
+`DistractorProvider`. Definition labels use the effective English `definition`, falling back
+to the effective `gloss.zh`, `gloss.zh-CN`, then `gloss.en`; word labels use effective lemma `text`.
+Other senses displaying the same headword cannot be incorrect definition alternatives.
 The result is `DistractorCandidates` (including the answer's private `answer_choice_id`) or
 `Unavailable`. `select_choices(pool, ...)` is the pure typed selection seam.
 
@@ -100,6 +101,30 @@ including alternate accessible spellings of synonym senses. Selection preserves 
 returns two to four choices when possible, and shuffles their positions with an injectable RNG.
 Oversized synonym/ancestry safety sets fail closed. Bounded discovery may report unavailable
 instead of searching the whole dictionary; it never invents options.
+
+### Recognition plugins (3.2.3)
+
+`services.recognition.register(target, recognition.DatabaseProvider(db))` installs `def2word`,
+`word2def` and `relation` into the supplied typed registry. The application bootstrap calls this
+alongside the recall/scenario registration hooks; importing the module has no global side effects.
+`RecognitionProvider` supplies labeled distractor choices and accessible `RelationQuestion`s,
+so offline fixtures can replace acquisition without replacing grading or attempt persistence.
+
+Definition-to-word uses the selected sense's effective meaning, not another sense of its lemma.
+Word-to-definition includes the selected lexeme's POS and available accent/IPA in `prompt.text`;
+missing pronunciation is valid, and no new pronunciation is fetched or synthesized.
+Relation prompts explicitly name the stored edge type and its direction relative to the selected
+sense/lexeme. Accessible `relates_to` and `derives_to` targets require visible ancestry and effective
+content. Other known answers for the same relation/direction and the source headword are removed
+from alternatives, in addition to the distractor service's bidirectional synonym exclusions.
+Discovery is bounded to 64 edges/answer contexts and oversized safety sets fail closed.
+
+Every generated question independently shuffles choices and replaces record IDs with random opaque
+IDs. The correct ID and displayed feedback answer exist only in the persisted private `AnswerSpec`;
+the shared registry grader compares submitted IDs, never client correctness or displayed labels.
+Missing meanings, relations or two safe distinct options return `Unavailable` for framework fallback.
+No new schema or transport types are required. Automatic recognition ratings remain capped at Good;
+manual Easy confirmation remains supported.
 
 **Choosing an exercise type**: new or learning cards get recognition types. Cards in review get
 mostly recall types as stability grows. Types whose requirements are missing (no audio, LLM off)

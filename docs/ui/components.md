@@ -149,6 +149,13 @@ protected `media_id`; media IDs still require the authenticated blob adapter, no
 Open attempts have no correctness/feedback/accepted forms. Hint requests use the persisted
 `/hint` response; the shell must not synthesize `hint_used`.
 
+Recognition plugins (3.2.3) use the existing choice prompt shape. Render all 2–4 returned labels
+in server order and submit the selected opaque `Choice.id`, not its label, position or a dictionary
+record ID. IDs are new for every generated question; do not infer correctness or reuse old IDs.
+Word-to-definition includes available accent/IPA in prompt text and remains usable without it.
+Relation text specifies the stored relation type and direction; do not reinterpret an incoming edge
+as an outgoing synonym/derivation. The open response contains no grading marker.
+
 On prompt display capture `performance.now()`. Submit `AttemptAnswer {answer, duration_ms}`
 or `AttemptGiveUp {duration_ms}`, flooring the elapsed nonnegative milliseconds. Preserve the
 same body for retries; a different answer/duration after grading is a conflict. Render only
