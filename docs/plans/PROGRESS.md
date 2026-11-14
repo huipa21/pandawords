@@ -19,7 +19,6 @@ browser logs will be committed as source.
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
 | 2.1.5 | task/2.1.5-fixture-reader | ../pandawords.worktrees/2.1.5 | Starting; production-built fixture and typed reader |
-| 2.1.6 | task/2.1.6-lexicon-artifact | ../pandawords.worktrees/2.1.6 | Starting; shared-root build and packaging |
 
 ## Blocked
 
@@ -45,6 +44,21 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 2.1.6 Lexicon command and transfer artifact
+- Result / completed: shared-root `dev.ps1 lexicon`, all enrichment hooks, dated atomic archive,
+  manifest and checksums, explicit stage failures and rollback; `8d50810` merged.
+- Dependencies: 2.1.3, 2.1.4 and 1.6.5 checked ✅.
+- Verification: agent `check`, backend 422 and PowerShell lexicon/release/quality passed;
+  synthetic main/linked-worktree builds, archive unpack/integrity/checksums verified.
+  Main merge `check`, lexicon PowerShell guards and combined backend/frontend passed
+  (422 backend). Guard output includes intentional synthetic failure messages; suite passed.
+- Skipped / deferred: multi-gigabyte upstream downloads/full-source build intentionally not run;
+  no production/raw data replaced. Lexicon remains excluded from site backups.
+- Failures / causes / corrections: initial tools, import sorting and Windows atomic-rename
+  issue fixed; no unresolved failures or blockers.
+- Follow-ups: branch/worktree removed. Previous project preview left a child process holding its
+  directory; exact owned PID stopped, delayed directory removal succeeded and absence verified.
 
 ### 2026-11-14 — 2.6.2 Responsive project CRUD pages
 - Result / completed: list/create/edit/detail routes, validated plans, confirmation and bilingual
