@@ -1,5 +1,14 @@
 # Lexicon pipeline & enrichment
 
+## Distractor consumers (3.2.2)
+
+The learning service consumes already-materialized Phase 2 concept/domain tags and semantic
+edges; it does not read the full SQLite lexicon or materialize extra words during selection.
+Optional `morph_group` tags improve ranking but missing Phase 4 data is normal.
+Fallback uses the selected lexeme's POS and the lemma's `floor(freq_zipf)` band; zero or absent
+frequency is unknown, not a match. Existing shared/user ownership and per-user effective
+overrides remain authoritative. There is no LLM or fabricated-candidate fallback.
+
 ## Sources
 
 | Source | Gives us | License / note |

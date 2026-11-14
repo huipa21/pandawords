@@ -82,6 +82,25 @@ Later: `image2word` (Phase 5) and `produce` (write a sentence, graded by DeepSee
 the same morph group → `confusable` relations → the same POS and frequency band. A distractor can
 never be a synonym of the answer.
 
+`services.distractors.choices(db, context, *, label="word" | "definition", count=4,
+rng=None)` implements this offline provider. Capture the DB and label in a closure for
+`DistractorProvider`; no recognition plugin is registered here. Definition labels use the
+effective English `definition`; word labels use the effective lemma `text`.
+The result is `DistractorCandidates` (including the answer's private `answer_choice_id`) or
+`Unavailable`. `select_choices(pool, ...)` is the pure typed selection seam.
+
+Discovery considers up to 64 rows per tier in stable edge-ID order, uses accessible
+`member_of` concept/domain or optional morph-group tags, then bidirectional `confusable`
+edges and same-POS lemma frequency. Frequency bands are `floor(freq_zipf)`; missing, zero,
+negative and non-finite frequencies never match. No morphology or LLM prerequisite is added.
+All records, ancestry edges, semantic edges and tags must be shared or owned by the learner;
+only that learner's effective overrides affect labels. Synonyms in either direction and
+equivalent displayed labels (Unicode NFKC, case and whitespace normalized) are excluded,
+including alternate accessible spellings of synonym senses. Selection preserves tier priority,
+returns two to four choices when possible, and shuffles their positions with an injectable RNG.
+Oversized synonym/ancestry safety sets fail closed. Bounded discovery may report unavailable
+instead of searching the whole dictionary; it never invents options.
+
 **Choosing an exercise type**: new or learning cards get recognition types. Cards in review get
 mostly recall types as stability grows. Types whose requirements are missing (no audio, LLM off)
 are skipped.

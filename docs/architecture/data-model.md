@@ -100,6 +100,12 @@ API transport uses `app/core/record_ids.py`; see [conventions](../dev/convention
 | `used_in` | sense → lemma(phrase)\|sentence\|passage | `span? [start, end]` |
 | `part_of` | sentence → passage | `order` |
 
+Distractor discovery (3.2.2) reuses sense → tag `member_of` for `concept`/`domain` and
+optional `morph_group` tags, sense → sense `relates_to` (`confusable` and `synonym`, both
+directions), and visible `has_sense`/`has_lexeme` ancestry for POS and lemma `freq_zipf`.
+It introduces no persisted fields or migration. The internal `domain.distractors` pool
+contains only owner-visible effective display fields and ranking tiers, not raw graph rows.
+
 Phrase rule: `contains` always exists, even for idioms. `sense used_in phrase` exists only when a
 word's sense applies literally (e.g. *heavy rain*, not *kick the bucket*). A phrase's own meaning
 lives under its own lexeme/sense, like any lemma.

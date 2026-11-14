@@ -1,5 +1,18 @@
 # SurrealDB 3.3 notes
 
+### Bounded distractor graph reads (3.2.2) ✅
+
+Verified with SDK 3.0 against migrated isolated databases at `127.0.0.1:8101`:
+bound `SELECT * FROM $targets` accepts arrays of record IDs; empty arrays return no records.
+Relation-table filters can combine edge `owner`, dereferenced `in.owner`/`out.owner`,
+`out.kind IN $kinds`, `out.pos`, and lemma `in.freq_zipf` numeric bounds.
+Selecting `id` alongside endpoints permits stable `ORDER BY id LIMIT $limit`.
+Both incoming and outgoing semantic edges are found with
+`(in = $answer OR out = $answer)`. Owner-scoped deterministic override IDs are bulk-read
+in the same transaction. The distractor integration tests verify private endpoint, tag,
+ancestry/semantic edge and override isolation, plus oversized-synonym fail-closed behavior.
+No dev database or migration is changed.
+
 Check here before writing SurrealQL. **Status:** ✅ verified on the version shown · ❌ original
 form is wrong (a working, verified replacement is given). New, unverified beliefs must be
 tested before being used.

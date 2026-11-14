@@ -1,5 +1,29 @@
 # Testing
 
+## Distractor provider (3.2.2)
+
+From `backend`, against the existing isolated-database test server:
+
+```powershell
+$env:NO_PROXY = '127.0.0.1,localhost'
+$env:SURREAL_TEST_URL = 'ws://127.0.0.1:8101/rpc'
+uv run --no-sync pytest -q tests\unit\test_distractors.py tests\integration\test_distractor_graph.py
+```
+
+Pure tests cover all ranking tiers, frequency floor boundaries and unknown frequencies,
+missing POS/graph data, synonym IDs and labels, Unicode/case/whitespace display deduplication,
+choice-count bounds, insufficiency and seeded reproducibility. Real migrated database tests
+exercise each Phase 2/optional tag tier, reverse semantic relations, foreign private senses,
+tags and ancestry/semantic edges, own private candidates, effective override isolation,
+duplicate definition labels and oversized synonym safety sets. No migration, live LLM,
+recognition registry changes, E2E or stack lifecycle operation is needed.
+
+Verification on 2026-11-14: **98 tests passed** across the distractor suites and existing
+exercise framework/state/API regression suites; `dev.ps1 check` passed. A Pylance syntax
+request timed out; actual imports/tests, Ruff and basedpyright supplied validation instead.
+Missing worktree Python dependencies were restored with offline `uv sync`, without changing
+manifests. No full backend suite or E2E run is implied by this focused result.
+
 ## Daily plan and dashboard (3.1.3)
 
 From `backend`, with `SURREAL_TEST_URL=ws://127.0.0.1:8101/rpc` and loopback proxy bypass:
