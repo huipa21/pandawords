@@ -4,6 +4,27 @@ Check here before writing SurrealQL. **Status:** ✅ verified on the version sho
 form is wrong (a working, verified replacement is given). New, unverified beliefs must be
 tested before being used.
 
+### User dictionary API (2.3.3) ✅
+
+Verified on **2026-11-14** using SDK **3.0.0**, the existing loopback test server **8101**
+and migrated, random harness databases (no dev database or server lifecycle changes):
+
+- Bound `UPDATE $overlay SET fields = $fields, updated_at = $now WHERE owner = $user
+  RETURN AFTER` replaces the entire flexible `fields` object, including replacement with `{}`.
+  Recursive PATCH merging is performed in Python before that assignment. Thus PUT reliably
+  drops omitted keys rather than relying on nested MERGE semantics.
+- Deterministic owner/target overlay IDs work with separate owner-filtered SELECT/UPDATE/DELETE
+  and CREATE in an SDK transaction. Reset never touches the target or another owner's overlay.
+- Creating a user-owned sense and `RELATE $lexeme->$edge->$sense CONTENT $content` with a
+  user-owned bound edge ID commits atomically. Effective entry reads expose it only to its
+  creator and leave existing shared rows/edges unchanged.
+- Owner/target-filtered note lists (`ORDER BY id`), owner-filtered note mutation and independent
+  target visibility checks work inside the same SDK transaction. A deleted/foreign target
+  cannot be accessed through a retained note/overlay row.
+
+API regression coverage lives in `test_overrides.py`, `test_user_dictionary.py`, `test_notes.py`.
+No migration or snapshot change is needed; these reuse `0005` and `0006`.
+
 Task **1.3.2** verified all 23 notes on **2026-11-14**, against the **test** instance on
 loopback port **8101**, Python **3.14.3**, and Python SDK **`surrealdb==3.0.0`**. The official
 image was `docker.io/surrealdb/surrealdb:v3.3.5`, digest

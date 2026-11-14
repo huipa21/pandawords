@@ -104,6 +104,33 @@ neither changes shared data nor exposes identity/ownership fields. Affix composi
 directional semantic edges are idempotent and do not recursively materialize related senses.
 The existing server on 8101 is reused; no dev database or server lifecycle changes are needed.
 
+### User dictionary API (2.3.3)
+
+From `backend`, run `uv run --no-sync pytest -q tests\api\test_overrides.py
+tests\api\test_user_dictionary.py tests\api\test_notes.py`. These tests use fresh users and
+the migrated, randomly named harness database on the existing test server (8101).
+
+Coverage includes authenticated effective lemma entries; own custom sense/edge creation and
+foreign-parent rejection; override application, recursive map patches, full replacement,
+per-field reset by replacement and idempotent whole reset on all seven target tables; note CRUD
+and current-target visibility checks after ownership changes/deletion. Every new route has
+unauthenticated coverage and cross-user isolation (including administrator requests).
+Shared rows/edges are compared before/after,
+and invalid IDs, unknown/identity/pointer fields, wrong-table fields, nulls, invalid nested
+values and strict rank/boolean validation are rejected. Shared `run` materialization explicitly
+selects only `run-move`, preserving the existing repository test's initial-cache assumptions.
+No memberships/add-to-project behavior or E2E/dev lifecycle is exercised here.
+
+Verification on 2026-11-14: generated API contracts preserve every existing route/model;
+`check` passed, the final backend suite passed **516 tests** and frontend unit tests passed
+**85 tests**. The focused API suite passed **40 tests**. Initial missing `ruff`/`pytest` failures
+were resolved with `uv sync --frozen`; frontend execution restored its locked cached packages.
+The first full run exposed the shared `run` cache assumption described above; narrowed fixture
+selection fixed it. The existing Starlette/httpx deprecation warning remains. Pylance could not
+attach the worktree file; CLI basedpyright and runtime tests passed. Subsequent check/gen-api
+verification called the existing script implementations directly to avoid loading private
+development environment files. No remaining blockers; E2E and memberships are out of scope.
+
 - `db`: async WebSocket connection to the migrated session database, or the empty database for
   a `fresh_db` test. `test_settings` selects the same database; `session_db` and
   `session_db_settings` explicitly access the shared migrated database.

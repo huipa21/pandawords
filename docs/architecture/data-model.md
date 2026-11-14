@@ -220,6 +220,67 @@ and rolls back the whole write rather than taking ownership. Shared edge IDs are
 their type and source. This preserves repeated morphemes and distinct relation provenance.
 No new schema/migration is needed.
 
+### User dictionary HTTP contract (2.3.3)
+
+All routes below require an enabled, password-changed bearer user, return `Cache-Control:
+no-store`, and use opaque record IDs. Missing, malformed, wrong-table and foreign-owned target
+IDs return 404. Supported target tables are exactly `lemma`, `lexeme`, `sense`, `morpheme`,
+`tag`, `sentence`, `passage`; project, user, relation and arbitrary-record annotations are not
+exposed by this API, even though the note schema permits arbitrary record references.
+
+| Route | Request → response |
+|---|---|
+| `GET /api/dictionary/lemmas/{lemma_id}/entry` | `DictionaryEntryRead` from `services.dictionary.read_entry` |
+| `POST /api/dictionary/lexemes/{lexeme_id}/senses` | `CustomSenseCreate` → 201 `DictionaryRecordRead` |
+| `GET /api/dictionary/{table}/{id}/override` | `OverrideRead` (404 if no own override) |
+| `PUT /api/dictionary/{table}/{id}/override` | `OverrideUpdate` → `OverrideRead`; create or replace the entire own overlay |
+| `PATCH /api/dictionary/{table}/{id}/override` | `OverrideUpdate` → `OverrideRead`; create or recursively merge the own overlay |
+| `DELETE /api/dictionary/{table}/{id}/override` | 204; reset the entire own overlay, idempotent for a visible target |
+| `POST /api/notes` | `NoteCreate` → 201 `NoteRead` |
+| `GET /api/notes?target_table=...&target_id=...` | Own `NoteRead[]`, in ID order, for one visible target |
+| `GET /api/notes/{id}` | Own `NoteRead` |
+| `PATCH /api/notes/{id}` | `NoteUpdate` → own `NoteRead` |
+| `DELETE /api/notes/{id}` | 204; subsequent access returns 404 |
+
+`OverrideUpdate = {fields: OverrideFields}`. Only explicitly provided fields are stored/returned;
+nulls, unknown fields and fields outside the target-specific allowlist return 422:
+
+| Target | Editable fields |
+|---|---|
+| lemma | `text`, `cefr`, `exam_tags` |
+| lexeme | `etymology_text`, `forms`, `pron` |
+| sense | `definition`, `gloss`, `register`, `domain`, `examples`, `rank`, `common` |
+| morpheme | `text`, `meaning` |
+| tag | `name` |
+| sentence | `text`, `translation` |
+| passage | `title`, `text` |
+
+Identity, owner, source/provenance, language, classification and structural pointers cannot be
+overridden. Forms accept only `{form, tags}`; pronunciations accept only `{accent: US|UK, ipa}`,
+never audio record pointers. Language maps have string values and language-tag keys. Text fields
+are strict strings up to 10,000 characters, lists have at most 100 entries, `common` is a strict
+boolean, and `rank` is a strict nonnegative signed 64-bit integer.
+PATCH merges nested language maps; arrays/scalars replace. PUT discards omitted overlay fields,
+so removing a single field means PUTting the remaining fields; `{fields: {}}` is a valid empty
+overlay. DELETE removes the row. `OverrideRead` returns `target_table`, `target_id`, `fields`,
+UTC `updated_at`, never the internal composite ID or mutable ownership.
+
+`CustomSenseCreate` requires nonblank `definition`; optional `gloss`, `register`, `domain`,
+`examples`, `rank`, `common` default to `{}`, `[]`, `[]`, `[]`, `0`, `false`. Its field types and
+limits match the corresponding override fields. The server atomically creates a random-ID sense
+with `source="custom"` and the authenticated owner, plus an equally owned `has_sense` edge to
+the visible lexeme. It does not create memberships, modify shared rows, or materialize lexicon
+data. Own custom senses are read through effective lemma entries and edited/reset through
+overlays; another user's entry omits both the sense and its edge.
+
+`NoteCreate = {target_table, target_id, kind?: note|mnemonic, text}`, with default kind `note`.
+`NoteUpdate` accepts only optional `kind` and `text`; omitted fields stay unchanged, empty patches
+are no-ops, nulls are rejected. Text is trimmed, nonblank and at most 10,000 characters.
+`NoteRead = {id, target_table, target_id, kind, text}`. Notes cannot be retargeted or re-owned.
+Every note operation rechecks target existence/visibility; knowing a note ID or having an
+administrator role never grants access to another user's note. Visibility checks and writes
+share a transaction. These endpoints reuse migration `0006`, without a schema change.
+
 Supported source edges are `has_lexeme`, `has_sense`, affix `composed_of`, sense-domain
 `member_of` (to `tag:['domain', normalized_name]`), and directional `relates_to`. Semantic
 edges connect only already-materialized shared endpoints; incoming and outgoing source

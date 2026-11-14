@@ -263,6 +263,97 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/dictionary/lemmas/{lemma_id}/entry': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Read Entry */
+    get: operations['read_entry_api_dictionary_lemmas__lemma_id__entry_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/dictionary/lexemes/{lexeme_id}/senses': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Create Sense */
+    post: operations['create_sense_api_dictionary_lexemes__lexeme_id__senses_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/dictionary/{table}/{id}/override': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Read Override */
+    get: operations['read_override_api_dictionary__table___id__override_get']
+    /** Replace Override */
+    put: operations['replace_override_api_dictionary__table___id__override_put']
+    post?: never
+    /** Reset Override */
+    delete: operations['reset_override_api_dictionary__table___id__override_delete']
+    options?: never
+    head?: never
+    /** Update Override */
+    patch: operations['update_override_api_dictionary__table___id__override_patch']
+    trace?: never
+  }
+  '/api/notes': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List Notes */
+    get: operations['list_notes_api_notes_get']
+    put?: never
+    /** Create Note */
+    post: operations['create_note_api_notes_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/notes/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Read Note */
+    get: operations['read_note_api_notes__id__get']
+    put?: never
+    post?: never
+    /** Delete Note */
+    delete: operations['delete_note_api_notes__id__delete']
+    options?: never
+    head?: never
+    /** Update Note */
+    patch: operations['update_note_api_notes__id__patch']
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -377,7 +468,69 @@ export interface components {
       /** Sources */
       sources: components['schemas']['LexiconSource'][]
     }
+    /** CustomSenseCreate */
+    'CustomSenseCreate': {
+      definition: components['schemas']['app__domain__overrides__Text__2']
+      /** Gloss */
+      gloss?: {
+        [key: string]: components['schemas']['app__domain__overrides__Text__1']
+      }
+      /** Register */
+      register?: components['schemas']['app__domain__overrides__Text__1'][]
+      /** Domain */
+      domain?: components['schemas']['app__domain__overrides__Text__1'][]
+      /** Examples */
+      examples?: components['schemas']['app__domain__overrides__Text__1'][]
+      /** @default 0 */
+      rank: components['schemas']['Rank']
+      /**
+       * Common
+       * @default false
+       */
+      common: boolean
+    }
+    /** DictionaryEntryRead */
+    'DictionaryEntryRead': {
+      lemma: components['schemas']['DictionaryRecordRead']
+      /** Lexemes */
+      lexemes: components['schemas']['DictionaryLexemeRead'][]
+    }
     'DictionaryKey-Output': (string | number)[]
+    /** DictionaryLexemeRead */
+    'DictionaryLexemeRead': {
+      lexeme: components['schemas']['DictionaryRecordRead']
+      /** Senses */
+      senses: components['schemas']['DictionaryRecordRead'][]
+    }
+    /**
+     * DictionaryRecordRead
+     * @description Transport-safe record; fields are schema fields, never ownership or identity.
+     */
+    'DictionaryRecordRead': {
+      /** Id */
+      id: string
+      table: components['schemas']['DictionaryTable']
+      /** Owner */
+      owner: string | null
+      /** Fields */
+      fields: {
+        [key: string]: components['schemas']['JsonValue']
+      }
+    }
+    /** @enum {string} */
+    'DictionaryTable': 'lemma' | 'lexeme' | 'sense' | 'morpheme' | 'tag' | 'sentence' | 'passage'
+    /** Form */
+    'Form-Input': {
+      form: components['schemas']['app__domain__overrides__Text__1']
+      /** Tags */
+      tags?: components['schemas']['app__domain__overrides__Text__1'][]
+    }
+    /** Form */
+    'Form-Output': {
+      form: components['schemas']['Text-Output']
+      /** Tags */
+      tags?: components['schemas']['Text-Output'][]
+    }
     /** HTTPValidationError */
     'HTTPValidationError': {
       /** Detail */
@@ -405,6 +558,7 @@ export interface components {
       error?: string | null
     }
     'JsonValue': unknown
+    'Language': string
     /** LexiconGloss */
     'LexiconGloss': {
       lexeme_id: components['schemas']['DictionaryKey-Output']
@@ -510,6 +664,116 @@ export interface components {
       /** Password */
       password: string
     }
+    /** NoteCreate */
+    'NoteCreate': {
+      target_table: components['schemas']['DictionaryTable']
+      /** Target Id */
+      target_id: string
+      /** @default note */
+      kind: components['schemas']['NoteKind']
+      text: components['schemas']['NoteText']
+    }
+    /** @enum {string} */
+    'NoteKind': 'note' | 'mnemonic'
+    /** NoteRead */
+    'NoteRead': {
+      /** Id */
+      id: string
+      target_table: components['schemas']['DictionaryTable']
+      /** Target Id */
+      target_id: string
+      kind: components['schemas']['NoteKind']
+      /** Text */
+      text: string
+    }
+    'NoteText': string
+    /** NoteUpdate */
+    'NoteUpdate': {
+      kind?: components['schemas']['NoteKind'] | null
+      text?: components['schemas']['NoteText'] | null
+    }
+    /** OverrideFields */
+    'OverrideFields-Input': {
+      text?: components['schemas']['app__domain__overrides__Text__1'] | null
+      cefr?: components['schemas']['app__domain__overrides__Text__1'] | null
+      /** Exam Tags */
+      exam_tags?: components['schemas']['app__domain__overrides__Text__1'][] | null
+      etymology_text?: components['schemas']['app__domain__overrides__Text__1'] | null
+      /** Forms */
+      forms?: components['schemas']['Form-Input'][] | null
+      /** Pron */
+      pron?: components['schemas']['Pronunciation-Input'][] | null
+      definition?: components['schemas']['app__domain__overrides__Text__1'] | null
+      /** Gloss */
+      gloss?: {
+        [key: string]: components['schemas']['app__domain__overrides__Text__1']
+      } | null
+      /** Register */
+      register?: components['schemas']['app__domain__overrides__Text__1'][] | null
+      /** Domain */
+      domain?: components['schemas']['app__domain__overrides__Text__1'][] | null
+      /** Examples */
+      examples?: components['schemas']['app__domain__overrides__Text__1'][] | null
+      rank?: components['schemas']['Rank'] | null
+      /** Common */
+      common?: boolean | null
+      meaning?: components['schemas']['app__domain__overrides__Text__1'] | null
+      name?: components['schemas']['app__domain__overrides__Text__1'] | null
+      /** Translation */
+      translation?: {
+        [key: string]: components['schemas']['app__domain__overrides__Text__1']
+      } | null
+      title?: components['schemas']['app__domain__overrides__Text__1'] | null
+    }
+    /** OverrideFields */
+    'OverrideFields-Output': {
+      text?: components['schemas']['Text-Output'] | null
+      cefr?: components['schemas']['Text-Output'] | null
+      /** Exam Tags */
+      exam_tags?: components['schemas']['Text-Output'][] | null
+      etymology_text?: components['schemas']['Text-Output'] | null
+      /** Forms */
+      forms?: components['schemas']['Form-Output'][] | null
+      /** Pron */
+      pron?: components['schemas']['Pronunciation-Output'][] | null
+      definition?: components['schemas']['Text-Output'] | null
+      /** Gloss */
+      gloss?: {
+        [key: string]: components['schemas']['Text-Output']
+      } | null
+      /** Register */
+      register?: components['schemas']['Text-Output'][] | null
+      /** Domain */
+      domain?: components['schemas']['Text-Output'][] | null
+      /** Examples */
+      examples?: components['schemas']['Text-Output'][] | null
+      rank?: components['schemas']['Rank'] | null
+      /** Common */
+      common?: boolean | null
+      meaning?: components['schemas']['Text-Output'] | null
+      name?: components['schemas']['Text-Output'] | null
+      /** Translation */
+      translation?: {
+        [key: string]: components['schemas']['Text-Output']
+      } | null
+      title?: components['schemas']['Text-Output'] | null
+    }
+    /** OverrideRead */
+    'OverrideRead': {
+      target_table: components['schemas']['DictionaryTable']
+      /** Target Id */
+      target_id: string
+      fields: components['schemas']['OverrideFields-Output']
+      /**
+       * Updated At
+       * Format: date-time
+       */
+      updated_at: string
+    }
+    /** OverrideUpdate */
+    'OverrideUpdate': {
+      fields: components['schemas']['OverrideFields-Input']
+    }
     /** PasswordChange */
     'PasswordChange': {
       /** Current Password */
@@ -593,6 +857,26 @@ export interface components {
       /** Plan */
       plan?: components['schemas']['ProjectPlan']
     }
+    /** Pronunciation */
+    'Pronunciation-Input': {
+      /**
+       * Accent
+       * @enum {string}
+       */
+      accent: 'US' | 'UK'
+      ipa: components['schemas']['app__domain__overrides__Text__1']
+    }
+    /** Pronunciation */
+    'Pronunciation-Output': {
+      /**
+       * Accent
+       * @enum {string}
+       */
+      accent: 'US' | 'UK'
+      ipa: components['schemas']['Text-Output']
+    }
+    'Rank': number
+    'Text-Output': string
     /** UserPreferences */
     'UserPreferences': {
       /**
@@ -649,6 +933,8 @@ export interface components {
     }
     'app__domain__dictionary_keys__DictionaryKey__1': (string | number)[]
     'app__domain__dictionary_keys__DictionaryKey__2': (string | number)[]
+    'app__domain__overrides__Text__1': string
+    'app__domain__overrides__Text__2': string
   }
   responses: never
   parameters: never
@@ -1223,6 +1509,366 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['AddToProjectRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  read_entry_api_dictionary_lemmas__lemma_id__entry_get: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        lemma_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DictionaryEntryRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  create_sense_api_dictionary_lexemes__lexeme_id__senses_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        lexeme_id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CustomSenseCreate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DictionaryRecordRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  read_override_api_dictionary__table___id__override_get: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        table: 'lemma' | 'lexeme' | 'sense' | 'morpheme' | 'tag' | 'sentence' | 'passage'
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['OverrideRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  replace_override_api_dictionary__table___id__override_put: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        table: 'lemma' | 'lexeme' | 'sense' | 'morpheme' | 'tag' | 'sentence' | 'passage'
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['OverrideUpdate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['OverrideRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  reset_override_api_dictionary__table___id__override_delete: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        table: 'lemma' | 'lexeme' | 'sense' | 'morpheme' | 'tag' | 'sentence' | 'passage'
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  update_override_api_dictionary__table___id__override_patch: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        table: 'lemma' | 'lexeme' | 'sense' | 'morpheme' | 'tag' | 'sentence' | 'passage'
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['OverrideUpdate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['OverrideRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  list_notes_api_notes_get: {
+    parameters: {
+      query: {
+        target_table: 'lemma' | 'lexeme' | 'sense' | 'morpheme' | 'tag' | 'sentence' | 'passage'
+        target_id: string
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['NoteRead'][]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  create_note_api_notes_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['NoteCreate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['NoteRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  read_note_api_notes__id__get: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['NoteRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  delete_note_api_notes__id__delete: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  update_note_api_notes__id__patch: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['NoteUpdate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['NoteRead']
         }
       }
       /** @description Validation Error */

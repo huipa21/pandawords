@@ -45,7 +45,9 @@ async def relate(
     )[0][0]
 
 
-async def visible(db: AsyncWsSurrealConnection, table: str, user: RecordID) -> list[dict[str, Any]]:
+async def visible(
+    db: AsyncWsSurrealConnection, table: str, user: RecordID | None
+) -> list[dict[str, Any]]:
     return (
         await checked_query(
             db,
