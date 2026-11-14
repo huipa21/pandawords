@@ -32,10 +32,9 @@ review media preferences (5.1.3); other schema additions require a coordinator a
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 4.1.1 | task/4.1.1-phrases | ../pandawords.worktrees/4.1.1 | Committed c4ef220, awaiting integration |
 | 4.3.1 | task/4.3.1-tags | ../pandawords.worktrees/4.3.1 | Agent running, wave 1 |
-| 4.1.2 | task/4.1.2-phrase-flow | ../pandawords.worktrees/4.1.2 | Waiting for 4.1.1 |
-| 4.2.2 | task/4.2.2-ingestion | ../pandawords.worktrees/4.2.2 | Ready; prerequisite 4.2.1 verified |
+| 4.1.2 | task/4.1.2-phrase-flow | ../pandawords.worktrees/4.1.2 | Ready; prerequisite 4.1.1 verified |
+| 4.2.2 | task/4.2.2-ingestion | ../pandawords.worktrees/4.2.2 | Agent running |
 | 4.3.2 | task/4.3.2-morphology | ../pandawords.worktrees/4.3.2 | Waiting for 4.3.1 |
 | 4.4.1 | task/4.4.1-graph-api | ../pandawords.worktrees/4.4.1 | Waiting for 4.1.1, 4.2.1, 4.3.1 |
 | 4.2.3 | task/4.2.3-reading | ../pandawords.worktrees/4.2.3 | Waiting for 4.2.2 |
@@ -70,6 +69,19 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 4.1.1 Phrase lexicon and composition
+- Result / completed: `c4ef220` merged as `553612e`; attributed, source-backed ordered components,
+  explicit literal usage, idempotent shared materialization and owner isolation. SQLite schema v2
+  requires rebuilding existing lexicon artifacts. No database migration.
+- Dependencies: 2.2.3 and 2.1.2 checked ✅.
+- Verification: agent check, 63 focused and 106 related regressions passed; main integrated
+  check and 42 phrase/context integration cases passed.
+- Failures / causes / corrections: local missing Ruff restored from lock; lint/type findings fixed.
+  Pylance timed out; runtime/Ruff/basedpyright passed. Testing-doc merge conflict resolved preserving
+  both schema and phrase sections.
+- Skipped / deferred: final full suites/E2E later; no live providers required.
+- Blockers / follow-ups: none; 4.1.2 ready. Task worktree cleanup pending.
 
 ### 2026-11-14 — 4.2.1 Context schema contract
 - Result / completed: `a97632b` merged as `a266512`; 30 schema cases and three existing docs.

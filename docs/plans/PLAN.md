@@ -100,7 +100,7 @@ are in `phase-N.md`. If a phase file doesn't exist yet, the agent asks before wr
 
 | ID | Task | Depends on | Wave | Size | Status |
 |---|---|---|---|---|---|
-| 4.1.1 | Phrases: multi-word lemmas in lexicon + `contains` materialization | 2.2.3, 2.1.2 | 1 | M | 🟡 |
+| 4.1.1 | Phrases: multi-word lemmas in lexicon + `contains` materialization | 2.2.3, 2.1.2 | 1 | M | ✅ |
 | 4.1.2 | Phrase add flow + "phrases containing this word" (API + UI) | 4.1.1, 2.6.5 | 2 | M | 🟡 |
 | 4.2.1 | Migrations: `sentence`, `passage`, `used_in`, `part_of` | 2.2.1 | 1 | S | ✅ |
 | 4.2.2 | Sentence/passage CRUD + ingestion (split, lemmatize, link senses, optional LLM) | 4.2.1, 2.4.1, 3.2.5 | 2 | L | 🟡 |
