@@ -102,6 +102,8 @@ def main() -> None:
     parser.add_argument("--kaikki", type=Path)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--words", type=Path, help="UTF-8 word list, one lemma per line")
+    parser.add_argument("--ecdict", type=Path, help="Enrich with this ECDICT CSV (explicit opt-in)")
+    parser.add_argument("--wordfreq", action="store_true", help="Enrich with offline wordfreq Zipf")
     args = parser.parse_args()
     try:
         raw = default_raw_dir() if args.kaikki is None or args.output is None else Path()
@@ -111,7 +113,16 @@ def main() -> None:
         if args.words is not None:
             with args.words.open(encoding="utf-8") as file:
                 words = {line.strip() for line in file if line.strip()}
-        result = build(kaikki, output, words=words)
+        enrichers: list[Enricher] = []
+        if args.ecdict is not None:
+            from .lexicon_ecdict import ecdict_enricher
+
+            enrichers.append(ecdict_enricher(args.ecdict))
+        if args.wordfreq:
+            from .lexicon_frequency import wordfreq_enricher
+
+            enrichers.append(wordfreq_enricher())
+        result = build(kaikki, output, words=words, enrichers=enrichers)
     except (OSError, ValueError, sqlite3.Error) as error:
         parser.exit(1, f"lexicon build failed: {error}\n")
     print(

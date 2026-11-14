@@ -88,6 +88,7 @@ Downloading is separate from SQLite building. From `backend`:
 uv run --no-sync python -m scripts.build_lexicon
 uv run --no-sync python -m scripts.build_lexicon --kaikki path\kaikki-english.jsonl --output path\lexicon.sqlite
 uv run --no-sync python -m scripts.build_lexicon --words path\fixture.txt
+uv run --no-sync python -m scripts.build_lexicon --ecdict path\ecdict.csv --wordfreq
 ```
 
 Default input/output are the main worktree's shared `data\lexicon\raw\kaikki-english.jsonl`
@@ -185,7 +186,66 @@ OEWN owns relations and `sense.lexname` (append domain tags only if preserving e
 Frequency rows are per source: ECDICT ranks and wordfreq Zipf values need not share provenance.
 The canonical wordfreq `freq.zipf` and `lemma.freq_zipf` should be kept in sync by that enricher.
 Enrichment-specific CLI flags may be added to `build_lexicon.main` as a small integration change;
-the core CLI currently imports no optional enrichment modules.
+the core CLI imports an enrichment module only when its flag is requested.
+
+### ECDICT and wordfreq enrichment
+
+`--ecdict PATH` and `--wordfreq` independently opt in; neither is implicitly enabled.
+ECDICT runs before wordfreq when both flags are present. The requested CSV must exist;
+invalid CSV, malformed nonnegative BNC/COCA ranks or a mismatched sibling download manifest
+abort publication. No network or silent source fallback is used. ECDICT streams CSV rows
+after streaming payload validation, retaining only the current row and its matching lexemes.
+
+Typed callable factories (both hooks return `None`; `.result` is populated after success):
+
+```python
+from scripts.lexicon_ecdict import ecdict_enricher
+from scripts.lexicon_frequency import wordfreq_enricher
+
+ecdict = ecdict_enricher(csv_path)  # EcdictEnricher
+frequency = wordfreq_enricher()  # FrequencyEnricher; installed offline English "best" list
+build(kaikki, output, enrichers=(ecdict, frequency))
+# Fixture option: wordfreq_enricher(lookup=callable, package_version="fixture-v1")
+```
+
+`EcdictResult` counts rows, matched/unmatched lemma rows, duplicate matched rows, unmatched
+glosses, ambiguous gloss alignments and inserted glosses. `FrequencyResult` counts lemmas and
+zero/unknown Zipf values. Structured `ecdict_unmatched`, `ecdict_duplicate`,
+`ecdict_gloss_unresolved`, `wordfreq_unmatched` and completion events expose skipped entries
+with CSV row/word/reason or frequency word. Ambiguous glosses are never silently attached.
+
+Matching uses normalized `lemma_key("en", word)` only: no fuzzy matching or inflection lookup.
+Translation lines (including literal `\n`) carry POS prefixes: `n`, `v`/`vt`/`vi`,
+`a`/`adj`, `ad`/`adv`, `pron`, `prep`, `conj`, `int`/`interj`, `num`, `art`, `aux`.
+Slash/ampersand-separated labels are supported; unrecognized labels are unresolved.
+Unlabelled text attaches only when the lemma has exactly one lexeme; labelled text needs
+exactly one matching POS lexeme. Multiple etymologies are ambiguous, not guessed. The
+statistical ECDICT `pos` column is not used to invent a gloss alignment. Continuation lines
+retain their last prefix. Semicolons separate glosses; whitespace-trimmed identical glosses
+are deduplicated. For duplicate normalized word rows, the first CSV row wins entirely,
+including ranks and tags; row order is part of the checksummed source input.
+
+Per lexeme, the first aligned gloss is stored in the top sense's `gloss_zh` and in `zh_gloss`
+with that `sense_id`; other glosses remain lexeme-level (`sense_id=NULL`). Top means lowest
+`rank`, then lexical sense ID. This is a conservative POS/top-sense heuristic, **not**
+English–Chinese semantic equivalence. Source sense provenance remains Wiktionary.
+Exam tags are deduplicated against `zk gk cet4 cet6 ky toefl ielts gre`; other labels are ignored.
+`bnc` and `frq` populate ECDICT `freq.bnc`/`freq.coca`; blank/zero ranks become NULL.
+
+wordfreq writes every English lemma's Zipf to both `freq(source='wordfreq').zipf` and
+`lemma.freq_zipf`, including zero (unknown); negative/nonfinite values fail the build.
+ECDICT ranks are not converted to Zipf. Each enricher recomputes `common`, so hook order
+does not affect selection: per lexeme, Zipf **>=5 selects the top two**, **>=3 selects
+the top one**, and lower/zero/missing frequency selects none. Additionally the sense
+carrying a primary aligned ECDICT gloss is always common, even without wordfreq.
+Remaining senses stay false; unaligned or ambiguous glosses never select a sense.
+
+`source.ecdict` records MIT attribution, exact-byte SHA-256 and verified download record
+when supplied. `source.wordfreq` records package version, English/`best` options, Robyn Speer
+and data-contributor attribution and Apache-2.0/data CC-BY-SA-4.0 licensing/NOTICE URL.
+`uv.lock` pins the package/data snapshot. Fixture lookup versions must be explicit.
+No new schema or tables are introduced. Rebuilding identical inputs produces identical
+logical SQLite data (not a promise of byte-identical SQLite files).
 
 Focused, network-free tests from `backend`:
 
@@ -193,6 +253,7 @@ Focused, network-free tests from `backend`:
 New-Item -ItemType Directory -Force .dev | Out-Null
 uv run --no-sync pytest tests\unit\test_download_lexicon.py --basetemp=.dev\lexicon-tests -q
 uv run --no-sync pytest tests\unit\test_build_lexicon.py --basetemp=.dev\lexicon-build-tests -q
+uv run --no-sync pytest tests\unit\test_lexicon_ecdict.py --basetemp=.dev\lexicon-ecdict-tests -q
 ```
 
 From the repository root, run `.\scripts\dev.ps1 check` and
