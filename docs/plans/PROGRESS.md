@@ -10,6 +10,7 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 ## Current run
 
 Request: implement all Phase 3 tasks with dependency-driven parallel agents (maximum five).
+Status: complete. All 13 tasks are merged and verified; no active task branches or worktrees.
 Phase 1 and Phase 2 dependencies are all ✅. Schedule ready tasks immediately after their prerequisites
 are merged and verified, without waiting for unrelated tasks in the same wave.
 Pre-existing Phase 3 plan/details are included unchanged except task statuses, as requested.
@@ -18,7 +19,6 @@ Migration allocations: 0013 memory/history; 0014 LLM; 0015 SRS preferences;
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 3.3.4 | task/3.3.4-e2e | ../pandawords.worktrees/3.3.4 | Agent writing real-stack browser flow |
 
 ## Blocked
 
@@ -57,6 +57,42 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Findings: sentence, passage, phrase, tag, morpheme and related edge schemas already exist in
   migration 0005; task 4.2.1 requires verification and only additive migration if needed.
 - Blockers / follow-ups: none.
+
+### 2026-11-14 — Phase 3 complete
+- Result / completed: all 13 Phase 3 tasks merged to `main`, all task branches and folders
+  removed, empty worktree parent removed. Existing supplied Phase 3 planning and subsequently
+  supplied Phase 4 detail document preserved and committed; no Phase 4 implementation.
+- Dependencies: every Phase 3 row checked ✅.
+- Verification: final `dev.ps1 check` and `dev.ps1 test -Backend -Frontend` passed after all
+  merges and dependency-folder cleanup (894 backend, existing Starlette warning).
+  Production frontend build passed. Full `dev.ps1 test -E2E` passed all three browser flows;
+  explicit `playwright test review-session.spec.ts` passed independently after cleanup.
+  Final worktree/branch audit showed only main; `git diff --check` passed.
+- Skipped / deferred: live LLM/audio calls deliberately excluded by the required offline
+  verification; no acceptance checks skipped. No remaining implementation work or blockers.
+- Failures / causes / corrections: cold-test initialization, expanded-preview timeout,
+  isolated fixture assumptions, shared-venv cleanup incident and request-inspection assertion
+  recorded below; all corrected and verified, no unresolved failures.
+- Findings / follow-ups: owned API/worker/Vite/dev DB stopped after browser verification.
+  Only test-created projects were deleted and test learners disabled; their retained review
+  history and the development database volume remain as required. No push requested or made.
+
+### 2026-11-14 — 3.3.4 Real-stack review E2E
+- Result / completed: `7a11601` merged; unique learner/project, fixture-safe recognition,
+  plan navigation, server feedback, manual rating override, persisted receipt, reload/retry
+  and exactly-once count/queue assertions. Cleanup always disables only the captured learner
+  and deletes only its project.
+- Dependencies: 3.3.2 and 3.3.3 checked ✅.
+- Verification: agent check/frontend/E2E TypeScript/discovery passed; main check passed.
+  Full real-stack E2E passed 3/3; explicit review selector passed 1/1 with DeepSeek budget zero,
+  placeholder key and audio networking disabled. Final backend/frontend suite passed.
+- Skipped / deferred: none. Existing SRS integration coverage proves a single log under
+  concurrent/retried confirmation; no duplicate implementation-shaped backend test added.
+- Failures / causes / corrections: first browser run reached a correct persisted override
+  but Chromium returned null for streamed-request `postDataJSON()`. Removed only that
+  redundant inspection; durable receipt/rating/retry/count assertions remain and all pass.
+- Blockers / follow-ups: none. Task branch/folder safely removed after unlinking reparse
+  points without traversing targets; supplied planning files and all requested files committed.
 
 ### 2026-11-14 — 3.3.2 Durable review session
 - Result / completed: `6fda8e4` merged; project queue/attempt/grade/confirm session,
