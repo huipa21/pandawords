@@ -21,8 +21,9 @@ from app.domain.exercises import ExerciseContext, Unavailable
 from app.domain.lexicon import Accent
 from app.domain.media import MediaCreate
 from app.domain.overrides import OverrideFields, OverrideUpdate
-from app.services import exercise_listen, media, overrides, srs
+from app.services import exercise_cloze, exercise_listen, media, overrides, srs
 from app.services.exercise_answers import selected_lexeme_forms
+from app.services.exercise_registry import ExerciseRegistry
 from app.services.lexicon import LexiconReader
 from tests.api.auth_support import bearer, login
 from tests.api.test_exercise_attempts import URL, assert_no_key, issue
@@ -30,6 +31,19 @@ from tests.conftest import UserFactory
 from tests.integration.srs_support import Study, create_study
 
 pytestmark = pytest.mark.integration
+
+
+@pytest.fixture(autouse=True)
+def recall_plugins(monkeypatch: pytest.MonkeyPatch) -> None:
+    def build_registry(
+        db: AsyncSurrealConnection, settings: Settings, accent: Accent
+    ) -> ExerciseRegistry:
+        target = ExerciseRegistry()
+        exercise_cloze.register(target)
+        exercise_listen.register(target, exercise_listen.provider(db, settings, accent))
+        return target
+
+    monkeypatch.setattr("app.api.exercise_attempts.build_registry", build_registry)
 
 
 @pytest.fixture(autouse=True)

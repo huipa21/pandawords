@@ -7,7 +7,7 @@ from app.db import exercise_test_support as probe
 from app.db.auth import _atomic
 from app.db.exercise_context import selected_context
 from app.services import exercise_attempts, recognition
-from app.services.exercise_registry import ExerciseRegistry, registry
+from app.services.exercise_registry import ExerciseRegistry
 from app.services.lexicon import LexiconReader
 from tests.api.auth_support import bearer, login
 from tests.api.test_exercise_attempts import assert_no_key
@@ -20,7 +20,7 @@ pytestmark = pytest.mark.integration
 URL = "/api/exercise-attempts"
 
 
-@pytest.mark.parametrize("exercise", ["def2word", "word2def", "relation"])
+@pytest.mark.parametrize("exercise", ["def2word", "word2def", "relation", None])
 @pytest.mark.parametrize("submission", ["correct", "wrong", "giveup"])
 async def test_real_recognition_attempt_lifecycle_and_owner_isolation(
     client: AsyncClient,
@@ -28,7 +28,7 @@ async def test_real_recognition_attempt_lifecycle_and_owner_isolation(
     make_user: UserFactory,
     lexicon_reader: LexiconReader,
     monkeypatch: pytest.MonkeyPatch,
-    exercise: str,
+    exercise: str | None,
     submission: str,
 ) -> None:
     study = await create_study(db, make_user, lexicon_reader)
@@ -48,7 +48,10 @@ async def test_real_recognition_attempt_lifecycle_and_owner_isolation(
     await semantic(db, source, answer, "antonym")
     target = ExerciseRegistry()
     recognition.register(target, recognition.DatabaseProvider(db))
-    monkeypatch.setattr(registry, "_plugins", {exercise: target.get(exercise)})
+    if exercise is not None:
+        selected = ExerciseRegistry()
+        selected.register(target.get(exercise))
+        monkeypatch.setattr("app.api.exercise_attempts.build_registry", lambda *_args: selected)
     clock = Clock()
     monkeypatch.setattr(exercise_attempts, "_now", clock.now)
     headers = bearer(await login(client, study.user.username))
@@ -59,7 +62,9 @@ async def test_real_recognition_attempt_lifecycle_and_owner_isolation(
     )
     assert opened_response.status_code == 201, opened_response.text
     opened = opened_response.json()
-    assert opened["exercise"] == exercise and opened["kind"] == "recognition"
+    if exercise is not None:
+        assert opened["exercise"] == exercise
+    assert opened["kind"] == "recognition"
     assert_no_key(opened)
     assert 2 <= len(opened["prompt"]["choices"]) <= 4
     assert all(len(item["id"]) == 32 for item in opened["prompt"]["choices"])
@@ -106,7 +111,7 @@ async def test_real_recognition_attempt_lifecycle_and_owner_isolation(
     assert confirmed.status_code == 200, confirmed.text
     assert confirmed.json()["receipt"]["rating"] == 4
     logs = await probe.logs(db, study.user.id)
-    assert len(logs) == 1 and logs[0]["exercise"] == exercise
+    assert len(logs) == 1 and logs[0]["exercise"] == opened["exercise"]
     assert logs[0]["auto_rating"] == (3 if submission == "correct" else 1)
     assert logs[0]["rating"] == 4
     assert await probe.logs(db, bob.id) == []

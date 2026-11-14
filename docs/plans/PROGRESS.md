@@ -18,9 +18,8 @@ Migration allocations: 0013 memory/history; 0014 LLM; 0015 SRS preferences;
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 3.2.3 | task/3.2.3-recognition | ../pandawords.worktrees/3.2.3 | Agent running |
 | 3.2.6 | task/3.2.6-scenario | ../pandawords.worktrees/3.2.6 | Agent running |
-| 3.3.2 | task/3.3.2-review | ../pandawords.worktrees/3.3.2 | Waiting for review prerequisites |
+| 3.3.2 | task/3.3.2-review | ../pandawords.worktrees/3.3.2 | Ready |
 | 3.3.4 | task/3.3.4-e2e | ../pandawords.worktrees/3.3.4 | Waiting for 3.3.2 and 3.3.3 |
 
 ## Blocked
@@ -60,6 +59,22 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Findings: sentence, passage, phrase, tag, morpheme and related edge schemas already exist in
   migration 0005; task 4.2.1 requires verification and only additive migration if needed.
 - Blockers / follow-ups: none.
+
+### 2026-11-14 — 3.2.3 Recognition plugins
+- Result / completed: `a39e2b8` merged; definition/word/relation recognition, effective
+  overlays, opaque options and accessible directed relation questions. Main registered
+  the concrete provider in request-bound bootstrap.
+- Dependencies: 3.2.2 checked ✅.
+- Verification: agent check/126 relevant tests passed; main check and 99 combined
+  recognition/distractor/recall/framework API regressions passed, including default production
+  bootstrap answer/give-up/confirmation flows without a registry override.
+- Skipped / deferred: final full-suite sweep follows scenario integration.
+- Failures / causes / corrections: initial combined run exposed plugin tests assuming an
+  otherwise empty registry. Tests now inject their focused registry through the API factory;
+  production bootstrap remains real in additional cases. Shared frequency candidates made
+  a distractor fixture nondeterministic; its tests now use per-test migrated databases.
+  Pylance hover timed out; basedpyright and runtime checks passed.
+- Blockers / follow-ups: none; review UI ready concurrently with scenario integration.
 
 ### 2026-11-14 — 3.2.4 Cloze and authenticated listening
 - Result / completed: `776581a` merged as `6c7f767`; concrete recall plugins, shared

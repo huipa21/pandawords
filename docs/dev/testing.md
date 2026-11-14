@@ -6,6 +6,11 @@ setup hook. This keeps cold plugin/configuration loading out of the first assert
 The full design-preview App integration test uses a scoped 20-second budget because it
 mounts both complete theme catalogues, including six exercise shells, and switches locale.
 
+Concrete exercise API tests inject a focused registry through the API's request-bound
+factory when asserting a particular exercise. Additional recognition lifecycle cases use
+the production bootstrap without overrides. Distractor graph tests use isolated migrated
+databases so equal-frequency candidates from other suites cannot change seeded choices.
+
 ## Recognition plugins (3.2.3)
 
 From `backend`, using the existing isolated random-database harness on loopback **8101**:

@@ -38,6 +38,7 @@ async def study(
 ) -> Study:
     fake = plugins(FakeGenerator("fake_recognition", "recognition"))
     monkeypatch.setattr(registry, "_plugins", fake._plugins)
+    monkeypatch.setattr("app.api.exercise_attempts.build_registry", lambda *_args: registry)
     return await create_study(db, make_user, lexicon_reader)
 
 

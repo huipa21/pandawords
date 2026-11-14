@@ -5,6 +5,7 @@ import pytest
 from surrealdb import RecordID
 from surrealdb.connections.async_ws import AsyncWsSurrealConnection
 
+from app.core.config import Settings
 from app.core.record_ids import decode_rid, encode_rid
 from app.db import distractors as repository
 from app.db.dictionary import read_records
@@ -16,6 +17,16 @@ from app.services import distractors, overrides
 from tests.conftest import UserFactory
 
 pytestmark = pytest.mark.integration
+
+
+@pytest.fixture
+def test_settings(job_settings: Settings) -> Settings:
+    return job_settings
+
+
+@pytest.fixture
+async def db(job_db: AsyncWsSurrealConnection) -> AsyncWsSurrealConnection:
+    return job_db
 
 
 async def entry(
