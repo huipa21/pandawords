@@ -238,9 +238,38 @@ attempts or status. Keys are `dictionary:v1:sense:{sense_id}` for enrichment and
 `dictionary:v1:lexeme:{lexeme_id}:{accent}` for audio. Thus repeat/subset requests and other
 projects of the same owner reuse jobs. Different owners get independently readable jobs;
 future audio handlers must still reuse shared media across users.
-The existing worker registry does not yet implement these handlers: executing such a job
-currently yields the worker's terminal `unknown_handler` failure. Enrichment/audio handler
-tasks must register `enrich`/`audio`; this task only persists work and exposes its status.
+The `audio` handler is registered in `app.worker.handlers.HANDLERS`, additively alongside
+other handlers. Dispatch supplies the active database and configured settings through
+`app.worker.context.get_context()`; `app.services.audio.acquire(db, settings, reader,
+AudioJobPayload)` is the explicit service interface.
+
+### Shared audio contract (2.5.2)
+
+The worker validates that payload IDs name a shared lemma/lexeme pair. It first looks for
+shared `media` targeting that lexeme and accent, validates its local file through the media
+service, and reuses it across requester-owned jobs. Missing cached files trigger acquisition
+again. Wikimedia recording candidates must match the requested accent; ambiguous/untagged
+recordings are not guessed. Commons `imageinfo` resolves the original recording URL, MIME,
+artist/credit and license metadata. Only HTTPS `upload.wikimedia.org/wikipedia/commons/`
+downloads are accepted; redirects, unsupported MIME, empty and oversized files are rejected.
+Stored attribution includes the file URL, upstream credits and available Commons license
+metadata, never an assumed blanket recording license.
+
+If a recording is absent or permanently unavailable, optional Edge TTS synthesizes the
+lemma using the configured accent voice. A blank voice or explicit no-audio result logs an
+unavailable event and completes the optional job without media. Timeouts, transport failures,
+HTTP 429/5xx and unexpected exceptions remain worker failures and use its bounded retry
+policy; a transient recording failure retries before replacing it with synthetic audio.
+No failure changes the already-committed add operation.
+
+Both providers write only through `media.store`, with `owner = NONE`, target `lexeme`,
+kind `audio`, accent, source `wiktionary`/`edge_tts`, MIME and attribution. Attachment updates
+the shared lexeme's existing `pron[*].audio` record reference while preserving IPA. When no
+IPA exists, an accent entry with `ipa: ""` is added (not a fabricated transcription).
+Effective entry reads encode `lexemes[*].lexeme.fields.pron[*].audio` as an opaque media ID.
+The detail UI can use that ID with authenticated `GET /api/media/{id}`; metadata comes from
+`media.read(db, settings, id, user)` for internal callers. No local path or external URL is
+used for playback, and no API model/schema change or regenerated API types is needed.
 
 ### Candidates contract (2.4.1)
 
@@ -297,5 +326,9 @@ batching where possible, and a per-user daily request budget (setting).
 ## External fetch etiquette
 
 - Wikimedia audio: set a descriptive User-Agent, cache permanently, throttle to ≤ 2 requests/s.
+  `WIKIMEDIA_USER_AGENT` applies to both Commons metadata and recording downloads.
+  `WIKIMEDIA_REQUEST_INTERVAL_SECONDS` defaults to 0.5 and cannot be configured lower.
+  Throttling is shared by all audio jobs in a worker process; multiple worker processes
+  must be operated with a combined Wikimedia request rate ≤ 2/s.
 - Pixabay: images must be **downloaded and stored** (no hotlinking). Keep the attribution fields.
 - Package sources: use the official ones first. Mirrors come from `.env` fallback variables.

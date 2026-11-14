@@ -75,6 +75,16 @@ the script only imports the runner. Assertions are the checks: run without Pytho
 
 ## Verified snippets
 
+### Shared pronunciation attachment (2.5.2) ✅
+
+Verified against isolated migrated databases on the existing test instance **8101**
+(SurrealDB 3.3.5 / SDK 3.0.0 / Python 3.14.3): owner-filtered `has_lexeme` endpoint checks,
+`media` lookup using the existing `media_target` index, and UUID transactions updating
+`lexeme.pron` with bound arrays containing `RecordID("media", ...)`. The existing
+`pron.*.audio` field preserves record references and effective reads encode opaque IDs.
+An empty-string IPA permits an audio-only accent entry without fabricating a transcription.
+Private media cannot be attached to shared pronunciations. No migration is necessary.
+
 ### Atomic add-to-project boundary (2.4.2) ✅
 
 Verified on SurrealDB 3.3.5 / SDK 3.0.0 using isolated migrated databases on test port

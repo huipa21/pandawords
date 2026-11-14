@@ -10,6 +10,7 @@ from app.core.config import Settings
 from app.db.client import database_lifespan
 from app.domain.jobs import Job
 from app.services import jobs
+from app.worker.context import HANDLER_CONTEXT, HandlerContext
 from app.worker.handlers import HANDLERS, Handler
 from app.worker.wakeup import POLL_SECONDS, LiveWakeup
 
@@ -27,12 +28,19 @@ async def _settle[T](operation: Coroutine[Any, Any, T]) -> T:
 
 
 async def execute(
-    db: AsyncSurrealConnection, job: Job, handlers: dict[str, Handler] | None = None
+    db: AsyncSurrealConnection,
+    job: Job,
+    handlers: dict[str, Handler] | None = None,
+    *,
+    settings: Settings | None = None,
 ) -> None:
     handler = (HANDLERS if handlers is None else handlers).get(job.type)
     if handler is None:
         await _settle(jobs.fail(db, job, terminal=True))
         return
+    token = HANDLER_CONTEXT.set(
+        HandlerContext(db, settings if settings is not None else Settings())
+    )
     try:
         await handler(job)
     except asyncio.CancelledError:
@@ -45,9 +53,16 @@ async def execute(
         await _settle(jobs.fail(db, job))
     else:
         await _settle(jobs.complete(db, job))
+    finally:
+        HANDLER_CONTEXT.reset(token)
 
 
-async def run_once(db: AsyncSurrealConnection, handlers: dict[str, Handler] | None = None) -> bool:
+async def run_once(
+    db: AsyncSurrealConnection,
+    handlers: dict[str, Handler] | None = None,
+    *,
+    settings: Settings | None = None,
+) -> bool:
     pending = asyncio.create_task(jobs.claim(db))
     try:
         job = await asyncio.shield(pending)
@@ -61,7 +76,7 @@ async def run_once(db: AsyncSurrealConnection, handlers: dict[str, Handler] | No
         raise
     if job is None:
         return False
-    await execute(db, job, handlers)
+    await execute(db, job, handlers, settings=settings)
     return True
 
 
@@ -74,7 +89,7 @@ async def run_worker(settings: Settings) -> None:
                 wakeup.clear()
                 try:
                     db = await database.get_connection()
-                    if await run_once(db):
+                    if await run_once(db, settings=settings):
                         continue
                 except Exception as exc:
                     structlog.get_logger().error(
