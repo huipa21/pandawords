@@ -19,7 +19,6 @@ Migration allocations: 0013 memory/history; 0014 LLM; 0015 SRS preferences;
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
 | 3.2.3 | task/3.2.3-recognition | ../pandawords.worktrees/3.2.3 | Agent running |
-| 3.2.4 | task/3.2.4-recall | ../pandawords.worktrees/3.2.4 | Agent running |
 | 3.2.6 | task/3.2.6-scenario | ../pandawords.worktrees/3.2.6 | Agent running |
 | 3.3.2 | task/3.3.2-review | ../pandawords.worktrees/3.3.2 | Waiting for review prerequisites |
 | 3.3.4 | task/3.3.4-e2e | ../pandawords.worktrees/3.3.4 | Waiting for 3.3.2 and 3.3.3 |
@@ -62,6 +61,20 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
   migration 0005; task 4.2.1 requires verification and only additive migration if needed.
 - Blockers / follow-ups: none.
 
+### 2026-11-14 — 3.2.4 Cloze and authenticated listening
+- Result / completed: `776581a` merged as `6c7f767`; concrete recall plugins, shared
+  normalization/forms, whole-form blanks, strict spoken spelling, protected accent audio
+  and request-scoped registry bootstrap.
+- Dependencies: 3.2.1 and 2.5.2 checked ✅.
+- Verification: agent check/77 focused tests passed; main check and 77 recall/framework/API
+  regression tests passed.
+- Skipped / deferred: final full-suite sweep follows integration. Agent full backend
+  had 781 passed/1 mocked-LLM cold-start timeout; not recorded as a clean full-suite pass.
+  Scenario task contains the cold-SDK fixture correction; no live provider call occurred.
+- Failures / causes / corrections: additive docs conflicts preserved concrete control
+  contracts plus recall transport guidance.
+- Blockers / follow-ups: none; review UI awaits recognition merge; cleanup follows.
+
 ### 2026-11-14 — 3.3.1 Shared exercise controls
 - Result / completed: `eccbba6` merged as `647873b`; accessible localized exercise shell,
   choices/typed input/rating/progress, scoped shortcuts, monotonic timing and design previews.
@@ -73,7 +86,8 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
   integration test timed out twice. Agent measured four-second isolated run, no loops;
   that test alone now has a 20-second budget, preserving all assertions. An initially
   misplaced timeout argument was caught by type checking and corrected before verification.
-- Blockers / follow-ups: none; review UI still awaits recognition and recall integration.
+- Blockers / follow-ups: none; review UI still awaits recognition integration.
+  Components branch/folder removed after inspected locked/remaining files cleared.
 
 ### 2026-11-14 — 3.3.3 Plan settings and dashboard UI
 - Result / completed: `d264f38` merged as `f99612d`; localized project settings/summary,
