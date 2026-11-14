@@ -19,7 +19,7 @@ browser logs will be committed as source.
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
 | 2.1.2 | task/2.1.2-core-lexicon | ../pandawords.worktrees/2.1.2 | Starting; streaming SQLite builder |
-| 2.3.1 | task/2.3.1-project-schema | ../pandawords.worktrees/2.3.1 | Starting; project and overlays |
+| 2.3.2 | task/2.3.2-project-api | ../pandawords.worktrees/2.3.2 | Starting; owner-scoped CRUD |
 | 2.5.1 | task/2.5.1-media | ../pandawords.worktrees/2.5.1 | Starting; authenticated media |
 
 ## Blocked
@@ -46,6 +46,18 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 2.3.1 Project and overlay schema
+- Result / completed: migration 0006, typed projects/membership/overrides/notes, snapshot and
+  focused integration tests; `a9533b9` merged.
+- Dependencies: 2.2.1 and 1.5.1 checked ✅; 2.3.2 now ready and starting.
+- Verification: agent focused 22, snapshot-update and normal backend 343 passed, `check`
+  passed. Main merge `check` and combined backend/frontend passed (343 backend).
+- Skipped / deferred: APIs remain subsequent tasks. Schema intentionally excludes lexeme
+  membership per the current data model; tree implementation must derive grouping visibility
+  or add a forward migration if the required behavior needs it.
+- Failures / causes / corrections: initial missing environments restored; no unresolved failure.
+- Blockers: none. Branch/worktree removed after verification.
 
 ### 2026-11-14 — 2.6.1 Shared word components
 - Result / completed: all 12 requested word components, controlled presentation contracts,
