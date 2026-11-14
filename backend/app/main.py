@@ -10,6 +10,7 @@ from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.types import ASGIApp
 
+from app.api.auth import router as auth_router
 from app.core.config import Settings
 from app.core.errors import (
     AppError,
@@ -22,6 +23,7 @@ from app.core.errors import (
 from app.core.logging import RequestIdMiddleware, configure_logging
 from app.db.client import database_lifespan
 from app.services.auth import bootstrap_admin
+from app.services.login_backoff import LoginBackoff
 from app.services.system import check_readiness
 
 
@@ -70,6 +72,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         lifespan=lifespan,
     )
     app.state.settings = app_settings
+    app.state.login_backoff = LoginBackoff()
     app.add_middleware(RequestIdMiddleware)
     app.add_exception_handler(AppError, app_error_handler)
     app.add_exception_handler(RequestValidationError, validation_error_handler)
@@ -87,6 +90,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return {"status": "ok"}
 
     app.include_router(router)
+    app.include_router(auth_router)
     return app
 
 

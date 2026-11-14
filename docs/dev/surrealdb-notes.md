@@ -80,6 +80,18 @@ independent-login and cross-user isolation. Bootstrap's stable `user:bootstrap_a
 inside a transaction, followed by conflict retry/recheck, creates one admin on concurrent
 starts without updating an existing password. No migration or snapshot change was needed.
 
+Task **1.5.3**, **2026-11-14**, verified password/session mutations on the same isolated
+**8101** instance (**3.3.5 / SDK 3.0.0**), through `tests/api/test_auth_password.py` and
+`test_auth_endpoints.py`. Within the existing conflict-retrying SDK transaction, an
+`UPDATE $user ... WHERE id = $user AND disabled = false AND password_hash = $expected_hash`
+returns the updated user only when the verified hash is still current. The transaction then
+revokes `refresh_token` rows with `WHERE user = $user` and creates the replacement session.
+Wrong-password and rejected-update paths leave user/session state unchanged; successful
+password change revokes independent old logins without affecting another user's sessions.
+Logout binds the authenticated subject before revoking the cookie's family. Forced-change
+refresh returns the user without rotating, allowing the service to raise its domain 403.
+The assembled backend suite passed **158 tests**, with no skips; no schema change was needed.
+
 All snippets below target **server 3.3.5 / Python SDK 3.0.0**. Executable versions live in
 `app.db.spike_support`, `spike_records`, `spike_graph`, and `spike_operations`; do not move
 SurrealQL into scripts, API handlers, or services.

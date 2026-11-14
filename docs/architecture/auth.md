@@ -57,5 +57,45 @@
 - Transaction begin/rollback cleanup is cancellation-shielded. Cleanup failures log only their
   exception type; the original error still propagates. Structured conflicts retry in a fresh
   transaction even when the server already aborted the old one and rejects its cancellation.
-- Cookie handling, endpoint/public response models, auth dependencies, forced-password gate and
-  login backoff belong to task **1.5.3**; this core does not register new endpoints.
+- The core remains usable independently; HTTP contracts are documented below.
+
+## Auth API (1.5.3)
+
+| Endpoint | Input | Success |
+|---|---|---|
+| `POST /api/auth/login` | JSON `{username, password}` | Auth response and refresh cookie |
+| `POST /api/auth/refresh` | Refresh cookie; no request body | Auth response and rotated cookie |
+| `GET /api/auth/me` | Bearer access token | Public user |
+| `POST /api/auth/password` | Bearer token; JSON `{current_password, new_password}` | Auth response and new cookie |
+| `POST /api/auth/logout` | Bearer token; optional refresh cookie | 204, cookie cleared |
+
+- An auth response is `{access_token, token_type: "bearer", user}`. The public user contains
+  `id` (the canonical API rid), `username`, `role`, `disabled`, `must_change_password`,
+  `source_lang`, `target_lang`, and `prefs` (`theme`, `locale`, `accent`). Neither password hashes
+  nor refresh tokens appear in JSON. Success responses are `Cache-Control: no-store`.
+- Cookie name: `refresh_token`; httpOnly, `SameSite=Strict`, path `/api/auth`, `Secure` in
+  production. Its maximum age matches `JWT_REFRESH_TTL_DAYS`. Refresh failures clear the
+  cookie and retain the standard `{code, message, field}` error envelope.
+- `current_user` decodes the access JWT and reloads the enabled user on every request.
+  `require_admin` checks the current database role, not the potentially stale JWT role.
+  Missing/invalid credentials and disabled/unknown users fail with generic 401
+  `auth.invalid_credentials`; non-admin authorization fails with 403 `auth.forbidden`.
+- A user with `must_change_password` can authenticate through public login but may only call
+  authenticated `me`, `password`, and `logout`. Other authenticated routes, **including
+  cookie-based refresh**, return 403 `auth.password_change_required`. Refresh does not rotate
+  the session in this case and clears the cookie. A reloaded frontend must fall back to login,
+  then route the user to password change; it must not rely on refresh bypassing the gate.
+- Password change verifies the current password and requires a new password of 10–1024
+  characters. One owner-scoped transaction compares the verified password hash, updates the
+  password, clears the forced-change flag, revokes **all** old refresh sessions, and creates a
+  fresh refresh session. The response gives a usable new access token. Existing access JWTs
+  retain their configured lifetime; user state/role are still reloaded on every request.
+  Login rechecks the verified hash when issuing its session, preventing a concurrent password
+  change from allowing a stale-password login. Logout revokes only a cookie family belonging
+  to the authenticated user; a foreign user's cookie is cleared locally but not revoked.
+- Login protection is per application process, keyed by the username and direct transport IP
+  (untrusted forwarded headers are ignored). Failed credentials impose 1, 2, 4, … up to 60
+  seconds of backoff; early/concurrent retries return generic 429 `auth.login_throttled`.
+  Success resets the counter. State expires after 15 minutes and is capped at 4096 hashed
+  keys; a full active map rejects new attempts rather than evicting live restrictions.
+  It is deliberately not a distributed limiter: deployment requires a single API process.
