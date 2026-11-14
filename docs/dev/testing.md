@@ -1,5 +1,37 @@
 # Testing
 
+## Sentence and passage schema contract (4.2.1)
+
+From `backend`, with the existing healthy loopback **8101** test server:
+
+```powershell
+$env:NO_PROXY = '127.0.0.1,localhost'
+$env:SURREAL_TEST_URL = 'ws://127.0.0.1:8101/rpc'
+uv run --no-sync pytest -q tests\integration\test_context_schema.py tests\integration\test_dictionary_schema.py tests\integration\test_schema_snapshot.py tests\integration\test_migrations.py
+```
+
+The focused suite uses isolated random databases, not the persistent dev database. It covers
+fresh migrations, no-op and direct 0005 replay over populated context graphs, committed snapshot
+comparison and readable synthetic drift. Typed endpoint unions/existence, shared/private owner
+fields, required context fields, multilingual translations, unknown fields, optional exact
+integer-pair spans and required integer passage order are exercised against real SurrealDB.
+Explicit mismatched-owner edge probes demonstrate that ENFORCED endpoints and an edge-owner
+filter alone do not provide authorization; later CRUD/reading tests must check both endpoints.
+
+Verification on 2026-11-14, SurrealDB **3.3.5**: **89 focused tests passed**, including **30**
+new context cases, and `dev.ps1 check` passed. The existing schema is sufficient, so migration
+0005 and the snapshot remain unchanged. The initial check could not find worktree-local Ruff;
+`uv sync --frozen --quiet` restored locked backend dependencies before rerunning successfully.
+An initial SCHEMAFULL probe incorrectly expected unknown fields to be dropped; the real server
+rejected them, and the test now asserts that observed contract. The Pylance syntax tool timed
+out; actual pytest, Ruff and basedpyright provide validation instead. No API shape changed,
+so API generation is not needed. No frontend/E2E or stack lifecycle operation was performed.
+The additional `dev.ps1 test -Backend` run finished with **923 passed, 1 failed, 1 warning**
+in **519.35 seconds**: the unchanged
+`test_llm.py::test_valid_persistent_canonical_cache_disabled` hit its mocked-provider timeout.
+Its immediate isolated retry passed (**1 passed in 1.86 seconds**); the full run is not a clean
+pass. No unrelated LLM test or production behavior was changed.
+
 ## Project review session (3.3.2)
 
 `frontend/src/features/study/ReviewSessionPage.test.ts` exercises recognition IDs, generic typed
