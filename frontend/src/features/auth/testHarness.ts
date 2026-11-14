@@ -18,6 +18,8 @@ export function authPayload(overrides: Partial<components['schemas']['UserRead']
         locale: 'zh-CN',
         accent: 'US',
         desired_retention: 0.9,
+        review_images_enabled: true,
+        review_audio_enabled: true,
       },
       ...overrides,
     },

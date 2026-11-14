@@ -16,6 +16,11 @@ components and require no design-preview entry.
 - `StudyForecast`: accessible seven-date UTC table of actual scheduled reviews.
 - `ExamSummary`: server-calculated pacing, capacity, past-exam and revision-buffer warnings.
 - `RetentionSettings`: separately validated per-user scheduling preference; no history rewrite.
+- `ReviewMediaSettings`: persisted image/audio exercise switches and US/UK accent, separately
+  loaded/saved on the project plan with localized accessible controls and retry feedback.
+- Review's image prompt reuses feature-owned `words/ProtectedImage`: authenticated blob loading,
+  generic localized alt, explicit unavailable/retry, cancellation and object-URL revocation on
+  replacement, decoder failure and unmount. Answer-safe attribution is rendered as plain text.
 - `SenseOrderEditor`: keyboard-operable, paginated priority draft over all visible selections,
   including those outside today's capped queue. It starts explicitly in tree order because the
   API currently cannot read the saved full priority. Loading every tree page must succeed

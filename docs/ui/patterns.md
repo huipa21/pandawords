@@ -11,6 +11,16 @@ replacement/unmount. Late responses after a sense change are ignored. Removal us
 `ConfirmAction`; empty, loading, unavailable and retry states remain visible. Failed uploads
 retain the original file and request identity for retry; provider retries reuse their selection.
 
+## Image review and media preferences (5.1.3)
+
+The project plan exposes separate image/audio switches plus existing US/UK accent. Saving is
+explicit and affects new attempts only. Failed loading/saving is localized and retryable; other
+preferences are not replaced. Review dispatches `image2word` IDs to the protected image loader,
+not the audio player or its space shortcut. Generic prompt/alt never use the word or filename.
+Safe required attribution remains visible as plain text. Deleted/broken images show Retry;
+typing, giving up and exiting remain available without revealing an answer. The ordinary
+keyboard submission, timer, feedback, rating and receipt-driven continuation remain unchanged.
+
 ## Layout & navigation
 
 - Mobile-first. Below `lg`: header + bottom nav (Projects · Review · Words · Reading · Me).

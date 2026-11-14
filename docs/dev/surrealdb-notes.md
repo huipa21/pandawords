@@ -9,6 +9,18 @@ checked separately in the same transaction. Hidden lemma ancestry removes shared
 senses; owned global tags remain discoverable, and a second user's project discovery is 404.
 Seed batches reuse existing effective-node/override queries (maximum 300 per batch).
 
+## Review media defaults and partial preferences (5.1.3) ✅
+
+Verified against the existing isolated **8101** SurrealDB 3.3 harness: after defining two
+non-optional bool fields, updating only the first missing field on a legacy user fails because
+the second still contains NONE. Backfill both fields in **one** UPDATE, using
+`IF prefs.field = NONE THEN true ELSE prefs.field END` for each, to preserve existing false
+values. Replaying the migration retains false toggles and every other preference.
+Bound `IF $flag THEN $value ELSE prefs.field END` assignments support atomic owner-filtered
+partial preference updates without replacing the object. Focused API/migration tests verify
+each toggle, accent, isolation and preservation of theme/locale/retention. No 8100 migration or
+service lifecycle operation was performed by this task branch.
+
 ## Containing-phrase traversal (4.1.2) ✅
 
 Verified against the existing isolated random-database harness on loopback **8101**,

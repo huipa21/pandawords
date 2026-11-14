@@ -48,14 +48,20 @@ async function load() {
       loading.value = false
   }
 }
+function unavailable() {
+  clear()
+  failed.value = true
+}
 watch(() => props.mediaId, load, { immediate: true })
 onScopeDispose(clear)
 </script>
 
 <template>
   <div class="grid gap-3">
-    <NSpin v-if="loading" :aria-label="t('common.loading')" />
-    <img v-if="url && !failed" :src="url" :alt="t('images.alt')" class="max-h-full max-w-full rounded-lg object-contain" @error="failed = true">
+    <div v-if="loading" role="status" :aria-label="t('common.loading')">
+      <NSpin />
+    </div>
+    <img v-if="url && !failed" :src="url" :alt="t('images.alt')" class="max-h-full max-w-full rounded-lg object-contain" @error="unavailable">
     <NAlert v-if="failed" type="warning">
       {{ t('images.unavailable') }}
       <NButton size="large" @click="load">

@@ -147,11 +147,10 @@ async def test_listen_actual_authenticated_prompt_and_server_grade(
     other_accent: Accent = "UK" if accent == "US" else "US"
     await recording(db, test_settings, source, other_accent)
     headers = bearer(await login(client, study.user.username))
-    await media_test_support.change(
-        db,
-        user_record(study.user.id),
-        {"prefs": {**study.user.prefs.model_dump(), "accent": accent}},
+    updated = await client.patch(
+        "/api/auth/me/review-preferences", headers=headers, json={"accent": accent}
     )
+    assert updated.status_code == 200 and updated.json()["accent"] == accent
     _, opened = await issue(client, study)
     assert opened["exercise"] == "listen"
     assert opened["prompt"]["media_id"] == chosen
@@ -170,6 +169,16 @@ async def test_listen_actual_authenticated_prompt_and_server_grade(
     assert graded.json()["feedback"] == {"correct": correct, "answer": "run"}
     assert await probe.logs(db, study.user.id) == []
     _, abandoned = await issue(client, study)
+    toggled = await client.patch(
+        "/api/auth/me/review-preferences", headers=headers, json={"review_audio_enabled": False}
+    )
+    assert toggled.status_code == 200
+    skipped = await client.post(
+        URL,
+        headers=headers,
+        json={"project_id": study.project.id, "sense_id": study.sense_id},
+    )
+    assert skipped.status_code == 409
     gave_up = await client.post(
         f"{URL}/{abandoned['id']}/giveup", headers=headers, json={"duration_ms": 0}
     )

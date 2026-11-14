@@ -31,6 +31,16 @@ plus the migrations. This doc explains the intent. Syntax details: [../dev/surre
 
 ## Two layers
 
+### Review media preferences (5.1.3)
+
+Migration `0020_review_media_preferences.surql` adds `user.prefs.review_images_enabled` and
+`review_audio_enabled` as booleans defaulting to true. A single conditional update backfills
+both missing fields while retaining existing false values and every other preference.
+The owner-bound review preference repository uses fixed per-field conditional assignments,
+never replaces `prefs`, and exposes the existing accent alongside the media toggles.
+Image attribution is stored in the attempt's existing private JSON payload/public prompt only
+after the image plugin's anti-answer-leak checks; no new image/attempt table is needed.
+
 ### Private sense images (5.1.1)
 
 `media` image rows always use the attaching user's owner, including shared sense targets.

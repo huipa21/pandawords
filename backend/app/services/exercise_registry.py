@@ -82,6 +82,7 @@ class ExerciseRegistry:
         memory: MemoryRead,
         *,
         random_value: Callable[[], float] = random.random,
+        disabled: frozenset[str] = frozenset(),
     ) -> Selection:
         review = memory.introduced and memory.card.state == State.Review
         eligible: dict[ExerciseKind, list[tuple[ExercisePlugin, GeneratedExercise]]] = {
@@ -90,6 +91,9 @@ class ExerciseRegistry:
         }
         skipped: list[Unavailable] = []
         for plugin in sorted(self._plugins.values(), key=lambda item: item.exercise):
+            if plugin.exercise in disabled:
+                skipped.append(Unavailable(exercise=plugin.exercise, reason="preference"))
+                continue
             if not review and plugin.kind != "recognition":
                 skipped.append(Unavailable(exercise=plugin.exercise, reason="card_state"))
                 continue

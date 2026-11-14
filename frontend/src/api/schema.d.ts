@@ -175,6 +175,24 @@ export interface paths {
     patch: operations['patch_srs_preferences_api_auth_me_srs_preferences_patch']
     trace?: never
   }
+  '/api/auth/me/review-preferences': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Read Review Preferences */
+    get: operations['read_review_preferences_api_auth_me_review_preferences_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Patch Review Preferences */
+    patch: operations['patch_review_preferences_api_auth_me_review_preferences_patch']
+    trace?: never
+  }
   '/api/jobs/{id}': {
     parameters: {
       query?: never
@@ -1429,6 +1447,8 @@ export interface components {
       choices: components['schemas']['Choice'][]
       /** Media Id */
       media_id?: string | null
+      /** Media Attribution */
+      media_attribution?: string | null
     }
     /** ForecastDay */
     'ForecastDay': {
@@ -2209,6 +2229,34 @@ export interface components {
       /** Sense Id */
       sense_id: string
     }
+    /** ReviewPreferences */
+    'ReviewPreferences': {
+      /**
+       * Review Images Enabled
+       * @default true
+       */
+      review_images_enabled: boolean
+      /**
+       * Review Audio Enabled
+       * @default true
+       */
+      review_audio_enabled: boolean
+      /**
+       * Accent
+       * @default US
+       * @enum {string}
+       */
+      accent: 'US' | 'UK'
+    }
+    /** ReviewPreferencesUpdate */
+    'ReviewPreferencesUpdate': {
+      /** Review Images Enabled */
+      review_images_enabled?: boolean | null
+      /** Review Audio Enabled */
+      review_audio_enabled?: boolean | null
+      /** Accent */
+      accent?: ('US' | 'UK') | null
+    }
     /** ReviewReceipt */
     'ReviewReceipt': {
       /** Attempt Id */
@@ -2455,6 +2503,16 @@ export interface components {
        * @enum {string}
        */
       accent: 'US' | 'UK'
+      /**
+       * Review Images Enabled
+       * @default true
+       */
+      review_images_enabled: boolean
+      /**
+       * Review Audio Enabled
+       * @default true
+       */
+      review_audio_enabled: boolean
       /**
        * Desired Retention
        * @default 0.9
@@ -2807,6 +2865,59 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['SrsPreferences']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  read_review_preferences_api_auth_me_review_preferences_get: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ReviewPreferences']
+        }
+      }
+    }
+  }
+  patch_review_preferences_api_auth_me_review_preferences_patch: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ReviewPreferencesUpdate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ReviewPreferences']
         }
       }
       /** @description Validation Error */

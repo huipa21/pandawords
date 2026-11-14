@@ -583,6 +583,8 @@
         "prefs.accent": "DEFINE FIELD prefs.accent ON user TYPE 'US' | 'UK' PERMISSIONS FULL",
         "prefs.desired_retention": "DEFINE FIELD prefs.desired_retention ON user TYPE float DEFAULT 0.9f ASSERT $value > 0 AND $value < 1 PERMISSIONS FULL",
         "prefs.locale": "DEFINE FIELD prefs.locale ON user TYPE string PERMISSIONS FULL",
+        "prefs.review_audio_enabled": "DEFINE FIELD prefs.review_audio_enabled ON user TYPE bool DEFAULT true PERMISSIONS FULL",
+        "prefs.review_images_enabled": "DEFINE FIELD prefs.review_images_enabled ON user TYPE bool DEFAULT true PERMISSIONS FULL",
         "prefs.theme": "DEFINE FIELD prefs.theme ON user TYPE 'system' | 'light' | 'dark' PERMISSIONS FULL",
         "role": "DEFINE FIELD role ON user TYPE 'admin' | 'user' PERMISSIONS FULL",
         "source_lang": "DEFINE FIELD source_lang ON user TYPE string PERMISSIONS FULL",

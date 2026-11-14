@@ -29,6 +29,15 @@ and HTTPS provider hosts on every redirect, bounds streamed responses and decode
 preserves creator/source-page/Content License attribution. Terminal errors are public-safe;
 resubmitting the same selection retries a failed job without duplicating an attachment.
 
+## Optional image review (5.1.3)
+
+Production `image2word` is local recall over a stable, byte-validated, owner-only exact-sense
+attachment. Public prompts contain protected IDs and only answer-safe required credit; images
+whose credit leaks a selected form are unavailable. Review renders these IDs through
+`ProtectedImage`, not the audio player. Preferences at `/api/auth/me/review-preferences`
+control new image/audio exercises and US/UK accent without invalidating existing attempts.
+The ordinary answer/give-up/confirmation/receipt pipeline remains authoritative.
+
 ## Optional mnemonic workflow (5.1.2)
 
 The existing notes router exposes explicit suggestion request/status operations; mnemonic
