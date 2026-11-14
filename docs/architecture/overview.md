@@ -1,5 +1,18 @@
 # Architecture overview
 
+## Graph presentation and discovery (4.4.2)
+
+`GET /api/graph/seeds?q=&page=1&page_size=20&project_id=` is authenticated,
+no-store and returns generated discriminated effective graph nodes, not a graph snapshot.
+It shares the graph authorization snapshot: the non-hidden per-project union plus owned
+records globally, or only one owner-checked project's visible selections when scoped.
+Effective overridden labels are matched case-insensitively before pagination. Authorization
+and batch sizes retain existing graph safety bounds; oversized authorization fails explicitly.
+The frontend checks node labels, identities, edge endpoints and the 300-node cap before
+rendering. `/words` and project graph mode share `GraphExplorer`; Cytoscape/fcose/dagre are
+presentation-only and never infer authorization or relations. Focus expansion replaces the
+bounded neighborhood; neither initial discovery nor layout changes fetch a full graph.
+
 ## Private image flow (5.1.1)
 
 `/api/images/senses/{sense_id}` provides authenticated list/raw upload and

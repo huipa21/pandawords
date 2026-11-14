@@ -1,5 +1,11 @@
 # Design tokens
 
+Graph rendering uses `graphNodes` shapes, `graphEdges` line/color aliases and light/dark
+`themes` only. `graphMetrics` owns canvas height, control width, node/focus dimensions,
+border/edge widths and label size/width. Cytoscape styles rebuild on resolved theme changes;
+the design preview can explicitly supply either theme. Semantic edges always show their
+directed target arrow, even when reciprocal links are present.
+
 **Source of truth:** `frontend/src/design/tokens.ts`. Everything else is generated from it:
 
 | Output | Used by |

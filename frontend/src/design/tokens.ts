@@ -83,6 +83,17 @@ export const graphNodes = {
   tag: { shape: 'tag' },
 } as const satisfies Record<NodeName, { shape: string, size?: string }>
 
+export const graphMetrics = {
+  nodeSize: 44,
+  focusSize: 56,
+  borderWidth: 3,
+  edgeWidth: 1,
+  labelSize: 12,
+  labelWidth: 120,
+  canvasHeight: '28rem',
+  controlWidth: '10rem',
+} as const
+
 export const graphEdges = {
   synonym: { color: 'success', line: 'solid' },
   antonym: { color: 'error', line: 'solid' },

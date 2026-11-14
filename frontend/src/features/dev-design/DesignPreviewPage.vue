@@ -14,6 +14,7 @@ import { radius, spacing, themes, typography } from '@/design/tokens'
 import en from '@/i18n/dev-design/en.json'
 import zhCN from '@/i18n/dev-design/zh-CN.json'
 import ExerciseComponentsPreview from './ExerciseComponentsPreview.vue'
+import GraphComponentsPreview from './GraphComponentsPreview.vue'
 import JobStatusPreview from './JobStatusPreview.vue'
 import WordComponentsPreview from './WordComponentsPreview.vue'
 
@@ -85,6 +86,7 @@ function colorVariable(group: typeof groups[number], name: string) {
           <h3 class="m-0 text-lg font-semibold">
             {{ t(mode) }}
           </h3>
+          <GraphComponentsPreview :mode="mode" />
           <section v-for="group in groups" :key="group">
             <h4 class="text-base font-semibold">
               {{ t(group) }}

@@ -26,6 +26,15 @@ importers:
       '@fontsource-variable/roboto-serif':
         specifier: 5.3.0
         version: 5.3.0
+      cytoscape:
+        specifier: 3.35.0
+        version: 3.35.0
+      cytoscape-dagre:
+        specifier: 4.1.0
+        version: 4.1.0(cytoscape@3.35.0)
+      cytoscape-fcose:
+        specifier: 2.2.0
+        version: 2.2.0(cytoscape@3.35.0)
       naive-ui:
         specifier: 2.45.3
         version: 2.45.3(vue@3.5.45(typescript@6.0.3))
@@ -54,6 +63,15 @@ importers:
       '@playwright/test':
         specifier: 1.65.0
         version: 1.65.0
+      '@types/cytoscape':
+        specifier: 3.31.0
+        version: 3.31.0
+      '@types/cytoscape-dagre':
+        specifier: 2.3.4
+        version: 2.3.4
+      '@types/cytoscape-fcose':
+        specifier: 2.2.5
+        version: 2.2.5
       '@types/node':
         specifier: 24.19.2
         version: 24.19.2
@@ -717,6 +735,16 @@ packages:
   '@types/chai@5.2.3':
     resolution: {integrity: sha512-Mw558oeA9fFbv65/y4mHtXDs9bPnFMZAL/jxdPFUpOHHIXX91mcgEHbS5Lahr+pwZFR8A7GQleRWeI6cGFC2UA==}
 
+  '@types/cytoscape-dagre@2.3.4':
+    resolution: {integrity: sha512-uOGXuPfPLFoKZaegjHl9oj4tqONNJuhUl180FiJgRZ35rVijBs6J4UP1Ah6mA6S46h+7pv4ICqpgfdC3EADZlw==}
+
+  '@types/cytoscape-fcose@2.2.5':
+    resolution: {integrity: sha512-FaM6MM5zC4Yh72E60vkpbM4tstJS90wj3u1Vq/SMiK/MShhLaMd17QkmR39S14aUWdfNSlUEfx/g/XkDdFmXDA==}
+
+  '@types/cytoscape@3.31.0':
+    resolution: {integrity: sha512-EXHOHxqQjGxLDEh5cP4te6J0bi7LbCzmZkzsR6f703igUac8UGMdEohMyU3GHAayCTZrLQOMnaE/lqB2Ekh8Ww==}
+    deprecated: This is a stub types definition. cytoscape provides its own type definitions, so you do not need this installed.
+
   '@types/debug@4.1.13':
     resolution: {integrity: sha512-KSVgmQmzMwPlmtljOomayoR89W4FynCAi3E8PPs7vmDVPe84hT+vGPKkJfThkmXs0x0jAaa9U8uW8bbfyS2fWw==}
 
@@ -1193,6 +1221,9 @@ packages:
     resolution: {integrity: sha512-52r6fkXgxv4GLMjmFcMWRx7X9bw071xTTdrDcdyPGRqU2oE+9pCG0bAOMifSBdLw0JRBZKEF0q3B55qPlLuE8g==}
     engines: {node: '>=6.4.0'}
 
+  cose-base@2.2.0:
+    resolution: {integrity: sha512-AzlgcsCbUMymkADOJtQm3wO9S3ltPfYOFD5033keQn9NJzIbtnZj+UdBJe7DYml/8TdbtHJW3j58SOnKhWY/5g==}
+
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
     engines: {node: '>= 8'}
@@ -1217,6 +1248,20 @@ packages:
 
   csstype@3.2.3:
     resolution: {integrity: sha512-z1HGKcYy2xA8AGQfwrn0PAy+PB7X/GSj3UVJW9qKyn43xWa+gl5nXmU4qqLMRzWVLFC8KusUX8T/0kCiOYpAIQ==}
+
+  cytoscape-dagre@4.1.0:
+    resolution: {integrity: sha512-wZYva0KmkIeCrUIy6u/SJgwEFHtWUuu4UqVOjJ6thtvmiNcjS9hY/4AXiIDx8k/zleVxrYCPb7TGlAyNjZ627Q==}
+    peerDependencies:
+      cytoscape: ^3.2.22
+
+  cytoscape-fcose@2.2.0:
+    resolution: {integrity: sha512-ki1/VuRIHFCzxWNrsshHYPs6L7TvLu3DL+TyIGEsRcvVERmxokbf5Gdk7mFxZnTdiGtnA4cfSmjZJMviqSuZrQ==}
+    peerDependencies:
+      cytoscape: ^3.2.0
+
+  cytoscape@3.35.0:
+    resolution: {integrity: sha512-sMvBIXiGMnhkCaWz2R06FwF/27MNlS+Tqvi17foO9UhnUg3XGZccKjxsvEqQFAQYMSSZmN5SxYzUYlQ0DOJJ3g==}
+    engines: {node: '>=0.10'}
 
   date-fns-tz@3.2.0:
     resolution: {integrity: sha512-sg8HqoTEulcbbbVXeg84u5UnlsQa8GS5QXMqjjYIhS4abEVVKIUwe0/l/UhrZdKaL/W5eWZNlbTeEIiOXTcsBQ==}
@@ -1783,6 +1828,9 @@ packages:
 
   keyv@5.6.0:
     resolution: {integrity: sha512-CYDD3SOtsHtyXeEORYRx2qBtpDJFjRTGXUtmNEMGyzYOKj1TE3tycdlho7kA1Ufx9OYWZzg52QFBGALTirzDSw==}
+
+  layout-base@2.0.1:
+    resolution: {integrity: sha512-dp3s92+uNI1hWIpPGH3jK2kxE2lMjdXdr+DH8ynZHpd6PUlH6x6cbuXnoMmiNumznqaNO31xu9e79F0uuZ0JFg==}
 
   lefthook-android-arm64@2.2.2:
     resolution: {integrity: sha512-wb9rQQFLX7u1dJLxvMrq9VUfMYi5kxM7tJQ6Y4mWEOwaU+SmIm2wjoT/nromKq27Y8fh2Qd7FgCD3G1wfW8CnQ==}
@@ -3355,6 +3403,18 @@ snapshots:
       '@types/deep-eql': 4.0.2
       assertion-error: 2.0.1
 
+  '@types/cytoscape-dagre@2.3.4':
+    dependencies:
+      cytoscape: 3.35.0
+
+  '@types/cytoscape-fcose@2.2.5':
+    dependencies:
+      cytoscape: 3.35.0
+
+  '@types/cytoscape@3.31.0':
+    dependencies:
+      cytoscape: 3.35.0
+
   '@types/debug@4.1.13':
     dependencies:
       '@types/ms': 2.1.0
@@ -3949,6 +4009,10 @@ snapshots:
     dependencies:
       browserslist: 4.29.5
 
+  cose-base@2.2.0:
+    dependencies:
+      layout-base: 2.0.1
+
   cross-spawn@7.0.6:
     dependencies:
       path-key: 3.1.1
@@ -3972,6 +4036,17 @@ snapshots:
   csstype@3.0.11: {}
 
   csstype@3.2.3: {}
+
+  cytoscape-dagre@4.1.0(cytoscape@3.35.0):
+    dependencies:
+      cytoscape: 3.35.0
+
+  cytoscape-fcose@2.2.0(cytoscape@3.35.0):
+    dependencies:
+      cose-base: 2.2.0
+      cytoscape: 3.35.0
+
+  cytoscape@3.35.0: {}
 
   date-fns-tz@3.2.0(date-fns@4.4.0):
     dependencies:
@@ -4551,6 +4626,8 @@ snapshots:
   keyv@5.6.0:
     dependencies:
       '@keyv/serialize': 1.1.1
+
+  layout-base@2.0.1: {}
 
   lefthook-android-arm64@2.2.2:
     optional: true

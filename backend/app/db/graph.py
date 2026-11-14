@@ -13,11 +13,42 @@ from app.db.auth import _atomic
 from app.db.dictionary import RELATIONS, TABLE_FIELDS, _json, _merge
 from app.db.graph_visibility import MAX_EDGE_ROWS, bounded_rows, too_large, visible
 from app.domain.dictionary import DictionaryRelation, DictionaryTable
-from app.domain.graph import GraphEdge, GraphNode, GraphQuery, GraphRead
+from app.domain.graph import GraphEdge, GraphNode, GraphQuery, GraphRead, GraphSeedsQuery
 from app.domain.identity import user_key
 
 NODE_LIMIT = 300
 _node = TypeAdapter(GraphNode)
+
+
+async def seeds(
+    db: AsyncSurrealConnection, owner: str, query: GraphSeedsQuery, project: RecordID | None
+) -> list[GraphNode]:
+    async def operation(txn: UUID) -> list[GraphNode]:
+        user = RecordID("user", user_key(owner))
+        authorized = await visible(db, user, txn, project)
+        # Fetch in bounded batches to apply effective overrides before text matching.
+        records = sorted(authorized, key=str)
+        matches: list[GraphNode] = []
+        start = (query.page - 1) * query.page_size
+        for offset in range(0, len(records), NODE_LIMIT):
+            nodes = await _nodes(db, user, set(records[offset : offset + NODE_LIMIT]), txn)
+            for node in nodes:
+                fields = node.fields.model_dump(by_alias=True)
+                label = next(
+                    (
+                        fields[key]
+                        for key in ("text", "definition", "name", "title", "pos")
+                        if isinstance(fields.get(key), str)
+                    ),
+                    "",
+                )
+                if query.q.casefold() in label.casefold():
+                    matches.append(node)
+            if len(matches) >= start + query.page_size:
+                break
+        return matches[start : start + query.page_size]
+
+    return await _atomic(db, operation)
 
 
 async def _edges(

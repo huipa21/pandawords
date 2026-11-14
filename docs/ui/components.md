@@ -113,6 +113,16 @@ word/phrase trees and empty states at responsive widths.
 | `GraphLegend` | Node and edge legend from tokens. Toggles filters |
 | `GraphToolbar` | Layout switch, depth, filters (node types, relation types), fit, search |
 
+Graph components live in `src/components/graph/`. `GraphCanvas` accepts checked presentation
+`elements: { nodes, edges }`, `layout`, `focusId` and optional preview `theme`; exposes `fit()`.
+Single tap selects; the selection panel and accessible node list provide explicit expansion
+buttons for touch/keyboard (double tap is an additional shortcut). Canvas drawing is decorative:
+the adjacent disclosure lists every node, its type, selection and expansion controls.
+`GraphLegend` uses `v-model:nodes` / `v-model:relations`; empty filters mean all API types.
+`GraphToolbar` uses models for layout/depth/search/direction and emits search/fit.
+Both fcose and dagre run without animation. `/dev/design` includes sparse/dense samples in
+both theme columns; theme changes rebuild Cytoscape token styles.
+
 ## Exercise components (`src/components/exercise/`)
 
 | Component | Purpose / key props |

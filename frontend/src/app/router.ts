@@ -7,7 +7,6 @@ import AuthLayout from './layouts/AuthLayout.vue'
 const placeholder = () => import('./pages/PlaceholderPage.vue')
 
 const pages = [
-  ['words', 'words', 'words'],
   ['reading/:passageId', 'reading', 'reading'],
   ['settings', 'settings', 'settings'],
   ['admin/backup', 'admin-backup', 'backup'],
@@ -16,6 +15,12 @@ const pages = [
 export function createAppRouter(history: RouterHistory = createWebHistory()) {
   const children: RouteRecordRaw[] = [
     { path: '', redirect: '/projects' },
+    {
+      path: 'words',
+      name: 'words',
+      component: () => import('@/features/graph/AllWordsPage.vue'),
+      meta: { title: 'words' },
+    },
     {
       path: 'tags',
       name: 'tags',
