@@ -53,8 +53,8 @@ are in `phase-N.md`. If a phase file doesn't exist yet, the agent asks before wr
 
 | ID | Task | Depends on | Wave | Size | Status |
 |---|---|---|---|---|---|
-| 2.1.1 | Lexicon download scripts (kaikki, OEWN, ECDICT) + manifest | 1.2.1 | 1 | S | 🟡 |
-| 2.1.2 | Build `lexicon.sqlite` core from kaikki (lemma/lexeme/sense/pron/forms/audio/form_index) | 2.1.1 | 2 | L | ⬜ |
+| 2.1.1 | Lexicon download scripts (kaikki, OEWN, ECDICT) + manifest | 1.2.1 | 1 | S | ✅ |
+| 2.1.2 | Build `lexicon.sqlite` core from kaikki (lemma/lexeme/sense/pron/forms/audio/form_index) | 2.1.1 | 2 | L | 🟡 |
 | 2.1.3 | Merge ECDICT + wordfreq (zh gloss, exam tags, frequency, `common`) | 2.1.2 | 3 | M | ⬜ |
 | 2.1.4 | Align OEWN relations to senses | 2.1.2 | 3 | M | ⬜ |
 | 2.1.5 | Fixture lexicon (~50 words) + `LexiconReader` service | 2.1.3, 2.1.4 | 4 | M | ⬜ |

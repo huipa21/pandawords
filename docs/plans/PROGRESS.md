@@ -18,7 +18,7 @@ browser logs will be committed as source.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 2.1.1 | task/2.1.1-downloads | ../pandawords.worktrees/2.1.1 | Starting; sources and manifest |
+| 2.1.2 | task/2.1.2-core-lexicon | ../pandawords.worktrees/2.1.2 | Starting; streaming SQLite builder |
 | 2.2.1 | task/2.2.1-dictionary-schema | ../pandawords.worktrees/2.2.1 | Starting; dictionary schema |
 | 2.6.1 | task/2.6.1-word-components | ../pandawords.worktrees/2.6.1 | Starting; shared word UI |
 
@@ -46,6 +46,19 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 2.1.1 Lexicon downloads
+- Result / completed: independent official-first downloads, explicit fallbacks, pinned checksums,
+  manifest and atomic staging; `046525d` merged. Documentation and mocked failure tests included.
+- Dependencies: 1.2.1 checked ✅; 2.1.2 now ready and starting immediately.
+- Verification: agent `check`, 22 focused tests and backend 213 passed; main merge `check`
+  and combined `test -Backend -Frontend` passed (274 backend tests).
+- Skipped / deferred: full multi-gigabyte downloads not needed for mocked acceptance;
+  builder belongs to 2.1.2. No unresolved failures or blockers.
+- Findings: Kaikki upstream endpoint deprecation documented. Identifier task cleanup initially
+  left a Windows directory; exact remaining directory was removed and absence verified.
+- Follow-ups: source manifest interface available to builder/packaging. Download worktree and
+  branch removed after verification; no unrelated files removed.
 
 ### 2026-11-14 — 2.2.2 Dictionary identity helpers
 - Result / completed: deterministic normalized dictionary keys and strict URL-safe structured
