@@ -33,18 +33,17 @@ review media preferences (5.1.3); other schema additions require a coordinator a
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
 | 4.1.1 | task/4.1.1-phrases | ../pandawords.worktrees/4.1.1 | Committed c4ef220, awaiting integration |
-| 4.2.1 | task/4.2.1-context-schema | ../pandawords.worktrees/4.2.1 | Merged a266512, integrated check running |
 | 4.3.1 | task/4.3.1-tags | ../pandawords.worktrees/4.3.1 | Agent running, wave 1 |
 | 4.1.2 | task/4.1.2-phrase-flow | ../pandawords.worktrees/4.1.2 | Waiting for 4.1.1 |
-| 4.2.2 | task/4.2.2-ingestion | ../pandawords.worktrees/4.2.2 | Waiting for 4.2.1 |
+| 4.2.2 | task/4.2.2-ingestion | ../pandawords.worktrees/4.2.2 | Ready; prerequisite 4.2.1 verified |
 | 4.3.2 | task/4.3.2-morphology | ../pandawords.worktrees/4.3.2 | Waiting for 4.3.1 |
 | 4.4.1 | task/4.4.1-graph-api | ../pandawords.worktrees/4.4.1 | Waiting for 4.1.1, 4.2.1, 4.3.1 |
 | 4.2.3 | task/4.2.3-reading | ../pandawords.worktrees/4.2.3 | Waiting for 4.2.2 |
 | 4.4.2 | task/4.4.2-graph-ui | ../pandawords.worktrees/4.4.2 | Waiting for 4.4.1 |
 | 4.4.4 | task/4.4.4-context-exercises | ../pandawords.worktrees/4.4.4 | Waiting for 4.2.2, 4.3.2 |
 | 4.4.3 | task/4.4.3-relations | ../pandawords.worktrees/4.4.3 | Waiting for 4.4.2 |
-| 5.1.1 | task/5.1.1-images | ../pandawords.worktrees/5.1.1 | Ready, wave 1 |
-| 5.1.2 | task/5.1.2-mnemonics | ../pandawords.worktrees/5.1.2 | Ready, wave 1 |
+| 5.1.1 | task/5.1.1-images | ../pandawords.worktrees/5.1.1 | Agent running, wave 1 |
+| 5.1.2 | task/5.1.2-mnemonics | ../pandawords.worktrees/5.1.2 | Agent running, wave 1 |
 | 5.1.3 | task/5.1.3-image-review | ../pandawords.worktrees/5.1.3 | Waiting for 5.1.1 |
 
 ## Blocked
@@ -71,6 +70,20 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 4.2.1 Context schema contract
+- Result / completed: `a97632b` merged as `a266512`; 30 schema cases and three existing docs.
+  Existing immutable 0005 schema suffices; no migration or snapshot change.
+- Dependencies: 2.2.1 checked ✅.
+- Verification: agent focused contracts/replay/drift 89 passed; agent and integrated main
+  `dev.ps1 check` passed. Main `test_context_schema.py` passed 30/30 on isolated real databases.
+- Failures / causes / corrections: agent full backend 923 passed/one existing mocked-LLM timeout
+  (`test_valid_persistent_canonical_cache_disabled`); isolated retry passed in 1.86 seconds.
+  Pylance timed out; runtime tests, Ruff and basedpyright passed.
+- Skipped / deferred: frontend/E2E/API regeneration not applicable; final full-suite sweep later.
+- Findings: translation required (`{}` valid); spans are exactly two integers but bounds need
+  application validation; `part_of.order` required. ENFORCED does not check matching owners.
+- Blockers / follow-ups: none; 4.2.2 ready. Task worktree cleanup pending.
 
 ### 2026-11-14 — Phase 4 task details
 - Result / completed: added [phase-4.md](phase-4.md) with goals, deliverables and acceptance
