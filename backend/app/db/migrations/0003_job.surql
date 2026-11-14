@@ -1,0 +1,10 @@
+DEFINE TABLE IF NOT EXISTS job SCHEMAFULL;
+DEFINE FIELD OVERWRITE type ON job TYPE string ASSERT string::len($value) > 0;
+DEFINE FIELD OVERWRITE payload ON job TYPE object FLEXIBLE;
+DEFINE FIELD OVERWRITE status ON job TYPE 'queued' | 'running' | 'done' | 'failed';
+DEFINE FIELD OVERWRITE attempts ON job TYPE int ASSERT $value >= 0;
+DEFINE FIELD OVERWRITE run_after ON job TYPE datetime;
+DEFINE FIELD OVERWRITE error ON job TYPE option<string>;
+DEFINE FIELD OVERWRITE owner ON job TYPE option<record<user>>;
+DEFINE INDEX IF NOT EXISTS job_due ON job FIELDS status, run_after;
+DEFINE INDEX IF NOT EXISTS job_owner ON job FIELDS owner;

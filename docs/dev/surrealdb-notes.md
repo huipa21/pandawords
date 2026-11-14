@@ -96,6 +96,50 @@ All snippets below target **server 3.3.5 / Python SDK 3.0.0**. Executable versio
 `app.db.spike_support`, `spike_records`, `spike_graph`, and `spike_operations`; do not move
 SurrealQL into scripts, API handlers, or services.
 
+### Job worker verification (task 1.6.2, 2026-11-14)
+
+Verified ✅ on **surrealdb-3.3.5 / SDK 3.0.0**, against individually generated migrated
+databases on the loopback test server **8101**, never the dev/production database:
+
+- `DEFINE FIELD ... TYPE object FLEXIBLE` retains arbitrary nested job payloads in
+  SCHEMAFULL tables. The initially attempted `FLEXIBLE TYPE object` was rejected by the
+  server parser: FLEXIBLE must follow TYPE. `0003_job.surql` uses the accepted form.
+- `SELECT ... WHERE status = 'queued' AND run_after <= time::now() ORDER BY run_after
+  LIMIT 1` selects candidates. `UPDATE $id SET status = 'running', attempts += 1,
+  error = NONE WHERE status = 'queued' AND attempts = $attempts AND run_after <=
+  time::now() RETURN AFTER` is the atomic claim. Synchronized reads on **two independent
+  WebSocket connections** select the same row; only one conditional UPDATE returns it,
+  exactly one handler runs, and the stored job is done with attempts = 1. Structured
+  `TransactionConflict` is retried with bounded delay; all other errors propagate.
+- Bound UTC `run_after` values round-trip and exclude retries from immediate polling.
+  Retry tests verify the actual scheduled times, 1/2/4/8 seconds between attempts,
+  permanent failure at attempt five, and immediate terminal failure for unknown handlers.
+  Completion/retry UPDATEs also compare the claim's attempts, running status and owner.
+- `LIVE SELECT * FROM job WHERE status = 'queued'` returns a query UUID;
+  `await subscribe_live(id)` returns an async generator. Enqueue produces CREATE, and
+  changing running back to queued produces UPDATE. KILL plus `aclose()` ends the stream.
+  SDK 3.0.0 documents and the disconnect test observes subscription failure after loss
+  of its own socket. The worker uses a separate connection with reconnect disabled,
+  logs failure without messages/payloads, closes it and establishes a **new** subscription
+  after five seconds. A fresh enqueue then wakes it again. Independent polling continues
+  when LIVE setup fails; cancellation tests confirm no remaining worker/SDK tasks.
+- `GET /api/jobs/{id}` binds `RecordID("job", key)` and `owner = $user`; absent,
+  malformed, other-owner and shared jobs all return the same 404. Only generated lowercase
+  32-hex keys are accepted; query fragments are never parsed as record identifiers.
+
+The migration loader checks each discovered version against the set already applied,
+not a highest-version watermark; an unapplied `0003` can therefore follow an already
+applied `0004` when both immutable files are present. Fresh databases apply them sorted.
+The combined post-merge snapshot must contain both job and admin-guard definitions.
+
+Verification: baseline backend **158 passed**; the full normal (snapshot comparison)
+suite after jobs/LIVE integration **170 passed**, with only the existing Starlette
+TestClient deprecation warning. Explicit `--update-snapshot` succeeded first. After
+adding the Windows signal-restoration regression, the final focused worker/API/snapshot
+selection passed **15 tests**. Ruff check/format and basedpyright are clean; generated
+OpenAPI/TypeScript contracts pass scoped ESLint and frontend typecheck. Production
+image/Compose/browser acceptance is deferred to the integrated parent run.
+
 ### Connection and result shape (N02, N03)
 
 Run Python snippets with `backend` as the working directory. Credentials are read from

@@ -43,6 +43,17 @@ def test_settings(request: pytest.FixtureRequest, session_db_settings: Settings)
 
 
 @pytest.fixture
+def job_settings() -> Settings:
+    return test_database_settings()
+
+
+@pytest.fixture
+async def job_db(job_settings: Settings) -> AsyncIterator[AsyncWsSurrealConnection]:
+    async with isolated_database(job_settings, migrate=True) as connection:
+        yield connection
+
+
+@pytest.fixture
 async def db(
     request: pytest.FixtureRequest,
     test_settings: Settings,

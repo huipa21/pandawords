@@ -102,6 +102,23 @@ The backend uses Python 3.14 slim (Debian trixie), uv 0.11.18 and the frozen pro
 dependencies only. Its runtime user is UID/GID `10001:10001`; writable media mounts at
 `/data/media` must permit that UID to write. Mount the lexicon read-only at `/data/lexicon`.
 The same backend image supports command overrides for the worker and migrations.
+Production Compose starts `worker` with `python -m app.worker`, after successful migration
+and database health, on the internal network with the same media/lexicon mounts as the API.
+It runs as the image's non-root user, exposes no port and has a 30-second shutdown grace period.
+The skeleton registry includes `noop`; register future handlers in `app.worker.handlers`.
+LIVE notifications are wakeup hints; the worker scans due queued jobs at least every five
+seconds and recreates a disconnected LIVE subscription after five seconds. A conditional
+UPDATE is the only claim authority, so concurrent worker processes cannot execute the same
+claim. Failed handlers retry after 1, 2, 4 and 8 seconds, then fail permanently on attempt five.
+Unknown handler types fail immediately. Persisted/API errors are fixed safe codes, not
+exception messages; payloads and owners are omitted from the authenticated status endpoint.
+SIGINT/SIGTERM cancels the current handler, schedules a bounded retry (or terminal failure
+at the limit), kills LIVE and closes both connections. Handlers must propagate cancellation
+and tolerate retries: external side effects are not exactly-once transactions.
+A forced kill, machine crash, or DB outage during completion can leave a job `running`;
+there is deliberately no lease/reaper in this skeleton. After confirming the old worker is
+stopped, an operator must inspect/requeue such a job, respecting its attempt limit. Do not
+automatically replay possibly completed external effects.
 The web build uses Node 24.21.0 Alpine 3.23, the workspace-pinned pnpm, and nginx 1.30 Alpine.
 The Dockerfile-specific web ignore file and backend ignore file exclude local dependencies,
 build output and environment files.

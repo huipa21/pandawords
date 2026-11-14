@@ -11,6 +11,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.types import ASGIApp
 
 from app.api.auth import router as auth_router
+from app.api.jobs import router as jobs_router
 from app.core.config import Settings
 from app.core.errors import (
     AppError,
@@ -91,6 +92,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     app.include_router(router)
     app.include_router(auth_router)
+    app.include_router(jobs_router)
     return app
 
 
