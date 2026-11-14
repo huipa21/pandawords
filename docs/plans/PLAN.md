@@ -91,7 +91,7 @@ are in `phase-N.md`. If a phase file doesn't exist yet, the agent asks before wr
 | 3.2.4 | Exercises: `cloze`, `listen` | 3.2.1, 2.5.2 | 4 | M | 🟡 |
 | 3.2.5 | DeepSeek client (JSON mode, caching, budget, fallback) | 1.2.2, 1.5.1 | 1 | S | ✅ |
 | 3.2.6 | Exercise: `scenario` (cached generation) | 3.2.5, 3.2.1 | 4 | M | 🟡 |
-| 3.3.1 | Exercise components (ExerciseShell, ChoiceGrid, TypedAnswerInput, RatingBar, ReviewProgress) | 2.6.1, 3.2.1 | 4 | M | 🟡 |
+| 3.3.1 | Exercise components (ExerciseShell, ChoiceGrid, TypedAnswerInput, RatingBar, ReviewProgress) | 2.6.1, 3.2.1 | 4 | M | ✅ |
 | 3.3.2 | Review session page | 3.3.1, 3.1.3, 3.2.3, 3.2.4 | 6 | M | 🟡 |
 | 3.3.3 | Plan settings + dashboard | 3.1.3, 2.6.2 | 4 | M | ✅ |
 | 3.3.4 | E2E: review session | 3.3.2, 3.3.3 | 7 | S | 🟡 |

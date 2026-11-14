@@ -21,7 +21,6 @@ Migration allocations: 0013 memory/history; 0014 LLM; 0015 SRS preferences;
 | 3.2.3 | task/3.2.3-recognition | ../pandawords.worktrees/3.2.3 | Agent running |
 | 3.2.4 | task/3.2.4-recall | ../pandawords.worktrees/3.2.4 | Agent running |
 | 3.2.6 | task/3.2.6-scenario | ../pandawords.worktrees/3.2.6 | Agent running |
-| 3.3.1 | task/3.3.1-components | ../pandawords.worktrees/3.3.1 | Agent running |
 | 3.3.2 | task/3.3.2-review | ../pandawords.worktrees/3.3.2 | Waiting for review prerequisites |
 | 3.3.4 | task/3.3.4-e2e | ../pandawords.worktrees/3.3.4 | Waiting for 3.3.2 and 3.3.3 |
 
@@ -63,6 +62,19 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
   migration 0005; task 4.2.1 requires verification and only additive migration if needed.
 - Blockers / follow-ups: none.
 
+### 2026-11-14 — 3.3.1 Shared exercise controls
+- Result / completed: `eccbba6` merged as `647873b`; accessible localized exercise shell,
+  choices/typed input/rating/progress, scoped shortcuts, monotonic timing and design previews.
+- Dependencies: 2.6.1 and 3.2.1 checked ✅.
+- Verification: agent check/build/120 frontend tests passed; both themes/locales at
+  390/1440 widths validated. Integrated main check and standard frontend suite passed.
+- Skipped / deferred: none. Failures / causes / corrections: locale merge kept study and
+  exercise sections. Expanded preview mounts six real shells; default five-second App
+  integration test timed out twice. Agent measured four-second isolated run, no loops;
+  that test alone now has a 20-second budget, preserving all assertions. An initially
+  misplaced timeout argument was caught by type checking and corrected before verification.
+- Blockers / follow-ups: none; review UI still awaits recognition and recall integration.
+
 ### 2026-11-14 — 3.3.3 Plan settings and dashboard UI
 - Result / completed: `d264f38` merged as `f99612d`; localized project settings/summary,
   desired retention, forecast/dashboard, complete reorder drafts and review navigation.
@@ -72,7 +84,7 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Skipped / deferred: E2E belongs to 3.3.4; backend unchanged, latest main backend 787 passed.
 - Failures / causes / corrections: additive testing-doc conflict retained both sections;
   cold-lint setup fix on main removes the observed frontend initialization timeout.
-- Blockers / follow-ups: none; cleanup follows.
+- Blockers / follow-ups: none; task branch and inspected worktree folder removed.
 
 ### 2026-11-14 — 3.2.2 Safe ranked distractors
 - Result / completed: `15441c2` merged; owner-filtered bounded graph discovery, ranked

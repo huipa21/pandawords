@@ -78,7 +78,7 @@ describe('app', () => {
       disposePinia(pinia)
       vi.unstubAllGlobals()
     }
-  })
+  }, 20_000)
 
   it('syncs controls, Naive theme, CSS theme and language metadata', async () => {
     localStorage.clear()
