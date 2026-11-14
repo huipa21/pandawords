@@ -10,12 +10,14 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 ## Current run
 
 Request: resume and complete Phase 1, proceeding through waves in dependency order.
-Next step: implement wave 9 Auth API with disjoint implementation and API-test components;
-then continue remaining Phase 1 waves in dependency order.
+Next step: implement wave 10 admin API, frontend auth and worker/jobs in parallel task worktrees;
+assemble and verify each before starting wave 11.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 1.5.3 | `task/1.5.3-auth-api` | `../pandawords.worktrees/1.5.3` | Starting with parallel implementation/tests; dependency 1.5.2 is ✅ |
+| 1.5.4 | `task/1.5.4-admin-api` | `../pandawords.worktrees/1.5.4` | Starting; dependency1.5.3 is ✅ |
+| 1.5.5 | `task/1.5.5-frontend-auth` | `../pandawords.worktrees/1.5.5` | Starting; dependencies1.5.3/1.4.3/1.4.5 are ✅ |
+| 1.6.2 | `task/1.6.2-worker-jobs` | `../pandawords.worktrees/1.6.2` | Starting; dependencies1.3.4/1.3.5/1.5.3/1.6.4 are ✅ |
 
 ## Blocked
 
@@ -41,6 +43,23 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 1.5.3 Auth API
+- Result / completed: five auth endpoints, strict cookie, reload-based current_user/require_admin,
+  forced-change gate, bounded username/IP exponential login backoff; atomic password change
+  revokes old sessions and issues usable tokens; `fca8fe3` merged as `066f873`.
+- Dependencies:1.5.2 is ✅.
+- Verification: integrated Ruff/format/basedpyright, backend158 tests, frontend lint/typecheck
+  and43 tests passed;26 focused API cases cover generic login failures, cookie flags, rotation,
+  logout, gate, disabled user, owner isolation and stale-login/password-change races. Generated
+  frontend API contracts from OpenAPI; hooks passed.
+- Skipped / deferred: aggregate scripts remain1.6.1; actual browser auth awaits1.5.5.
+- Failures / causes / corrections: missing worktree dependencies restored locked/offline;
+  duplicate test module name fixed. Existing Starlette warning remains; Pylance worktree unavailable
+  but standalone typecheck/runtime tests passed.
+- Findings: forced-change refresh is403 and clears cookie; public login grants the token needed
+  for me/password/logout, and password change returns fresh usable access/refresh credentials.
+- Blockers / follow-ups: none; wave10 tasks now ready. Wave8 branch/worktree removed.
 
 ### 2026-11-14 — 1.5.2 Security core
 - Result / completed: recovered and assembled unfinished work with parallel implementation and

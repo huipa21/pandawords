@@ -38,12 +38,12 @@ are in `phase-N.md`. If a phase file doesn't exist yet, the agent asks before wr
 | 1.4.5 | OpenAPI → TS types pipeline (`gen-api`) + API client with refresh | 1.4.1, 1.2.2 | 4 | M | ✅ |
 | 1.5.1 | Migration: `user`, `refresh_token` | 1.3.4, 1.3.5 | 7 | S | ✅ |
 | 1.5.2 | Security core: argon2, JWT, refresh rotation, admin bootstrap | 1.5.1 | 8 | M | ✅ |
-| 1.5.3 | Auth API (login, refresh, logout, me, password) + forced change gate | 1.5.2 | 9 | M | 🟡 |
-| 1.5.4 | Admin users API | 1.5.3 | 10 | S | ⬜ |
-| 1.5.5 | Frontend auth: login, store, guards, change password | 1.5.3, 1.4.3, 1.4.5 | 10 | M | ⬜ |
+| 1.5.3 | Auth API (login, refresh, logout, me, password) + forced change gate | 1.5.2 | 9 | M | ✅ |
+| 1.5.4 | Admin users API | 1.5.3 | 10 | S | 🟡 |
+| 1.5.5 | Frontend auth: login, store, guards, change password | 1.5.3, 1.4.3, 1.4.5 | 10 | M | 🟡 |
 | 1.5.6 | Frontend admin users page | 1.5.4, 1.5.5 | 11 | M | ⬜ |
 | 1.6.1 | `dev.ps1` `up`/`down`/`check`/`test` complete | 1.3.3, 1.4.3, 1.6.2 | 11 | M | ⬜ |
-| 1.6.2 | Worker skeleton + `job` table + jobs API | 1.3.4, 1.3.5, 1.5.3, 1.6.4 | 10 | M | ⬜ |
+| 1.6.2 | Worker skeleton + `job` table + jobs API | 1.3.4, 1.3.5, 1.5.3, 1.6.4 | 10 | M | 🟡 |
 | 1.6.3 | Dockerfiles (api, web/nginx) | 1.2.2, 1.4.3 | 5 | M | ✅ |
 | 1.6.4 | Production `compose.yml` + pre-migrate export + Caddy snippet | 1.6.3, 1.3.3, 1.3.2 | 6 | M | ✅ |
 | 1.6.5 | `dev.ps1 release` (images → tar.gz, deploy bundle) | 1.6.4 | 7 | S | ✅ |
