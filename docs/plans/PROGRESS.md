@@ -10,12 +10,12 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 ## Current run
 
 Request: resume and complete Phase 1, proceeding through waves in dependency order.
-Next step: implement wave12 first-login E2E, run against main up stack, then finish
-Phase1 full checks, packaging and task-worktree cleanup.
+Result: Phase 1 is complete. All 29 tasks are ✅ and merged to main; independent wave
+components ran in parallel, with integrated verification and cleanup after each task.
+No active task remains. Phase 2 was not started; pre-existing Phase 2 edits are preserved.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 1.6.6 | `task/1.6.6-first-login-e2e` | `../pandawords.worktrees/1.6.6` | Starting; dependencies1.5.6/1.6.1 are ✅ |
 
 ## Blocked
 
@@ -41,6 +41,28 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 1.6.6 First-login E2E and Phase 1 completion
+- Result / completed: planned Playwright dependency/config and one Chromium UI flow, generated
+  contract types, isolated learner cleanup, safe credential inputs and disabled recordings;
+  `9fab165` merged, exact real-run corrections committed as `eddaa42`.
+- Dependencies:1.5.6/1.6.1 are ✅; all29 Phase1 tasks are now ✅.
+- Verification: actual main `up`, `test -E2E`, then final `check` and combined
+  `test -Backend -Frontend -E2E` passed:191 backend tests,65 frontend tests and1 Chromium E2E.
+  Final frontend production build passed. Full flow: admin UI creates unique learner, temporary
+  password login forces change, in-app Projects attempt stays gated, password change reaches
+  Projects; cleanup disables only that learner. Zero skipped tests or success-shaped fallbacks.
+  Final down exited all21 owned host/child processes; dev ports8000/5173/8100 closed.
+- Skipped / deferred: live remote/Docker deployment not run; later phases intentionally untouched.
+- Failures / causes / corrections: initial real E2E timed out on required-label asterisk; fixed
+  prefix locators. Replaced full reload with in-app brand-link navigation because refresh
+  intentionally denies pending-change users. Reran required command and combined suite successfully.
+  Existing Starlette/httpx deprecation warning remains; no unresolved code/test failure.
+- Findings: Chromium download/launch and package install verified with TLS enabled. API/schema
+  snapshots and frontend contracts remain committed. Release/image/production acceptance recorded
+  below. Generated E2E learners remain disabled in dev DB because no delete API exists.
+- Blockers / follow-ups: none for Phase1. All task branches/worktrees removed, leaving main only;
+  pre-existing Phase2 heading/details and browser-output folder preserved, no push requested.
 
 ### 2026-11-14 — Integrated release acceptance
 - Result / completed: main `dev.ps1 release -Version0.1.6913` built current API/worker and

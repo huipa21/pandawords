@@ -47,7 +47,7 @@ are in `phase-N.md`. If a phase file doesn't exist yet, the agent asks before wr
 | 1.6.3 | Dockerfiles (api, web/nginx) | 1.2.2, 1.4.3 | 5 | M | ✅ |
 | 1.6.4 | Production `compose.yml` + pre-migrate export + Caddy snippet | 1.6.3, 1.3.3, 1.3.2 | 6 | M | ✅ |
 | 1.6.5 | `dev.ps1 release` (images → tar.gz, deploy bundle) | 1.6.4 | 7 | S | ✅ |
-| 1.6.6 | E2E: admin creates user → first login → forced password change | 1.5.6, 1.6.1 | 12 | S | 🟡 |
+| 1.6.6 | E2E: admin creates user → first login → forced password change | 1.5.6, 1.6.1 | 12 | S | ✅ |
 
 ## Phase 2 — Dictionary & projects
 

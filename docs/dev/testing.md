@@ -39,8 +39,12 @@ Vitest's `src/**/*.test.ts` include keeps `e2e/**/*.spec.ts` out of unit runs.
 The single flow selects English via the existing browser preference format, signs in as
 the administrator, creates a unique `e2e_<UUID>` learner, reads the temporary-password
 dialog, signs out, and signs in as that learner. It verifies the public forced-change
-flag, the `/change-password` guard (including a direct `/projects` visit), then changes
-the password and reaches Projects. API response types come from the generated schema.
+flag and the `/change-password` guard, including an in-app attempt to reach Projects
+through the brand link, then changes the password and reaches Projects. This navigation
+must remain in-app: a full reload instead runs refresh, which intentionally rejects
+pending-change users and requires another login. Required form labels include Naive UI's
+asterisk, so credential locators match their label prefix. API response types come from
+the generated schema.
 Finally, the captured administrator token disables **only** the learner created by
 this run, even after an assertion failure. The record remains in the dev database:
 there is no delete API. An interrupted process or failed cleanup can leave an enabled
