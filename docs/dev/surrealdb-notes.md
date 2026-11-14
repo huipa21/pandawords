@@ -54,6 +54,34 @@ the script only imports the runner. Assertions are the checks: run without Pytho
 
 ## Verified snippets
 
+Task **2.2.1**, **2026-11-14**, verified `0005_dictionary.surql` using the existing loopback
+**test** server on **8101**, HTTP version **surrealdb-3.3.5**, Python **3.14.3**, SDK **3.0.0**.
+`tests/integration/test_dictionary_schema.py` uses fresh harness databases, checks all documented
+field types and relation endpoint sets through `INFO`, exercises accepted/rejected writes and
+shared/Alice/Bob owner-filtered reads on every table/edge, and replays both the migration runner
+and raw DDL without schema changes or data loss. It never uses the dev database or changes the
+shared server lifecycle.
+
+- ✅ Nested SCHEMAFULL object arrays: `TYPE array<object>` plus `forms.*.form`,
+  `forms.*.tags TYPE array<string>`, `pron.*.accent` and `pron.*.audio` retain and validate nested
+  values. A missing required form, invalid accent, non-string tag or wrong audio record table fails.
+- ✅ Dynamic language maps: `DEFINE FIELD ... gloss ON sense TYPE object FLEXIBLE;` followed by
+  `DEFINE FIELD ... gloss.* ON sense TYPE string;` preserves `zh` and `fr` keys while rejecting
+  numeric translations. `translation` uses the same pattern. **`FLEXIBLE TYPE object` is rejected**:
+  the server explicitly requires FLEXIBLE after TYPE.
+- ✅ `TYPE option<array<int, 2>>` permits an absent span or exactly two integers, rejecting
+  one/three elements and a string element. `INFO` normalizes option types to `none | ...`.
+- ✅ Relation unions use `IN sense | morpheme | tag OUT tag ENFORCED SCHEMAFULL` and
+  `IN sense OUT lemma | sentence | passage ENFORCED SCHEMAFULL`. Each allowed endpoint combination
+  succeeds; wrong endpoint tables and nonexistent records fail.
+- ✅ Dynamic `RELATE $start->$edge->$end CONTENT $attributes` works when `$edge` is a bound
+  **RecordID** in the relation table. Binding its table name as a plain string fails (interpreted
+  as an invalid `out` value); the test helper binds generated RecordIDs instead.
+- ✅ Every dictionary owner is `option<record<user>>`: NONE/shared and user references round-trip;
+  NULL, strings and wrong reference tables are rejected. References constrain table type, not
+  user/media record existence. Cross-owner edge pairs are allowed; no speculative unique edge
+  index blocks user overlays. `lemma(lang, text)` remains globally unique as documented.
+
 Task **1.5.4**, **2026-11-14**, verified against the existing loopback **test** server
 (8101), **surrealdb-3.3.5**, SDK **3.0.0**. Migration `0004_admin_guard.surql` adds
 an internal SCHEMAFULL singleton with an integer `version`; `UPDATE admin_guard:singleton

@@ -13,8 +13,24 @@
     "tables": {
       "_migration": "DEFINE TABLE _migration TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "admin_guard": "DEFINE TABLE admin_guard TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
+      "composed_of": "DEFINE TABLE composed_of TYPE RELATION IN lexeme OUT morpheme ENFORCED SCHEMAFULL PERMISSIONS NONE",
+      "contains": "DEFINE TABLE contains TYPE RELATION IN lemma OUT lexeme ENFORCED SCHEMAFULL PERMISSIONS NONE",
+      "derives_to": "DEFINE TABLE derives_to TYPE RELATION IN lexeme OUT lexeme ENFORCED SCHEMAFULL PERMISSIONS NONE",
+      "has_lexeme": "DEFINE TABLE has_lexeme TYPE RELATION IN lemma OUT lexeme ENFORCED SCHEMAFULL PERMISSIONS NONE",
+      "has_sense": "DEFINE TABLE has_sense TYPE RELATION IN lexeme OUT sense ENFORCED SCHEMAFULL PERMISSIONS NONE",
       "job": "DEFINE TABLE job TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
+      "lemma": "DEFINE TABLE lemma TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
+      "lexeme": "DEFINE TABLE lexeme TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
+      "member_of": "DEFINE TABLE member_of TYPE RELATION IN sense | morpheme | tag OUT tag ENFORCED SCHEMAFULL PERMISSIONS NONE",
+      "morpheme": "DEFINE TABLE morpheme TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
+      "part_of": "DEFINE TABLE part_of TYPE RELATION IN sentence OUT passage ENFORCED SCHEMAFULL PERMISSIONS NONE",
+      "passage": "DEFINE TABLE passage TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "refresh_token": "DEFINE TABLE refresh_token TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
+      "relates_to": "DEFINE TABLE relates_to TYPE RELATION IN sense OUT sense ENFORCED SCHEMAFULL PERMISSIONS NONE",
+      "sense": "DEFINE TABLE sense TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
+      "sentence": "DEFINE TABLE sentence TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
+      "tag": "DEFINE TABLE tag TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
+      "used_in": "DEFINE TABLE used_in TYPE RELATION IN sense OUT lemma | sentence | passage ENFORCED SCHEMAFULL PERMISSIONS NONE",
       "user": "DEFINE TABLE user TYPE NORMAL SCHEMAFULL PERMISSIONS NONE"
     },
     "users": {}
@@ -43,6 +59,65 @@
       "lives": {},
       "tables": {}
     },
+    "composed_of": {
+      "events": {},
+      "fields": {
+        "in": "DEFINE FIELD in ON composed_of TYPE record<lexeme> PERMISSIONS FULL",
+        "order": "DEFINE FIELD order ON composed_of TYPE int PERMISSIONS FULL",
+        "out": "DEFINE FIELD out ON composed_of TYPE record<morpheme> PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON composed_of TYPE none | record<user> PERMISSIONS FULL"
+      },
+      "indexes": {},
+      "lives": {},
+      "tables": {}
+    },
+    "contains": {
+      "events": {},
+      "fields": {
+        "in": "DEFINE FIELD in ON contains TYPE record<lemma> PERMISSIONS FULL",
+        "out": "DEFINE FIELD out ON contains TYPE record<lexeme> PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON contains TYPE none | record<user> PERMISSIONS FULL",
+        "position": "DEFINE FIELD position ON contains TYPE int PERMISSIONS FULL"
+      },
+      "indexes": {},
+      "lives": {},
+      "tables": {}
+    },
+    "derives_to": {
+      "events": {},
+      "fields": {
+        "in": "DEFINE FIELD in ON derives_to TYPE record<lexeme> PERMISSIONS FULL",
+        "out": "DEFINE FIELD out ON derives_to TYPE record<lexeme> PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON derives_to TYPE none | record<user> PERMISSIONS FULL",
+        "via": "DEFINE FIELD via ON derives_to TYPE none | string PERMISSIONS FULL"
+      },
+      "indexes": {},
+      "lives": {},
+      "tables": {}
+    },
+    "has_lexeme": {
+      "events": {},
+      "fields": {
+        "in": "DEFINE FIELD in ON has_lexeme TYPE record<lemma> PERMISSIONS FULL",
+        "out": "DEFINE FIELD out ON has_lexeme TYPE record<lexeme> PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON has_lexeme TYPE none | record<user> PERMISSIONS FULL"
+      },
+      "indexes": {},
+      "lives": {},
+      "tables": {}
+    },
+    "has_sense": {
+      "events": {},
+      "fields": {
+        "in": "DEFINE FIELD in ON has_sense TYPE record<lexeme> PERMISSIONS FULL",
+        "out": "DEFINE FIELD out ON has_sense TYPE record<sense> PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON has_sense TYPE none | record<user> PERMISSIONS FULL",
+        "rank": "DEFINE FIELD rank ON has_sense TYPE int PERMISSIONS FULL"
+      },
+      "indexes": {},
+      "lives": {},
+      "tables": {}
+    },
     "job": {
       "events": {},
       "fields": {
@@ -61,6 +136,95 @@
       "lives": {},
       "tables": {}
     },
+    "lemma": {
+      "events": {},
+      "fields": {
+        "cefr": "DEFINE FIELD cefr ON lemma TYPE none | string PERMISSIONS FULL",
+        "exam_tags": "DEFINE FIELD exam_tags ON lemma TYPE array<string> PERMISSIONS FULL",
+        "exam_tags.*": "DEFINE FIELD exam_tags.* ON lemma TYPE string PERMISSIONS FULL",
+        "freq_zipf": "DEFINE FIELD freq_zipf ON lemma TYPE number PERMISSIONS FULL",
+        "kind": "DEFINE FIELD kind ON lemma TYPE 'word' | 'phrase' PERMISSIONS FULL",
+        "lang": "DEFINE FIELD lang ON lemma TYPE string PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON lemma TYPE none | record<user> PERMISSIONS FULL",
+        "source": "DEFINE FIELD source ON lemma TYPE string PERMISSIONS FULL",
+        "text": "DEFINE FIELD text ON lemma TYPE string PERMISSIONS FULL"
+      },
+      "indexes": {
+        "lemma_lang_text": "DEFINE INDEX lemma_lang_text ON lemma FIELDS lang, text UNIQUE"
+      },
+      "lives": {},
+      "tables": {}
+    },
+    "lexeme": {
+      "events": {},
+      "fields": {
+        "etymology_no": "DEFINE FIELD etymology_no ON lexeme TYPE int PERMISSIONS FULL",
+        "etymology_text": "DEFINE FIELD etymology_text ON lexeme TYPE none | string PERMISSIONS FULL",
+        "forms": "DEFINE FIELD forms ON lexeme TYPE array<object> PERMISSIONS FULL",
+        "forms.*": "DEFINE FIELD forms.* ON lexeme TYPE object PERMISSIONS FULL",
+        "forms.*.form": "DEFINE FIELD forms.*.form ON lexeme TYPE string PERMISSIONS FULL",
+        "forms.*.tags": "DEFINE FIELD forms.*.tags ON lexeme TYPE array<string> PERMISSIONS FULL",
+        "forms.*.tags.*": "DEFINE FIELD forms.*.tags.* ON lexeme TYPE string PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON lexeme TYPE none | record<user> PERMISSIONS FULL",
+        "pos": "DEFINE FIELD pos ON lexeme TYPE string PERMISSIONS FULL",
+        "pron": "DEFINE FIELD pron ON lexeme TYPE array<object> PERMISSIONS FULL",
+        "pron.*": "DEFINE FIELD pron.* ON lexeme TYPE object PERMISSIONS FULL",
+        "pron.*.accent": "DEFINE FIELD pron.*.accent ON lexeme TYPE 'US' | 'UK' PERMISSIONS FULL",
+        "pron.*.audio": "DEFINE FIELD pron.*.audio ON lexeme TYPE none | record<media> PERMISSIONS FULL",
+        "pron.*.ipa": "DEFINE FIELD pron.*.ipa ON lexeme TYPE string PERMISSIONS FULL"
+      },
+      "indexes": {},
+      "lives": {},
+      "tables": {}
+    },
+    "member_of": {
+      "events": {},
+      "fields": {
+        "in": "DEFINE FIELD in ON member_of TYPE record<sense | morpheme | tag> PERMISSIONS FULL",
+        "out": "DEFINE FIELD out ON member_of TYPE record<tag> PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON member_of TYPE none | record<user> PERMISSIONS FULL"
+      },
+      "indexes": {},
+      "lives": {},
+      "tables": {}
+    },
+    "morpheme": {
+      "events": {},
+      "fields": {
+        "meaning": "DEFINE FIELD meaning ON morpheme TYPE none | string PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON morpheme TYPE none | record<user> PERMISSIONS FULL",
+        "text": "DEFINE FIELD text ON morpheme TYPE string PERMISSIONS FULL",
+        "type": "DEFINE FIELD type ON morpheme TYPE 'prefix' | 'root' | 'suffix' | 'infix' PERMISSIONS FULL"
+      },
+      "indexes": {},
+      "lives": {},
+      "tables": {}
+    },
+    "part_of": {
+      "events": {},
+      "fields": {
+        "in": "DEFINE FIELD in ON part_of TYPE record<sentence> PERMISSIONS FULL",
+        "order": "DEFINE FIELD order ON part_of TYPE int PERMISSIONS FULL",
+        "out": "DEFINE FIELD out ON part_of TYPE record<passage> PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON part_of TYPE none | record<user> PERMISSIONS FULL"
+      },
+      "indexes": {},
+      "lives": {},
+      "tables": {}
+    },
+    "passage": {
+      "events": {},
+      "fields": {
+        "lang": "DEFINE FIELD lang ON passage TYPE string PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON passage TYPE none | record<user> PERMISSIONS FULL",
+        "source": "DEFINE FIELD source ON passage TYPE string PERMISSIONS FULL",
+        "text": "DEFINE FIELD text ON passage TYPE string PERMISSIONS FULL",
+        "title": "DEFINE FIELD title ON passage TYPE string PERMISSIONS FULL"
+      },
+      "indexes": {},
+      "lives": {},
+      "tables": {}
+    },
     "refresh_token": {
       "events": {},
       "fields": {
@@ -75,6 +239,78 @@
         "refresh_token_hash": "DEFINE INDEX refresh_token_hash ON refresh_token FIELDS token_hash UNIQUE",
         "refresh_token_user": "DEFINE INDEX refresh_token_user ON refresh_token FIELDS user"
       },
+      "lives": {},
+      "tables": {}
+    },
+    "relates_to": {
+      "events": {},
+      "fields": {
+        "in": "DEFINE FIELD in ON relates_to TYPE record<sense> PERMISSIONS FULL",
+        "out": "DEFINE FIELD out ON relates_to TYPE record<sense> PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON relates_to TYPE none | record<user> PERMISSIONS FULL",
+        "source": "DEFINE FIELD source ON relates_to TYPE string PERMISSIONS FULL",
+        "type": "DEFINE FIELD type ON relates_to TYPE 'synonym' | 'antonym' | 'hypernym' | 'hyponym' | 'confusable' | 'collocation' | 'default' PERMISSIONS FULL"
+      },
+      "indexes": {},
+      "lives": {},
+      "tables": {}
+    },
+    "sense": {
+      "events": {},
+      "fields": {
+        "common": "DEFINE FIELD common ON sense TYPE bool PERMISSIONS FULL",
+        "definition": "DEFINE FIELD definition ON sense TYPE string PERMISSIONS FULL",
+        "domain": "DEFINE FIELD domain ON sense TYPE array<string> PERMISSIONS FULL",
+        "domain.*": "DEFINE FIELD domain.* ON sense TYPE string PERMISSIONS FULL",
+        "examples": "DEFINE FIELD examples ON sense TYPE array<string> PERMISSIONS FULL",
+        "examples.*": "DEFINE FIELD examples.* ON sense TYPE string PERMISSIONS FULL",
+        "gloss": "DEFINE FIELD gloss ON sense TYPE object FLEXIBLE PERMISSIONS FULL",
+        "gloss.*": "DEFINE FIELD gloss.* ON sense TYPE string PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON sense TYPE none | record<user> PERMISSIONS FULL",
+        "rank": "DEFINE FIELD rank ON sense TYPE int PERMISSIONS FULL",
+        "register": "DEFINE FIELD register ON sense TYPE array<string> PERMISSIONS FULL",
+        "register.*": "DEFINE FIELD register.* ON sense TYPE string PERMISSIONS FULL",
+        "source": "DEFINE FIELD source ON sense TYPE string PERMISSIONS FULL"
+      },
+      "indexes": {},
+      "lives": {},
+      "tables": {}
+    },
+    "sentence": {
+      "events": {},
+      "fields": {
+        "lang": "DEFINE FIELD lang ON sentence TYPE string PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON sentence TYPE none | record<user> PERMISSIONS FULL",
+        "source": "DEFINE FIELD source ON sentence TYPE string PERMISSIONS FULL",
+        "text": "DEFINE FIELD text ON sentence TYPE string PERMISSIONS FULL",
+        "translation": "DEFINE FIELD translation ON sentence TYPE object FLEXIBLE PERMISSIONS FULL",
+        "translation.*": "DEFINE FIELD translation.* ON sentence TYPE string PERMISSIONS FULL"
+      },
+      "indexes": {},
+      "lives": {},
+      "tables": {}
+    },
+    "tag": {
+      "events": {},
+      "fields": {
+        "kind": "DEFINE FIELD kind ON tag TYPE string PERMISSIONS FULL",
+        "name": "DEFINE FIELD name ON tag TYPE string PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON tag TYPE none | record<user> PERMISSIONS FULL"
+      },
+      "indexes": {},
+      "lives": {},
+      "tables": {}
+    },
+    "used_in": {
+      "events": {},
+      "fields": {
+        "in": "DEFINE FIELD in ON used_in TYPE record<sense> PERMISSIONS FULL",
+        "out": "DEFINE FIELD out ON used_in TYPE record<lemma | sentence | passage> PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON used_in TYPE none | record<user> PERMISSIONS FULL",
+        "span": "DEFINE FIELD span ON used_in TYPE none | array<int, 2> PERMISSIONS FULL",
+        "span.*": "DEFINE FIELD span.* ON used_in TYPE int PERMISSIONS FULL"
+      },
+      "indexes": {},
       "lives": {},
       "tables": {}
     },
