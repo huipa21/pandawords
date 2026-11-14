@@ -18,8 +18,8 @@ Migration allocations: 0013 memory/history; 0014 LLM; 0015 SRS preferences;
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 3.1.3 | task/3.1.3-plan | ../pandawords.worktrees/3.1.3 | Ready; migration 0016 |
-| 3.2.1 | task/3.2.1-exercises | ../pandawords.worktrees/3.2.1 | Ready; migration 0017 |
+| 3.1.3 | task/3.1.3-plan | ../pandawords.worktrees/3.1.3 | Agent running; migration 0016 |
+| 3.2.1 | task/3.2.1-exercises | ../pandawords.worktrees/3.2.1 | Agent running; migration 0017 |
 | 3.2.2 | task/3.2.2-distractors | ../pandawords.worktrees/3.2.2 | Waiting for 3.2.1 |
 | 3.2.3 | task/3.2.3-recognition | ../pandawords.worktrees/3.2.3 | Waiting for 3.2.2 |
 | 3.2.4 | task/3.2.4-recall | ../pandawords.worktrees/3.2.4 | Waiting for 3.2.1 |
@@ -66,7 +66,9 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
   no-op capacity serialization with a real project revision increment and regression tests.
 - Findings: issuance must capture memory version and persist FrameworkGrade server-side;
   only confirmation applies the SRS update.
-- Blockers / follow-ups: none; 3.1.3 and 3.2.1 ready concurrently; cleanup follows.
+- Blockers / follow-ups: none; 3.1.3 and 3.2.1 agents started concurrently. Task branch and
+  folder removed (inspected dependency leftovers removed after initial worktree cleanup).
+  Main dev stack migrated forward through 0015; API and Vite readiness HTTP 200.
 
 ### 2026-11-14 — 3.2.5 Optional DeepSeek client
 - Result / completed: `b8c43bb` merged as `ed125ce`; typed JSON service, validated persistent
