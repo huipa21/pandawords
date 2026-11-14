@@ -16,10 +16,16 @@ async def test_tag_revision_backfills_existing_users_without_resetting_replayed_
 ) -> None:
     migrations = migrate.discover(migrate.MIGRATIONS)
     with monkeypatch.context() as patch:
-        patch.setattr(migrate, "discover", lambda _directory: migrations[:-1])
+        patch.setattr(
+            migrate,
+            "discover",
+            lambda _directory: [item for item in migrations if item.version < "0018"],
+        )
         await migrate.run_migrations(db)
     user = await make_user()
-    assert await migrate.run_migrations(db) == ["0018_tag_hierarchy.surql"]
+    assert await migrate.run_migrations(db) == [
+        item.path.name for item in migrations if item.version >= "0018"
+    ]
     a = await tags.create(db, user.id, TagCreate(name="a"))
     b = await tags.create(db, user.id, TagCreate(name="b"))
     await tags.assign(db, user.id, decode_rid(b.id, "tag"), decode_rid(a.id, "tag"), remove=False)

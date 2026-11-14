@@ -166,7 +166,9 @@ async def test_missing_database_does_not_get_created(tmp_path: Path) -> None:
     assert not missing.exists()
 
 
-@pytest.mark.parametrize("kind", ["garbage", "empty", "wrong-version", "incomplete", "bad-column"])
+@pytest.mark.parametrize(
+    "kind", ["garbage", "empty", "wrong-version", "v2", "incomplete", "bad-column"]
+)
 async def test_invalid_database_errors(tmp_path: Path, kind: str) -> None:
     output = tmp_path / "invalid.sqlite"
     if kind == "garbage":
@@ -180,6 +182,8 @@ async def test_invalid_database_errors(tmp_path: Path, kind: str) -> None:
         with closing(sqlite3.connect(output)) as connection:
             if kind == "wrong-version":
                 connection.execute("PRAGMA user_version = 1")
+            elif kind == "v2":
+                connection.execute("PRAGMA user_version = 2")
             else:
                 connection.execute("ALTER TABLE lemma RENAME COLUMN cefr TO unexpected")
             connection.commit()

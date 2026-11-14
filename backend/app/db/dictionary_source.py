@@ -123,18 +123,7 @@ async def prepare(
             )
         )
         plan.edges.append(SharedEdge("has_lexeme", lemma_id, lexeme_id))
-        for affix in await reader.affixes(lexeme.id):
-            morpheme = RecordID("morpheme", [*lemma_key(lemma.lang, affix.text), affix.type])
-            plan.rows.append(SharedRow(morpheme, {"text": affix.text, "type": affix.type}))
-            plan.edges.append(
-                SharedEdge(
-                    "composed_of",
-                    lexeme_id,
-                    morpheme,
-                    {"order": affix.position},
-                    [affix.position],
-                )
-            )
+        selected_lexeme_senses = []
         for sense in await reader.senses(lexeme.id):
             chosen = sense.common if selected_senses is None else sense.id in selected_senses
             if not chosen:
@@ -142,6 +131,7 @@ async def prepare(
             found.append(sense.id)
             sense_id = RecordID("sense", sense.id)
             plan.senses.append(sense_id)
+            selected_lexeme_senses.append(sense_id)
             plan.rows.append(SharedRow(sense_id, _sense_fields(sense)))
             plan.edges.append(SharedEdge("has_sense", lexeme_id, sense_id, {"rank": sense.rank}))
             for domain in sense.domain:
@@ -149,6 +139,13 @@ async def prepare(
                 plan.rows.append(SharedRow(tag_id, {"kind": "domain", "name": domain}))
                 plan.edges.append(SharedEdge("member_of", sense_id, tag_id))
             plan.edges.extend(await relation_edges(reader, sense.id))
+        from app.services.morphology import prepare_morphology
+
+        morphology_rows, morphology_edges = await prepare_morphology(
+            reader, lexeme.id, selected_lexeme_senses
+        )
+        plan.rows.extend(morphology_rows)
+        plan.edges.extend(morphology_edges)
     if selected_senses is not None and any(key not in found for key in selected_senses):
         raise AppError(
             "dictionary.invalid_selection", 422, "Selected senses must belong to this lemma."

@@ -10,6 +10,7 @@ from app.db.dictionary_source import Materialization, SharedEdge, relation_edges
 from app.domain.add_to_project import EnrichJobPayload
 from app.domain.dictionary_keys import DictionaryKey
 from app.services.lexicon import LexiconReader
+from app.services.morphology import prepare_morphology
 
 
 async def _derivations(
@@ -97,4 +98,6 @@ async def prepare_enrichment(
         structlog.get_logger().info(
             "enrich_optional_source_absent", lemma_key=lemma.id, fields=missing
         )
-    return Materialization(lemma_id, [lexeme_id], [sense_id], [], edges), fields
+    rows, morphology_edges = await prepare_morphology(reader, lexeme.id, [sense_id])
+    edges.extend(morphology_edges)
+    return Materialization(lemma_id, [lexeme_id], [sense_id], rows, edges), fields

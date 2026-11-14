@@ -32,6 +32,31 @@ never client URLs; no previews are hotlinked or automatically fetched. Local del
 authenticated media IDs. Stored attribution includes creator, source page and the Pixabay
 Content License link; original provider URLs remain internal cache data.
 
+## Evidenced morphology (4.3.2)
+
+SQLite v3 adds `morphology_analysis` diagnostics (absent/supported/rejected, with reason);
+v2 artifacts must be rebuilt. English prefix/pre, suffix/suf, affix/af and compound/com
+templates preserve component order and repeats. Unsupported, malformed or conflicting
+templates (including conflicting duplicate source records) reject the complete analysis.
+No spelling segmentation is performed. Every component must map to a source lemma, matching
+component type, a unique etymology and a usable source sense before any graph rows are written.
+Missing or ambiguous mappings leave the entire lexeme unanalysed.
+
+Materialization and enrichment share the validator. Shared morphemes use
+`[en,text,type,etymology_no]`; morph-group tags use `[morph_group,...morpheme_key]`.
+Composition IDs include source and position, so repeated components are safe. Morpheme
+identities retain Wiktionary attribution; source composition/membership edges record
+`wiktionary`, optional LLM-proposed edges `llm:morphology-v1`. Writes are insert-only and
+transactional; conflicting existing shared compositions raise `dictionary.morphology_conflict`
+instead of mixing analyses. Private edges never modify the shared analysis.
+
+LLM fallback is explicitly opt-in via `enrich(..., llm_settings=..., user=...)`, not enabled
+by the normal enrichment worker. It uses only shared lexeme inputs through `services.llm`,
+only when templates are absent. Exact known identities, types and contiguous positions are
+validated before dictionary writes; unavailable, ambiguous or rejected proposals write no
+morphology. Logs expose skip reasons without provider payloads. Normal offline behavior
+requires no LLM.
+
 ## Distractor consumers (3.2.2)
 
 The learning service consumes already-materialized Phase 2 concept/domain tags and semantic
@@ -106,7 +131,7 @@ Concurrent builds of the same output directory are refused by a release lock.
 - The build streams the input (orjson, line by line) so it stays within the server's 4 GB RAM. It
   normally runs on the laptop. The artifact is transferred to the server as
   `pandawords-lexicon-<date>.tar.gz` and mounted read-only.
-- SQLite schema v2 (`PRAGMA user_version=2`) uses compact JSON arrays from the shared
+- SQLite schema v3 (`PRAGMA user_version=3`) uses compact JSON arrays from the shared
   `app.domain.dictionary_keys` helpers as lemma/lexeme/sense TEXT primary keys. `source` holds
   attribution and input metadata; per-row source references preserve provenance. Inflection
   lookup includes normalized lemma spellings, forms and explicit `form_of` backlinks. US/UK
@@ -121,7 +146,7 @@ Concurrent builds of the same output directory are refused by a release lock.
   validation/atomic publication. They populate the predeclared enrichment tables without
   changing core transforms or schema. Exact columns, IDs, JSON encoding, constraints,
   reader lookups and callable/CLI contracts are in
-  [`backend/scripts/README.md`](../../backend/scripts/README.md#sqlite-v2-and-extension-contract).
+  [`backend/scripts/README.md`](../../backend/scripts/README.md#sqlite-v3-and-extension-contract).
 - Senses are aligned across sources: Wiktionary is the backbone. ECDICT Chinese glosses attach at
   POS level (`sense.gloss_zh` for the top sense, `zh_gloss` lexeme-level list otherwise). OEWN
   aligns only existing lemma/POS senses, using the maximum pairwise gloss token Jaccard

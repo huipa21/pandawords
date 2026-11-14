@@ -18,6 +18,7 @@ from app.domain.lexicon import (
     LexiconGloss,
     LexiconLemma,
     LexiconLexeme,
+    LexiconMorphologyAnalysis,
     LexiconPhraseComponent,
     LexiconPhraseUsage,
     LexiconPronunciation,
@@ -44,6 +45,7 @@ _TABLES: dict[str, type[LexiconRecord]] = {
     "source": LexiconSource,
     "phrase_component": LexiconPhraseComponent,
     "phrase_usage": LexiconPhraseUsage,
+    "morphology_analysis": LexiconMorphologyAnalysis,
 }
 _JSON_COLUMNS = {
     "glosses",
@@ -53,6 +55,7 @@ _JSON_COLUMNS = {
     "examples",
     "audio",
     "metadata",
+    "components",
 }
 _KEY_COLUMNS = {
     "lemma_id",
@@ -85,8 +88,8 @@ class LexiconReader:
         connection = sqlite3.connect(f"{self._path.as_uri()}?mode=ro", uri=True)
         try:
             connection.execute("PRAGMA query_only = ON")
-            if connection.execute("PRAGMA user_version").fetchone()[0] != 2:
-                raise ValueError("unsupported schema version (expected 2; rebuild lexicon)")
+            if connection.execute("PRAGMA user_version").fetchone()[0] != 3:
+                raise ValueError("unsupported schema version (expected 3; rebuild lexicon)")
         except Exception:
             connection.close()
             raise
@@ -266,6 +269,16 @@ class LexiconReader:
             "SELECT * FROM affix WHERE lexeme_id = ? ORDER BY position, source",
             _key(lexeme_id),
         )
+
+    async def morphology_analysis(
+        self, lexeme_id: DictionaryKey
+    ) -> LexiconMorphologyAnalysis | None:
+        rows = await self._many(
+            LexiconMorphologyAnalysis,
+            "SELECT * FROM morphology_analysis WHERE lexeme_id = ?",
+            _key(lexeme_id),
+        )
+        return rows[0] if rows else None
 
     async def affixes_for_root(self, text: str, *, lang: str = "en") -> list[LexiconAffix]:
         language, normalized = lemma_key(lang, text)

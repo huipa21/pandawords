@@ -1,5 +1,16 @@
 # Data model (SurrealDB 3.3)
 
+### Evidenced morphology (4.3.2)
+
+Migration 0021 adds optional `source` to morpheme/composed_of/member_of and an
+owner/in/order composition index; existing records remain unchanged. Shared source-backed
+morpheme keys are `[en,text,type,etymology_no]`, group tag keys
+`[morph_group,...morpheme_key]`. Composition identity includes provenance and zero-based
+order, retaining repeated components. Membership connects only evidenced morphemes and
+selected senses to these groups. Reads authorize edge, source endpoint and target endpoint
+independently. User-owned morphology is visible only to its owner and never replaces
+shared source composition. See the lexicon pipeline for validation and absence diagnostics. (SurrealDB 3.3)
+
 ## Hierarchical user tags (4.3.1)
 
 Tag API kinds are `custom`, `concept`, `domain`, and `morph_group`; names are trimmed,
