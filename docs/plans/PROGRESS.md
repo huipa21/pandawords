@@ -20,7 +20,7 @@ browser logs will be committed as source.
 |---|---|---|---|
 | 2.3.4 | task/2.3.4-project-tree-api | ../pandawords.worktrees/2.3.4 | Starting; membership/effective tree and reversible visibility |
 | 2.4.3 | task/2.4.3-enrichment | ../pandawords.worktrees/2.4.3 | Starting; relation/tag/frequency worker |
-| 2.5.2 | task/2.5.2-audio | ../pandawords.worktrees/2.5.2 | Starting; source audio and optional TTS |
+| 2.6.5 | task/2.6.5-lemma-detail | ../pandawords.worktrees/2.6.5 | Starting; effective values, edits, notes and audio |
 | 2.6.3 | task/2.6.3-add-dialog | ../pandawords.worktrees/2.6.3 | Starting; candidates, selection and job status |
 
 ## Blocked
@@ -47,6 +47,19 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 2.5.2 Pronunciation audio worker
+- Result / completed: registered context-aware audio handler, source-first/throttled Wikimedia,
+  optional edge-tts, shared media caching and pronunciation linkage; `1308944` merged.
+  `AUDIO_NETWORK_ENABLED=false` supports deterministic offline fixture workflows.
+- Dependencies: 2.5.1 and 2.4.2 checked ✅; lemma detail UI now ready and starting.
+- Verification: agent `check`, 44 focused and backend 504 passed; main locked sync,
+  `check` and combined backend/frontend passed (544 backend), no live providers called in tests.
+- Skipped / deferred: live providers/nginx playback remain unperformed; mocks exercise provider
+  success/fallback/retry and source attribution. Final E2E uses networking disabled.
+- Failures / causes / corrections: missing environment restored; worktree Pylance unavailable,
+  basedpyright passed. No unresolved code failures or blockers.
+- Follow-ups: authenticated media-fetch adapter in detail UI; branch/worktree removed.
 
 ### 2026-11-14 — 2.3.3 User dictionary edits and notes
 - Result / completed: effective entry API, owner-scoped field override/reset, custom senses

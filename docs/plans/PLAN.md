@@ -70,12 +70,12 @@ are in `phase-N.md`. If a phase file doesn't exist yet, the agent asks before wr
 | 2.4.2 | Add-to-project API: materialize, includes, enqueue jobs | 2.4.1, 2.2.3, 2.3.2, 1.6.2 | 6 | M | ✅ |
 | 2.4.3 | `enrich` job: relations among materialized items, tags, frequency | 2.4.2 | 7 | M | 🟡 |
 | 2.5.1 | Media storage + authenticated serving (X-Accel-Redirect) | 2.2.1, 1.6.3 | 2 | M | ✅ |
-| 2.5.2 | `audio` job: Wiktionary → edge-tts fallback (US/UK) | 2.5.1, 2.4.2 | 7 | M | 🟡 |
+| 2.5.2 | `audio` job: Wiktionary → edge-tts fallback (US/UK) | 2.5.1, 2.4.2 | 7 | M | ✅ |
 | 2.6.1 | Word components + previews | 1.4.4, 1.4.5 | 1 | M | ✅ |
 | 2.6.2 | Projects list/create/edit pages | 2.3.2, 1.5.5 | 4 | M | ✅ |
 | 2.6.3 | Add-word dialog (SenseSelectList, JobStatus) | 2.4.2, 2.6.1, 2.6.2 | 7 | M | 🟡 |
 | 2.6.4 | Project tree view (LemmaTree, hide/unhide with undo) | 2.3.4, 2.6.1, 2.6.2 | 8 | M | ⬜ |
-| 2.6.5 | Lemma detail page (overrides, notes, audio) | 2.3.3, 2.5.2, 2.6.1 | 8 | M | ⬜ |
+| 2.6.5 | Lemma detail page (overrides, notes, audio) | 2.3.3, 2.5.2, 2.6.1 | 8 | M | 🟡 |
 | 2.6.6 | E2E: project → add word → edit sense → hide sense | 2.6.3, 2.6.4, 2.6.5 | 9 | S | ⬜ |
 
 ## Phase 3 — Learning engine
