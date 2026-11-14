@@ -141,6 +141,15 @@ Because SurrealDB automatically deletes all graph edges when deleting an endpoin
 foreign-owned associations block deletion with 409 instead of silently cascading another
 owner's edges. Full replacement updates use UPDATE, not DELETE/recreate, to preserve such edges.
 
+Context-aware cloze (4.4.4) reads these same persisted `used_in.span` offsets against the
+original sentence text, never offsets into a normalized copy. Both the relation and sentence
+must belong to the authenticated learner; the sense must be shared or owned by that learner.
+Project-hidden sentence memberships and deleted/stale associations are not exercise sources.
+Only the masked sentence enters that owner's durable attempt, with no private sentence
+metadata in the public prompt and no shared-cache writes. No new schema is required.
+Concept/domain and morph-group distractor discovery independently authorizes memberships,
+tags, candidate senses and their ancestry; it never infers morphology from spelling.
+
 `app/domain/dictionary_keys.py` is the shared source of lemma, lexeme and sense keys:
 `lemma_key(lang, text)`, `lexeme_key(lang, text, pos, etymology_no=1)` and
 `sense_key(lang, text, pos, etymology_no=1, *, source_sense_id=None, gloss=None)`.

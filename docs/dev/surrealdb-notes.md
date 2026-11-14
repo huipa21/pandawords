@@ -799,3 +799,15 @@ An independent bound `SELECT id FROM $target WHERE owner = NONE OR owner = $user
 checks current target existence/visibility. With `$user = NONE`, only shared targets
 match, so trusted shared writes cannot attach to a private target. Verified through
 the migrated backend suite (snapshot-update mode); no shared dev database was changed.
+
+### Owner-private cloze context (4.4.4) ✅
+
+Verified the bound `exercise_cloze.sentences` read on the existing dev DB at 8100
+(read-only, nonexistent probe owner/sense/project; no rows written) and populated isolated
+test databases at 8101. `record::tb(out) = 'sentence'`, endpoint `out.id != NONE`,
+`out.text AS text`, `out NOT IN $hidden`, and `ORDER BY out, id LIMIT $limit`
+work together on `used_in`. Filtering relation owner plus both endpoint owners remains
+necessary even with ENFORCED edges. Original `span` arrays arrive as Python integer lists;
+mask against original Python code-point offsets, not a normalized copy or UTF-16 indices.
+Project-hidden memberships use a separate owner/project-bound `includes` read in the
+same transaction; oversized discovery fails closed to source examples. No migration needed.

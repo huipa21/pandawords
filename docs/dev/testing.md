@@ -1,5 +1,25 @@
 # Testing
 
+## Context-aware recall and distractors (4.4.4)
+
+With the existing healthy test DB on 8101, from `backend`:
+
+```powershell
+uv run --no-sync pytest -q tests\unit\test_cloze_context.py tests\unit\test_exercise_recall.py tests\unit\test_distractors.py tests\integration\test_context_cloze.py tests\integration\test_context_distractors.py tests\integration\test_distractor_graph.py tests\api\test_context_attempts.py tests\api\test_recall_attempts.py
+```
+
+Tests cover original Unicode code-point offsets (emoji, NFKC expansion, combining characters),
+all repeated/inflected forms, owner-private versus source example precedence, hidden/deleted
+links/endpoints, stale spans, bounded discovery and missing-context fallback. Real DB/API tests
+authorize both sentence and edge owners, deny foreign attempt access, retain no-store prompt
+responses, and leave the shared LLM cache unchanged. They verify server grading, no SRS write
+before confirmation, one owner-scoped receipt/log on confirmation and idempotent retry.
+Tag/morph tests cover each relation/endpoint owner, tier precedence, bidirectional synonym
+exclusion, deterministic seeded ordering, bounded choices and insufficient-safe-choice fallback.
+No provider, new migration, frontend change or generated API shape is needed.
+Context tests that add study data use isolated job databases, so their enrichment jobs
+cannot displace unrelated worker tests in the shared session database.
+
 ## Phrase discovery and normal add flow (4.1.2)
 
 Using the existing healthy 8101 server, from `backend`:

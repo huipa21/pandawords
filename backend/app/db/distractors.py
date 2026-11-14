@@ -7,9 +7,11 @@ from uuid import UUID
 from surrealdb import AsyncSurrealConnection, RecordID
 from surrealdb.types import Value
 
+from app.core.errors import AppError
 from app.core.record_ids import decode_rid, encode_rid
 from app.db.auth import _atomic, _rows
 from app.db.dictionary import TABLE_FIELDS, _merge, _record
+from app.db.morphology import group_members
 from app.db.srs import user_record
 from app.domain.distractors import DistractorPool, DistractorRecord
 from app.domain.exercises import ExerciseContext
@@ -21,6 +23,15 @@ LIMIT = 64
 async def candidate_pool(
     db: AsyncSurrealConnection, context: ExerciseContext
 ) -> DistractorPool | None:
+    try:
+        morph = await group_members(
+            db, context.owner, decode_rid(context.sense_id, "sense"), limit=LIMIT
+        )
+    except AppError as error:
+        if error.status == 404:
+            return None
+        raise
+
     async def operation(txn: UUID) -> DistractorPool | None:
         user = user_record(context.owner)
         answer = decode_rid(context.sense_id, "sense")
@@ -47,7 +58,7 @@ async def candidate_pool(
             return None
         excluded = {row["out"] if row["in"] == answer else row["in"] for row in synonyms}
         tiers: dict[RecordID, int] = {}
-        for tier, kinds in ((0, ["concept", "domain"]), (1, ["morph_group"])):
+        for tier, kinds in ((0, ["concept", "domain"]),):
             memberships = await query(
                 "SELECT id, out FROM member_of WHERE (owner = NONE OR owner = $user) "
                 "AND (in.owner = NONE OR in.owner = $user) "
@@ -66,6 +77,9 @@ async def candidate_pool(
             for row in rows[:LIMIT]:
                 if row["in"].table_name == "sense":
                     tiers.setdefault(row["in"], tier)
+        for member in morph:
+            if member.table == "sense":
+                tiers.setdefault(decode_rid(member.id, "sense"), 1)
         confusable = await query(
             "SELECT id, in, out FROM relates_to WHERE (owner = NONE OR owner = $user) "
             "AND (in.owner = NONE OR in.owner = $user) "

@@ -16,7 +16,7 @@ def build_registry(
     target = ExerciseRegistry()
     for plugin in registry._plugins.values():
         target.register(plugin)
-    exercise_cloze.register(target)
+    exercise_cloze.register(target, exercise_cloze.provider(db))
     exercise_listen.register(target, exercise_listen.provider(db, settings, accent))
     recognition.register(target, recognition.DatabaseProvider(db))
     exercise_scenario.register(target, partial(scenario.acquire, db, settings))

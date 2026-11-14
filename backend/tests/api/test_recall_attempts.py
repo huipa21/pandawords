@@ -39,7 +39,7 @@ def recall_plugins(monkeypatch: pytest.MonkeyPatch) -> None:
         db: AsyncSurrealConnection, settings: Settings, accent: Accent
     ) -> ExerciseRegistry:
         target = ExerciseRegistry()
-        exercise_cloze.register(target)
+        exercise_cloze.register(target, exercise_cloze.provider(db))
         exercise_listen.register(target, exercise_listen.provider(db, settings, accent))
         return target
 
