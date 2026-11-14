@@ -18,7 +18,8 @@ browser logs will be committed as source.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 2.1.2 | task/2.1.2-core-lexicon | ../pandawords.worktrees/2.1.2 | Starting; streaming SQLite builder |
+| 2.1.3 | task/2.1.3-ecdict-frequency | ../pandawords.worktrees/2.1.3 | Starting; Chinese/frequency enrichment |
+| 2.1.4 | task/2.1.4-oewn | ../pandawords.worktrees/2.1.4 | Starting; sense relation alignment |
 | 2.3.2 | task/2.3.2-project-api | ../pandawords.worktrees/2.3.2 | Starting; owner-scoped CRUD |
 | 2.5.1 | task/2.5.1-media | ../pandawords.worktrees/2.5.1 | Starting; authenticated media |
 
@@ -46,6 +47,18 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 2.1.2 Streaming core lexicon
+- Result / completed: atomic streaming Kaikki builder, indexed SQLite v1 schema, attribution,
+  pronunciation/audio metadata and stable IDs; `d3a3f62` merged. Independent enrichment
+  hooks permit 2.1.3 and 2.1.4 to run in parallel.
+- Dependencies: 2.1.1 checked ✅; reused verified 2.2.2 key helpers.
+- Verification: agent `check`, focused 17, backend 291 and explicit basedpyright passed.
+  Main merge `check` and combined backend/frontend passed (360 backend).
+- Skipped / deferred: full upstream-scale benchmark not run; synthetic tests prove streaming
+  and integrity/atomic replacement. Enrichment belongs to subsequent tasks.
+- Failures / causes / corrections: initial missing environments restored; none unresolved.
+- Blockers: none. Branch/worktree removed after verification; both enrichment tasks starting.
 
 ### 2026-11-14 — 2.3.1 Project and overlay schema
 - Result / completed: migration 0006, typed projects/membership/overrides/notes, snapshot and
