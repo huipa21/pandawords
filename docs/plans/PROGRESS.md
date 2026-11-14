@@ -18,7 +18,7 @@ browser logs will be committed as source.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 2.6.4 | task/2.6.4-project-tree-ui | ../pandawords.worktrees/2.6.4 | Starting; tree rendering, hide/unhide and undo |
+| 2.6.6 | task/2.6.6-project-word-e2e | ../pandawords.worktrees/2.6.6 | Starting; fixture-only real browser workflow |
 
 ## Blocked
 
@@ -44,6 +44,16 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 2.6.4 Project tree UI
+- Result / completed: effective paginated tree, reversible visibility and Undo, restore-hidden
+  controls, link to detail and refresh on add/jobs; `ee1d798` merged.
+- Dependencies: 2.3.4, 2.6.1 and 2.6.2 checked ✅; final E2E prerequisites now met.
+- Verification: agent `check`, frontend tests and build passed; main merge `check` and combined
+  backend/frontend passed (556 backend, existing Starlette warning).
+- Failures / causes / corrections: none reported; no unresolved failures.
+- Skipped / deferred: integrated real browser flow belongs to 2.6.6; no blockers.
+  Branch/worktree removed after verification; main fixture-backed stack ready for E2E.
 
 ### 2026-11-14 — 2.6.5 Lemma detail
 - Result / completed: effective lemma detail, override editing/reset, notes and authenticated
