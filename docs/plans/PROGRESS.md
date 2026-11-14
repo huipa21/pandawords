@@ -18,12 +18,11 @@ Migration allocations: 0013 memory/history; 0014 LLM; 0015 SRS preferences;
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 3.2.3 | task/3.2.3-recognition | ../pandawords.worktrees/3.2.3 | Ready |
+| 3.2.3 | task/3.2.3-recognition | ../pandawords.worktrees/3.2.3 | Agent running |
 | 3.2.4 | task/3.2.4-recall | ../pandawords.worktrees/3.2.4 | Agent running |
 | 3.2.6 | task/3.2.6-scenario | ../pandawords.worktrees/3.2.6 | Agent running |
 | 3.3.1 | task/3.3.1-components | ../pandawords.worktrees/3.3.1 | Agent running |
 | 3.3.2 | task/3.3.2-review | ../pandawords.worktrees/3.3.2 | Waiting for review prerequisites |
-| 3.3.3 | task/3.3.3-dashboard | ../pandawords.worktrees/3.3.3 | Agent running |
 | 3.3.4 | task/3.3.4-e2e | ../pandawords.worktrees/3.3.4 | Waiting for 3.3.2 and 3.3.3 |
 
 ## Blocked
@@ -64,6 +63,17 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
   migration 0005; task 4.2.1 requires verification and only additive migration if needed.
 - Blockers / follow-ups: none.
 
+### 2026-11-14 — 3.3.3 Plan settings and dashboard UI
+- Result / completed: `d264f38` merged as `f99612d`; localized project settings/summary,
+  desired retention, forecast/dashboard, complete reorder drafts and review navigation.
+- Dependencies: 3.1.3 and 2.6.2 checked ✅.
+- Verification: agent check/build/frontend 126 passed (with timeout overrides/retry);
+  main check and standard frontend suite passed without overrides or retries.
+- Skipped / deferred: E2E belongs to 3.3.4; backend unchanged, latest main backend 787 passed.
+- Failures / causes / corrections: additive testing-doc conflict retained both sections;
+  cold-lint setup fix on main removes the observed frontend initialization timeout.
+- Blockers / follow-ups: none; cleanup follows.
+
 ### 2026-11-14 — 3.2.2 Safe ranked distractors
 - Result / completed: `15441c2` merged; owner-filtered bounded graph discovery, ranked
   optional graph/frequency tiers, bidirectional synonym filtering, label deduplication
@@ -75,7 +85,9 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
   repeatedly exhausted 20 seconds loading the lint configuration, including single-worker
   run. Added explicit 60-second `beforeAll` configuration initialization; original assertions
   and their time limits unchanged. Normal frontend runner then passed, without retries.
-- Blockers / follow-ups: none; recognition ready. Cleanup follows.
+- Blockers / follow-ups: none; recognition agent started. Distractor branch and inspected
+  worktree folder removed. A new untracked Phase 4 detail document appeared during execution;
+  preserved unchanged as external input, not implemented as part of Phase 3.
 
 ### 2026-11-14 — 3.2.1 Durable exercise attempt framework
 - Result / completed: `029c23d` merged as `af3c4e8`; typed registry/weighted selector,
