@@ -142,3 +142,15 @@ defaults; callers supply the flags, languages and complete preferences. Preferen
 `record<user>` reference, string hash and datetime expiry; `revoked_at` is an optional datetime,
 and `replaced_by` an optional `record<refresh_token>`. These typed references constrain the
 target table, not record existence. Only refresh-token hashes, never raw tokens, are stored.
+
+### Media storage contract
+
+`0007_media.surql` adds SCHEMAFULL `media`, independently of dictionary migration `0005`.
+`target` is a typed record reference to lemma, lexeme, sense, morpheme, tag, sentence or
+passage; `media_target(target)` indexes target lookup. `owner` is an optional user record
+(NONE means shared). Required fields are `kind` (audio/image), safe relative `path`, MIME
+and `source` (wiktionary/edge_tts/pixabay/upload); attribution and US/UK accent are optional.
+References constrain table types, not existence. The media service additionally validates
+kind/MIME/extension agreement, audio-only accent, target existence and visibility, and
+filesystem containment. Paths are storage-only, never public metadata. API reads recheck
+both owners and the current target rather than trusting media ownership alone.

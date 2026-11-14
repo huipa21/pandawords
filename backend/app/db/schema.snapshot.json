@@ -21,6 +21,7 @@
       "job": "DEFINE TABLE job TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "lemma": "DEFINE TABLE lemma TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "lexeme": "DEFINE TABLE lexeme TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
+      "media": "DEFINE TABLE media TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "member_of": "DEFINE TABLE member_of TYPE RELATION IN sense | morpheme | tag OUT tag ENFORCED SCHEMAFULL PERMISSIONS NONE",
       "morpheme": "DEFINE TABLE morpheme TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "part_of": "DEFINE TABLE part_of TYPE RELATION IN sentence OUT passage ENFORCED SCHEMAFULL PERMISSIONS NONE",
@@ -174,6 +175,24 @@
         "pron.*.ipa": "DEFINE FIELD pron.*.ipa ON lexeme TYPE string PERMISSIONS FULL"
       },
       "indexes": {},
+      "lives": {},
+      "tables": {}
+    },
+    "media": {
+      "events": {},
+      "fields": {
+        "accent": "DEFINE FIELD accent ON media TYPE none | 'US' | 'UK' PERMISSIONS FULL",
+        "attribution": "DEFINE FIELD attribution ON media TYPE none | string PERMISSIONS FULL",
+        "kind": "DEFINE FIELD kind ON media TYPE 'audio' | 'image' PERMISSIONS FULL",
+        "mime": "DEFINE FIELD mime ON media TYPE string PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON media TYPE none | record<user> PERMISSIONS FULL",
+        "path": "DEFINE FIELD path ON media TYPE string PERMISSIONS FULL",
+        "source": "DEFINE FIELD source ON media TYPE 'wiktionary' | 'edge_tts' | 'pixabay' | 'upload' PERMISSIONS FULL",
+        "target": "DEFINE FIELD target ON media TYPE record<lemma | lexeme | sense | morpheme | tag | sentence | passage> PERMISSIONS FULL"
+      },
+      "indexes": {
+        "media_target": "DEFINE INDEX media_target ON media FIELDS target"
+      },
       "lives": {},
       "tables": {}
     },

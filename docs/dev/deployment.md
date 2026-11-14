@@ -269,3 +269,16 @@ Migrations only move forward. If a release has to be reverted after migrating:
 | web | 64 MB |
 
 Uvicorn runs with 1 worker. The total leaves headroom for Caddy and the OS.
+
+### Authenticated media delivery
+
+`GET /api/media/{rid}` requires a bearer token and authorizes both the media and its target.
+The API returns only `X-Accel-Redirect: /_media/audio/<generated name>` (or `image/`),
+the validated content type and private/no-store caching. Existing nginx `/_media/`
+is `internal` with `alias /data/media/`; do not expose that location publicly.
+API/worker `MEDIA_DIR` must identify the same volume mounted read-only at `/data/media`
+in web. Only trusted application producers may write to it: paths and directory links
+are rejected, but the shared filesystem must not permit untrusted concurrent mutations.
+Missing or inaccessible media returns a generic 404, never an absolute filesystem path.
+Calling uvicorn directly does not deliver file bytes: development playback also needs
+the nginx media mount/proxy path. This task does not introduce a public upload endpoint.

@@ -129,3 +129,17 @@ removes its own lint-error fixture and asserts nonzero exit plus Ruff's full fai
 - Always test owner isolation for new user-data endpoints.
 - Don't test constants, re-exports, trivial accessors, framework behavior or markup snapshots.
 - Coverage is not a goal.
+
+### Media storage and authorization
+
+`tests/unit/test_media.py` exercises kind/MIME/accent validation, stored extension
+agreement, traversal, header injection, Windows reserved paths and link containment.
+`tests/api/test_media_endpoints.py` uses real migrated metadata and worktree-local
+temporary media directories; it covers bearer authentication, shared/private assets,
+cross-user isolation, independent target ownership, deleted targets, missing files,
+corrupt metadata, safe redirect headers and persistence-failure file cleanup.
+The focused command from `backend` is
+`uv run --no-sync pytest -q tests\unit\test_media.py tests\api\test_media_endpoints.py`.
+Regenerate the snapshot explicitly with `dev.ps1 test -Backend -UpdateSnapshot`, then
+run the normal backend suite to verify the committed schema. These API tests inspect
+the nginx redirect contract; they do not prove production nginx playback.
