@@ -13,7 +13,11 @@
 ## Commands
 
 `./scripts/dev.ps1 test` runs everything except E2E. `-Backend`, `-Frontend` and `-E2E` select one
-layer. The output is quiet (`pytest -q`, vitest `dot` reporter). On failure it prints the full
+layer, and selectors can combine (duplicates run only once). E2E is explicit only: it requires
+the main worktree, a ready stack on 5173, and `frontend/playwright.config.*` (task 1.6.6); a
+missing config or tool fails rather than silently skipping tests. The hook runs
+`pnpm exec playwright test`, using that config. `-UpdateSnapshot` requires the backend selector.
+The output is quiet (`pytest -q`, vitest `dot` reporter). On failure it prints the full
 failure output.
 
 ## Test database
@@ -61,15 +65,28 @@ failure output.
   CREATE/UPDATE, socket loss/resubscription, polling without LIVE, and cancellation task cleanup.
   API tests verify owner-only status reads (shared jobs are not public), malformed opaque IDs,
   password-change gating and disabled accounts. No production services are started.
-- The backend runner currently implements only `test -Backend [-UpdateSnapshot]`; frontend,
-  E2E and combined orchestration are deferred to 1.6.1. Run from the selected worktree; it needs
-  that worktree's backend environment (`uv sync --locked`).
+- Run unit tests from the selected worktree; it needs that worktree's backend environment
+  (`uv sync --locked`) and frontend dependencies (`pnpm install --frozen-lockfile`).
 - `lexicon_small.sqlite`: about 50 words (polysemy: *run*, *bank*; phrase: *kick the bucket*,
   *give up*; US/UK: *schedule*, *tomato*; derivation: *decide → decision*). It is built by the
   lexicon script from `backend/tests/fixtures/words.txt`.
 - The DeepSeek client is faked in tests by default. No network access in unit, integration or API tests.
 
 ## What to test
+
+Focused development-command guards (no shared dev ports or private environment changes):
+
+```powershell
+pwsh -NoProfile -File .\scripts\tests\lifecycle.Tests.ps1
+pwsh -NoProfile -File .\scripts\tests\quality.Tests.ps1
+pwsh -NoProfile -File .\scripts\tests\check-failure.Tests.ps1
+pwsh -NoProfile -File .\scripts\tests\test-backend.Tests.ps1
+```
+
+The process test starts real tiny Node trees through native, cmd and actual pnpm launchers,
+exercises stale/reused-PID guards and a
+crashing launcher, and verifies all owned descendants disappear. The check test creates and
+removes its own lint-error fixture and asserts nonzero exit plus Ruff's full failure diagnostic.
 
 - Test behavior that a change introduces or fixes, with a few focused cases including edge cases.
 - Always test owner isolation for new user-data endpoints.

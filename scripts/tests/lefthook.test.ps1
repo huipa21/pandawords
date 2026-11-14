@@ -124,6 +124,7 @@ try {
         (Join-Path 'frontend' 'eslint.config.mjs'),
         (Join-Path 'frontend' 'package.json'),
         (Join-Path 'scripts' 'dev.ps1')
+        (Join-Path 'scripts' 'setup.ps1')
         (Join-Path 'scripts' 'lint-staged.cjs')
     )
     foreach ($file in $projectFiles) { Copy-ProjectFile -Path $file }

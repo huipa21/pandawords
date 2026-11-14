@@ -154,7 +154,9 @@ The external network must already exist and include Caddy. Only web joins it, wi
 alias `pandawords-web`; there are no host port bindings. All services share an
 isolated internal network. API outbound internet access is intentionally unavailable
 in this baseline; optional external providers require a deliberate egress design.
-The worker service is deferred to task 1.6.2.
+The worker service uses the API image and runs `python -m app.worker`; Compose starts it after
+the database is healthy. Development `dev.ps1 up` runs the worker locally; dev seeds are never
+part of production startup.
 
 Add `Caddyfile.snippet` to your Caddy config and reload Caddy:
 
