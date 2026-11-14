@@ -82,15 +82,117 @@ incorrect CSV headers/row widths, and malformed/incomplete input.
 
 ## Build and tests
 
-Downloading is separate from SQLite building. Task 2.1.2 implements the builder;
-`.\scripts\dev.ps1 lexicon` is not implemented yet and is not a download command.
-The intended pipeline is download → offline build → `data\lexicon\lexicon.sqlite`.
+Downloading is separate from SQLite building. From `backend`:
+
+```powershell
+uv run --no-sync python -m scripts.build_lexicon
+uv run --no-sync python -m scripts.build_lexicon --kaikki path\kaikki-english.jsonl --output path\lexicon.sqlite
+uv run --no-sync python -m scripts.build_lexicon --words path\fixture.txt
+```
+
+Default input/output are the main worktree's shared `data\lexicon\raw\kaikki-english.jsonl`
+and `data\lexicon\lexicon.sqlite`. `--words` is a UTF-8 list of lemmas, one per line,
+normalized with `lemma_key`; blank lines are ignored. Both explicit paths avoid needing Git.
+`.\scripts\dev.ps1 lexicon` orchestration/packaging is deferred to 2.1.6.
+
+The builder hashes input without retaining it and reads JSONL one entry at a time with `orjson`.
+Lines larger than 16 MiB fail explicitly; SQLite has an 8 MiB page cache and disk-backed
+temporary storage. Memory scales with the largest entry, not dataset size (plus an optional
+fixture word set). It does not fetch audio or use the network. A sibling download manifest,
+when present, must match the input filename, size and SHA-256; its complete record is retained
+in `source.metadata.download`. Without a manifest, upstream attribution and an input hash are
+still recorded.
+
+Invalid JSON, non-object/non-English entries, missing word/POS/senses and invalid etymology
+numbers fail with a line number. Missing etymology numbers (including null) default to 1.
+Unusable individual senses (no nonblank gloss, including malformed objects) are skipped and
+counted; `raw_glosses` is a fallback. A database without usable senses is rejected. Optional
+forms/sounds/examples can be absent or incomplete. Blank source sense IDs use the gloss hash.
+Duplicate identities keep their first row; additional distinct senses/forms/sounds are merged.
+Ranks are one-based source order, not a renumbered list after skipped senses.
+
+Output is built in a unique sibling `.part` file. Only after all imports/enrichers, SQLite
+integrity/foreign-key checks and commit succeed is the closed stage atomically replaced into
+place. Any ordinary failure removes the stage and leaves existing output untouched. A hard
+process termination may leave a hidden stage/journal; never treat it as the final artifact.
+Use read-only runtime connections; close readers before replacement on Windows.
+
+### SQLite v1 and extension contract
+
+`scripts.lexicon_schema` owns the DDL; `PRAGMA user_version = 1`. All IDs and foreign IDs are
+TEXT. Lemma/lexeme/sense IDs are **compact JSON arrays**, not prefixed record-ID strings:
+`["en","run"]`, `["en","run","verb",1]`, `["en","run","verb",1,"<sense-key>"]`.
+Decode the array for shared dictionary materialization. Keys come exclusively from
+`app.domain.dictionary_keys`; `scripts.lexicon_kaikki.key_text(key)` serializes them.
+Normalized text is NFKC/case-folded/whitespace-collapsed. The original form spelling is retained
+in `form.form`; `form_index.form` is normalized.
+
+Columns below are NOT NULL unless marked `?`; JSON columns contain serialized arrays except
+`source.metadata` and `pron.audio` (objects). Empty collections are `[]`/`{}`, not NULL.
+All `source` columns reference `source.name`.
+
+| Table | Columns / keys |
+|---|---|
+| `source` | `name` PK, `metadata` JSON (URL, license, attribution, checksum; optional download record) |
+| `lemma` | `id` PK, `text`, `lang`, `kind` (`word`/`phrase`), `freq_zipf?` REAL, `cefr?`, `source`; UNIQUE(`lang`,`text`) |
+| `lexeme` | `id` PK, `lemma_id` FK, `pos`, `etymology_no` positive INTEGER, `etymology_text?`, `source`; UNIQUE(`lemma_id`,`pos`,`etymology_no`) |
+| `sense` | `id` PK, `lexeme_id` FK, `definition`, `glosses` JSON, `gloss_zh?`, `tags` JSON, `register` JSON, `domain` JSON, `examples` JSON, `rank` positive INTEGER, `common` INTEGER 0/1 DEFAULT 0, `source`, `source_id?`, `lexname?` |
+| `pron` | `id` PK (SHA-256 of lexeme/accent/source sound), `lexeme_id` FK, `accent?` (`US`/`UK`), `ipa?`, `audio` JSON, `tags` JSON, `source` |
+| `form` | `lexeme_id` FK, `form`, `tags` JSON, `source`; PK(`lexeme_id`,`form`,`tags`) |
+| `form_index` | `form`, `lemma_id` FK; PK(`form`,`lemma_id`) |
+| `zh_gloss` | `lexeme_id` FK, `gloss`, `source`, `sense_id?` FK; PK(`lexeme_id`,`gloss`,`source`) |
+| `exam_tag` | `lemma_id` FK, `tag`, `source`; PK(`lemma_id`,`tag`,`source`) |
+| `freq` | `lemma_id` FK, `zipf?` REAL, `bnc?` INTEGER, `coca?` INTEGER, `source`; PK(`lemma_id`,`source`) |
+| `relation` | `source_sense_id` FK, `target_sense_id` FK, `type` (`synonym`/`antonym`/`hypernym`/`hyponym`), `source`; PK(all four columns) |
+| `affix` | `lexeme_id` FK, `position` nonnegative INTEGER, `text`, `type` (`prefix`/`root`/`suffix`/`infix`), `source`; PK(`lexeme_id`,`position`,`source`) |
+
+Indexes cover lemma text/language, lexeme lemma/POS/etymology, sense lexeme/rank/ID,
+pron lexeme/accent, original form text, normalized form lookup and reverse lemma lookup,
+Chinese-gloss sense lookup and relation target/type. Child lookup by parent is covered by
+the primary keys for remaining enrichment tables.
+
+`sense.definition` is the first gloss; `glosses` retains all gloss strings. `examples` retains
+source example objects. `register` selects register labels from tags; `domain` retains topics;
+`tags` retains every source tag. `gloss_zh`, `lexname`, frequency and common selection are
+reserved for enrichment, not guessed by the core importer.
+US/General-American and UK/Received-Pronunciation tags map to accents, with dual-tagged
+sounds producing both rows and untagged/other accents retained as NULL. `pron.audio` preserves
+every sound field except IPA/tags, including filenames, URL variants and available media
+license/attribution. Audio-only rows are supported. The Wiktionary text license is not an
+assumption about individual media licensing.
+`form_index` includes lemma spellings, inflections and explicit sense `form_of` backlinks.
+Backlinks may create a target lemma without lexemes if that target is absent/filtered out.
+
+Enrichment modules should be independent files (for example `lexicon_ecdict.py`,
+`lexicon_oewn.py`) with their own tests. They **do not need to modify the core importer or
+schema**. Public builder interface:
+
+```python
+build(kaikki: Path, output: Path, *,
+      words: collections.abc.Set[str] | None = None,
+      enrichers: Iterable[Callable[[sqlite3.Connection], None]] = ()) -> BuildResult
+# BuildResult.records, BuildResult.skipped_senses: int
+```
+
+Hooks run in order after the entire core import, on the same writable transaction with foreign
+keys enabled, before validation/publication. Supply source paths/options with a closure or
+`functools.partial`; hooks return None. Use bound SQLite parameters, do not commit/close the
+connection, run `executescript`, change schema/journal mode, or publish files inside a hook.
+Register attribution with `INSERT INTO source(name, metadata) VALUES (?, ?)` before inserting
+source-tagged rows (including a separate `oewn:approx` source for approximate alignments).
+Any exception aborts publication. ECDICT owns Chinese gloss/tag/frequency/common updates;
+OEWN owns relations and `sense.lexname` (append domain tags only if preserving existing ones).
+Frequency rows are per source: ECDICT ranks and wordfreq Zipf values need not share provenance.
+The canonical wordfreq `freq.zipf` and `lemma.freq_zipf` should be kept in sync by that enricher.
+Enrichment-specific CLI flags may be added to `build_lexicon.main` as a small integration change;
+the core CLI currently imports no optional enrichment modules.
 
 Focused, network-free tests from `backend`:
 
 ```powershell
 New-Item -ItemType Directory -Force .dev | Out-Null
 uv run --no-sync pytest tests\unit\test_download_lexicon.py --basetemp=.dev\lexicon-tests -q
+uv run --no-sync pytest tests\unit\test_build_lexicon.py --basetemp=.dev\lexicon-build-tests -q
 ```
 
 From the repository root, run `.\scripts\dev.ps1 check` and

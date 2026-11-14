@@ -37,13 +37,30 @@ Observed fields, exact source URLs, licenses, recovery instructions and commands
 2026-11-14 confirmed the ECDICT CSV header, English wiktextract records and OEWN 2025 WN-LMF XML.
 The English-only kaikki endpoint is deprecated upstream; the proposed raw replacement is
 multilingual, so it must not be silently substituted. Full dataset downloads are not test inputs.
-The SQLite builder and `dev.ps1 lexicon` orchestration remain subsequent tasks.
+The core SQLite builder is available as `uv run --no-sync python -m scripts.build_lexicon`
+from `backend`; `dev.ps1 lexicon` orchestration remains task 2.1.6.
 
 - `lexicon.sqlite` tables: `lemma`, `lexeme`, `sense`, `pron`, `form`, `relation`, `zh_gloss`,
   `exam_tag`, `freq`, `affix`, plus `form_index(form → lemma)` for inflection lookup.
 - The build streams the input (orjson, line by line) so it stays within the server's 4 GB RAM. It
   normally runs on the laptop. The artifact is transferred to the server as
   `pandawords-lexicon-<date>.tar.gz` and mounted read-only.
+- SQLite schema v1 (`PRAGMA user_version=1`) uses compact JSON arrays from the shared
+  `app.domain.dictionary_keys` helpers as lemma/lexeme/sense TEXT primary keys. `source` holds
+  attribution and input metadata; per-row source references preserve provenance. Inflection
+  lookup includes normalized lemma spellings, forms and explicit `form_of` backlinks. US/UK
+  IPA and source audio metadata are retained without downloading media.
+- A build uses a unique sibling stage and replaces the final file only after import,
+  enrichment, integrity/foreign-key checks and commit succeed. Invalid records fail with line
+  numbers; individual senses lacking usable glosses are counted/skipped. An empty usable
+  lexicon is an error. JSONL lines are limited to 16 MiB, SQLite's page cache to 8 MiB; source
+  data is never accumulated in memory.
+- ECDICT/wordfreq and OEWN are independent enrichment modules. The builder's ordered
+  `enrichers` callables receive the writable `sqlite3.Connection` after core import, before
+  validation/atomic publication. They populate the predeclared enrichment tables without
+  changing core transforms or schema. Exact columns, IDs, JSON encoding, constraints,
+  reader lookups and callable/CLI contracts are in
+  [`backend/scripts/README.md`](../../backend/scripts/README.md#sqlite-v1-and-extension-contract).
 - Senses are aligned across sources: Wiktionary is the backbone. ECDICT Chinese glosses attach at
   POS level (`sense.gloss.zh` for the top sense, `lexeme`-level gloss list otherwise). OEWN
   relations attach by best gloss overlap (a token Jaccard score; below the threshold they attach to
