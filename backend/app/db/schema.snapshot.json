@@ -18,7 +18,7 @@
       "derives_to": "DEFINE TABLE derives_to TYPE RELATION IN lexeme OUT lexeme ENFORCED SCHEMAFULL PERMISSIONS NONE",
       "has_lexeme": "DEFINE TABLE has_lexeme TYPE RELATION IN lemma OUT lexeme ENFORCED SCHEMAFULL PERMISSIONS NONE",
       "has_sense": "DEFINE TABLE has_sense TYPE RELATION IN lexeme OUT sense ENFORCED SCHEMAFULL PERMISSIONS NONE",
-      "includes": "DEFINE TABLE includes TYPE RELATION IN project OUT lemma | sense | sentence | passage ENFORCED SCHEMAFULL PERMISSIONS NONE",
+      "includes": "DEFINE TABLE includes TYPE RELATION IN project OUT lemma | lexeme | sense | sentence | passage ENFORCED SCHEMAFULL PERMISSIONS NONE",
       "job": "DEFINE TABLE job TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "lemma": "DEFINE TABLE lemma TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "lexeme": "DEFINE TABLE lexeme TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
@@ -108,7 +108,9 @@
         "out": "DEFINE FIELD out ON has_lexeme TYPE record<lexeme> PERMISSIONS FULL",
         "owner": "DEFINE FIELD owner ON has_lexeme TYPE none | record<user> PERMISSIONS FULL"
       },
-      "indexes": {},
+      "indexes": {
+        "has_lexeme_tree_lookup": "DEFINE INDEX has_lexeme_tree_lookup ON has_lexeme FIELDS in, owner, out"
+      },
       "lives": {},
       "tables": {}
     },
@@ -120,7 +122,9 @@
         "owner": "DEFINE FIELD owner ON has_sense TYPE none | record<user> PERMISSIONS FULL",
         "rank": "DEFINE FIELD rank ON has_sense TYPE int PERMISSIONS FULL"
       },
-      "indexes": {},
+      "indexes": {
+        "has_sense_tree_lookup": "DEFINE INDEX has_sense_tree_lookup ON has_sense FIELDS in, owner, out"
+      },
       "lives": {},
       "tables": {}
     },
@@ -130,7 +134,7 @@
         "added_at": "DEFINE FIELD added_at ON includes TYPE datetime PERMISSIONS FULL",
         "hidden": "DEFINE FIELD hidden ON includes TYPE bool PERMISSIONS FULL",
         "in": "DEFINE FIELD in ON includes TYPE record<project> PERMISSIONS FULL",
-        "out": "DEFINE FIELD out ON includes TYPE record<lemma | sense | sentence | passage> PERMISSIONS FULL",
+        "out": "DEFINE FIELD out ON includes TYPE record<lemma | lexeme | sense | sentence | passage> PERMISSIONS FULL",
         "owner": "DEFINE FIELD owner ON includes TYPE record<user> PERMISSIONS FULL"
       },
       "indexes": {

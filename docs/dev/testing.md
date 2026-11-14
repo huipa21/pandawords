@@ -1,5 +1,31 @@
 # Testing
 
+## Project tree API (2.3.4)
+
+From `backend`, run `uv run --no-sync pytest -q tests\api\test_project_tree.py
+tests\api\test_project_tree_visibility.py
+tests\integration\test_project_schema.py`. The isolated migrated harness on existing port
+8101 covers empty/selected-only trees, requester overlays, stable IDs/content, hidden
+senses/ancestors, independent lexeme markers, restored membership history, pagination and
+explicit bounds, strict visibility inputs, authentication and project/row/relation/membership
+owner isolation. Schema tests now accept lexeme endpoints introduced by forward migration
+`0012`; `0006` is immutable. Regenerate with `dev.ps1 test -Backend -UpdateSnapshot`,
+then run normal backend tests to verify the committed snapshot without rewriting it.
+Use `include_hidden=true` for UI/E2E restore controls and PATCH the node's own `hidden` flag;
+do not infer direct sense hiding from `effective_hidden` inherited from an ancestor.
+Tree API tests override `test_settings`/`db` with the existing `job_settings`/`job_db`
+fixtures, giving each test its own migrated database. This prevents broad cached fixture
+materialization from changing later dictionary repository tests' initial selections.
+
+Verification on 2026-11-14: snapshot-update and normal backend suites passed **525 tests**;
+repository `check` and frontend tests passed. Initial `check` found missing `ruff`, resolved
+by `uv sync`. The first backend run exposed two dictionary tests contaminated by the tree
+tests' shared source cache; per-test database isolation fixed both. A frontend token-enforcement
+test initially hit its 20-second timeout under concurrent checks; the unchanged suite passed
+on rerun. Backend emits the existing Starlette/httpx deprecation warning. Pylance editor tools
+could not resolve this worktree's new Python file; `basedpyright`, ruff and runtime tests
+provide the validation instead. No E2E or persistent dev-database operations were performed.
+
 ## Layers
 
 | Layer | Tool | Location | Covers |

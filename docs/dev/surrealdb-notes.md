@@ -4,6 +4,32 @@ Check here before writing SurrealQL. **Status:** ✅ verified on the version sho
 form is wrong (a working, verified replacement is given). New, unverified beliefs must be
 tested before being used.
 
+### Project tree visibility (2.3.4) ✅
+
+Verified **2026-11-14**, SurrealDB **3.3.5** / SDK **3.0.0**, using only random migrated
+harness databases on the existing **8101** test server:
+
+- `DEFINE TABLE OVERWRITE includes TYPE RELATION IN project OUT lemma | lexeme | sense |
+  sentence | passage ENFORCED SCHEMAFULL` extends the endpoint union and updates the implicit
+  `out` field type without losing fields, indexes or existing memberships. Migration `0012`
+  is forward-only; `0006` remains unchanged. Existing replay/schema tests verify the updated
+  contract and valid lexeme membership, while wrong/nonexistent endpoints remain rejected.
+  New `(in, owner, out)` indexes on `has_lexeme` and `has_sense` support the tree's
+  bound parent/owner/selected-target lookups; `includes` reuses its existing lookup index.
+- Bound `type::table($table)` relation reads can combine owner filters on relation and both
+  endpoints with `($targets = NONE OR out IN $targets)` and bound `LIMIT`. An empty target
+  array selects no edges, so an empty sense selection cannot expose cached meanings.
+- Owner/project/target-filtered `UPDATE includes SET hidden = $hidden ... RETURN AFTER`
+  preserves edge IDs/timestamps. Lazy lexeme `RELATE` markers commit in the same SDK
+  transaction as owner-safe ancestry validation; ancestor restoration does not alter sense flags.
+- Dictionaries and requester overrides reuse the existing transaction-aware effective `_record`
+  helper. Tests exercise private endpoints, foreign dictionary relations and foreign includes
+  edges attached to otherwise shared/own rows; all are independently excluded.
+
+Retained probes: `tests/api/test_project_tree.py`, `tests/api/test_project_tree_visibility.py`,
+`tests/integration/test_project_schema.py`.
+The generated schema snapshot includes the extended `includes` table and endpoint type.
+
 ### User dictionary API (2.3.3) ✅
 
 Verified on **2026-11-14** using SDK **3.0.0**, the existing loopback test server **8101**

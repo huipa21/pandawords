@@ -229,6 +229,40 @@ export interface paths {
     patch: operations['update_project_api_projects__id__patch']
     trace?: never
   }
+  '/api/projects/{project_id}/tree': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Read Tree */
+    get: operations['read_tree_api_projects__project_id__tree_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/projects/{project_id}/tree/{table}/{target_id}/visibility': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Set Visibility */
+    patch: operations['set_visibility_api_projects__project_id__tree__table___target_id__visibility_patch']
+    trace?: never
+  }
   '/api/dictionary/candidates': {
     parameters: {
       query?: never
@@ -802,6 +836,20 @@ export interface components {
       source_lang: string
       plan?: components['schemas']['ProjectPlan']
     }
+    /** ProjectMembershipRead */
+    'ProjectMembershipRead': {
+      /** Id */
+      id: string
+      /** Target Id */
+      target_id: string
+      /** Hidden */
+      hidden: boolean
+      /**
+       * Added At
+       * Format: date-time
+       */
+      added_at: string
+    }
     /** ProjectPage */
     'ProjectPage': {
       /** Items */
@@ -844,6 +892,45 @@ export interface components {
        */
       created_at: string
     }
+    /** ProjectTreeLemmaRead */
+    'ProjectTreeLemmaRead': {
+      lemma: components['schemas']['DictionaryRecordRead']
+      /** Hidden */
+      hidden: boolean
+      /** Effective Hidden */
+      effective_hidden: boolean
+      /** Lexemes */
+      lexemes: components['schemas']['ProjectTreeLexemeRead'][]
+    }
+    /** ProjectTreeLexemeRead */
+    'ProjectTreeLexemeRead': {
+      lexeme: components['schemas']['DictionaryRecordRead']
+      /** Hidden */
+      hidden: boolean
+      /** Effective Hidden */
+      effective_hidden: boolean
+      /** Senses */
+      senses: components['schemas']['ProjectTreeSenseRead'][]
+    }
+    /** ProjectTreePage */
+    'ProjectTreePage': {
+      /** Items */
+      items: components['schemas']['ProjectTreeLemmaRead'][]
+      /** Total */
+      total: number
+      /** Page */
+      page: number
+      /** Page Size */
+      page_size: number
+    }
+    /** ProjectTreeSenseRead */
+    'ProjectTreeSenseRead': {
+      sense: components['schemas']['DictionaryRecordRead']
+      /** Hidden */
+      hidden: boolean
+      /** Effective Hidden */
+      effective_hidden: boolean
+    }
     /** ProjectUpdate */
     'ProjectUpdate': {
       /** Name */
@@ -856,6 +943,11 @@ export interface components {
       source_lang?: string
       /** Plan */
       plan?: components['schemas']['ProjectPlan']
+    }
+    /** ProjectVisibilityUpdate */
+    'ProjectVisibilityUpdate': {
+      /** Hidden */
+      hidden: boolean
     }
     /** Pronunciation */
     'Pronunciation-Input': {
@@ -1441,6 +1533,78 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ProjectRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  read_tree_api_projects__project_id__tree_get: {
+    parameters: {
+      query?: {
+        page?: number
+        page_size?: number
+        include_hidden?: boolean
+      }
+      header?: never
+      path: {
+        project_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ProjectTreePage']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  set_visibility_api_projects__project_id__tree__table___target_id__visibility_patch: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        project_id: string
+        table: 'lemma' | 'lexeme' | 'sense'
+        target_id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ProjectVisibilityUpdate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ProjectMembershipRead']
         }
       }
       /** @description Validation Error */

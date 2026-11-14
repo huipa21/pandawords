@@ -18,6 +18,7 @@ from app.api.jobs import router as jobs_router
 from app.api.media import router as media_router
 from app.api.notes import router as notes_router
 from app.api.overrides import router as overrides_router
+from app.api.project_tree import router as project_tree_router
 from app.api.projects import router as projects_router
 from app.api.user_dictionary import router as user_dictionary_router
 from app.core.config import Settings
@@ -104,6 +105,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(media_router)
     app.include_router(admin_router)
     app.include_router(projects_router)
+    app.include_router(project_tree_router)
     app.include_router(candidates_router)
     app.include_router(add_to_project_router)
     app.include_router(user_dictionary_router)
