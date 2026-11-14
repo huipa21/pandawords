@@ -22,8 +22,9 @@
 
 Open <http://localhost:5173> and log in with `ADMIN_USERNAME` / `ADMIN_PASSWORD` from `.env.dev`.
 
-The script resolves the main worktree through Git, so it can be run from a linked worktree and
-still uses the main worktree's `.env.dev`. Existing process environment variables take precedence
+The script resolves the main worktree through Git; all commands load the main worktree's
+`.env.dev`. `up`, `down` and E2E are **main-worktree only**; `check`, unit tests and API generation
+operate on the selected worktree. Existing process environment variables take precedence
 over values in that file. Run `./scripts/dev.ps1 help` to list the commands currently implemented;
 additional commands are added in later foundation tasks.
 Setup reports installed tool versions without requiring the Podman machine to be running. To verify
@@ -31,9 +32,30 @@ the compose provider, start the machine and run `podman compose version`.
 
 ## Daily commands
 
-See the table in [../../AGENTS.md](../../AGENTS.md). The planned `up` command runs the API, worker
-and Vite as background jobs and writes logs to `.dev/logs/*.log`; `down` stops them by PID (from
-`.dev/pids.json`) and stops the dev DB container. These commands are not implemented yet.
+See the table in [../../AGENTS.md](../../AGENTS.md). `up` starts the dev DB on 8100, migrates it,
+runs development seeds, and starts Uvicorn with reload (8000), the worker and Vite (5173).
+It verifies API authentication readiness (`/api/readyz`), the worker's database connection and
+Vite's HTTP response before printing URLs. Phase 1's `backend/app/db/seeds/` is deliberately
+empty: no learning data or passwords are invented. Future `NNNN_name.py` seeds expose an
+idempotent `async def up(db)`; the seed entrypoint refuses production settings.
+
+On Windows, each background launcher creates its native command suspended and assigns it
+to a kill-on-close Job Object before allowing it to spawn children, so `down` stops the
+entire tree (including pnpm/cmd, Vite and reload children), not just a shell PID. `.dev/pids.json`
+records PID, creation time, random ownership token and launcher path; stale/reused PIDs are
+not killed. The host reports its actual PID rather than trusting a Windows app-execution
+relay PID; pnpm uses its native `.cmd` shim rather than a brokered PowerShell wrapper.
+Logs are `.dev/logs/{api,worker,vite}{,.error}.log`. `down` stops only the recorded,
+label-verified dev container, never the shared test DB, and preserves the dev data volume.
+Both commands are idempotent; concurrent operations are locked. Occupied ports are refused,
+not taken over. A failed startup rolls back its processes and any DB it started; an already
+running owned DB is retained on rollback. Keep `.dev/pids.json` while the stack is running.
+
+`check` runs Ruff format-check, Ruff lint, basedpyright, ESLint and vue-tsc quietly. `test`
+defaults to backend plus frontend tests; selectors combine, and E2E is explicit only. Missing
+tools fail with diagnostics: restore this worktree's dependencies with `uv sync --locked` in
+`backend` and `pnpm install --frozen-lockfile` at the root, then retry. Commands do not install
+dependencies or edit the private environment file.
 
 ## Local databases
 
