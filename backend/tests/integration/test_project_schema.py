@@ -83,7 +83,7 @@ async def test_fresh_schema_replay_and_drift(project_db: AsyncWsSurrealConnectio
     assert "ENFORCED" in definitions["includes"]
     assert "TYPE record<project>" in info["fields"]["in"]
     targets = info["fields"]["out"].split("TYPE record<")[1].split(">")[0]
-    assert set(targets.split(" | ")) == {"lemma", "sense", "sentence", "passage"}
+    assert set(targets.split(" | ")) == {"lemma", "lexeme", "sense", "sentence", "passage"}
     for table, index, fields in (
         ("project", "project_owner", "owner"),
         ("note", "note_owner_target", "owner, target"),
@@ -102,7 +102,7 @@ async def test_membership_endpoints_restore_and_visibility(
     project = (await create(db, RecordID("project", "alice"), PROJECT))["id"]
     other = (await create(db, RecordID("project", "bob"), {**PROJECT, "owner": BOB}))["id"]
     attributes: dict[str, Value] = {"owner": ALICE, "hidden": False, "added_at": NOW}
-    for table in ("lemma", "sense", "sentence", "passage"):
+    for table in ("lemma", "lexeme", "sense", "sentence", "passage"):
         target = (await create(db, RecordID(table, "item"), ROWS[table]))["id"]
         edge = await relate(db, "includes", project, target, attributes)
         assert edge["in"] == project and edge["out"] == target
@@ -114,18 +114,22 @@ async def test_membership_endpoints_restore_and_visibility(
         assert restored == edge
         assert target in {row["id"] for row in await visible(db, table, ALICE)}
         assert await visible_items(db, project, BOB) == []
-    assert len(await visible_items(db, project, ALICE)) == 4
+    assert len(await visible_items(db, project, ALICE)) == 5
+    before = await owned(db, "includes", ALICE)
+    schema = await snapshot(db)
+    await checked_query(db, (MIGRATIONS / "0012_project_tree_visibility.surql").read_text("utf-8"))
+    assert await snapshot(db) == schema
+    assert await owned(db, "includes", ALICE) == before
     private = (await create(db, RecordID("sense", "private"), {**ROWS["sense"], "owner": BOB}))[
         "id"
     ]
     await relate(db, "includes", project, private, attributes)
     await relate(db, "includes", other, private, {**attributes, "owner": BOB})
-    assert len(await visible_items(db, project, ALICE)) == 4
+    assert len(await visible_items(db, project, ALICE)) == 5
     assert await visible_items(db, other, ALICE) == []
     lexeme = (await create(db, RecordID("lexeme", "wrong"), ROWS["lexeme"]))["id"]
     for start, end in (
         (lexeme, private),
-        (project, lexeme),
         (RecordID("project", "missing"), private),
         (project, RecordID("sense", "missing")),
     ):

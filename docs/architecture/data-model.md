@@ -109,7 +109,7 @@ content tasks should reuse them rather than redefine this migration.
 | `user` | `username`, `password_hash`, `role` (admin\|user), `disabled`, `must_change_password`, `source_lang`, `target_lang`, `prefs {theme, locale, accent}` | |
 | `refresh_token` | `user`, `token_hash`, `expires_at`, `revoked_at?`, `replaced_by?` | rotation |
 | `project` | `owner`, `name`, `description`, `target_lang`, `source_lang`, `plan {daily_new, exam_date?, review_cap?}`, `created_at` | |
-| `includes` (edge) | project → lemma\|sense\|sentence\|passage | `hidden`, `added_at`. Selected senses = `includes` edges to senses. Hidden items are kept for restore and history but left out of the tree and reviews |
+| `includes` (edge) | project → lemma\|lexeme\|sense\|sentence\|passage | `hidden`, `added_at`. Selected senses = `includes` edges to senses. Lexeme edges are independent group-visibility markers, not sense selections. Hidden items are kept for restore and history |
 | `override` | id `override:[user:<id>, <target record>]`, `fields` (partial object), `updated_at` | Edits per user, applied on read |
 | `note` | `owner`, `target` (any record), `kind` (note\|mnemonic), `text` | |
 | `media` | `owner?` (NONE for shared audio), `target`, `kind` (audio\|image), `path`, `mime`, `source` (wiktionary\|edge_tts\|pixabay\|upload), `attribution?`, `accent?` | |
@@ -129,16 +129,20 @@ edge, preserving its ID and `added_at`.
 Add-to-project (`2.4.2`) creates new membership IDs as
 `includes:[project:<id>, <target record>]`, with the project's owner, `hidden = false` and
 the initial `added_at`. Targets are exactly the lemma plus explicitly selected senses;
-lexemes have no memberships. A repeat reuses any existing matching owner/project/target
+lexemes have no memberships until a tree visibility update creates a group marker. A repeat reuses any existing matching owner/project/target
 memberships (including legacy IDs), sets only their `hidden` flag to false, and preserves
 IDs/timestamps. Omitted senses and their hidden flags remain untouched; additions accumulate
 instead of replacing selections. No shared content, overrides, notes or memory is rewritten.
 Migration `0008_includes_lookup.surql` adds the nonunique `(owner, in, out)` lookup index;
 deterministic IDs and the retryable add transaction prevent new duplicate memberships.
 
-`includes` is ENFORCED from an existing project to an existing lemma, sense, sentence or passage;
-it does **not** accept lexeme endpoints. The tree API must derive ancestor visibility within this
-contract; direct lexeme membership would require a later migration. Owners on projects, edges
+Migration `0012_project_tree_visibility.surql` extends the original `0006` endpoint union with
+lexeme, preserving existing fields, indexes and edges. A missing lexeme marker means visible.
+It also indexes the new tree relation lookups on `(in, owner, out)` for `has_lexeme` and
+`has_sense`; memberships reuse `0008`'s owner/project/target index.
+Hiding a lemma or lexeme changes only that ancestor's own flag; individual sense flags survive
+ancestor hide/restore. A lexeme marker never selects unselected cached senses.
+`includes` remains ENFORCED from an existing project to an existing target. Owners on projects, edges
 and targets must each be checked by repositories: endpoint enforcement does not enforce matching
 owners or authorization. No membership-uniqueness index is added by this task.
 
@@ -175,6 +179,50 @@ attached to this project is rejected with `409 project.membership_conflict`, lea
 unchanged. Membership APIs must validate matching project/edge owners to prevent that state.
 
 ## Effective views
+
+### Project tree HTTP contract (2.3.4)
+
+Both routes require `current_user`, use opaque IDs and return `Cache-Control: no-store`:
+
+| Route | Request → response |
+|---|---|
+| `GET /api/projects/{project_id}/tree` | `page=1`, `page_size=20` (1–100), `include_hidden=false` → `ProjectTreePage` |
+| `PATCH /api/projects/{project_id}/tree/{table}/{target_id}/visibility` | `{hidden: boolean}` → `ProjectMembershipRead`; table is `lemma`, `lexeme` or `sense` |
+
+`ProjectTreePage` contains `items`, `total`, `page`, `page_size`. Items are
+`ProjectTreeLemmaRead(lemma, hidden, effective_hidden, lexemes)`, with
+`ProjectTreeLexemeRead(lexeme, hidden, effective_hidden, senses)` and
+`ProjectTreeSenseRead(sense, hidden, effective_hidden)`. Each content record uses
+`DictionaryRecordRead` (stable `id`, `table`, `owner`, effective `fields`), including text,
+POS, pronunciations/audio references, definitions, multilingual glosses and examples.
+Only requester-owned overlays apply; content and both graph edges/endpoints are owner-filtered
+inside the same SDK transaction as the selection read.
+
+Only included lemmas and explicitly included senses participate. Normal reads omit hidden
+lemmas and any sense hidden directly or by a lemma/lexeme ancestor. Groups with no remaining
+selected visible senses are omitted; an included lemma with no such senses remains with
+`lexemes=[]`. `include_hidden=true` is the restore-management interface: it retains hidden
+selected nodes and groups, reports each node's own `hidden` plus inherited `effective_hidden`,
+and still never exposes unselected senses. Lemmas/lexemes are ordered by opaque ID; senses
+by effective rank then ID. Pagination/`total` count eligible lemmas, including empty ones.
+Page numbers are bounded to signed 32-bit positive integers. Separate pages are separate
+snapshots; concurrent membership changes may shift page positions.
+
+Visibility updates require an own project and own, visible-target membership. Lexemes instead
+require an owner-safe path from an included lemma to an included sense (hidden paths count).
+They lazily create `includes:[project, lexeme]` markers. Updates restore the same edge IDs and
+`added_at`, change no descendant flags and never rewrite dictionary rows, overlays, source
+caches or another project's memberships. Legacy duplicate memberships are hidden if any
+matching edge is hidden; an explicit update sets all matching own edges consistently without
+deleting history. An existing foreign-owned deterministic marker yields 409
+`project.membership_conflict`, not an ownership takeover.
+
+Each request admits at most 10,000 owner-visible memberships, 2,000 returned content nodes
+per page and 2,000 matching edges per parent lookup. Oversized results fail explicitly with
+413 `project.tree_too_large`; nothing is silently truncated. Request a smaller page for
+page-level limits; membership limits require splitting the project. Missing/malformed/foreign
+projects return 404 `project.not_found`; unavailable items return 404 `project.item_not_found`.
+Visibility payloads reject unknown fields and non-boolean hidden values.
 
 ### Dictionary repository and service facade
 
