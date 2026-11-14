@@ -18,7 +18,8 @@ browser logs will be committed as source.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 2.1.4 | task/2.1.4-oewn | ../pandawords.worktrees/2.1.4 | Starting; sense relation alignment |
+| 2.1.5 | task/2.1.5-fixture-reader | ../pandawords.worktrees/2.1.5 | Starting; production-built fixture and typed reader |
+| 2.1.6 | task/2.1.6-lexicon-artifact | ../pandawords.worktrees/2.1.6 | Starting; shared-root build and packaging |
 | 2.6.2 | task/2.6.2-project-pages | ../pandawords.worktrees/2.6.2 | Starting; project CRUD UI |
 
 ## Blocked
@@ -45,6 +46,17 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 2.1.4 OEWN relation alignment
+- Result / completed: streaming XML/gzip OEWN alignment, exact/approx provenance, directed
+  relations and lexnames; `f626aae` merged.
+- Dependencies: 2.1.2 checked ✅; fixture/reader and packaging prerequisites now all ✅.
+- Verification: agent focused 17 and backend 377 passed, `check` and explicit types passed.
+  Main merge `check` and combined backend/frontend passed (409 backend).
+- Failures / causes / corrections: parallel enrichment documentation conflict resolved by
+  keeping both test commands, current SQLite column names and detailed alignment rules.
+- Skipped / deferred: packaging hook wiring explicitly assigned to 2.1.6.
+- Blockers: none. Branch/worktree removed after verification; two ready tasks starting.
 
 ### 2026-11-14 — 2.1.3 ECDICT and frequency enrichment
 - Result / completed: deterministic Chinese gloss/exam matching, Zipf frequencies, common
