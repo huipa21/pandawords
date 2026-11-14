@@ -10,6 +10,23 @@ frame: at most 25 million pixels/frame, 100 frames and 50 million total pixels.
 Do not expose `/_media/` publicly or replace protected media delivery with provider hotlinks.
 `PIXABAY_API_KEY` stays server-side; omitting it leaves ordinary upload fully functional.
 
+The API image seeds `/data/media/.initialized` before switching to UID/GID 10001.
+Keep this marker: with a completely empty fresh Podman volume, a later root nginx mount
+can reinitialize ownership to 0:0, making API uploads fail despite its read-only mount.
+A nonempty API-owned copy-up preserves ownership; do not make the API root or broadly chmod
+the media volume. Existing incorrectly owned volumes require inspection before manual repair.
+Run the real-proxy regression against a locally built API image:
+
+```powershell
+.\scripts\test-image-proxy.ps1 -ApiImage localhost/pandawords-api:your-validation-tag
+```
+
+It uses the actual nginx configuration, isolated containers/network/fresh media volume,
+generated secrets, mocked-out optional providers and an in-memory throwaway database. It
+checks an exact 10 MiB upload, protected byte-identical delivery, 10 MiB+1 rejection, deletion
+and subsequent 404, then cleans up only its own resources. Required local images:
+the supplied API image, nginx 1.30-alpine and SurrealDB 3.3.5; pulling is disabled.
+
 There is no CI and nothing is built on the server. Images are built on the Windows laptop with
 Podman, transferred manually, and loaded with Docker on the server (Korea, 2 vCPU / 4 GB / 60 GB).
 
