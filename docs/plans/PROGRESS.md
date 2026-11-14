@@ -20,7 +20,6 @@ browser logs will be committed as source.
 |---|---|---|---|
 | 2.1.5 | task/2.1.5-fixture-reader | ../pandawords.worktrees/2.1.5 | Starting; production-built fixture and typed reader |
 | 2.1.6 | task/2.1.6-lexicon-artifact | ../pandawords.worktrees/2.1.6 | Starting; shared-root build and packaging |
-| 2.6.2 | task/2.6.2-project-pages | ../pandawords.worktrees/2.6.2 | Starting; project CRUD UI |
 
 ## Blocked
 
@@ -46,6 +45,20 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 2.6.2 Responsive project CRUD pages
+- Result / completed: list/create/edit/detail routes, validated plans, confirmation and bilingual
+  states; `6d72879` merged.
+- Dependencies: 2.3.2 and 1.5.5 checked ✅.
+- Verification: agent `check`, frontend 85, focused 12 and production build passed.
+  Main merge `check` and combined backend/frontend passed (409 backend). Actual Chromium
+  create/read/update/list/delete against the dev API passed at 375px and 1280px with no
+  horizontal overflow; all isolated test projects deleted.
+- Failures / causes / corrections: initial browser harness used incorrect delete-confirm
+  labels; read shared ConfirmAction contract, changed harness to Confirm and reran both sizes.
+  No product change required; failed attempts also cleaned their own projects.
+- Skipped / deferred: tree/add controls assigned to later tasks. No blockers.
+  Branch/worktree removed after verification; main dev stack retained for remaining UI checks.
 
 ### 2026-11-14 — 2.1.4 OEWN relation alignment
 - Result / completed: streaming XML/gzip OEWN alignment, exact/approx provenance, directed
