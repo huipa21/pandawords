@@ -94,8 +94,10 @@ is async and returns `GeneratedExercise(prompt: ExercisePrompt, private: AnswerS
 `Unavailable(exercise, reason)`; the synchronous grader takes `(AnswerSpec, answer: str)` and
 returns `ExerciseFeedback(correct, answer)`. Plugins import the domain and registry contracts,
 not the attempt service. Register plugins at application composition time; this framework
-intentionally ships **no placeholder production generators**. Until 3.2.3/3.2.4/3.2.6 register
-real generators, creation returns `409 exercise.no_usable`, without calling a provider.
+intentionally ships **no placeholder production generators**. Request-bound
+`exercise_recall.build_registry(db, settings, accent)` adds concrete `cloze` and `listen`
+plugins to the base registry for API creation and grading. New/learning cards still need a
+recognition plugin; otherwise creation returns `409 exercise.no_usable`.
 
 The context contains effective owner-visible lemma/selected lexeme/sense records and normalized
 `forms`. It is resolved through visible selected ancestry, not by searching every lexeme of
@@ -120,6 +122,27 @@ accept arbitrary related words. `selected_lexeme_forms(lemma, lexeme)` returns s
 normalized headword + that effective lexeme's forms. `grade_answer` compares whole normalized
 recall answers; choice IDs use exact matching. Listening's audio-form restriction is separate
 from this common normalization.
+
+### Offline recall (3.2.4)
+
+`exercise_cloze.register(registry)` uses effective selected-sense examples. It normalizes the
+sentence with the shared answer contract, matches whole forms (not substrings of other words),
+prefers longer overlapping forms, and replaces **every** accepted-form occurrence with `____`.
+The prompt contains only that blanked sentence; it never includes definitions or translations
+that might reveal another answer. Empty forms and examples without a match are unavailable.
+All selected-lexeme forms plus the lemma remain acceptable, not just the blank's original form.
+
+`exercise_listen.register(registry, provider)` uses a typed `ListeningProvider`. Its production
+provider captures DB/settings and the authenticated user's preferred US/UK accent. It checks
+existing effective pronunciation references through `media.read`, requiring accessible local
+audio targeting this exact lexeme and matching the requested accent. No other-accent fallback,
+download, synthesis, job or LLM call happens during exercise creation. The recording represents
+the canonical stored lemma spelling, not a user's renamed headword or an unspoken inflection;
+if that spelling is no longer an accepted selected form, listening is unavailable.
+Only the opaque media ID appears in the otherwise empty listening prompt. The shared grader
+uses `audio_form` restriction for spelling, while retaining normal case/space/punctuation folding.
+Missing/private/broken audio skips only listening; missing examples skip only cloze, leaving
+other state-eligible plugins available. Both concrete types use the durable attempt flow.
 
 Attempts have opaque random IDs and persist `open → graded → confirmed`, expiring **30 minutes
 after issuance** while unconfirmed. Create/read/hint/answer/giveup/confirm are owner-scoped;

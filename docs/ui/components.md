@@ -106,7 +106,7 @@ word/phrase trees and empty states at responsive widths.
 |---|---|
 | `ExerciseShell` | Planned common frame: prompt/answer slots, server hint, submit/give up, feedback, hidden monotonic timer. Uses generated `AttemptRead`; emits answer + duration only, never client correctness |
 | `ChoiceGrid` | 2–4 options for recognition exercises. Keys 1–4 select; Enter submits |
-| `TypedAnswerInput` | Recall input. Accepts any valid form. Shows a diff highlight on a wrong answer |
+| `TypedAnswerInput` | Recall input. Cloze accepts selected-lexeme forms; listening accepts only the spoken spelling. Shows a diff highlight on a wrong answer |
 | `RatingBar` | Again / Hard / Good / Easy in `--pw-rating-*` colors, with the auto-rating preselected. Keys 1–4; Space/Enter confirms |
 | `ReviewProgress` | Done / remaining, new vs review counts |
 
@@ -130,3 +130,10 @@ Handle `exercise.no_usable`, expiry, unavailable hints, hidden/removed membershi
 attempt errors explicitly. Receipt-backed completed retries survive expiry; abandoned attempts
 require a new issuance. Concrete Vue shell implementation remains the study-UI task; these
 transport contracts do not import generators or expose their private answer specifications.
+
+For concrete recall (3.2.4), render cloze's blanked `prompt.text` verbatim; source examples
+are normalized with the shared English answer contract. Listening deliberately has empty
+prompt text and an opaque `media_id`: resolve it through the existing authenticated blob
+adapter and `AudioButton`, not a direct unauthenticated media URL. Do not fetch dictionary
+headwords/inflections to construct a listening label or a client-side answer key. Playback
+failure is unavailable media, never permission to reveal the spelling before server grading.

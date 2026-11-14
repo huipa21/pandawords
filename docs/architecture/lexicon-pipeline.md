@@ -274,6 +274,15 @@ used for playback, and no API model/schema change or regenerated API types is ne
 `enrich` is registered alongside `audio` in the production worker registry.
 Add-to-project itself only persists work and exposes its status.
 
+Listening recall (3.2.4) reads these existing effective `pron[*].audio` IDs without enqueuing
+or acquiring audio. Before returning a prompt it authorizes the media and local file, checks
+the exact lexeme target and preferred accent, and derives the spoken spelling from the
+canonical stored lemma (both recording and TTS workers speak that headword). An unrelated
+effective headword override or another inflection must not silently change the audio's answer.
+Absent, inaccessible or broken recordings make listening unavailable, not the whole queue.
+Playback continues through authenticated `/api/media/{id}` with no filesystem/provider URL
+in the prompt. No schema or media-delivery API changes are needed.
+
 ### Enrichment worker contract (2.4.3)
 
 `app.worker.enrich.enrich(Job)` validates the v1 `EnrichJobPayload`, obtains the dispatch's

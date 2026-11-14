@@ -13,6 +13,7 @@ from app.domain.exercises import (
     AttemptRead,
 )
 from app.services import exercise_attempts
+from app.services.exercise_recall import build_registry
 
 router = APIRouter(prefix="/api/exercise-attempts", tags=["exercises"])
 Actor = Annotated[User, Depends(current_user)]
@@ -20,9 +21,13 @@ Config = Annotated[Settings, Depends(get_settings)]
 
 
 @router.post("", status_code=201)
-async def create(data: AttemptCreate, db: Db, actor: Actor, response: Response) -> AttemptRead:
+async def create(
+    data: AttemptCreate, db: Db, config: Config, actor: Actor, response: Response
+) -> AttemptRead:
     response.headers["Cache-Control"] = "no-store"
-    return await exercise_attempts.create_attempt(db, actor.id, data)
+    return await exercise_attempts.create_attempt(
+        db, actor.id, data, plugins=build_registry(db, config, actor.prefs.accent)
+    )
 
 
 @router.get("/{attempt_id}")
@@ -48,7 +53,13 @@ async def answer(
 ) -> AttemptRead:
     response.headers["Cache-Control"] = "no-store"
     return await exercise_attempts.submit(
-        db, config, actor.id, attempt_id, data.answer, data.duration_ms
+        db,
+        config,
+        actor.id,
+        attempt_id,
+        data.answer,
+        data.duration_ms,
+        plugins=build_registry(db, config, actor.prefs.accent),
     )
 
 
@@ -62,7 +73,15 @@ async def give_up(
     response: Response,
 ) -> AttemptRead:
     response.headers["Cache-Control"] = "no-store"
-    return await exercise_attempts.submit(db, config, actor.id, attempt_id, None, data.duration_ms)
+    return await exercise_attempts.submit(
+        db,
+        config,
+        actor.id,
+        attempt_id,
+        None,
+        data.duration_ms,
+        plugins=build_registry(db, config, actor.prefs.accent),
+    )
 
 
 @router.post("/{attempt_id}/confirm")
