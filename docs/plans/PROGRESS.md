@@ -34,9 +34,8 @@ The images agent was notified before integration. Other additions require coordi
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 4.2.3 | task/4.2.3-reading | ../pandawords.worktrees/4.2.3 | Committed 865a5ae; awaiting integration |
 | 4.4.2 | task/4.4.2-graph-ui | ../pandawords.worktrees/4.4.2 | Agent running |
-| 4.4.4 | task/4.4.4-context-exercises | ../pandawords.worktrees/4.4.4 | Ready; both context prerequisites verified |
+| 4.4.4 | task/4.4.4-context-exercises | ../pandawords.worktrees/4.4.4 | Agent running |
 | 4.4.3 | task/4.4.3-relations | ../pandawords.worktrees/4.4.3 | Waiting for 4.4.2 |
 | 5.1.3 | task/5.1.3-image-review | ../pandawords.worktrees/5.1.3 | Agent running |
 
@@ -65,6 +64,16 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
 
+### 2026-11-15 — 4.2.3 Reading and inline vocabulary
+- Result / completed: `865a5ae` merged as `c56af3a`; reachable bilingual passage library/ingestion,
+  effective project-only highlights, explicit sense selection and resumable add/link drafts.
+- Dependencies: 4.2.2 and 2.6.3 checked ✅.
+- Verification: agent gen-api/check, 10 backend and 16 frontend cases passed; main regenerated
+  combined API, check, same 10 backend and 16 reading/router/add-dialog frontend cases passed.
+- Failures / causes / corrections: initial typing/lint/mock issues fixed. No merge conflict.
+- Skipped / deferred: final full suites/real-browser visual verification later; no migration/provider.
+- Blockers / follow-ups: none; task cleanup pending.
+
 ### 2026-11-15 — 4.3.2 Evidenced morphology and groups
 - Result / completed: `1c219be` merged as `da068b4`; source-backed ordered morphemes/provenance,
   deterministic owner-safe groups and explicit opt-in validated fallback. Migration 0021/snapshot,
@@ -76,7 +85,8 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
   assuming it was last; corrected that directly coupled assumption and targeted regression passed.
   Full suite not claimed; docs conflicts preserved both features.
 - Skipped / deferred: final full suites/browser sweep; no public API change/gen-api needed.
-- Blockers / follow-ups: none; context exercise ready. Task cleanup pending.
+- Blockers / follow-ups: none; context exercise running. Task branch/folder safely removed after
+  unlinking 1,631 reparse points without following targets.
 
 ### 2026-11-15 — 5.1.1 Deployed-proxy acceptance complete
 - Result / completed: follow-up `948d211` merged; fresh API-owned media volumes now retain
