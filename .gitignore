@@ -9,6 +9,7 @@ __pycache__/
 *.sqlite
 !backend/tests/fixtures/*.sqlite
 playwright-report/
+.playwright-mcp/
 test-results/
 coverage/
 .coverage
