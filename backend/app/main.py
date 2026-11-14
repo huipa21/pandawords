@@ -16,6 +16,7 @@ from app.api.auth import router as auth_router
 from app.api.candidates import router as candidates_router
 from app.api.content import router as content_router
 from app.api.exercise_attempts import router as exercise_attempts_router
+from app.api.graph import router as graph_router
 from app.api.images import router as images_router
 from app.api.jobs import router as jobs_router
 from app.api.media import router as media_router
@@ -87,6 +88,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         openapi_url="/api/openapi.json",
         lifespan=lifespan,
     )
+    app.include_router(graph_router)
     app.state.settings = app_settings
     app.state.login_backoff = LoginBackoff()
     app.add_middleware(RequestIdMiddleware)

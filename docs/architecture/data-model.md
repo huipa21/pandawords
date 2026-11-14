@@ -33,6 +33,25 @@ serialize concurrent retries, and aborted transactions remove their unique local
 `image_rate` coordinates owner search/queue limits; `image_provider_rate` contains only global
 provider counters, never queries, owners or search results.
 
+### Graph exploration authorization (4.4.1)
+
+Graph visibility is narrower than general dictionary lookup: the union of nonhidden
+project selections belonging to the requester, plus every requester-owned dictionary record.
+A hidden lemma or lexeme also hides selected descendants **in that project**. A visible
+selection in another owned project still authorizes the record; own dictionary rows remain
+independently authorized. Hidden ancestry follows only shared/requester-owned hierarchy edges
+with independently authorized owners on both endpoints. It also works without an intermediate
+lexeme membership marker. Nearby unselected shared dictionary records are never implicitly added.
+
+Both edge endpoints must belong to this set, and the edge itself must be shared/requester-owned.
+Node/relation filters are applied before expansion, so excluded nodes cannot act as bridges.
+One transaction provides the authorization/traversal/effective-field snapshot. Batched reads
+avoid per-node queries: depth at most 3, at most 300 returned nodes and 10,000 matching edges.
+Authorization reads reject more than 10,000 project memberships, own rows per dictionary table,
+or hierarchy edges per hierarchy relation. Each query uses a limit plus one sentinel;
+overflows fail explicitly rather than truncate. These operational authorization bounds can
+also produce `graph.too_large` before traversal. No migration is needed.
+
 1. **Shared dictionary**: canonical linguistic data, materialized from the lexicon the first time
    any user adds a word. These rows have `owner = NONE` and are read-only for users.
 2. **Per-user layer**: projects, project membership/hiding, overrides, user-created content, notes,

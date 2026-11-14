@@ -4,6 +4,23 @@
  */
 
 export interface paths {
+  '/api/graph': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Read Graph */
+    get: operations['read_graph_api_graph_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/healthz': {
     parameters: {
       query?: never
@@ -1318,6 +1335,8 @@ export interface components {
       }
     }
     /** @enum {string} */
+    'DictionaryRelation': 'has_lexeme' | 'has_sense' | 'composed_of' | 'derives_to' | 'relates_to' | 'member_of' | 'contains' | 'used_in' | 'part_of'
+    /** @enum {string} */
     'DictionaryTable': 'lemma' | 'lexeme' | 'sense' | 'morpheme' | 'tag' | 'sentence' | 'passage'
     /** ExamPacing */
     'ExamPacing': {
@@ -1382,6 +1401,99 @@ export interface components {
       /** Tags */
       tags?: components['schemas']['Text-Output'][]
     }
+    /** @enum {string} */
+    'GraphDirection': 'both' | 'outgoing' | 'incoming'
+    /** GraphEdge */
+    'GraphEdge': {
+      /** Id */
+      id: string
+      table: components['schemas']['DictionaryRelation']
+      /** Start */
+      start: string
+      /** End */
+      end: string
+      fields: components['schemas']['GraphEdgeFields']
+    }
+    /** GraphEdgeFields */
+    'GraphEdgeFields': {
+      /** Rank */
+      rank?: number | null
+      /** Order */
+      order?: number | null
+      /** Position */
+      position?: number | null
+      /** Via */
+      via?: string | null
+      /** Type */
+      type?: ('synonym' | 'antonym' | 'hypernym' | 'hyponym' | 'confusable' | 'collocation' | 'default') | null
+      /** Source */
+      source?: string | null
+      /** Span */
+      span?: [
+        number,
+        number,
+      ] | null
+    }
+    /** GraphExamSource */
+    'GraphExamSource': {
+      /** Tag */
+      tag: string
+      /** Source */
+      source: string
+    }
+    /** GraphForm */
+    'GraphForm': {
+      /** Form */
+      form: string
+      /** Tags */
+      tags: string[]
+    }
+    /** GraphFrequency */
+    'GraphFrequency': {
+      /** Source */
+      source: string
+      /** Zipf */
+      zipf?: number | null
+      /** Bnc */
+      bnc?: number | null
+      /** Coca */
+      coca?: number | null
+    }
+    'GraphNode': components['schemas']['LemmaNode'] | components['schemas']['LexemeNode'] | components['schemas']['SenseNode'] | components['schemas']['MorphemeNode'] | components['schemas']['TagNode'] | components['schemas']['SentenceNode'] | components['schemas']['PassageNode']
+    /** GraphPronunciation */
+    'GraphPronunciation': {
+      /**
+       * Accent
+       * @enum {string}
+       */
+      accent: 'US' | 'UK'
+      /** Ipa */
+      ipa: string
+      /** Audio */
+      audio?: string | null
+    }
+    /** GraphRead */
+    'GraphRead': {
+      /** Focus Id */
+      focus_id: string
+      /** Depth */
+      depth: number
+      direction: components['schemas']['GraphDirection']
+      /** Nodes */
+      nodes: components['schemas']['GraphNode'][]
+      /** Edges */
+      edges: components['schemas']['GraphEdge'][]
+      /** Node Types */
+      node_types: components['schemas']['DictionaryTable'][]
+      /** Relation Types */
+      relation_types: components['schemas']['DictionaryRelation'][]
+      /**
+       * Node Limit
+       * @default 300
+       * @constant
+       */
+      node_limit: 300
+    }
     /** HTTPValidationError */
     'HTTPValidationError': {
       /** Detail */
@@ -1419,6 +1531,65 @@ export interface components {
     }
     'JsonValue': unknown
     'Language': string
+    /** LemmaFields */
+    'LemmaFields': {
+      /** Text */
+      text: string
+      /** Lang */
+      lang: string
+      /**
+       * Kind
+       * @enum {string}
+       */
+      kind: 'word' | 'phrase'
+      /** Freq Zipf */
+      freq_zipf: number
+      /** Cefr */
+      cefr?: string | null
+      /** Exam Tags */
+      exam_tags: string[]
+      /** Source */
+      source: string
+      /** Frequencies */
+      frequencies?: components['schemas']['GraphFrequency'][] | null
+      /** Exam Tag Sources */
+      exam_tag_sources?: components['schemas']['GraphExamSource'][] | null
+    }
+    /** LemmaNode */
+    'LemmaNode': {
+      /** Id */
+      id: string
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      table: 'lemma'
+      fields: components['schemas']['LemmaFields']
+    }
+    /** LexemeFields */
+    'LexemeFields': {
+      /** Pos */
+      pos: string
+      /** Etymology No */
+      etymology_no: number
+      /** Etymology Text */
+      etymology_text?: string | null
+      /** Forms */
+      forms: components['schemas']['GraphForm'][]
+      /** Pron */
+      pron: components['schemas']['GraphPronunciation'][]
+    }
+    /** LexemeNode */
+    'LexemeNode': {
+      /** Id */
+      id: string
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      table: 'lexeme'
+      fields: components['schemas']['LexemeFields']
+    }
     /** LexiconGloss */
     'LexiconGloss': {
       lexeme_id: components['schemas']['DictionaryKey-Output']
@@ -1560,6 +1731,29 @@ export interface components {
       introduced: boolean
       card: components['schemas']['CardState']
     }
+    /** MorphemeFields */
+    'MorphemeFields': {
+      /** Text */
+      text: string
+      /**
+       * Type
+       * @enum {string}
+       */
+      type: 'prefix' | 'root' | 'suffix' | 'infix'
+      /** Meaning */
+      meaning?: string | null
+    }
+    /** MorphemeNode */
+    'MorphemeNode': {
+      /** Id */
+      id: string
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      table: 'morpheme'
+      fields: components['schemas']['MorphemeFields']
+    }
     /** NoteCreate */
     'NoteCreate': {
       target_table: components['schemas']['DictionaryTable']
@@ -1695,6 +1889,28 @@ export interface components {
     'PartAssignment': {
       /** Sentence Id */
       sentence_id: string
+    }
+    /** PassageFields */
+    'PassageFields': {
+      /** Title */
+      title: string
+      /** Text */
+      text: string
+      /** Lang */
+      lang: string
+      /** Source */
+      source: string
+    }
+    /** PassageNode */
+    'PassageNode': {
+      /** Id */
+      id: string
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      table: 'passage'
+      fields: components['schemas']['PassageFields']
     }
     /** PassageRead */
     'PassageRead': {
@@ -1935,6 +2151,38 @@ export interface components {
       /** Is Introduction */
       is_introduction: boolean
     }
+    /** SenseFields */
+    'SenseFields': {
+      /** Definition */
+      definition: string
+      /** Gloss */
+      gloss: {
+        [key: string]: string
+      }
+      /** Register */
+      register: string[]
+      /** Domain */
+      domain: string[]
+      /** Examples */
+      examples: string[]
+      /** Rank */
+      rank: number
+      /** Common */
+      common: boolean
+      /** Source */
+      source: string
+    }
+    /** SenseNode */
+    'SenseNode': {
+      /** Id */
+      id: string
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      table: 'sense'
+      fields: components['schemas']['SenseFields']
+    }
     /** SenseOrderRead */
     'SenseOrderRead': {
       /** Project Id */
@@ -1946,6 +2194,30 @@ export interface components {
     'SenseOrderUpdate': {
       /** Sense Ids */
       sense_ids: string[]
+    }
+    /** SentenceFields */
+    'SentenceFields': {
+      /** Text */
+      text: string
+      /** Lang */
+      lang: string
+      /** Translation */
+      translation: {
+        [key: string]: string
+      }
+      /** Source */
+      source: string
+    }
+    /** SentenceNode */
+    'SentenceNode': {
+      /** Id */
+      id: string
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      table: 'sentence'
+      fields: components['schemas']['SentenceFields']
     }
     /** SentencePart */
     'SentencePart': {
@@ -2041,9 +2313,27 @@ export interface components {
       /** @default custom */
       kind: components['schemas']['TagKind']
     }
+    /** TagFields */
+    'TagFields': {
+      /** Kind */
+      kind: string
+      /** Name */
+      name: string
+    }
     /** @enum {string} */
     'TagKind': 'morph_group' | 'concept' | 'domain' | 'custom'
     'TagName': string
+    /** TagNode */
+    'TagNode': {
+      /** Id */
+      id: string
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      table: 'tag'
+      fields: components['schemas']['TagFields']
+    }
     /** TagRead */
     'TagRead': {
       /** Id */
@@ -2141,6 +2431,41 @@ export interface components {
 }
 export type $defs = Record<string, never>
 export interface operations {
+  read_graph_api_graph_get: {
+    parameters: {
+      query: {
+        focus_id: string
+        depth?: number
+        node_types?: components['schemas']['DictionaryTable'][]
+        relation_types?: components['schemas']['DictionaryRelation'][]
+        direction?: components['schemas']['GraphDirection']
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GraphRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
   healthz_api_healthz_get: {
     parameters: {
       query?: never

@@ -1,0 +1,21 @@
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Query, Response
+
+from app.api.dependencies import Db, current_user
+from app.domain.auth import User
+from app.domain.graph import GraphQuery, GraphRead
+from app.services import graph
+
+router = APIRouter(prefix="/api/graph", tags=["graph"])
+
+
+@router.get("")
+async def read_graph(
+    query: Annotated[GraphQuery, Query()],
+    db: Db,
+    actor: Annotated[User, Depends(current_user)],
+    response: Response,
+) -> GraphRead:
+    response.headers["Cache-Control"] = "no-store"
+    return await graph.read(db, actor.id, query)

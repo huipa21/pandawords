@@ -67,6 +67,19 @@ the existing loopback **8101** server:
 Retained probes: `test_context_schema.py`, `test_dictionary_schema.py`,
 `test_schema_snapshot.py`, `test_migrations.py`. No persistent dev database was changed.
 
+### Bounded graph snapshots (4.4.1) ✅
+
+Real migrated **8101**, SurrealDB 3.3.5: `FROM $targets` accepts bound record arrays,
+including composite override record IDs. `in IN $authorized` / `out IN $authorized`
+combine with owner dereferences, bound frontier arrays and bound `LIMIT $limit` for
+bounded directional reads. Boolean negation uses `$induced = false`; `NOT $induced`
+is not accepted by this parser. The SDK has no connection-level `merge`; use
+`db.update(record).merge(fields)`. The real graph API and 10,201-edge dense fixture retain
+these query/limit probes. No schema or persistent dev data was changed.
+The same visibility, directional/induced relation and batched override/node query paths
+also passed a read-only **8100** transaction probe with unique nonexistent IDs; it created
+or changed no records and did not operate any service lifecycle.
+
 ### Hierarchical tags and relation deletion (4.3.1) ✅
 
 Verified with SDK 3.0 against migrated random databases on existing loopback **8101**:

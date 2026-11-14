@@ -5,6 +5,102 @@
     "version": "0.1.0"
   },
   "paths": {
+    "/api/graph": {
+      "get": {
+        "tags": [
+          "graph"
+        ],
+        "summary": "Read Graph",
+        "operationId": "read_graph_api_graph_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "focus_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 16384,
+              "title": "Focus Id"
+            }
+          },
+          {
+            "name": "depth",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 3,
+              "minimum": 0,
+              "default": 1,
+              "title": "Depth"
+            }
+          },
+          {
+            "name": "node_types",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/DictionaryTable"
+              },
+              "maxItems": 7,
+              "title": "Node Types"
+            }
+          },
+          {
+            "name": "relation_types",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/DictionaryRelation"
+              },
+              "maxItems": 9,
+              "title": "Relation Types"
+            }
+          },
+          {
+            "name": "direction",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/GraphDirection",
+              "default": "both"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GraphRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/healthz": {
       "get": {
         "tags": [
@@ -4860,6 +4956,20 @@
         "title": "DictionaryRecordRead",
         "description": "Transport-safe record; fields are schema fields, never ownership or identity."
       },
+      "DictionaryRelation": {
+        "type": "string",
+        "enum": [
+          "has_lexeme",
+          "has_sense",
+          "composed_of",
+          "derives_to",
+          "relates_to",
+          "member_of",
+          "contains",
+          "used_in",
+          "part_of"
+        ]
+      },
       "DictionaryTable": {
         "type": "string",
         "enum": [
@@ -5037,6 +5147,362 @@
         ],
         "title": "Form"
       },
+      "GraphDirection": {
+        "type": "string",
+        "enum": [
+          "both",
+          "outgoing",
+          "incoming"
+        ]
+      },
+      "GraphEdge": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "table": {
+            "$ref": "#/components/schemas/DictionaryRelation"
+          },
+          "start": {
+            "type": "string",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "title": "End"
+          },
+          "fields": {
+            "$ref": "#/components/schemas/GraphEdgeFields"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "table",
+          "start",
+          "end",
+          "fields"
+        ],
+        "title": "GraphEdge"
+      },
+      "GraphEdgeFields": {
+        "properties": {
+          "rank": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rank"
+          },
+          "order": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Order"
+          },
+          "position": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Position"
+          },
+          "via": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Via"
+          },
+          "type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "synonym",
+                  "antonym",
+                  "hypernym",
+                  "hyponym",
+                  "confusable",
+                  "collocation",
+                  "default"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Type"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source"
+          },
+          "span": {
+            "anyOf": [
+              {
+                "prefixItems": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "integer"
+                  }
+                ],
+                "type": "array",
+                "maxItems": 2,
+                "minItems": 2
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Span"
+          }
+        },
+        "type": "object",
+        "title": "GraphEdgeFields"
+      },
+      "GraphExamSource": {
+        "properties": {
+          "tag": {
+            "type": "string",
+            "title": "Tag"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "tag",
+          "source"
+        ],
+        "title": "GraphExamSource"
+      },
+      "GraphForm": {
+        "properties": {
+          "form": {
+            "type": "string",
+            "title": "Form"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tags"
+          }
+        },
+        "type": "object",
+        "required": [
+          "form",
+          "tags"
+        ],
+        "title": "GraphForm"
+      },
+      "GraphFrequency": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "zipf": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Zipf"
+          },
+          "bnc": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bnc"
+          },
+          "coca": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Coca"
+          }
+        },
+        "type": "object",
+        "required": [
+          "source"
+        ],
+        "title": "GraphFrequency"
+      },
+      "GraphNode": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/LemmaNode"
+          },
+          {
+            "$ref": "#/components/schemas/LexemeNode"
+          },
+          {
+            "$ref": "#/components/schemas/SenseNode"
+          },
+          {
+            "$ref": "#/components/schemas/MorphemeNode"
+          },
+          {
+            "$ref": "#/components/schemas/TagNode"
+          },
+          {
+            "$ref": "#/components/schemas/SentenceNode"
+          },
+          {
+            "$ref": "#/components/schemas/PassageNode"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "table",
+          "mapping": {
+            "lemma": "#/components/schemas/LemmaNode",
+            "lexeme": "#/components/schemas/LexemeNode",
+            "morpheme": "#/components/schemas/MorphemeNode",
+            "passage": "#/components/schemas/PassageNode",
+            "sense": "#/components/schemas/SenseNode",
+            "sentence": "#/components/schemas/SentenceNode",
+            "tag": "#/components/schemas/TagNode"
+          }
+        }
+      },
+      "GraphPronunciation": {
+        "properties": {
+          "accent": {
+            "type": "string",
+            "enum": [
+              "US",
+              "UK"
+            ],
+            "title": "Accent"
+          },
+          "ipa": {
+            "type": "string",
+            "title": "Ipa"
+          },
+          "audio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Audio"
+          }
+        },
+        "type": "object",
+        "required": [
+          "accent",
+          "ipa"
+        ],
+        "title": "GraphPronunciation"
+      },
+      "GraphRead": {
+        "properties": {
+          "focus_id": {
+            "type": "string",
+            "title": "Focus Id"
+          },
+          "depth": {
+            "type": "integer",
+            "title": "Depth"
+          },
+          "direction": {
+            "$ref": "#/components/schemas/GraphDirection"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/GraphNode"
+            },
+            "type": "array",
+            "title": "Nodes"
+          },
+          "edges": {
+            "items": {
+              "$ref": "#/components/schemas/GraphEdge"
+            },
+            "type": "array",
+            "title": "Edges"
+          },
+          "node_types": {
+            "items": {
+              "$ref": "#/components/schemas/DictionaryTable"
+            },
+            "type": "array",
+            "title": "Node Types"
+          },
+          "relation_types": {
+            "items": {
+              "$ref": "#/components/schemas/DictionaryRelation"
+            },
+            "type": "array",
+            "title": "Relation Types"
+          },
+          "node_limit": {
+            "type": "integer",
+            "const": 300,
+            "title": "Node Limit",
+            "default": 300
+          }
+        },
+        "type": "object",
+        "required": [
+          "focus_id",
+          "depth",
+          "direction",
+          "nodes",
+          "edges",
+          "node_types",
+          "relation_types"
+        ],
+        "title": "GraphRead"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -5132,6 +5598,181 @@
       "Language": {
         "type": "string",
         "pattern": "^[a-zA-Z]{2,8}(-[a-zA-Z0-9]{1,8})*$"
+      },
+      "LemmaFields": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "lang": {
+            "type": "string",
+            "title": "Lang"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "word",
+              "phrase"
+            ],
+            "title": "Kind"
+          },
+          "freq_zipf": {
+            "type": "number",
+            "title": "Freq Zipf"
+          },
+          "cefr": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cefr"
+          },
+          "exam_tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Exam Tags"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "frequencies": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/GraphFrequency"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Frequencies"
+          },
+          "exam_tag_sources": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/GraphExamSource"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exam Tag Sources"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text",
+          "lang",
+          "kind",
+          "freq_zipf",
+          "exam_tags",
+          "source"
+        ],
+        "title": "LemmaFields"
+      },
+      "LemmaNode": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "table": {
+            "type": "string",
+            "const": "lemma",
+            "title": "Table"
+          },
+          "fields": {
+            "$ref": "#/components/schemas/LemmaFields"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "table",
+          "fields"
+        ],
+        "title": "LemmaNode"
+      },
+      "LexemeFields": {
+        "properties": {
+          "pos": {
+            "type": "string",
+            "title": "Pos"
+          },
+          "etymology_no": {
+            "type": "integer",
+            "title": "Etymology No"
+          },
+          "etymology_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Etymology Text"
+          },
+          "forms": {
+            "items": {
+              "$ref": "#/components/schemas/GraphForm"
+            },
+            "type": "array",
+            "title": "Forms"
+          },
+          "pron": {
+            "items": {
+              "$ref": "#/components/schemas/GraphPronunciation"
+            },
+            "type": "array",
+            "title": "Pron"
+          }
+        },
+        "type": "object",
+        "required": [
+          "pos",
+          "etymology_no",
+          "forms",
+          "pron"
+        ],
+        "title": "LexemeFields"
+      },
+      "LexemeNode": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "table": {
+            "type": "string",
+            "const": "lexeme",
+            "title": "Table"
+          },
+          "fields": {
+            "$ref": "#/components/schemas/LexemeFields"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "table",
+          "fields"
+        ],
+        "title": "LexemeNode"
       },
       "LexiconGloss": {
         "properties": {
@@ -5592,6 +6233,64 @@
           "card"
         ],
         "title": "MemoryRead"
+      },
+      "MorphemeFields": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "prefix",
+              "root",
+              "suffix",
+              "infix"
+            ],
+            "title": "Type"
+          },
+          "meaning": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Meaning"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text",
+          "type"
+        ],
+        "title": "MorphemeFields"
+      },
+      "MorphemeNode": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "table": {
+            "type": "string",
+            "const": "morpheme",
+            "title": "Table"
+          },
+          "fields": {
+            "$ref": "#/components/schemas/MorphemeFields"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "table",
+          "fields"
+        ],
+        "title": "MorphemeNode"
       },
       "NoteCreate": {
         "properties": {
@@ -6258,6 +6957,57 @@
         ],
         "title": "PartAssignment"
       },
+      "PassageFields": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "lang": {
+            "type": "string",
+            "title": "Lang"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "text",
+          "lang",
+          "source"
+        ],
+        "title": "PassageFields"
+      },
+      "PassageNode": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "table": {
+            "type": "string",
+            "const": "passage",
+            "title": "Table"
+          },
+          "fields": {
+            "$ref": "#/components/schemas/PassageFields"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "table",
+          "fields"
+        ],
+        "title": "PassageNode"
+      },
       "PassageRead": {
         "properties": {
           "passage": {
@@ -6882,6 +7632,89 @@
         ],
         "title": "ReviewReceipt"
       },
+      "SenseFields": {
+        "properties": {
+          "definition": {
+            "type": "string",
+            "title": "Definition"
+          },
+          "gloss": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Gloss"
+          },
+          "register": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Register"
+          },
+          "domain": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Domain"
+          },
+          "examples": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Examples"
+          },
+          "rank": {
+            "type": "integer",
+            "title": "Rank"
+          },
+          "common": {
+            "type": "boolean",
+            "title": "Common"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "definition",
+          "gloss",
+          "register",
+          "domain",
+          "examples",
+          "rank",
+          "common",
+          "source"
+        ],
+        "title": "SenseFields"
+      },
+      "SenseNode": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "table": {
+            "type": "string",
+            "const": "sense",
+            "title": "Table"
+          },
+          "fields": {
+            "$ref": "#/components/schemas/SenseFields"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "table",
+          "fields"
+        ],
+        "title": "SenseNode"
+      },
       "SenseOrderRead": {
         "properties": {
           "project_id": {
@@ -6920,6 +7753,60 @@
           "sense_ids"
         ],
         "title": "SenseOrderUpdate"
+      },
+      "SentenceFields": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "lang": {
+            "type": "string",
+            "title": "Lang"
+          },
+          "translation": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Translation"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "text",
+          "lang",
+          "translation",
+          "source"
+        ],
+        "title": "SentenceFields"
+      },
+      "SentenceNode": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "table": {
+            "type": "string",
+            "const": "sentence",
+            "title": "Table"
+          },
+          "fields": {
+            "$ref": "#/components/schemas/SentenceFields"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "table",
+          "fields"
+        ],
+        "title": "SentenceNode"
       },
       "SentencePart": {
         "properties": {
@@ -7186,6 +8073,24 @@
         ],
         "title": "TagCreate"
       },
+      "TagFields": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind",
+          "name"
+        ],
+        "title": "TagFields"
+      },
       "TagKind": {
         "type": "string",
         "enum": [
@@ -7199,6 +8104,29 @@
         "type": "string",
         "maxLength": 200,
         "minLength": 1
+      },
+      "TagNode": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "table": {
+            "type": "string",
+            "const": "tag",
+            "title": "Table"
+          },
+          "fields": {
+            "$ref": "#/components/schemas/TagFields"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "table",
+          "fields"
+        ],
+        "title": "TagNode"
       },
       "TagRead": {
         "properties": {

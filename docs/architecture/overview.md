@@ -47,6 +47,25 @@ Only `web` joins the Caddy network. SurrealDB is never exposed publicly.
 
 ## Request flow
 
+### Bounded graph API (4.4.1)
+
+`GET /api/graph?focus_id=<opaque-id>&depth=1` requires authentication. Depth is 0–3;
+repeated `node_types` and `relation_types` query parameters restrict traversal, and
+`direction=both|outgoing|incoming` controls expansion (default `both`). Empty filter lists
+mean all supported types. The focus must be authorized and pass the node filter.
+The response contains `focus_id`, `depth`, `direction`, discriminated typed `nodes`,
+typed `edges`, effective filter metadata (`node_types`, `relation_types`) and `node_limit: 300`.
+Nodes have `{id, table, fields}`; edges have `{id, table, start, end, fields}`.
+Effective fields include only the requester's overrides. Ownership is never returned.
+
+Edges retain their stored start→end orientation, independent of expansion direction.
+The response is the induced matching graph on the reachable node set; depth 0 therefore
+returns the focus and any matching self-edges. Nodes sort by `(table,id)` and edges by
+`(table,start,end,id)`. Isolated focuses return one node, not an error.
+Malformed/unsupported IDs and invalid filters return 422, missing/unauthorized focuses 404,
+and oversized results 413 `graph.too_large` with guidance to reduce depth/filters or hide
+unused selections. No arbitrary partial graph is returned. Successful responses are no-store.
+
 ### Tag API (4.3.1)
 
 Authenticated `/api/tags` supports POST (201), GET (visible shared/own list),
