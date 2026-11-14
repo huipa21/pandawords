@@ -202,12 +202,34 @@ or confirmation. New/learning recognition and existing review-kind weights are u
 
 ### Offline recall (3.2.4)
 
-`exercise_cloze.register(registry)` uses effective selected-sense examples. It normalizes the
+`exercise_cloze.register(registry, provider)` first tries confirmed owner-private sentence
+contexts linked to the reviewed sense (4.4.4), then effective selected-sense examples.
+The request-bound provider reads only same-owner `used_in` edges and sentence endpoints.
+Hidden sentence memberships in the selected project, deleted links/endpoints and stale,
+invalid or nonmatching spans cannot supply a prompt. Discovery is deterministic and bounded
+to 64 links/hidden memberships; oversized contexts fall back to source examples.
+Private contexts are never written to shared caches, and public attempts expose only the
+masked text, not sentence/link IDs, source, translation or answer spans.
+
+Private sentence spans are half-open original Unicode code-point offsets. Validation and
+masking map normalized matches back to the original text, preserving casing, whitespace,
+combining characters and emoji outside the blanks. All repeated/inflected accepted forms
+are masked, not only the linked occurrence. Invalid context falls back without LLM use.
+Grading, timing, private answer storage and exactly-once SRS confirmation are unchanged.
+
+Without a private context, cloze normalizes the
 sentence with the shared answer contract, matches whole forms (not substrings of other words),
 prefers longer overlapping forms, and replaces **every** accepted-form occurrence with `____`.
 The prompt contains only that blanked sentence; it never includes definitions or translations
 that might reveal another answer. Empty forms and examples without a match are unavailable.
 All selected-lexeme forms plus the lemma remain acceptable, not just the blank's original form.
+
+Distractor morphology discovery reuses the bounded, owner-safe morphology group reader;
+only validated `morph_group` sense memberships qualify, never matching word fragments or
+arbitrary tag kinds/morpheme labels. Effective owner-visible concept/domain memberships
+still rank first, followed by morph groups, confusable edges, and POS/frequency fallback.
+Every relation and both endpoints are authorized separately. Synonym exclusions, stable
+tier/ID ordering, at most four choices, and fewer-than-two-safe-choices unavailability remain.
 
 `exercise_listen.register(registry, provider)` uses a typed `ListeningProvider`. Its production
 provider captures DB/settings and the authenticated user's preferred US/UK accent. It checks

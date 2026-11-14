@@ -1,7 +1,11 @@
-"""Offline cloze generation from the selected sense's effective examples."""
+"""Offline cloze from owner-private contexts or selected-sense source examples."""
 
 import re
+from collections.abc import Awaitable, Callable
 
+from surrealdb import AsyncSurrealConnection
+
+from app.db import exercise_cloze as repository
 from app.domain.exercises import (
     AnswerSpec,
     ExerciseContext,
@@ -9,11 +13,25 @@ from app.domain.exercises import (
     GeneratedExercise,
     Unavailable,
 )
+from app.services.cloze_context import mask
 from app.services.exercise_answers import grade_answer, normalize_answer
 from app.services.exercise_registry import ExercisePlugin, ExerciseRegistry
 
+ContextProvider = Callable[[ExerciseContext], Awaitable[tuple[repository.SentenceContext, ...]]]
 
-async def generate(context: ExerciseContext) -> GeneratedExercise | Unavailable:
+
+async def generate(
+    context: ExerciseContext, source: ContextProvider | None = None
+) -> GeneratedExercise | Unavailable:
+    if source is not None:
+        for sentence in await source(context):
+            masked = mask(sentence, context.forms)
+            if masked is not None:
+                text, answer = masked
+                return GeneratedExercise(
+                    prompt=ExercisePrompt(text=text, input="text"),
+                    private=AnswerSpec(answer=answer, accepted_forms=context.forms),
+                )
     forms = tuple(
         sorted(
             {normalize_answer(form) for form in context.forms if normalize_answer(form)},
@@ -38,5 +56,15 @@ async def generate(context: ExerciseContext) -> GeneratedExercise | Unavailable:
     return Unavailable(exercise="cloze", reason="missing_example")
 
 
-def register(target: ExerciseRegistry) -> None:
-    target.register(ExercisePlugin("cloze", "recall", generate, grade_answer))
+def provider(db: AsyncSurrealConnection) -> ContextProvider:
+    async def acquire(context: ExerciseContext) -> tuple[repository.SentenceContext, ...]:
+        return await repository.sentences(db, context)
+
+    return acquire
+
+
+def register(target: ExerciseRegistry, source: ContextProvider | None = None) -> None:
+    async def create(context: ExerciseContext) -> GeneratedExercise | Unavailable:
+        return await generate(context, source)
+
+    target.register(ExercisePlugin("cloze", "recall", create, grade_answer))
