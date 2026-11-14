@@ -28,21 +28,21 @@ which handed off sole coordination here. The supplied `phase-5.md` is now explic
 All external Phase 5 dependencies are ✅; 5.1.3 waits for 5.1.1 integration/verification.
 Partition lemma-detail additions into separate components; preserve every locale/API contribution.
 Migration allocations: 0018 tag hierarchy (already committed before the initial reservation);
-0019 reserved for image storage/search retry metadata; 0020 reserved for review media preferences.
+0019 image storage/search retry metadata; 0020 reserved for review media preferences;
+0021 allocated for morphology provenance/indexes after the agent identified missing schema fields.
 The images agent was notified before integration. Other additions require coordinator allocation.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 4.1.2 | task/4.1.2-phrase-flow | ../pandawords.worktrees/4.1.2 | Agent running |
-| 4.2.2 | task/4.2.2-ingestion | ../pandawords.worktrees/4.2.2 | Agent running |
-| 4.3.2 | task/4.3.2-morphology | ../pandawords.worktrees/4.3.2 | Ready; awaiting global agent slot |
+| 4.2.2 | task/4.2.2-ingestion | ../pandawords.worktrees/4.2.2 | Merged 40436cb; integrated verification running |
+| 4.3.2 | task/4.3.2-morphology | ../pandawords.worktrees/4.3.2 | Agent running |
 | 4.4.1 | task/4.4.1-graph-api | ../pandawords.worktrees/4.4.1 | Agent running; all prerequisites verified |
 | 4.2.3 | task/4.2.3-reading | ../pandawords.worktrees/4.2.3 | Waiting for 4.2.2 |
 | 4.4.2 | task/4.4.2-graph-ui | ../pandawords.worktrees/4.4.2 | Waiting for 4.4.1 |
 | 4.4.4 | task/4.4.4-context-exercises | ../pandawords.worktrees/4.4.4 | Waiting for 4.2.2, 4.3.2 |
 | 4.4.3 | task/4.4.3-relations | ../pandawords.worktrees/4.4.3 | Waiting for 4.4.2 |
-| 5.1.1 | task/5.1.1-images | ../pandawords.worktrees/5.1.1 | Agent running, wave 1 |
-| 5.1.2 | task/5.1.2-mnemonics | ../pandawords.worktrees/5.1.2 | Agent running, wave 1 |
+| 5.1.1 | task/5.1.1-images | ../pandawords.worktrees/5.1.1 | Committed fbe0c1f; awaiting integration |
+| 5.1.2 | task/5.1.2-mnemonics | ../pandawords.worktrees/5.1.2 | Committed 42981cc; awaiting integration |
 | 5.1.3 | task/5.1.3-image-review | ../pandawords.worktrees/5.1.3 | Waiting for 5.1.1 |
 
 ## Blocked
@@ -69,6 +69,18 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-15 — 4.1.2 Phrase discovery and add flow
+- Result / completed: `93a9848` merged as `866458e`; bounded exact containing-phrase lookup,
+  independent bilingual detail/add components and ordinary selected-sense/project add flow.
+- Dependencies: 4.1.1 and 2.6.5 checked ✅.
+- Verification: agent generated API/check, 11 backend and 15 frontend cases passed; main
+  regenerated combined API, check, 5 backend and 20 word/add-dialog frontend cases passed.
+- Failures / causes / corrections: initial fixture/mock/assertion/format findings fixed.
+  Detail imports and locale object conflicts merged preserving tags and phrases; generated
+  contracts regenerated from integrated backend rather than choosing a conflict side.
+- Skipped / deferred: final full suites/browser sweep later; no migration/provider required.
+- Blockers / follow-ups: none; branch/folder cleanup pending.
 
 ### 2026-11-14 — First-wave browser environment verification
 - Result / completed: initial real-stack E2E run passed first-login but failed word-add and review.
