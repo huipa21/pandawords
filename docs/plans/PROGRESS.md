@@ -10,11 +10,12 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 ## Current run
 
 Request: resume and complete Phase 1, proceeding through waves in dependency order.
-Next step: implement wave 8 security core; dependency 1.5.1 is ✅.
+Next step: recover and assemble wave 8 security core with parallel implementation and test agents;
+then continue remaining Phase 1 waves in dependency order.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 1.5.2 | `task/1.5.2-security-core` | `../pandawords.worktrees/1.5.2` | Starting; dependency 1.5.1 is ✅ |
+| 1.5.2 | `task/1.5.2-security-core` | `../pandawords.worktrees/1.5.2` | Resuming existing uncommitted work; disjoint implementation/tests agents, parent commits; dependency 1.5.1 is ✅ |
 
 ## Blocked
 
