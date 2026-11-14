@@ -18,9 +18,8 @@ Migration allocations: 0013 memory/history; 0014 LLM; 0015 SRS preferences;
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 3.1.2 | task/3.1.2-srs | ../pandawords.worktrees/3.1.2 | Agent running; migration 0015 |
-| 3.1.3 | task/3.1.3-plan | ../pandawords.worktrees/3.1.3 | Waiting for 3.1.2 |
-| 3.2.1 | task/3.2.1-exercises | ../pandawords.worktrees/3.2.1 | Waiting for 3.1.2 |
+| 3.1.3 | task/3.1.3-plan | ../pandawords.worktrees/3.1.3 | Ready; migration 0016 |
+| 3.2.1 | task/3.2.1-exercises | ../pandawords.worktrees/3.2.1 | Ready; migration 0017 |
 | 3.2.2 | task/3.2.2-distractors | ../pandawords.worktrees/3.2.2 | Waiting for 3.2.1 |
 | 3.2.3 | task/3.2.3-recognition | ../pandawords.worktrees/3.2.3 | Waiting for 3.2.2 |
 | 3.2.4 | task/3.2.4-recall | ../pandawords.worktrees/3.2.4 | Waiting for 3.2.1 |
@@ -55,6 +54,20 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
 
+### 2026-11-14 — 3.1.2 Atomic FSRS scheduling
+- Result / completed: `3045820` merged; FSRS 6.3.3 round-tripping, transaction card creation,
+  hidden membership reconciliation, server-grade contract, atomic shared-card updates,
+  idempotent receipts, stale/capacity checks, user retention preferences and generated API.
+- Dependencies: 3.1.1 and 2.4.2 checked ✅.
+- Verification: agent focused 55, backend 632, frontend and check passed. Integrated main
+  gen-api, check and backend/frontend passed (660 backend; existing Starlette warning).
+- Skipped / deferred: none. Failures / causes / corrections: main dependency restored
+  with `uv sync`; parallel config/lock/snapshot merged cleanly. Agent replaced ineffective
+  no-op capacity serialization with a real project revision increment and regression tests.
+- Findings: issuance must capture memory version and persist FrameworkGrade server-side;
+  only confirmation applies the SRS update.
+- Blockers / follow-ups: none; 3.1.3 and 3.2.1 ready concurrently; cleanup follows.
+
 ### 2026-11-14 — 3.2.5 Optional DeepSeek client
 - Result / completed: `b8c43bb` merged as `ed125ce`; typed JSON service, validated persistent
   shared/owner cache, atomic UTC provider budgets, bounded calls and observable unavailability.
@@ -66,7 +79,8 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: additive documentation conflicts retained both sections;
   main lacked newly added OpenAI dependency, restored with manifest-based `uv sync`.
   SDK logging filters and realistic cold-start mock timeout verified by agent tests.
-- Blockers / follow-ups: none; scenario awaits 3.2.1. Task branch/worktree cleanup follows.
+- Blockers / follow-ups: none; scenario awaits 3.2.1. Task branch/worktree removed and folder
+  absence confirmed after targeted cleanup of inspected dependency leftovers.
 
 ### 2026-11-14 — 3.1.1 Memory and review history
 - Result / completed: `a63be3b` merged; migration 0013, full FSRS state, canonical owner/sense

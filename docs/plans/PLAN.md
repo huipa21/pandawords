@@ -83,7 +83,7 @@ are in `phase-N.md`. If a phase file doesn't exist yet, the agent asks before wr
 | ID | Task | Depends on | Wave | Size | Status |
 |---|---|---|---|---|---|
 | 3.1.1 | Migrations: `memory`, `review_log` | 2.3.1 | 1 | S | ✅ |
-| 3.1.2 | SRS service: FSRS wrapper, card creation on add, review apply, auto-rating | 3.1.1, 2.4.2 | 2 | M | 🟡 |
+| 3.1.2 | SRS service: FSRS wrapper, card creation on add, review apply, auto-rating | 3.1.1, 2.4.2 | 2 | M | ✅ |
 | 3.1.3 | Daily plan, exam-date pacing, queue builder + plan API | 3.1.2 | 3 | M | 🟡 |
 | 3.2.1 | Exercise framework: registry, generate/grade API, server-side timing | 3.1.2 | 3 | M | 🟡 |
 | 3.2.2 | Distractor service (tags, morph groups, confusables, frequency band) | 3.2.1, 2.4.3 | 4 | M | 🟡 |
