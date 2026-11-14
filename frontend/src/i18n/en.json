@@ -27,6 +27,18 @@
       "morph_group": "Morphology group"
     }
   },
+  "phrases": {
+    "title": "Phrases containing this word",
+    "composition": "These are phrase components, not evidence that a particular word sense is used literally.",
+    "empty": "No materialized phrases contain this word.",
+    "error": "Could not load phrases.",
+    "retry": "Retry",
+    "more": "Load more",
+    "add": "Add phrase to a project",
+    "project": "Choose a project",
+    "projectError": "Could not load projects.",
+    "noProjects": "Create a project first, then return to add this phrase."
+  },
   "session": {
     "title": "Project review",
     "exit": "Exit review",

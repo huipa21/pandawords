@@ -79,6 +79,21 @@ Malformed/wrong-table IDs, missing projects and other users' projects all return
 Project tree and word-add endpoints are separate tasks; they must reuse the same project `rid`
 and ownership contract rather than inventing scalar IDs.
 
+### Phrase discovery and add flow (4.1.2)
+
+Authenticated `GET /api/dictionary/{table}/{id}/phrases` accepts `lemma` or `lexeme`,
+`offset` 0–10,000 and `limit` 1–50 (default 20). It traverses visible `contains` edges
+from exact component lexemes; lemma targets first resolve visible `has_lexeme` edges.
+The response contains effective phrase entries, canonical offline candidates where available,
+source attribution, and `has_more`. Results include only already-materialized phrases,
+deduplicated and ordered by stored phrase text then opaque identity. Missing, malformed and
+other-owner targets return the same 404. Success is `no-store`; discovery never writes.
+
+Word detail lists these phrases and navigates to the existing lemma route. Phrase add actions
+require an explicitly chosen project and open the ordinary add dialog prefilled with phrase
+text. The same candidate search, explicit sense selection, materialization, membership, job
+and card transaction handles words and phrases; there is no separate phrase membership API.
+
 ### Scheduling service and settings
 
 Authenticated `GET /api/projects/{id}/study-plan` returns `StudyPlanRead`, with bounded queue

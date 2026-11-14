@@ -12,9 +12,11 @@ import PronunciationChip from '@/components/word/PronunciationChip.vue'
 import SenseItem from '@/components/word/SenseItem.vue'
 import WordHeader from '@/components/word/WordHeader.vue'
 import TagAssignments from '@/features/tags/TagAssignments.vue'
+import ContainingPhrases from './ContainingPhrases.vue'
 import { entryRecords, lemmaView, posView, pronunciations, senseView, text } from './dictionaryView'
 import LemmaNotes from './LemmaNotes.vue'
 import OverrideEditor from './OverrideEditor.vue'
+import PhraseAddAction from './PhraseAddAction.vue'
 import { useLemmaDetail } from './useLemmaDetail'
 import { usePronunciation } from './usePronunciation'
 import { useWordDrafts } from './useWordDrafts'
@@ -80,6 +82,8 @@ async function reset() {
     </div>
     <ErrorState v-if="loadError" :error="loadError" :loading="loading" @retry="load" />
     <template v-if="entry">
+      <ContainingPhrases v-if="entry.lemma.fields.kind === 'word'" :lemma-id="entry.lemma.id" />
+      <PhraseAddAction v-if="entry.lemma.fields.kind === 'phrase' && !entry.lemma.owner" :key="entry.lemma.id" :text="text(entry.lemma.fields.text)" />
       <NCard>
         <WordHeader :lemma="lemmaView(entry.lemma)" size="xl" />
         <NTag v-if="text(entry.lemma.fields.cefr)" class="mt-3">

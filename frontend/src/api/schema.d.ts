@@ -349,6 +349,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/dictionary/{table}/{id}/phrases': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Containing Phrases */
+    get: operations['containing_phrases_api_dictionary__table___id__phrases_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/exercise-attempts': {
     parameters: {
       query?: never
@@ -943,6 +960,24 @@ export interface components {
        * @default 0
        */
       reviews: number
+    }
+    /** ContainingPhraseRead */
+    'ContainingPhraseRead': {
+      entry: components['schemas']['DictionaryEntryRead']
+      candidate?: components['schemas']['Candidate'] | null
+    }
+    /** ContainingPhrasesRead */
+    'ContainingPhrasesRead': {
+      /** Items */
+      items: components['schemas']['ContainingPhraseRead'][]
+      /** Sources */
+      sources: components['schemas']['LexiconSource'][]
+      /** Offset */
+      offset: number
+      /** Limit */
+      limit: number
+      /** Has More */
+      has_more: boolean
     }
     /** CustomSenseCreate */
     'CustomSenseCreate': {
@@ -2469,6 +2504,41 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['CandidateResponse']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  containing_phrases_api_dictionary__table___id__phrases_get: {
+    parameters: {
+      query?: {
+        offset?: number
+        limit?: number
+      }
+      header?: never
+      path: {
+        table: 'lemma' | 'lexeme'
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ContainingPhrasesRead']
         }
       }
       /** @description Validation Error */

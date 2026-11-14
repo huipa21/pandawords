@@ -125,6 +125,17 @@ Phrase rule: source-backed `contains` represents composition even for idioms. `s
 word's sense applies literally (e.g. *heavy rain*, not *kick the bucket*). A phrase's own meaning
 lives under its own lexeme/sense, like any lemma.
 
+Containing-phrase discovery (4.1.2) follows incoming `contains` from exact lexeme identities,
+not substrings, forms or sense usage. For lemma targets, both visible `has_lexeme` edges and
+visible lexeme endpoints are required. Phrase, component and relation owners are independently
+authorized. Graph traversal uses existing relation adjacency and adds no schema/migration.
+Pagination deduplicates phrase records before applying stored `text`, record-ID ordering,
+offset and limit; concurrent graph changes can shift pages. Effective entries and original
+source candidates are separate identities: private/custom phrases remain navigable without
+being represented as shared offline add candidates. User text overrides do not change source keys.
+Adding a phrase selects only its explicitly chosen own senses, not its component senses.
+Repeat/cross-project adds reuse cards and never remove other project selections.
+
 Task 4.1.1 materializes `contains` only for complete source-backed decompositions whose
 components each resolve to a unique English word lexeme; unknown or ambiguous components
 remain unlinked rather than being inferred from whitespace. `position` is zero-based, and

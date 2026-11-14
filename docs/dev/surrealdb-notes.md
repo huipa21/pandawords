@@ -1,5 +1,16 @@
 # SurrealDB 3.3 notes
 
+## Containing-phrase traversal (4.1.2) ✅
+
+Verified against the existing isolated random-database harness on loopback **8101**,
+SurrealDB **3.3.5**: `SELECT VALUE <-(contains WHERE ...).in FROM $targets` returns
+per-component arrays; `array::flatten((SELECT VALUE ...))` can feed an outer
+`lemma WHERE id IN ...` query. The outer selection deduplicates repeated component edges
+before `ORDER BY text ASC, id ASC LIMIT $limit START $offset`. Bound integer pagination
+parameters work. Relation `owner`, `in.owner`, `out.owner` and source-record owner checks
+independently exclude foreign edges/endpoints; lemma ancestry checks `has_lexeme` as well.
+The regression is `tests/api/test_phrases.py`; no new migration or schema is needed.
+
 ### Sentence and passage schema contract (4.2.1) ✅
 
 Verified 2026-11-14 against **SurrealDB 3.3.5 / SDK 3.0**, using fresh random databases on

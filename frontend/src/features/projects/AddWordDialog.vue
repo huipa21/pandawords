@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import type { components } from '@/api/schema'
+import { watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import JobStatus from '@/components/app/JobStatus.vue'
 import SenseSelectList from '@/components/word/SenseSelectList.vue'
 import WordHeader from '@/components/word/WordHeader.vue'
 import { useAddWord } from './useAddWord'
 
-const props = defineProps<{ projectId: string, show: boolean }>()
+const props = defineProps<{ projectId: string, show: boolean, initialText?: string }>()
 const emit = defineEmits<{
   'update:show': [show: boolean]
   'added': [result: components['schemas']['AddToProjectRead']]
@@ -31,6 +32,13 @@ const {
   search,
   submit,
 } = useAddWord(() => props.projectId, () => props.show)
+
+watch(() => [props.show, props.projectId, props.initialText] as const, ([show]) => {
+  if (show && props.initialText) {
+    text.value = props.initialText
+    void search()
+  }
+}, { immediate: true })
 
 async function add() {
   const result = await submit()

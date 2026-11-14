@@ -27,6 +27,18 @@
       "morph_group": "词素组"
     }
   },
+  "phrases": {
+    "title": "包含此词的短语",
+    "composition": "这里表示短语的组成成分，并不表示某个词义在短语中被按字面使用。",
+    "empty": "尚无已入库短语包含此词。",
+    "error": "无法加载短语。",
+    "retry": "重试",
+    "more": "加载更多",
+    "add": "将短语添加到项目",
+    "project": "选择项目",
+    "projectError": "无法加载项目。",
+    "noProjects": "请先创建项目，再返回添加此短语。"
+  },
   "session": {
     "title": "项目复习",
     "exit": "退出复习",

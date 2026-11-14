@@ -3,6 +3,7 @@ from uuid import uuid4
 
 import pytest
 from fastapi import FastAPI
+from fsrs import Rating
 from httpx import AsyncClient
 from surrealdb import RecordID
 from surrealdb.connections.async_ws import AsyncWsSurrealConnection
@@ -14,8 +15,16 @@ from app.db.project_schema_test_support import owned, put_override, set_hidden
 from app.domain.add_to_project import AudioJobPayload, EnrichJobPayload
 from app.domain.dictionary_keys import sense_key
 from app.domain.identity import user_key
+from app.domain.srs import FrameworkGrade
+from app.services import srs
 from tests.api.auth_support import bearer, login
 from tests.conftest import UserFactory
+
+# isort: split
+from scripts.build_lexicon import build
+
+# isort: split
+from tests.unit.test_build_lexicon import entry, source_file
 
 pytestmark = pytest.mark.integration
 MOVE = sense_key("en", "run", "verb", source_sense_id="run-move")
@@ -186,3 +195,85 @@ async def test_auth_validation_and_empty_selection(
     assert result["selected_sense_ids"] == [] and len(result["membership_ids"]) == 1
     assert {job["type"] for job in result["jobs"]} == {"audio"}
     assert len(await owned(db, "includes", RecordID("user", user_key(user.id)))) == 1
+
+
+async def test_phrase_explicit_selection_repeat_cross_project_preserves_card(
+    app: FastAPI,
+    client: AsyncClient,
+    make_user: UserFactory,
+    db: AsyncWsSurrealConnection,
+    tmp_path: Path,
+) -> None:
+    user = await make_user()
+    headers = bearer(await login(client, user.username))
+    owner = RecordID("user", user_key(user.id))
+    project = (await client.post("/api/projects", headers=headers, json={"name": "Phrases"})).json()
+    url = f"/api/projects/{project['id']}/dictionary"
+    await client.post(
+        url, headers=headers, json={"lemma_key": ["en", "run"], "selected_senses": [MOVE]}
+    )
+    original = await owned(db, "includes", owner)
+    output = tmp_path / "phrases.sqlite"
+    build(
+        source_file(
+            tmp_path,
+            entry(
+                "rain dance",
+                senses=[
+                    {"id": "ceremony", "glosses": ["A ceremony."]},
+                    {"id": "figurative", "glosses": ["A futile effort."]},
+                ],
+            ),
+        ),
+        output,
+    )
+    app.state.settings = app.state.settings.model_copy(update={"lexicon_path": output})
+    candidates = (
+        await client.post(
+            "/api/dictionary/candidates", headers=headers, json={"text": "rain dance"}
+        )
+    ).json()["candidates"]
+    assert candidates[0]["lemma"]["kind"] == "phrase"
+    senses = candidates[0]["lexemes"][0]["senses"]
+    selected = senses[1]["id"]
+    body = {"lemma_key": ["en", "rain dance"], "selected_senses": [selected]}
+    response = await client.post(url, headers=headers, json=body)
+    assert response.status_code == 200, response.text
+    result = response.json()
+    sense_id = encode_rid(RecordID("sense", selected), "sense")
+    assert result["selected_sense_ids"] == [sense_id]
+    memories = await owned(db, "memory", owner)
+    assert {row["sense"] for row in memories} == {
+        RecordID("sense", MOVE),
+        RecordID("sense", selected),
+    }
+    before_review = await srs.read_memory(db, user.id, sense_id)
+    review = await srs.grade_review(
+        db,
+        app.state.settings,
+        user.id,
+        attempt_id=uuid4().hex,
+        project_id=project["id"],
+        sense_id=sense_id,
+        expected_version=before_review.version,
+        grade=FrameworkGrade(
+            exercise="recognition", kind="recognition", correct=True, duration_ms=1500
+        ),
+    )
+    await srs.apply_review(db, user.id, review, Rating.Good)
+    cards = await owned(db, "memory", owner)
+    memberships = await owned(db, "includes", owner)
+    for row in original:
+        assert row in memberships
+    assert (await client.post(url, headers=headers, json=body)).json() == result
+    assert await owned(db, "includes", owner) == memberships
+    assert await owned(db, "memory", owner) == cards
+    second = (await client.post("/api/projects", headers=headers, json={"name": "Second"})).json()
+    cross = await client.post(
+        f"/api/projects/{second['id']}/dictionary", headers=headers, json=body
+    )
+    assert cross.status_code == 200, cross.text
+    assert cross.json()["selected_sense_ids"] == [sense_id]
+    assert await owned(db, "memory", owner) == cards
+    after = await owned(db, "includes", owner)
+    assert all(row in after for row in memberships)
