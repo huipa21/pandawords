@@ -78,6 +78,13 @@ def test_missing_pos_and_no_graph_data_are_unavailable() -> None:
     assert isinstance(select_choices(pool()), Unavailable)
     assert isinstance(select_choices(pool(record("other", 3, pos="verb"))), Unavailable)
     assert isinstance(select_choices(pool(record("other", 3, pos=None))), Unavailable)
+
+
+def test_other_senses_of_the_same_word_are_not_incorrect_definitions() -> None:
+    result = select_choices(
+        pool(record("same-word", word="ＡＮＳＷＥＲ"), record("safe")), label="definition"
+    )
+    assert ids(result) == {"answer", "safe"}
     assert isinstance(
         select_choices(
             pool(record("other", 3)).model_copy(update={"answer": record("answer", pos=None)})
@@ -108,7 +115,7 @@ def test_duplicate_words_definitions_unicode_and_ids() -> None:
         record("blank", word=" ", definition=" "),
     )
     assert ids(select_choices(source)) == {"answer", "b", "d", "e"}
-    assert ids(select_choices(source, label="definition")) == {"answer", "a", "b", "c"}
+    assert ids(select_choices(source, label="definition")) == {"answer", "b", "c"}
 
 
 def test_answer_label_missing_and_choice_count_limits() -> None:

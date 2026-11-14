@@ -13,6 +13,7 @@ from app.db.dictionary import TABLE_FIELDS, _merge, _record
 from app.db.srs import user_record
 from app.domain.distractors import DistractorPool, DistractorRecord
 from app.domain.exercises import ExerciseContext
+from app.domain.recognition import definition
 
 LIMIT = 64
 
@@ -161,7 +162,7 @@ async def candidate_pool(
                 record = DistractorRecord(
                     sense_id=encode_rid(sense_id, "sense"),
                     word=lemma.get("text", ""),
-                    definition=sense.get("definition", ""),
+                    definition=definition(sense),
                     pos=lexeme.get("pos"),
                     freq_zipf=frequency if isinstance(frequency, (int, float)) else None,
                     tier=tiers.get(sense_id, 0),

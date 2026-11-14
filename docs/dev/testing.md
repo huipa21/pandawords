@@ -4,6 +4,29 @@ The token-enforcement suite initializes the ESLint configuration in a dedicated 
 setup hook. This keeps cold plugin/configuration loading out of the first assertion's
 20-second budget; normal frontend tests need no retry or temporary timeout edits.
 
+## Recognition plugins (3.2.3)
+
+From `backend`, using the existing isolated random-database harness on loopback **8101**:
+
+```powershell
+uv run --no-sync pytest -q tests\unit\test_recognition.py tests\integration\test_recognition_graph.py tests\api\test_recognition_attempts.py
+```
+
+These suites register the real plugins explicitly without depending on application bootstrap
+ordering. They cover all three exercise types, effective selected senses/overrides and Chinese-gloss
+fallback, optional pronunciation, opaque unique options, correct/wrong/give-up grading, missing
+relations/alternatives and registry fallback. Real graph tests cover both directions of semantic and
+derivation edges, competing valid answers, bidirectional synonym exclusion, private edges/endpoints/
+ancestry and another owner's overrides. Real HTTP attempts verify no answer keys before grading,
+all attempt operations' owner isolation, Good-capped automatic ratings and persisted manual Easy.
+No LLM, frontend/E2E run, migration or development-stack lifecycle operation is needed.
+
+Verification on 2026-11-14: `dev.ps1 check` passed; **126 distinct focused/framework/distractor
+regression cases passed**. The existing frequency-tier graph case was verified separately:
+in a combined run, earlier shared same-frequency fixtures can displace its randomly named
+candidate from the top four (125 passed, one assertion failed); its isolated run passed.
+Pylance hover timed out; executable tests, Ruff and basedpyright provided validation.
+
 ## Distractor provider (3.2.2)
 
 From `backend`, against the existing isolated-database test server:

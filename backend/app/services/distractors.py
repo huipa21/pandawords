@@ -45,6 +45,8 @@ def select_choices(
     for candidate in ranked:
         if candidate.sense_id in seen_ids or not 0 <= candidate.tier <= 3:
             continue
+        if label == "definition" and _key(candidate.word) == _key(pool.answer.word):
+            continue
         if candidate.tier == 3:
             band = frequency_band(pool.answer.freq_zipf)
             if (

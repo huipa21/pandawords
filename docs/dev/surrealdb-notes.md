@@ -1,5 +1,15 @@
 # SurrealDB 3.3 notes
 
+### Recognition relation reads (3.2.3) ✅
+
+Verified against the migrated isolated harness on existing loopback **8101**: owner-filtered
+`relates_to`/`derives_to` reads accept bound selected sense/lexeme IDs, both endpoint-owner
+dereferences and `(in = $selected OR out = $selected)`. Existing `has_sense`/`has_lexeme`
+ancestry reads resolve either sense or lexeme targets with bound IDs and deterministic
+`ORDER BY id LIMIT $limit`. Per-owner `_record` reads apply only that learner's overrides.
+Recognition graph/API tests exercise incoming/outgoing semantic and derivation edges, private
+endpoints/edges/ancestry and effective meanings without changing migrations or the dev database.
+
 ### Bounded distractor graph reads (3.2.2) ✅
 
 Verified with SDK 3.0 against migrated isolated databases at `127.0.0.1:8101`:
