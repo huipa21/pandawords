@@ -35,6 +35,10 @@
   never trigger recovery. Recovery resets local state rather than recursively calling logout.
   Cookie-changing operations wait for in-flight refresh, and session versions prevent stale
   results from restoring tokens after logout or a newer login.
+- Explicit logout with an expired bearer uses the independent auth transport to refresh once
+  and retry revocation with the rotated access token, without restoring visible auth.
+  Refresh 401/403 clears the cookie server-side and completes local logout; transport/server
+  failures remain visible errors. Queued logins wait until this cookie cleanup finishes.
 - Destructive actions (delete project, reset override) use `ConfirmAction`. Hiding a sense is
   reversible, so it doesn't need a confirm. Instead it shows a message with **Undo**.
 

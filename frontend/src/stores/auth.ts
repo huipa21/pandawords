@@ -116,14 +116,30 @@ export const useAuthStore = defineStore('auth', () => {
   function logout() {
     const token = accessToken.value
     reset()
+    const started = version
     return mutate(async () => {
       const logoutToken = cookieAccessToken ?? token
-      const result = await client.POST('/api/auth/logout', {
-        headers: logoutToken
-          ? { Authorization: `Bearer ${logoutToken}` }
+      const revoke = (bearer: string | null) => client.POST('/api/auth/logout', {
+        headers: bearer
+          ? { Authorization: `Bearer ${bearer}` }
           : {},
       }).catch(transportError)
-      cookieAccessToken = null
+      let result = await revoke(logoutToken)
+      if (result.response.status === 401) {
+        // This transport has no lifecycle recovery. Keep rotated credentials local:
+        // queued logins wait for revocation, and no stale result can restore auth.
+        const refreshed = await client.POST('/api/auth/refresh').catch(transportError)
+        if (!refreshed.data) {
+          if (![401, 403].includes(refreshed.response.status))
+            throw new AuthRequestError(normalizeApiError(refreshed.error, refreshed.response.status))
+          if (started === version)
+            cookieAccessToken = null
+          return
+        }
+        result = await revoke(refreshed.data.access_token)
+      }
+      if (started === version)
+        cookieAccessToken = null
       if (!result.response.ok)
         throw new AuthRequestError(normalizeApiError(result.error, result.response.status))
     })

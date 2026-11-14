@@ -127,4 +127,80 @@ describe('memory-only auth store', () => {
       error: { code: 'auth.invalid_credentials', field: 'current_password' },
     })
   })
+
+  it('refreshes an expired logout bearer independently, revokes its rotated cookie, and cannot overwrite a queued login', async () => {
+    const refreshed = deferred<Response>()
+    const calls: string[] = []
+    const fetch = vi.fn<typeof globalThis.fetch>(async (input, init) => {
+      const request = new Request(input, init)
+      const path = new URL(request.url).pathname
+      const bearer = request.headers.get('Authorization')
+      calls.push(`${path}:${bearer}`)
+      if (path.endsWith('/refresh'))
+        return refreshed.promise
+      if (path.endsWith('/logout')) {
+        return new Response(null, {
+          status: bearer === 'Bearer rotated-access'
+            ? 204
+            : 401,
+        })
+      }
+      return Response.json({
+        ...authPayload(),
+        access_token: calls.length === 1
+          ? 'expired-access'
+          : 'new-login-access',
+      })
+    })
+    vi.stubGlobal('fetch', fetch)
+    const auth = useAuthStore()
+    await auth.login({ username: 'learner', password: 'old-password' })
+    const logout = auth.logout()
+    const outcome = logout.then(() => null, error => error)
+    await vi.waitFor(() => expect(calls).toContain('/api/auth/logout:Bearer expired-access'))
+    const login = auth.login({ username: 'learner', password: 'new-password' })
+    refreshed.resolve(Response.json({
+      ...authPayload(),
+      access_token: 'rotated-access',
+    }))
+    expect(await outcome).toBeNull()
+    await login
+    expect(calls).toEqual([
+      '/api/auth/login:null',
+      '/api/auth/logout:Bearer expired-access',
+      '/api/auth/refresh:null',
+      '/api/auth/logout:Bearer rotated-access',
+      '/api/auth/login:null',
+    ])
+    expect(auth.accessToken).toBe('new-login-access')
+    expect(auth.user?.username).toBe('learner')
+  })
+
+  it.each([401, 403, 503, 'transport'] as const)('handles expired logout refresh failure %s without hiding server/transport errors', async (failure) => {
+    const fetch = vi.fn<typeof globalThis.fetch>(async (input, init) => {
+      if (new Request(input, init).url.endsWith('/logout'))
+        return new Response(null, { status: 401 })
+      if (failure === 'transport')
+        throw new Error('offline')
+      return new Response(null, { status: failure })
+    })
+    vi.stubGlobal('fetch', fetch)
+    const auth = useAuthStore()
+    const logout = auth.logout()
+    if (failure === 401 || failure === 403) {
+      await expect(logout).resolves.toBeUndefined()
+    }
+    else {
+      await expect(logout).rejects.toMatchObject({
+        error: {
+          code: failure === 'transport'
+            ? 'transport'
+            : 'http.503',
+        },
+      })
+    }
+    expect(auth.accessToken).toBeNull()
+    expect(auth.user).toBeNull()
+    expect(fetch).toHaveBeenCalledTimes(2)
+  })
 })
