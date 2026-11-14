@@ -117,8 +117,36 @@ running this flow. Normal Playwright reports/results remain gitignored.
   never dev data or a server lifecycle change.
 - `lexicon_small.sqlite`: about 50 words (polysemy: *run*, *bank*; phrase: *kick the bucket*,
   *give up*; US/UK: *schedule*, *tomato*; derivation: *decide → decision*). It is built by the
-  lexicon script from `backend/tests/fixtures/words.txt`.
+  production importer and ECDICT/frequency/OEWN enrichment hooks from the committed synthetic
+  `backend/tests/fixtures/lexicon-small.*`, `lexicon-small-ecdict.csv`,
+  `lexicon-small-oewn.xml` and `lexicon-small-frequency.json` sources. These original concise
+  glosses and frequency values are test inputs, not extracts or authoritative lexical claims.
+  `lexicon_reader` is a reusable pytest fixture returning the typed, async `LexiconReader`.
+  Derivation is currently etymology text; production affix extraction is deferred and the
+  committed affix table is empty. A private copy with affix rows tests the reader's ordering
+  and structured-key decoding without changing the production artifact.
 - The DeepSeek client is faked in tests by default. No network access in unit, integration or API tests.
+
+### Rebuild and verify the small lexicon
+
+From `backend`, with existing dependencies (no download or database service required):
+
+```powershell
+uv run --no-sync python -m scripts.build_fixture_lexicon
+# Optional alternate output; never overwrite a production lexicon for a test.
+uv run --no-sync python -m scripts.build_fixture_lexicon --output .dev\lexicon-small-rebuilt.sqlite
+New-Item -ItemType Directory -Force .dev | Out-Null
+uv run --no-sync pytest tests\unit\test_lexicon_reader.py --basetemp=.dev\lexicon-reader-tests -q
+```
+
+Default output is `backend/tests/fixtures/lexicon_small.sqlite`, regardless of working directory.
+Commit updated source inputs and the rebuilt database together. The focused tests rebuild into
+a worktree-local scratch directory and compare the complete logical SQL dump with the committed
+artifact (including source checksums). They cover exact/inflected/phrase lookup, polysemy,
+ranked/common senses, accents, translations, tags, frequencies, directional OEWN relations,
+missing/invalid databases and invalid record payloads. A read-only probe attempts a write on
+the actual connection before the service sets `query_only`; concurrent reads preserve the
+file's hash/mtime and leave no open Windows file handle or journal. No full lexicon is loaded.
 
 ## What to test
 

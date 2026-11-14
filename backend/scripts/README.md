@@ -308,3 +308,28 @@ uv run --no-sync pytest tests\unit\test_lexicon_oewn.py --basetemp=.dev\lexicon-
 
 From the repository root, run `.\scripts\dev.ps1 check` and
 `.\scripts\dev.ps1 test -Backend` for repository validation.
+
+### Committed runtime fixture (2.1.5)
+
+From `backend`, rebuild the 50-lemma fixture entirely offline:
+
+```powershell
+uv run --no-sync python -m scripts.build_fixture_lexicon
+uv run --no-sync python -m scripts.build_fixture_lexicon --output .dev\lexicon-small-rebuilt.sqlite
+```
+
+The default output is `tests\fixtures\lexicon_small.sqlite`. The curated word list
+`lexicon-small.words`, synthetic wiktextract `lexicon-small.jsonl`, ECDICT-shaped
+`lexicon-small-ecdict.csv`, WN-LMF `lexicon-small-oewn.xml` and explicit frequency snapshot
+`lexicon-small-frequency.json` are committed beside it. They contain original test glosses,
+not upstream extracts; source names in the database indicate the production processing route,
+not claims of upstream authenticity. The wrapper delegates to `build` with the word filter and
+the unmodified ECDICT, frequency and OEWN hooks; it never creates or patches SQLite rows itself.
+The injected frequency version is `synthetic-fixture-v1`. Input hashes and the logical database
+dump are reproducible; SQLite byte layout is not a compatibility guarantee.
+
+Derivation coverage currently means preserved `decide → decision` etymology text. Affix graph
+extraction is a later production feature; no fixture-only transform fabricates those rows.
+Use `app.services.lexicon.LexiconReader` for runtime reads and the pytest `lexicon_reader`
+fixture in consumers' tests. See [testing](../../docs/dev/testing.md#rebuild-and-verify-the-small-lexicon)
+for the focused offline test command.

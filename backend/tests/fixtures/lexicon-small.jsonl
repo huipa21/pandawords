@@ -1,0 +1,52 @@
+{"word":"run","lang_code":"en","pos":"verb","senses":[{"id":"run-move","glosses":["Move quickly on foot."],"examples":[{"text":"We run every morning."}],"topics":["motion"]},{"id":"run-operate","glosses":["Operate a machine or business."],"tags":["transitive"]},{"id":"run-flow","glosses":["Flow along a surface."]}],"forms":[{"form":"ran","tags":["past"]},{"form":"running","tags":["present","participle"]},{"form":"runs","tags":["third-person","singular"]}]}
+{"word":"run","lang_code":"en","pos":"noun","senses":[{"id":"run-outing","glosses":["An outing at a running pace."]}]}
+{"word":"bank","lang_code":"en","pos":"noun","etymology_number":1,"etymology_text":"A financial institution.","senses":[{"id":"bank-finance","glosses":["An institution that keeps and lends money."],"topics":["finance"]},{"id":"bank-reserve","glosses":["A reserve of things for later use."]}],"forms":[{"form":"banks","tags":["plural"]}]}
+{"word":"bank","lang_code":"en","pos":"noun","etymology_number":2,"etymology_text":"The side of a river.","senses":[{"id":"bank-river","glosses":["Raised ground beside a river."]}]}
+{"word":"give up","lang_code":"en","pos":"verb","senses":[{"id":"give-up-stop","glosses":["Stop trying to do something."]}],"forms":[{"form":"gave up","tags":["past"]},{"form":"given up","tags":["past","participle"]}]}
+{"word":"kick the bucket","lang_code":"en","pos":"verb","senses":[{"id":"kick-bucket-die","glosses":["Die."],"tags":["idiomatic","informal"]}],"forms":[{"form":"kicked the bucket","tags":["past"]}]}
+{"word":"schedule","lang_code":"en","pos":"noun","senses":[{"id":"schedule-plan","glosses":["A plan listing times for activities."]}],"sounds":[{"ipa":"/ˈskɛdʒuːl/","tags":["US"]},{"ipa":"/ˈʃɛdjuːl/","tags":["UK"]}]}
+{"word":"tomato","lang_code":"en","pos":"noun","senses":[{"id":"tomato-fruit","glosses":["A soft red fruit used as food."]}],"forms":[{"form":"tomatoes","tags":["plural"]}],"sounds":[{"ipa":"/təˈmeɪtoʊ/","tags":["US"]},{"ipa":"/təˈmɑːtəʊ/","tags":["UK"]}]}
+{"word":"decide","lang_code":"en","pos":"verb","senses":[{"id":"decide-choose","glosses":["Choose after thinking."]}],"forms":[{"form":"decided","tags":["past"]}],"derived":[{"word":"decision"}]}
+{"word":"decision","lang_code":"en","pos":"noun","etymology_text":"Derived from decide with the noun-forming suffix -ion; the stem changes to decis-.","etymology_templates":[{"name":"suffix","args":{"1":"en","2":"decide","3":"ion"}}],"senses":[{"id":"decision-choice","glosses":["A choice made after thinking."]}]}
+{"word":"walk","lang_code":"en","pos":"verb","senses":[{"id":"walk-move","glosses":["Move on foot at an ordinary pace."]}],"forms":[{"form":"walked","tags":["past"]}]}
+{"word":"move","lang_code":"en","pos":"verb","senses":[{"id":"move-position","glosses":["Change position or place."]}]}
+{"word":"happy","lang_code":"en","pos":"adj","senses":[{"id":"happy-pleased","glosses":["Feeling pleased and content."]}]}
+{"word":"sad","lang_code":"en","pos":"adj","senses":[{"id":"sad-unhappy","glosses":["Feeling unhappy or sorrowful."]}]}
+{"word":"joyful","lang_code":"en","pos":"adj","senses":[{"id":"joyful-pleased","glosses":["Feeling pleased and content."]}]}
+{"word":"animal","lang_code":"en","pos":"noun","senses":[{"id":"animal-living","glosses":["A living creature that eats and moves."]}]}
+{"word":"dog","lang_code":"en","pos":"noun","senses":[{"id":"dog-pet","glosses":["A barking animal often kept as a pet."]}],"forms":[{"form":"dogs","tags":["plural"]}]}
+{"word":"cat","lang_code":"en","pos":"noun","senses":[{"id":"cat-pet","glosses":["A small animal that meows."]}],"forms":[{"form":"cats","tags":["plural"]}]}
+{"word":"bird","lang_code":"en","pos":"noun","senses":[{"id":"bird-feathers","glosses":["An animal with feathers and wings."]}]}
+{"word":"fish","lang_code":"en","pos":"noun","senses":[{"id":"fish-water","glosses":["An animal that lives in water and has gills."]}]}
+{"word":"tree","lang_code":"en","pos":"noun","senses":[{"id":"tree-plant","glosses":["A tall plant with a wooden trunk."]}]}
+{"word":"leaf","lang_code":"en","pos":"noun","senses":[{"id":"leaf-plant","glosses":["A flat green part of a plant."]}],"forms":[{"form":"leaves","tags":["plural"]}]}
+{"word":"book","lang_code":"en","pos":"noun","senses":[{"id":"book-pages","glosses":["A set of pages joined for reading."]}]}
+{"word":"read","lang_code":"en","pos":"verb","senses":[{"id":"read-text","glosses":["Understand written words."]}],"forms":[{"form":"reading","tags":["present","participle"]}]}
+{"word":"write","lang_code":"en","pos":"verb","senses":[{"id":"write-text","glosses":["Make words using letters."]}],"forms":[{"form":"wrote","tags":["past"]},{"form":"written","tags":["past","participle"]}]}
+{"word":"go","lang_code":"en","pos":"verb","senses":[{"id":"go-travel","glosses":["Travel to another place."]}],"forms":[{"form":"went","tags":["past"]},{"form":"gone","tags":["past","participle"]}]}
+{"word":"eat","lang_code":"en","pos":"verb","senses":[{"id":"eat-food","glosses":["Take food into the mouth and swallow it."]}],"forms":[{"form":"ate","tags":["past"]},{"form":"eaten","tags":["past","participle"]}]}
+{"word":"drink","lang_code":"en","pos":"verb","senses":[{"id":"drink-liquid","glosses":["Take liquid into the mouth and swallow it."]}]}
+{"word":"sleep","lang_code":"en","pos":"verb","senses":[{"id":"sleep-rest","glosses":["Rest with eyes closed and awareness reduced."]}],"forms":[{"form":"slept","tags":["past"]}]}
+{"word":"learn","lang_code":"en","pos":"verb","senses":[{"id":"learn-knowledge","glosses":["Gain knowledge or skill."]}]}
+{"word":"teach","lang_code":"en","pos":"verb","senses":[{"id":"teach-knowledge","glosses":["Help someone gain knowledge or skill."]}],"forms":[{"form":"taught","tags":["past"]}]}
+{"word":"child","lang_code":"en","pos":"noun","senses":[{"id":"child-young","glosses":["A young person."]}],"forms":[{"form":"children","tags":["plural"]}]}
+{"word":"person","lang_code":"en","pos":"noun","senses":[{"id":"person-human","glosses":["A human individual."]}],"forms":[{"form":"people","tags":["plural"]}]}
+{"word":"city","lang_code":"en","pos":"noun","senses":[{"id":"city-settlement","glosses":["A large settlement with many buildings."]}],"forms":[{"form":"cities","tags":["plural"]}]}
+{"word":"country","lang_code":"en","pos":"noun","senses":[{"id":"country-nation","glosses":["A nation with its own government."]}]}
+{"word":"water","lang_code":"en","pos":"noun","senses":[{"id":"water-liquid","glosses":["A clear liquid needed by living things."]}]}
+{"word":"food","lang_code":"en","pos":"noun","senses":[{"id":"food-nourishment","glosses":["Something eaten for nourishment."]}]}
+{"word":"house","lang_code":"en","pos":"noun","senses":[{"id":"house-building","glosses":["A building where people live."]}]}
+{"word":"home","lang_code":"en","pos":"noun","senses":[{"id":"home-place","glosses":["The place where someone lives."]}]}
+{"word":"school","lang_code":"en","pos":"noun","senses":[{"id":"school-learning","glosses":["A place where students learn."]}]}
+{"word":"work","lang_code":"en","pos":"verb","senses":[{"id":"work-task","glosses":["Spend effort on a task."]}]}
+{"word":"play","lang_code":"en","pos":"verb","senses":[{"id":"play-fun","glosses":["Do an activity for enjoyment."]}]}
+{"word":"light","lang_code":"en","pos":"noun","senses":[{"id":"light-visible","glosses":["Energy that makes things visible."]}]}
+{"word":"dark","lang_code":"en","pos":"adj","senses":[{"id":"dark-unlit","glosses":["Having little or no light."]}]}
+{"word":"hot","lang_code":"en","pos":"adj","senses":[{"id":"hot-temperature","glosses":["Having a high temperature."]}]}
+{"word":"cold","lang_code":"en","pos":"adj","senses":[{"id":"cold-temperature","glosses":["Having a low temperature."]}]}
+{"word":"big","lang_code":"en","pos":"adj","senses":[{"id":"big-size","glosses":["Large in size."]}]}
+{"word":"small","lang_code":"en","pos":"adj","senses":[{"id":"small-size","glosses":["Little in size."]}]}
+{"word":"quick","lang_code":"en","pos":"adj","senses":[{"id":"quick-speed","glosses":["Moving with speed."]}]}
+{"word":"slow","lang_code":"en","pos":"adj","senses":[{"id":"slow-speed","glosses":["Moving without speed."]}]}
+{"word":"good","lang_code":"en","pos":"adj","senses":[{"id":"good-quality","glosses":["Having a desirable quality."]}]}
+{"word":"bad","lang_code":"en","pos":"adj","senses":[{"id":"bad-quality","glosses":["Having an undesirable quality."]}]}

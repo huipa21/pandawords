@@ -1,4 +1,5 @@
 from collections.abc import AsyncIterator
+from pathlib import Path
 from typing import Protocol
 from uuid import uuid4
 
@@ -12,8 +13,14 @@ from app.db.test_support import isolated_database, test_database_settings
 from app.domain.auth import Role, User, UserCreate
 from app.main import create_app
 from app.services.auth import create_user
+from app.services.lexicon import LexiconReader
 
 pytest_plugins = ["tests.snapshot_plugin"]
+
+
+@pytest.fixture
+def lexicon_reader() -> LexiconReader:
+    return LexiconReader(Path(__file__).parent / "fixtures" / "lexicon_small.sqlite")
 
 
 @pytest.fixture(scope="session")
