@@ -17,7 +17,12 @@ Start internal dependents only after prerequisites are merged and verified. Seri
 API contract regeneration and snapshot conflict resolution. No dependency junctions or symlinks
 between worktrees; never traverse reparse points during cleanup. Shared services/ports must not be
 stopped or reset by agents. Agents use existing isolated random-database tests on port 8101.
-Main baseline `dev.ps1 check` passed; backend/frontend baseline tests are running.
+Main baseline `dev.ps1 check` passed. Baseline backend: 894 passed (existing Starlette warning).
+Baseline frontend: 161 passed, one pre-existing token-enforcement five-second timeout under the
+default 24-worker load. Its bounded rerun (`--maxWorkers=2 --testTimeout=60000`) passed 12/12;
+the complete bounded frontend baseline then passed 162/162. No unrelated timeout/configuration
+changes made. Main started the owned offline dev stack for syntax/browser verification
+(LLM budget zero, placeholder key, audio networking disabled); 8100/8000/5173 are ready.
 Coordination: another session is drafting `phase-5.md` only. Preserve that unrelated document
 without staging it; no Phase 5 implementation or cross-phase concurrent integration is authorized.
 
