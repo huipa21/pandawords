@@ -28,6 +28,23 @@ Shared rows use deterministic IDs, so materialization is idempotent and imports 
 
 User-created rows use random IDs (ULID strings).
 
+`app/domain/dictionary_keys.py` is the shared source of lemma, lexeme and sense keys:
+`lemma_key(lang, text)`, `lexeme_key(lang, text, pos, etymology_no=1)` and
+`sense_key(lang, text, pos, etymology_no=1, *, source_sense_id=None, gloss=None)`.
+Each returns the array used in `RecordID(table, key)`; it does not access the database.
+Language, lemma text, POS and fallback gloss are Unicode NFKC-normalized, case-folded, stripped
+and have whitespace runs collapsed to one space. Blank components are rejected. POS names are
+not aliased: callers must supply the canonical source POS. Etymology numbers are positive integers
+(not booleans); distinct POS and etymology values remain distinct identities.
+
+A nonblank stable source sense ID takes precedence over the gloss and is preserved verbatim
+(case-sensitive and not normalized). Without one, the sense key is the first 12 lowercase hex
+characters of SHA-1 over the normalized gloss's UTF-8 bytes. Missing or blank identity is an error.
+Gloss edits change fallback identity, but not source-ID identity. The truncated hash is an
+identity fallback, not a security primitive or a collision-free guarantee.
+
+API transport uses `app/core/record_ids.py`; see [conventions](../dev/conventions.md#api).
+
 ## Dictionary tables
 
 | Table | Fields |
