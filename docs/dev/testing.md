@@ -1,5 +1,37 @@
 # Testing
 
+## Daily plan and dashboard (3.1.3)
+
+From `backend`, with `SURREAL_TEST_URL=ws://127.0.0.1:8101/rpc` and loopback proxy bypass:
+`uv run --no-sync pytest -q tests\unit\test_study_plan.py tests\api\test_daily_plan.py
+tests\api\test_plan_statistics.py`.
+
+Pure tests cover exact exam suggestion/capacity, zero limits, passed/today instants, future
+midnight versus 00:01, offset-aware local midnight and the separate buffer deadline;
+deterministic FSRS retrievability/fallback ordering, completed allowances, actual seven-date
+forecasts, UTC retention boundaries, streak endings and shared-card capacity allocation.
+Real migrated API fixtures cover empty projects, auth/cross-user access on all endpoints,
+pagination bounds, full plan replacement, persistent reorder/hidden slots and timestamp
+preservation, hidden ancestors, content/edge/membership owner isolation, shared cards reviewed
+in different projects, zero/unlimited/exhausted limits, UTC reset, history isolation and legacy
+reconciliation without introduction. Migration `0016` participates in snapshot generation and
+normal drift/replay checks. Pylance could not resolve this worktree's new file; actual runtime
+tests, basedpyright and Ruff provide validation instead.
+
+Verification on 2026-11-14: full backend snapshot-update suite passed **689 tests**; final
+normal focused planning/schema/migration/SRS-limit suite passed **46 tests** (29 planning
+cases). `dev.ps1 check` and `gen-api` passed. The standard frontend runner twice timed out the
+existing token-enforcement test at 20 seconds; the unchanged full suite passed **109 tests**
+with `pnpm exec vitest run --reporter=dot --maxWorkers=1 --no-file-parallelism`.
+An initial quality run caught typed tree-table fixture arguments; another overlapped the
+backend migration tests' temporary probe files and linted them before their automatic cleanup.
+The final quality run after suite completion was clean. Initial focused collection used
+duplicate test module basenames; unique names fixed collection. An ownership fixture initially
+changed a different lexeme edge; selecting the actual ancestry fixed the probe.
+Missing worktree dependencies were restored through `uv sync` and the API generator's pnpm
+install, without manifest changes. The existing Starlette/httpx warning remains. No E2E,
+stack lifecycle operations, persistent dev-DB mutation or unrelated changes were performed.
+
 ## Scheduling service (3.1.2)
 
 Focused command from `backend`, using isolated random databases on the healthy existing

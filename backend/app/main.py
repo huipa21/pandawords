@@ -20,6 +20,7 @@ from app.api.notes import router as notes_router
 from app.api.overrides import router as overrides_router
 from app.api.project_tree import router as project_tree_router
 from app.api.projects import router as projects_router
+from app.api.study_plan import router as study_plan_router
 from app.api.user_dictionary import router as user_dictionary_router
 from app.core.config import Settings
 from app.core.errors import (
@@ -105,6 +106,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(media_router)
     app.include_router(admin_router)
     app.include_router(projects_router)
+    app.include_router(study_plan_router)
     app.include_router(project_tree_router)
     app.include_router(candidates_router)
     app.include_router(add_to_project_router)

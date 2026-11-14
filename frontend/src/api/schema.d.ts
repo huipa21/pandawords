@@ -247,6 +247,57 @@ export interface paths {
     patch: operations['update_project_api_projects__id__patch']
     trace?: never
   }
+  '/api/projects/{id}/study-plan': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Read Plan */
+    get: operations['read_plan_api_projects__id__study_plan_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/projects/{id}/study-plan/order': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Reorder */
+    put: operations['reorder_api_projects__id__study_plan_order_put']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/dashboard': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Read Dashboard */
+    get: operations['read_dashboard_api_dashboard_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/projects/{project_id}/tree': {
     parameters: {
       query?: never
@@ -520,6 +571,38 @@ export interface components {
       /** Sources */
       sources: components['schemas']['LexiconSource'][]
     }
+    /** CardState */
+    'CardState': {
+      /** Card Id */
+      card_id: number
+      state: components['schemas']['State']
+      /** Step */
+      step?: number | null
+      /** Stability */
+      stability?: number | null
+      /** Difficulty */
+      difficulty?: number | null
+      /**
+       * Due
+       * Format: date-time
+       */
+      due: string
+      /** Last Review */
+      last_review?: string | null
+    }
+    /** CompletedCounts */
+    'CompletedCounts': {
+      /**
+       * New
+       * @default 0
+       */
+      new: number
+      /**
+       * Reviews
+       * @default 0
+       */
+      reviews: number
+    }
     /** CustomSenseCreate */
     'CustomSenseCreate': {
       definition: components['schemas']['app__domain__overrides__Text__2']
@@ -540,6 +623,27 @@ export interface components {
        * @default false
        */
       common: boolean
+    }
+    /** DashboardRead */
+    'DashboardRead': {
+      /**
+       * As Of
+       * Format: date-time
+       */
+      as_of: string
+      /** Due Today */
+      due_today: number
+      /** New Today */
+      new_today: number
+      today: components['schemas']['CompletedCounts']
+      /** Retention 30 Days */
+      retention_30_days: number | null
+      /** Streak */
+      streak: number
+      /** Forecast */
+      forecast: components['schemas']['ForecastDay'][]
+      /** Projects */
+      projects: components['schemas']['ProjectForecast'][]
     }
     /** DictionaryEntryRead */
     'DictionaryEntryRead': {
@@ -571,6 +675,33 @@ export interface components {
     }
     /** @enum {string} */
     'DictionaryTable': 'lemma' | 'lexeme' | 'sense' | 'morpheme' | 'tag' | 'sentence' | 'passage'
+    /** ExamPacing */
+    'ExamPacing': {
+      /** Remaining New */
+      remaining_new: number
+      /** Days Left */
+      days_left: number
+      /** Suggested Daily New */
+      suggested_daily_new: number
+      /** Capacity */
+      capacity: number
+      /** Buffer Capacity */
+      buffer_capacity: number
+      /** Impossible */
+      impossible: boolean
+      /** Buffer At Risk */
+      buffer_at_risk: boolean
+    }
+    /** ForecastDay */
+    'ForecastDay': {
+      /**
+       * Date
+       * Format: date
+       */
+      date: string
+      /** Due */
+      due: number
+    }
     /** Form */
     'Form-Input': {
       form: components['schemas']['app__domain__overrides__Text__1']
@@ -716,6 +847,16 @@ export interface components {
       /** Password */
       password: string
     }
+    /** MemoryRead */
+    'MemoryRead': {
+      /** Id */
+      id: string
+      /** Sense Id */
+      sense_id: string
+      /** Introduced */
+      introduced: boolean
+      card: components['schemas']['CardState']
+    }
     /** NoteCreate */
     'NoteCreate': {
       target_table: components['schemas']['DictionaryTable']
@@ -854,6 +995,21 @@ export interface components {
       source_lang: string
       plan?: components['schemas']['ProjectPlan']
     }
+    /** ProjectForecast */
+    'ProjectForecast': {
+      /** Project Id */
+      project_id: string
+      /** Name */
+      name: string
+      /** Due */
+      due: number
+      /** New */
+      new: number
+      today: components['schemas']['CompletedCounts']
+      /** Forecast */
+      forecast: components['schemas']['ForecastDay'][]
+      exam: components['schemas']['ExamPacing'] | null
+    }
     /** ProjectMembershipRead */
     'ProjectMembershipRead': {
       /** Id */
@@ -986,6 +1142,18 @@ export interface components {
       ipa: components['schemas']['Text-Output']
     }
     'Rank': number
+    /** SenseOrderRead */
+    'SenseOrderRead': {
+      /** Project Id */
+      project_id: string
+      /** Sense Ids */
+      sense_ids: string[]
+    }
+    /** SenseOrderUpdate */
+    'SenseOrderUpdate': {
+      /** Sense Ids */
+      sense_ids: string[]
+    }
     /** SrsPreferences */
     'SrsPreferences': {
       /**
@@ -998,6 +1166,56 @@ export interface components {
     'SrsPreferencesUpdate': {
       /** Desired Retention */
       desired_retention: number
+    }
+    /**
+     * State
+     * @description Enum representing the learning state of a Card object.
+     * @enum {integer}
+     */
+    'State': 1 | 2 | 3
+    /** StudyPlanRead */
+    'StudyPlanRead': {
+      /** Project Id */
+      project_id: string
+      /**
+       * As Of
+       * Format: date-time
+       */
+      as_of: string
+      plan: components['schemas']['ProjectPlan']
+      /** Due */
+      due: number
+      /** New */
+      new: number
+      today: components['schemas']['CompletedCounts']
+      /** Remaining New Allowance */
+      remaining_new_allowance: number
+      /** Remaining Review Allowance */
+      remaining_review_allowance: number | null
+      /** Queue */
+      queue: components['schemas']['StudyQueueItem'][]
+      /** Queue Total */
+      queue_total: number
+      /** Offset */
+      offset: number
+      /** Limit */
+      limit: number
+      exam: components['schemas']['ExamPacing'] | null
+      /** Forecast */
+      forecast: components['schemas']['ForecastDay'][]
+    }
+    /** StudyQueueItem */
+    'StudyQueueItem': {
+      /**
+       * Kind
+       * @enum {string}
+       */
+      kind: 'review' | 'new'
+      memory: components['schemas']['MemoryRead']
+      /** Retrievability */
+      retrievability?: number | null
+      /** Memory Version */
+      readonly memory_version: string
     }
     'Text-Output': string
     /** UserPreferences */
@@ -1631,6 +1849,95 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  read_plan_api_projects__id__study_plan_get: {
+    parameters: {
+      query?: {
+        offset?: number
+        limit?: number
+      }
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['StudyPlanRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  reorder_api_projects__id__study_plan_order_put: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SenseOrderUpdate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SenseOrderRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  read_dashboard_api_dashboard_get: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DashboardRead']
         }
       }
     }
