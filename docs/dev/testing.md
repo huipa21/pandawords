@@ -1,5 +1,34 @@
 # Testing
 
+## Bounded graph API (4.4.1)
+
+From `backend`, against the existing healthy loopback **8101** server:
+
+```powershell
+$env:NO_PROXY = '127.0.0.1,localhost'
+$env:SURREAL_TEST_URL = 'ws://127.0.0.1:8101/rpc'
+uv run --no-sync pytest -q --basetemp=.pytest_graph tests\api\test_graph.py tests\api\test_graph_bounds.py
+```
+
+These tests exercise the real authenticated router and migrated isolated database, not mocked
+traversal. They cover all seven node types/nine relations, effective overrides, depth/direction,
+stored orientation, isolated focuses, deterministic ordering, malformed IDs, hidden ancestors,
+project union, own records without selections, foreign edges/endpoints and unselected shared
+neighbours. Bounds tests accept exactly 300 nodes, reject 301 without partial output, and reject
+a 101-node complete graph containing 10,201 edges. Instrumentation counts real query responses:
+at most 55 reads per measured request, at most 10,001 rows per read, and bounded aggregate rows.
+Depth reduction succeeds after rejection. Dense fixture writes are batched to fit the harness's
+two-second query deadline. No shared service lifecycle or migration change is required.
+
+Verification on 2026-11-14: the graph suites plus dictionary/project-tree regressions passed
+**30 tests in 30.63 seconds** (22 graph cases). `dev.ps1 gen-api`, `dev.ps1 check`,
+`dev.ps1 test -Frontend`, and `git diff --check` passed. The frontend runner prints only
+`Selected tests passed`, not a case count. No full backend suite or E2E run was performed;
+the coordinator runs integrated suites. Initial worktree Ruff absence was resolved with
+`uv sync --frozen --quiet`; generation restored its own local locked frontend tools.
+Initial fixture schema/SDK assumptions, the boolean parser form and dense seed query timeout
+were corrected before the final clean runs. No dependencies were symlinked.
+
 ## Sentence and passage schema contract (4.2.1)
 
 From `backend`, with the existing healthy loopback **8101** test server:
