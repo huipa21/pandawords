@@ -19,7 +19,8 @@ browser logs will be committed as source.
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
 | 2.1.2 | task/2.1.2-core-lexicon | ../pandawords.worktrees/2.1.2 | Starting; streaming SQLite builder |
-| 2.2.1 | task/2.2.1-dictionary-schema | ../pandawords.worktrees/2.2.1 | Starting; dictionary schema |
+| 2.3.1 | task/2.3.1-project-schema | ../pandawords.worktrees/2.3.1 | Starting; project and overlays |
+| 2.5.1 | task/2.5.1-media | ../pandawords.worktrees/2.5.1 | Starting; authenticated media |
 | 2.6.1 | task/2.6.1-word-components | ../pandawords.worktrees/2.6.1 | Starting; shared word UI |
 
 ## Blocked
@@ -46,6 +47,18 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 2.2.1 Shared dictionary schema
+- Result / completed: seven SCHEMAFULL dictionary tables and nine enforced relations, nested
+  field types, ownership and indexes; `d757d55` merged with generated schema snapshot.
+- Dependencies: 1.3.4 and 1.3.5 checked ✅. Project schema and media now ready and starting.
+- Verification: real SurrealDB 3.3.5; agent 47 focused tests, snapshot-update and normal backend
+  each 238 passed, `check` passed. Main merge `check` and combined backend/frontend passed
+  (321 backend tests).
+- Skipped / deferred: media metadata to 2.5.1; project overlays to 2.3.1, as planned.
+- Failures / causes / corrections: initial missing environments restored after failed commands;
+  syntax findings verified and documented. No unresolved failures or blockers.
+- Follow-ups: branch/worktree removed after verification; repeat migration and drift covered.
 
 ### 2026-11-14 — 2.1.1 Lexicon downloads
 - Result / completed: independent official-first downloads, explicit fallbacks, pinned checksums,
