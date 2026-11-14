@@ -1190,6 +1190,90 @@
         ]
       }
     },
+    "/api/dictionary/{table}/{id}/phrases": {
+      "get": {
+        "tags": [
+          "dictionary"
+        ],
+        "summary": "Containing Phrases",
+        "operationId": "containing_phrases_api_dictionary__table___id__phrases_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "table",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "enum": [
+                "lemma",
+                "lexeme"
+              ],
+              "type": "string",
+              "title": "Table"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 10000,
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 50,
+              "minimum": 1,
+              "default": 20,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContainingPhrasesRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/exercise-attempts": {
       "post": {
         "tags": [
@@ -2987,6 +3071,67 @@
         },
         "type": "object",
         "title": "CompletedCounts"
+      },
+      "ContainingPhraseRead": {
+        "properties": {
+          "entry": {
+            "$ref": "#/components/schemas/DictionaryEntryRead"
+          },
+          "candidate": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Candidate"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "entry"
+        ],
+        "title": "ContainingPhraseRead"
+      },
+      "ContainingPhrasesRead": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ContainingPhraseRead"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/LexiconSource"
+            },
+            "type": "array",
+            "title": "Sources"
+          },
+          "offset": {
+            "type": "integer",
+            "title": "Offset"
+          },
+          "limit": {
+            "type": "integer",
+            "title": "Limit"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "sources",
+          "offset",
+          "limit",
+          "has_more"
+        ],
+        "title": "ContainingPhrasesRead"
       },
       "CustomSenseCreate": {
         "properties": {

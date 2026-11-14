@@ -1,5 +1,37 @@
 # Testing
 
+## Phrase discovery and normal add flow (4.1.2)
+
+Using the existing healthy 8101 server, from `backend`:
+
+```powershell
+$env:NO_PROXY = '127.0.0.1,localhost'
+$env:SURREAL_TEST_URL = 'ws://127.0.0.1:8101/rpc'
+uv run --no-sync pytest -q --basetemp=.pytest_phrase_flow tests\api\test_phrases.py tests\api\test_add_to_project.py tests\api\test_candidates_endpoints.py tests\integration\test_phrase_materialization.py
+```
+
+From `frontend`:
+
+```powershell
+pnpm exec vitest run src\features\words\ContainingPhrases.test.ts src\features\projects\AddWordDialog.test.ts src\features\words\LemmaDetailPage.test.ts --maxWorkers=2 --testTimeout=60000 --reporter=dot
+```
+
+Cases cover exact graph components, deduplication, stable pagination/bounds, invisible
+endpoints/edges/ancestry, authentication, missing targets and no matches. A two-sense phrase
+fixture proves explicit-only selection and unchanged memberships/FSRS cards after a real
+review and repeat/cross-project adds. Frontend cases exercise composition wording, exact
+phrase navigation, project choice, ordinary candidate search/selected-sense add, and both
+locales' loading/empty/error retry states. OpenAPI generation uses `dev.ps1 gen-api`.
+
+Verification on 2026-11-14: the focused backend command passed **11 tests**, the frontend
+command passed **15 tests**, `dev.ps1 gen-api` completed and `dev.ps1 check` passed.
+Initial test-only fixture omissions, an async-generator assertion, incomplete API mocking
+and unsupported nested `setProps`/button selectors were corrected before these passing runs.
+The initial quality check caught formatting and was rerun successfully after formatting.
+Full backend/frontend suites and browser/E2E were not run for this isolated task; the
+coordinator performs integrated validation. No service lifecycle/reset, migration, external
+LLM or dependency junction/symlink operation was performed.
+
 ## Sentence and passage schema contract (4.2.1)
 
 From `backend`, with the existing healthy loopback **8101** test server:

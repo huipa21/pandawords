@@ -17,6 +17,17 @@
 - The root provides Naive config, message, dialog and notification contexts to both layouts.
   Bottom navigation reserves token-based space plus the device safe area.
 
+## Phrase discovery and adding (4.1.2)
+
+Word detail's `ContainingPhrases` region renders bilingual loading, empty and retryable error
+states, followed by bounded “Load more” pages. It explicitly describes component membership,
+not literal sense usage. Each phrase navigates by its own opaque lemma ID to the existing
+word detail route. `PhraseAddAction` loads the authenticated user's projects (with pagination),
+requires an explicit project choice and opens `AddWordDialog` prefilled with phrase text.
+The dialog still searches the dictionary and asks for explicit senses before the ordinary
+project add request; no discovery or navigation automatically adds memberships.
+Missing projects and project-fetch failures are localized and recoverable.
+
 ## Forms
 
 - `NForm` with `rules`. Labels sit on top. The submit button goes at the end and shows `loading`
