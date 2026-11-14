@@ -138,47 +138,6 @@ def add_sounds(connection: sqlite3.Connection, entry: dict[str, Any], lexeme_id:
             )
 
 
-def add_affixes(connection: sqlite3.Connection, entry: dict[str, Any], lexeme_id: str) -> None:
-    """Preserve an unambiguous English {{suffix|en|base|suffix}} decomposition."""
-    candidates: set[tuple[str, str]] = set()
-    for template in objects(entry.get("etymology_templates")):
-        if template.get("name") not in ("suffix", "suf"):
-            continue
-        arguments = template.get("args")
-        if not isinstance(arguments, dict) or arguments.get("1") != "en":
-            continue
-        if any(arguments.get(name) not in (None, "", "en") for name in ("lang1", "lang2")):
-            continue
-        if any(
-            name.isdecimal() and int(name) > 3 and value not in (None, "")
-            for name, value in arguments.items()
-        ):
-            continue
-        root, suffix = arguments.get("2"), arguments.get("3")
-        if not isinstance(root, str) or not root.strip():
-            continue
-        if not isinstance(suffix, str) or not suffix.strip():
-            continue
-        if any(character in root + suffix for character in "[]{}|<>"):
-            continue
-        root = str(lemma_key("en", root)[1])
-        suffix = str(lemma_key("en", suffix)[1]).removeprefix("-")
-        if root == "-" or not suffix:
-            continue
-        candidates.add((root, f"-{suffix}"))
-    if len(candidates) != 1:
-        return
-    root, suffix = candidates.pop()
-    # Keep the template's base lemma, not an alt1 display stem (decide, not decis).
-    connection.executemany(
-        "INSERT OR IGNORE INTO affix VALUES (?, ?, ?, ?, ?)",
-        [
-            (lexeme_id, 0, root, "root", "wiktionary"),
-            (lexeme_id, 1, suffix, "suffix", "wiktionary"),
-        ],
-    )
-
-
 def import_entry(connection: sqlite3.Connection, entry: dict[str, Any]) -> int:
     """Import one English entry; return the number of skipped unusable senses."""
     if entry.get("lang_code") != "en" or not isinstance(entry.get("senses"), list):
@@ -206,7 +165,10 @@ def import_entry(connection: sqlite3.Connection, entry: dict[str, Any]) -> int:
     )
     skipped = add_senses(connection, entry, lexeme_id)
     add_sounds(connection, entry, lexeme_id)
-    add_affixes(connection, entry, lexeme_id)
+    # Import locally because the parser shares canonical JSON helpers with this module.
+    from .lexicon_morphology import add_analysis
+
+    add_analysis(connection, entry, lexeme_id)
     for form in objects(entry.get("forms")):
         text = form.get("form")
         if not isinstance(text, str) or not text.strip():

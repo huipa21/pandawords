@@ -1,5 +1,16 @@
 # Learning engine
 
+### Morphology discovery contract (4.3.2)
+
+Existing morphology distractor ranking consumes materialized `morph_group` sense memberships;
+no exercise consumer should derive groups from matching word fragments. The service functions
+`morphology.read_morphemes(db,user,lexeme_id)` and
+`read_group_members(db,user,target_id,table,limit=100)` accept opaque IDs. Group targets are
+sense/morpheme only, candidates are deduplicated and deterministically ID-sorted, and limits
+are bounded to 1–300. All relation/endpoint/tag owners are checked independently; unrelated
+tag kinds and hierarchy members are excluded. Missing analyses/groups are ordinary empty
+results, not a reason to guess candidates or invoke an LLM during exercise selection.
+
 ## Unit of memory
 
 One FSRS card per **(user, sense)**, stored as `memory:[user, sense]`. A phrase's senses are cards

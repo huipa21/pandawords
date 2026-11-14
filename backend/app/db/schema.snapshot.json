@@ -75,9 +75,12 @@
         "in": "DEFINE FIELD in ON composed_of TYPE record<lexeme> PERMISSIONS FULL",
         "order": "DEFINE FIELD order ON composed_of TYPE int PERMISSIONS FULL",
         "out": "DEFINE FIELD out ON composed_of TYPE record<morpheme> PERMISSIONS FULL",
-        "owner": "DEFINE FIELD owner ON composed_of TYPE none | record<user> PERMISSIONS FULL"
+        "owner": "DEFINE FIELD owner ON composed_of TYPE none | record<user> PERMISSIONS FULL",
+        "source": "DEFINE FIELD source ON composed_of TYPE none | string PERMISSIONS FULL"
       },
-      "indexes": {},
+      "indexes": {
+        "composed_owner_in_order": "DEFINE INDEX composed_owner_in_order ON composed_of FIELDS owner, in, order"
+      },
       "lives": {},
       "tables": {}
     },
@@ -285,7 +288,8 @@
       "fields": {
         "in": "DEFINE FIELD in ON member_of TYPE record<sense | morpheme | tag> PERMISSIONS FULL",
         "out": "DEFINE FIELD out ON member_of TYPE record<tag> PERMISSIONS FULL",
-        "owner": "DEFINE FIELD owner ON member_of TYPE none | record<user> PERMISSIONS FULL"
+        "owner": "DEFINE FIELD owner ON member_of TYPE none | record<user> PERMISSIONS FULL",
+        "source": "DEFINE FIELD source ON member_of TYPE none | string PERMISSIONS FULL"
       },
       "indexes": {
         "member_owner_in": "DEFINE INDEX member_owner_in ON member_of FIELDS owner, in",
@@ -321,6 +325,7 @@
       "fields": {
         "meaning": "DEFINE FIELD meaning ON morpheme TYPE none | string PERMISSIONS FULL",
         "owner": "DEFINE FIELD owner ON morpheme TYPE none | record<user> PERMISSIONS FULL",
+        "source": "DEFINE FIELD source ON morpheme TYPE none | string PERMISSIONS FULL",
         "text": "DEFINE FIELD text ON morpheme TYPE string PERMISSIONS FULL",
         "type": "DEFINE FIELD type ON morpheme TYPE 'prefix' | 'root' | 'suffix' | 'infix' PERMISSIONS FULL"
       },

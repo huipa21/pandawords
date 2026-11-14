@@ -1,5 +1,17 @@
 # Testing
 
+### Evidenced morphology (4.3.2)
+
+Run from `backend`: `uv run --no-sync pytest tests\integration\test_morphology.py
+tests\unit\test_lexicon_affixes.py -q --basetemp=.pytest-morphology`.
+The offline builder tests template aliases, normalization, diagnostics, conflicts, source
+order and repeats. Real random databases on the existing 8101 server verify shared IDs,
+provenance, repeated-component edges, insert-only retries/conflicts, owner-filtered
+composition/group reads and LLM failure/rejection without guessed records. The integration
+fixture is built through the production pipeline and includes explicit root/affix identities.
+The committed general lexicon is rebuilt as schema v3; its missing `-ion` mapping intentionally
+remains unanalysed. No service restart or live user database reset is needed.
+
 ## Sentence and passage schema contract (4.2.1)
 
 From `backend`, with the existing healthy loopback **8101** test server:

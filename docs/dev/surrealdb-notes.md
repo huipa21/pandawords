@@ -1,5 +1,16 @@
 # SurrealDB 3.3 notes
 
+### Morphology provenance and bounded group reads (4.3.2) ✅
+
+Verified against existing loopback 8101, SurrealDB 3.3.5 / SDK 3.0, using migrated random
+databases: migration 0021's optional source fields and composite owner/in/order index apply;
+bound `out.* AS morpheme` expansion preserves composition order and source. Membership reads
+authorize both dereferenced endpoints and edge owner, check `out.kind = 'morph_group'`,
+then bind the authorized tag IDs to the candidate query. Repeated endpoint pairs with distinct
+position-bearing relation IDs persist independently. Insert-only transaction retries preserve
+private rows/edges and fail atomically on conflicting shared analyses. Retained probes:
+`test_morphology.py`. No persistent development data or service state was changed.
+
 ### Sentence and passage schema contract (4.2.1) ✅
 
 Verified 2026-11-14 against **SurrealDB 3.3.5 / SDK 3.0**, using fresh random databases on

@@ -104,6 +104,14 @@ class LexiconAffix(LexiconRecord):
     source: str
 
 
+class LexiconMorphologyAnalysis(LexiconRecord):
+    lexeme_id: DictionaryKey
+    status: Literal["absent", "supported", "rejected"]
+    reason: str
+    components: list[list[str]]
+    source: str
+
+
 class LexiconSource(LexiconRecord):
     name: str
     metadata: dict[str, JsonValue]

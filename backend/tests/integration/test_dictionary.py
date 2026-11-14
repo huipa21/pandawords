@@ -174,8 +174,8 @@ async def test_affixes_and_relations_are_idempotent_without_recursive_expansion(
     affixes = await read_edges(
         db, user.id, decision.lexeme_ids[0], "lexeme", relation="composed_of"
     )
-    assert sorted(cast(int, edge.fields["order"]) for edge in affixes) == [0, 1]
-    assert len(affixes) == 2
+    # This fixture has no source entry identifying the -ion morpheme.
+    assert affixes == []
     all_edges = await read_edges(db, user.id, decision.lexeme_ids[0], "lexeme")
     assert {edge.id for edge in affixes} < {edge.id for edge in all_edges}
     await materialize_lemma(db, lexicon_reader, "decision", selected_senses=[])

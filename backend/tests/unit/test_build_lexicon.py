@@ -95,6 +95,7 @@ def test_core_schema_keys_senses_forms_and_attribution(tmp_path: Path) -> None:
             "freq",
             "relation",
             "affix",
+            "morphology_analysis",
             "phrase_component",
             "phrase_usage",
         }

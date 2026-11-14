@@ -143,10 +143,10 @@ place. Any ordinary failure removes the stage and leaves existing output untouch
 process termination may leave a hidden stage/journal; never treat it as the final artifact.
 Use read-only runtime connections; close readers before replacement on Windows.
 
-### SQLite v2 and extension contract
+### SQLite v3 and extension contract
 
-`scripts.lexicon_schema` owns the DDL; `PRAGMA user_version = 2`. Rebuild v1 artifacts before
-deploying the v2 runtime reader; the application database needs no migration. All IDs and foreign IDs are
+`scripts.lexicon_schema` owns the DDL; `PRAGMA user_version = 3`. Rebuild v1/v2 artifacts before
+deploying the v3 runtime reader. Application migration 0021 adds morphology provenance. All IDs and foreign IDs are
 TEXT. Lemma/lexeme/sense IDs are **compact JSON arrays**, not prefixed record-ID strings:
 `["en","run"]`, `["en","run","verb",1]`, `["en","run","verb",1,"<sense-key>"]`.
 Decode the array for shared dictionary materialization. Keys come exclusively from
@@ -172,6 +172,7 @@ All `source` columns reference `source.name`.
 | `freq` | `lemma_id` FK, `zipf?` REAL, `bnc?` INTEGER, `coca?` INTEGER, `source`; PK(`lemma_id`,`source`) |
 | `relation` | `source_sense_id` FK, `target_sense_id` FK, `type` (`synonym`/`antonym`/`hypernym`/`hyponym`), `source`; PK(all four columns) |
 | `affix` | `lexeme_id` FK, `position` nonnegative INTEGER, `text`, `type` (`prefix`/`root`/`suffix`/`infix`), `source`; PK(`lexeme_id`,`position`,`source`) |
+| `morphology_analysis` | `lexeme_id` PK/FK, `status` (`absent`/`supported`/`rejected`), `reason`, `components` JSON ordered `[text,type]` pairs, `source` |
 | `phrase_component` | `phrase_id` lemma FK, `lexeme_id` FK, zero-based `position`, `source`; PK(`phrase_id`,`position`); reverse index (`lexeme_id`,`phrase_id`) |
 | `phrase_usage` | `phrase_id` lemma FK, `sense_id` FK, `source`; PK(`phrase_id`,`sense_id`,`source`) |
 
@@ -375,13 +376,22 @@ This positional contract is documented by
 (checked 2026-11-14). Display metadata such as `alt1` does not replace the base lemma identity.
 Non-English component language overrides, missing/malformed components, extra positional
 components, wiki markup and conflicting supported decompositions are skipped, not guessed.
-Equivalent duplicate templates collapse; duplicate backbone records retain the first pair.
-Other etymology templates are not parsed. No new schema or relation type is introduced.
+Equivalent duplicate templates collapse; conflicting duplicate backbone records remove the
+analysis rather than retaining an arbitrary first pair. The importer also supports English
+`prefix/pre`, `affix/af` and `compound/com`: explicit affix boundary markers in `affix`
+arguments identify component types, never matching substrings in the word. Compound arguments
+are roots. Source order and repeated occurrences are preserved (maximum 16 components).
+Unsupported templates, malformed analyses and absent templates are distinguished in
+`morphology_analysis`; only absence permits optional LLM fallback.
 
 The fixture's `decision` source explicitly supplies base `decide`, suffix `ion` and display
 stem `alt1=decis`; both affix rows now come from this production transform. Resolve a root's
 `text` with `get_lemma` and `lexemes` to follow the structured base→derived association;
-`affix.lexeme_id` identifies the derived lexeme. No fixture-only SQL inserts those rows.
+`affix.lexeme_id` identifies the derived lexeme. Source-backed graph materialization additionally
+requires every component to resolve to an English source lemma with exactly one etymology,
+matching affix POS (or non-affix POS for roots) and at least one usable sense. The small fixture
+does not identify `-ion`, so its decision affix rows deliberately produce no guessed graph rows.
+No fixture-only SQL inserts those rows.
 Use `app.services.lexicon.LexiconReader` for runtime reads and the pytest `lexicon_reader`
 fixture in consumers' tests. See [testing](../../docs/dev/testing.md#rebuild-and-verify-the-small-lexicon)
 for the focused offline test command.

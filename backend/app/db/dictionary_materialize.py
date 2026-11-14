@@ -42,6 +42,26 @@ async def materialize(
     skip_private_endpoints: bool = False,
 ) -> MaterializedDictionary:
     async def operation(txn: UUID) -> MaterializedDictionary:
+        compositions = {}
+        for edge in plan.edges:
+            if edge.table == "composed_of":
+                compositions.setdefault(str(edge.start), (edge.start, set()))[1].add(
+                    (str(edge.end), edge.fields["order"], edge.fields.get("source"))
+                )
+        for lexeme, expected in compositions.values():
+            existing = await _rows(
+                db,
+                "SELECT out, order, source FROM composed_of WHERE in = $lexeme AND owner = NONE;",
+                {"lexeme": lexeme},
+                txn_id=txn,
+            )
+            actual = {(str(row["out"]), row["order"], row.get("source")) for row in existing}
+            if actual and actual != expected:
+                raise AppError(
+                    "dictionary.morphology_conflict",
+                    409,
+                    "Existing shared morphology conflicts with this analysis.",
+                )
         for row in plan.rows:
             if not await shared_exists(db, row.record, txn):
                 await _rows(

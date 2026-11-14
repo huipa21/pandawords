@@ -2,11 +2,11 @@
 
 import sqlite3
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 
 SCHEMA = """
 PRAGMA foreign_keys = ON;
-PRAGMA user_version = 2;
+PRAGMA user_version = 3;
 CREATE TABLE source (
     name TEXT PRIMARY KEY, metadata TEXT NOT NULL CHECK(json_valid(metadata))
 );
@@ -88,6 +88,13 @@ CREATE TABLE affix (
     type TEXT NOT NULL CHECK(type IN ('prefix', 'root', 'suffix', 'infix')),
     source TEXT NOT NULL REFERENCES source(name),
     PRIMARY KEY(lexeme_id, position, source)
+);
+CREATE TABLE morphology_analysis (
+    lexeme_id TEXT PRIMARY KEY REFERENCES lexeme(id),
+    status TEXT NOT NULL CHECK(status IN ('absent', 'supported', 'rejected')),
+    reason TEXT NOT NULL,
+    components TEXT NOT NULL CHECK(json_valid(components)),
+    source TEXT NOT NULL REFERENCES source(name)
 );
 CREATE TABLE phrase_component (
     phrase_id TEXT NOT NULL REFERENCES lemma(id),
