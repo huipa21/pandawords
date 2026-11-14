@@ -18,13 +18,17 @@
       "derives_to": "DEFINE TABLE derives_to TYPE RELATION IN lexeme OUT lexeme ENFORCED SCHEMAFULL PERMISSIONS NONE",
       "has_lexeme": "DEFINE TABLE has_lexeme TYPE RELATION IN lemma OUT lexeme ENFORCED SCHEMAFULL PERMISSIONS NONE",
       "has_sense": "DEFINE TABLE has_sense TYPE RELATION IN lexeme OUT sense ENFORCED SCHEMAFULL PERMISSIONS NONE",
+      "includes": "DEFINE TABLE includes TYPE RELATION IN project OUT lemma | sense | sentence | passage ENFORCED SCHEMAFULL PERMISSIONS NONE",
       "job": "DEFINE TABLE job TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "lemma": "DEFINE TABLE lemma TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "lexeme": "DEFINE TABLE lexeme TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "member_of": "DEFINE TABLE member_of TYPE RELATION IN sense | morpheme | tag OUT tag ENFORCED SCHEMAFULL PERMISSIONS NONE",
       "morpheme": "DEFINE TABLE morpheme TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
+      "note": "DEFINE TABLE note TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
+      "override": "DEFINE TABLE override TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "part_of": "DEFINE TABLE part_of TYPE RELATION IN sentence OUT passage ENFORCED SCHEMAFULL PERMISSIONS NONE",
       "passage": "DEFINE TABLE passage TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
+      "project": "DEFINE TABLE project TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "refresh_token": "DEFINE TABLE refresh_token TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "relates_to": "DEFINE TABLE relates_to TYPE RELATION IN sense OUT sense ENFORCED SCHEMAFULL PERMISSIONS NONE",
       "sense": "DEFINE TABLE sense TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
@@ -118,6 +122,19 @@
       "lives": {},
       "tables": {}
     },
+    "includes": {
+      "events": {},
+      "fields": {
+        "added_at": "DEFINE FIELD added_at ON includes TYPE datetime PERMISSIONS FULL",
+        "hidden": "DEFINE FIELD hidden ON includes TYPE bool PERMISSIONS FULL",
+        "in": "DEFINE FIELD in ON includes TYPE record<project> PERMISSIONS FULL",
+        "out": "DEFINE FIELD out ON includes TYPE record<lemma | sense | sentence | passage> PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON includes TYPE record<user> PERMISSIONS FULL"
+      },
+      "indexes": {},
+      "lives": {},
+      "tables": {}
+    },
     "job": {
       "events": {},
       "fields": {
@@ -200,6 +217,31 @@
       "lives": {},
       "tables": {}
     },
+    "note": {
+      "events": {},
+      "fields": {
+        "kind": "DEFINE FIELD kind ON note TYPE 'note' | 'mnemonic' PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON note TYPE record<user> PERMISSIONS FULL",
+        "target": "DEFINE FIELD target ON note TYPE record PERMISSIONS FULL",
+        "text": "DEFINE FIELD text ON note TYPE string PERMISSIONS FULL"
+      },
+      "indexes": {
+        "note_owner_target": "DEFINE INDEX note_owner_target ON note FIELDS owner, target"
+      },
+      "lives": {},
+      "tables": {}
+    },
+    "override": {
+      "events": {},
+      "fields": {
+        "fields": "DEFINE FIELD fields ON override TYPE object FLEXIBLE PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON override TYPE record<user> PERMISSIONS FULL",
+        "updated_at": "DEFINE FIELD updated_at ON override TYPE datetime PERMISSIONS FULL"
+      },
+      "indexes": {},
+      "lives": {},
+      "tables": {}
+    },
     "part_of": {
       "events": {},
       "fields": {
@@ -222,6 +264,26 @@
         "title": "DEFINE FIELD title ON passage TYPE string PERMISSIONS FULL"
       },
       "indexes": {},
+      "lives": {},
+      "tables": {}
+    },
+    "project": {
+      "events": {},
+      "fields": {
+        "created_at": "DEFINE FIELD created_at ON project TYPE datetime PERMISSIONS FULL",
+        "description": "DEFINE FIELD description ON project TYPE string PERMISSIONS FULL",
+        "name": "DEFINE FIELD name ON project TYPE string PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON project TYPE record<user> PERMISSIONS FULL",
+        "plan": "DEFINE FIELD plan ON project TYPE object PERMISSIONS FULL",
+        "plan.daily_new": "DEFINE FIELD plan.daily_new ON project TYPE int PERMISSIONS FULL",
+        "plan.exam_date": "DEFINE FIELD plan.exam_date ON project TYPE none | datetime PERMISSIONS FULL",
+        "plan.review_cap": "DEFINE FIELD plan.review_cap ON project TYPE none | int PERMISSIONS FULL",
+        "source_lang": "DEFINE FIELD source_lang ON project TYPE string PERMISSIONS FULL",
+        "target_lang": "DEFINE FIELD target_lang ON project TYPE string PERMISSIONS FULL"
+      },
+      "indexes": {
+        "project_owner": "DEFINE INDEX project_owner ON project FIELDS owner"
+      },
       "lives": {},
       "tables": {}
     },

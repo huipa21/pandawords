@@ -54,6 +54,38 @@ the script only imports the runner. Assertions are the checks: run without Pytho
 
 ## Verified snippets
 
+Task **2.3.1**, **2026-11-14**, verified `0006_project_overlays.surql` on the existing
+loopback **test** server (**8101**, **surrealdb-3.3.5 / Python 3.14.3 / SDK 3.0.0**).
+`tests/integration/test_project_schema.py` uses fresh harness databases, checks INFO field/index
+definitions and endpoint unions, and replays both the migration runner and raw DDL with an
+identical full snapshot and retained project data. No dev database or shared server lifecycle
+changes are involved.
+
+- ✅ `TYPE RELATION IN project OUT lemma | sense | sentence | passage ENFORCED SCHEMAFULL`
+  accepts each documented endpoint, rejecting lexemes, wrong source tables and missing endpoints.
+  An owner-bound UPDATE toggles `hidden` on the same edge without changing `added_at` or the
+  dictionary record. Visibility probes filter project, edge and target ownership independently.
+- ✅ Required `record<user>` owners reject NONE, NULL, strings and wrong-table references.
+  Project plan nested integer fields and optional datetime/integer fields retain valid values;
+  malformed values and missing `daily_new` fail. No numeric range or business defaults are
+  implied by these types.
+- ✅ Override `fields TYPE object FLEXIBLE` preserves nested language maps and arrays.
+  Bound `RecordID("override", [user, target])` UPSERT repeatedly updates the same row;
+  another user/target has a different identity. Owner-bound DELETE resets only that overlay,
+  leaving the shared target and another user's edits unchanged. The deterministic ID shape and
+  ID-owner agreement remain repository contracts rather than database assertions.
+- ✅ Note `target TYPE record` accepts a reference to any table without requiring its existence;
+  literal `note | mnemonic` kind types and `note(owner, target)` indexing work as declared.
+  Alice/Bob owner-filtered note and overlay reads remain disjoint. Typed references are not
+  authorization: future APIs must validate target visibility and ownership.
+
+Verification: the focused project schema suite passed **22 tests**; `dev.ps1 check` passed;
+`dev.ps1 test -Backend -UpdateSnapshot` and the subsequent normal `test -Backend` each passed
+**343 tests**, with no skips. Both full runs reported the existing Starlette/httpx deprecation
+warning. Initial check/test attempts failed because the new worktree lacked `ruff`/`pytest`;
+`uv sync --frozen` restored the locked backend dependencies before successful reruns.
+Project CRUD, tree/override/note APIs and media are outside this migration task.
+
 Task **2.2.1**, **2026-11-14**, verified `0005_dictionary.surql` using the existing loopback
 **test** server on **8101**, HTTP version **surrealdb-3.3.5**, Python **3.14.3**, SDK **3.0.0**.
 `tests/integration/test_dictionary_schema.py` uses fresh harness databases, checks all documented
