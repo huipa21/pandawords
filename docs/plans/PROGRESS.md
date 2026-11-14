@@ -10,12 +10,12 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 ## Current run
 
 Request: resume and complete Phase 1, proceeding through waves in dependency order.
-Next step: finish wave 11 development commands and verify main up/check/test/down;
-admin UI is integrated and browser-verified, then implement wave 12 E2E.
+Next step: implement wave12 first-login E2E, run against main up stack, then finish
+Phase1 full checks, packaging and task-worktree cleanup.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 1.6.1 | `task/1.6.1-dev-lifecycle` | `../pandawords.worktrees/1.6.1` | Starting; dependencies1.3.3/1.4.3/1.6.2 are ✅ |
+| 1.6.6 | `task/1.6.6-first-login-e2e` | `../pandawords.worktrees/1.6.6` | Starting; dependencies1.5.6/1.6.1 are ✅ |
 
 ## Blocked
 
@@ -41,6 +41,26 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 1.6.1 Complete development commands
+- Result / completed: up/down/check/test selectors, dev-only seeds entrypoint, locked/PID-safe
+  lifecycle with native Windows Job Objects/process hosts, ready checks, logs and rollback;
+  `82bcf41` merged. Existing setup/DB/gen-api/release behaviors preserved.
+- Dependencies:1.3.3/1.4.3/1.6.2 are ✅.
+- Verification: main `check` and combined `test -Backend -Frontend` passed (191 backend tests;
+  frontend65 already verified and selector passed). Real main `up` twice returned API readiness200
+  and login200; browser at printed localhost URL showed functioning Chinese login form. `down`
+  twice exited all21 recorded owned host/child processes; ports8000/5173/8100 closed. Actual
+  lint-error fixture detected RuffF821/nonzero, removed itself, then main check passed.
+  Agent process-tree/PID-reuse/rollback/selector and existing release/backend/hook guards passed.
+- Skipped / deferred: E2E selector intentionally requires forthcoming1.6.6 config.
+- Failures / causes / corrections: initial parent harness inherited expected native lint-failure
+  exit code from same-shell fixture; child-shell execution proved fixture passes and restored check
+  passes. No production-code failure. Earlier manually started Vite children needed explicit
+  PID cleanup; new lifecycle owns full native jobs and real down proved no survivors.
+- Findings: no source change or secret/environment override was needed for default main up;
+  dev data retained and no unrelated process was stopped.
+- Blockers / follow-ups: none;1.6.6 now ready.
 
 ### 2026-11-14 — 1.5.6 Responsive admin users UI
 - Result / completed: desktop table/mobile cards, pagination/load/empty/error states, create/reset
