@@ -19,7 +19,9 @@ browser logs will be committed as source.
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
 | 2.3.3 | task/2.3.3-user-dictionary-api | ../pandawords.worktrees/2.3.3 | Starting; overrides/custom senses/notes |
-| 2.4.2 | task/2.4.2-add-to-project | ../pandawords.worktrees/2.4.2 | Starting; selected memberships and jobs |
+| 2.4.3 | task/2.4.3-enrichment | ../pandawords.worktrees/2.4.3 | Starting; relation/tag/frequency worker |
+| 2.5.2 | task/2.5.2-audio | ../pandawords.worktrees/2.5.2 | Starting; source audio and optional TTS |
+| 2.6.3 | task/2.6.3-add-dialog | ../pandawords.worktrees/2.6.3 | Starting; candidates, selection and job status |
 
 ## Blocked
 
@@ -45,6 +47,20 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 2.4.2 Atomic add-to-project workflow
+- Result / completed: owner-authorized atomic materialization/memberships/job enqueue,
+  exact selected senses, deterministic edge identity and owner/type/key job deduplication;
+  `9316fa9` merged with migration 0008 and generated contracts.
+- Dependencies: 2.4.1, 2.2.3, 2.3.2 and 1.6.2 checked ✅; enrichment/audio/dialog starting.
+- Verification: agent `check`, frontend and backend 481 passed; main `gen-api`, `check`
+  and combined backend/frontend passed (481 backend).
+- Skipped / deferred: handlers are next tasks; SRS memory creation belongs to Phase 3.
+- Failures / causes / corrections: initial environment restored; test fixture interference
+  corrected with isolated test databases. No unresolved failures or blockers.
+- Findings: repeated explicit add unhides selected membership while preserving omitted
+  memberships, timestamps and overrides; job payload v1 documented for worker consumers.
+  Branch/worktree removed after verification.
 
 ### 2026-11-14 — 2.2.3 Shared materialization and effective reads
 - Result / completed: deterministic idempotent materialization, owner-safe record/entry/edge
