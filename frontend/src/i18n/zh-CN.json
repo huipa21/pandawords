@@ -1,4 +1,22 @@
 {
+  "images": {
+    "title": "私人义项图片",
+    "upload": "上传图片",
+    "limits": "支持 JPEG、PNG、WebP 或 GIF；最大 10 MiB，每帧 2500 万像素，最多 100 帧，总计 5000 万像素。",
+    "alt": "私人词汇图片",
+    "empty": "尚未添加私人图片。",
+    "query": "Pixabay 搜索关键词",
+    "search": "搜索 Pixabay",
+    "source": "Pixabay #{id}，作者 {creator}",
+    "select": "下载并添加",
+    "noResults": "没有找到 Pixabay 图片。",
+    "remove": "移除图片",
+    "removeConfirm": "仅移除你的私人图片？此操作无法撤销。",
+    "unavailable": "此图片暂不可用。",
+    "disabled": "尚未配置 Pixabay 搜索。你仍可上传图片。",
+    "rateLimit": "图片服务或下载队列繁忙，请稍后重试。",
+    "error": "图片操作失败。未配置 Pixabay 时仍可上传。请检查图片或服务配置后重试。"
+  },
   "session": {
     "title": "项目复习",
     "exit": "退出复习",

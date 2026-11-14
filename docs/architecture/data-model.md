@@ -5,6 +5,19 @@ plus the migrations. This doc explains the intent. Syntax details: [../dev/surre
 
 ## Two layers
 
+### Private sense images (5.1.1)
+
+`media` image rows always use the attaching user's owner, including shared sense targets.
+The image list returns only that user's attachments; protected delivery additionally checks
+current target visibility. Removal never changes a dictionary sense or another owner's row.
+Migration `0019_images.surql` adds owner-bound `image_request` retry tombstones (target,
+fingerprint, provider identity, optional media reference) and JSON-text `image_search` entries
+with a 24-hour expiry. Request identities are hashed with the owner and conflicting reuse is
+409; deleted attachments cannot be resurrected by a late retry. Atomic request/media writes
+serialize concurrent retries, and aborted transactions remove their unique local files.
+`image_rate` coordinates owner search/queue limits; `image_provider_rate` contains only global
+provider counters, never queries, owners or search results.
+
 1. **Shared dictionary**: canonical linguistic data, materialized from the lexicon the first time
    any user adds a word. These rows have `owner = NONE` and are read-only for users.
 2. **Per-user layer**: projects, project membership/hiding, overrides, user-created content, notes,

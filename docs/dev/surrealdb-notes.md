@@ -1,5 +1,18 @@
 # SurrealDB 3.3 notes
 
+### Private image request/cache contracts (5.1.1) ✅
+
+Verified 2026-11-14 against the existing **8101** SurrealDB test server with isolated
+random migrated databases. Migration **0019** adds retry/cache/rate tables without changing
+0007. Bound `CREATE` + media insertion + owner-filtered request update in SDK transactions
+produces exactly one attachment under concurrent retries. Conflict retries remove losing files.
+Owner-filtered `DELETE ... RETURN BEFORE` and request tombstoning remove only private rows;
+path-reference lookup prevents removing a still-referenced file. Owner-scoped rate-row
+`UPSERT ... revision += 1` serializes bounded queue submissions; provider rate windows store
+only global counters. The generated snapshot reflects these new tables.
+`UPSERT ... CONTENT` replaces omitted required fields on existing rows: `DEFAULT 0`
+does not preserve an omitted `revision`. Rate refreshes explicitly include that field.
+
 ### Sentence and passage schema contract (4.2.1) ✅
 
 Verified 2026-11-14 against **SurrealDB 3.3.5 / SDK 3.0**, using fresh random databases on

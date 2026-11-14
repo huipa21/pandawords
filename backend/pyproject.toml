@@ -9,6 +9,7 @@ dependencies = [
     "httpx",
     "openai>=2,<3",
     "orjson",
+    "pillow>=12,<13",
     "pwdlib[argon2]",
     "pydantic>=2,<3",
     "pydantic-settings",

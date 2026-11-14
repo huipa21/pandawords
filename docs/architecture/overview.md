@@ -1,5 +1,21 @@
 # Architecture overview
 
+## Private image flow (5.1.1)
+
+`/api/images/senses/{sense_id}` provides authenticated list/raw upload and
+`/{image_id}` removal. Upload bodies are encoded image bytes, not multipart; send their actual
+MIME and a stable `request-id` header (16–80 alphanumeric, `_` or `-` characters).
+The streaming API rejects content above 10 MiB before decoding all frames with Pillow.
+Stored media IDs use the existing protected `/api/media/{rid}` endpoint and local media store.
+
+Pixabay is optional and explicit: `/api/images/pixabay/search?q=...` returns owner-cached
+result identities and attribution, not remote image URLs. Selecting an identity at
+`/api/images/senses/{sense_id}/pixabay` enqueues an owner-bound `image` job; the UI polls the
+existing job API, then reloads local attachments. The worker rechecks target/cache ownership
+and HTTPS provider hosts on every redirect, bounds streamed responses and decode work, and
+preserves creator/source-page/Content License attribution. Terminal errors are public-safe;
+resubmitting the same selection retries a failed job without duplicating an attachment.
+
 ## Containers (production, `deploy/compose.yml`)
 
 ```

@@ -1,5 +1,16 @@
 # UI patterns
 
+## Sense images (5.1.1)
+
+Each visible sense has a private image section. Manual upload is independent of provider
+configuration; explicit Pixabay search shows creator/source attribution and a separate
+download-and-attach action (no automatic searches, remote previews or permanent hotlinks).
+`SenseImages` owns upload/search/job/removal state; `ProtectedImage` fetches through the
+authenticated API client, uses generic localized alternative text and revokes blob URLs on
+replacement/unmount. Late responses after a sense change are ignored. Removal uses
+`ConfirmAction`; empty, loading, unavailable and retry states remain visible. Failed uploads
+retain the original file and request identity for retry; provider retries reuse their selection.
+
 ## Layout & navigation
 
 - Mobile-first. Below `lg`: header + bottom nav (Projects · Review · Words · Me). From `lg`: header

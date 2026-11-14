@@ -19,6 +19,10 @@
       "exercise_attempt": "DEFINE TABLE exercise_attempt TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "has_lexeme": "DEFINE TABLE has_lexeme TYPE RELATION IN lemma OUT lexeme ENFORCED SCHEMAFULL PERMISSIONS NONE",
       "has_sense": "DEFINE TABLE has_sense TYPE RELATION IN lexeme OUT sense ENFORCED SCHEMAFULL PERMISSIONS NONE",
+      "image_provider_rate": "DEFINE TABLE image_provider_rate TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
+      "image_rate": "DEFINE TABLE image_rate TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
+      "image_request": "DEFINE TABLE image_request TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
+      "image_search": "DEFINE TABLE image_search TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "includes": "DEFINE TABLE includes TYPE RELATION IN project OUT lemma | lexeme | sense | sentence | passage ENFORCED SCHEMAFULL PERMISSIONS NONE",
       "job": "DEFINE TABLE job TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "lemma": "DEFINE TABLE lemma TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
@@ -146,6 +150,55 @@
       },
       "indexes": {
         "has_sense_tree_lookup": "DEFINE INDEX has_sense_tree_lookup ON has_sense FIELDS in, owner, out"
+      },
+      "lives": {},
+      "tables": {}
+    },
+    "image_provider_rate": {
+      "events": {},
+      "fields": {
+        "count": "DEFINE FIELD count ON image_provider_rate TYPE int DEFAULT 0 PERMISSIONS FULL",
+        "until": "DEFINE FIELD until ON image_provider_rate TYPE datetime PERMISSIONS FULL"
+      },
+      "indexes": {},
+      "lives": {},
+      "tables": {}
+    },
+    "image_rate": {
+      "events": {},
+      "fields": {
+        "owner": "DEFINE FIELD owner ON image_rate TYPE record<user> PERMISSIONS FULL",
+        "revision": "DEFINE FIELD revision ON image_rate TYPE int DEFAULT 0 PERMISSIONS FULL",
+        "until": "DEFINE FIELD until ON image_rate TYPE datetime PERMISSIONS FULL"
+      },
+      "indexes": {},
+      "lives": {},
+      "tables": {}
+    },
+    "image_request": {
+      "events": {},
+      "fields": {
+        "fingerprint": "DEFINE FIELD fingerprint ON image_request TYPE string PERMISSIONS FULL",
+        "media": "DEFINE FIELD media ON image_request TYPE none | record<media> PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON image_request TYPE record<user> PERMISSIONS FULL",
+        "source_identity": "DEFINE FIELD source_identity ON image_request TYPE none | string PERMISSIONS FULL",
+        "target": "DEFINE FIELD target ON image_request TYPE record<sense> PERMISSIONS FULL"
+      },
+      "indexes": {
+        "image_request_owner": "DEFINE INDEX image_request_owner ON image_request FIELDS owner, target"
+      },
+      "lives": {},
+      "tables": {}
+    },
+    "image_search": {
+      "events": {},
+      "fields": {
+        "data": "DEFINE FIELD data ON image_search TYPE string PERMISSIONS FULL",
+        "expires_at": "DEFINE FIELD expires_at ON image_search TYPE datetime PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON image_search TYPE record<user> PERMISSIONS FULL"
+      },
+      "indexes": {
+        "image_search_owner": "DEFINE INDEX image_search_owner ON image_search FIELDS owner, expires_at"
       },
       "lives": {},
       "tables": {}

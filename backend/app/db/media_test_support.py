@@ -18,6 +18,28 @@ async def target(db: AsyncSurrealConnection, owner: str | None = None) -> Record
     return record
 
 
+async def sense(db: AsyncSurrealConnection, owner: str | None = None) -> RecordID:
+    record = RecordID("sense", uuid4().hex)
+    await db.query(
+        "CREATE $id CONTENT $data;",
+        {
+            "id": record,
+            "data": {
+                "definition": "image fixture",
+                "gloss": {},
+                "register": [],
+                "domain": [],
+                "examples": [],
+                "rank": 0,
+                "common": True,
+                "source": "test",
+                "owner": RecordID("user", user_key(owner)) if owner else None,
+            },
+        },
+    )
+    return record
+
+
 async def change(db: AsyncSurrealConnection, record: RecordID, data: Mapping[str, Value]) -> None:
     await db.query("UPDATE $id MERGE $data;", {"id": record, "data": dict(data)})
 

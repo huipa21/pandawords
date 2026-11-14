@@ -1,4 +1,22 @@
 {
+  "images": {
+    "title": "Private sense images",
+    "upload": "Upload an image",
+    "limits": "JPEG, PNG, WebP or GIF; up to 10 MiB, 25 million pixels per frame, 100 frames and 50 million pixels total.",
+    "alt": "Private vocabulary image",
+    "empty": "No private images attached.",
+    "query": "Pixabay search query",
+    "search": "Search Pixabay",
+    "source": "Pixabay #{id} by {creator}",
+    "select": "Download and attach",
+    "noResults": "No Pixabay results.",
+    "remove": "Remove image",
+    "removeConfirm": "Remove only your private attachment? This cannot be undone.",
+    "unavailable": "This image is unavailable.",
+    "disabled": "Pixabay search is not configured. You can still upload an image.",
+    "rateLimit": "The image provider or download queue is busy. Wait before retrying.",
+    "error": "Image operation failed. Upload remains available without Pixabay. Check the image or provider configuration and retry."
+  },
   "session": {
     "title": "Project review",
     "exit": "Exit review",
