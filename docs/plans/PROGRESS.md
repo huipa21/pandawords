@@ -19,7 +19,7 @@ Migration allocations: 0013 memory/history; 0014 LLM; 0015 SRS preferences;
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
 | 3.2.5 | task/3.2.5-llm | ../pandawords.worktrees/3.2.5 | Agent running; migration 0014 |
-| 3.1.2 | task/3.1.2-srs | ../pandawords.worktrees/3.1.2 | Ready; migration 0015 |
+| 3.1.2 | task/3.1.2-srs | ../pandawords.worktrees/3.1.2 | Agent running; migration 0015 |
 | 3.1.3 | task/3.1.3-plan | ../pandawords.worktrees/3.1.3 | Waiting for 3.1.2 |
 | 3.2.1 | task/3.2.1-exercises | ../pandawords.worktrees/3.2.1 | Waiting for 3.1.2 |
 | 3.2.2 | task/3.2.2-distractors | ../pandawords.worktrees/3.2.2 | Waiting for 3.2.1 |
@@ -66,7 +66,9 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
   ruff and basedpyright passed.
 - Findings: production project deletion preserves cards and history; cross-project/user
   identities exercised against real SurrealDB.
-- Blockers / follow-ups: none; 3.1.2 now ready. Task branch/worktree cleanup follows.
+- Blockers / follow-ups: none; 3.1.2 agent started. Task branch/worktree removed and folder
+  absence confirmed. Initial worktree removal left dependency files; targeted removal of
+  the inspected task folder succeeded.
 
 ### 2026-11-14 — Phase 3 start
 - Result / completed: execution set recorded; existing user-authored Phase 3 planning included.
