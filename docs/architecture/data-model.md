@@ -113,10 +113,31 @@ content tasks should reuse them rather than redefine this migration.
 | `override` | id `override:[user:<id>, <target record>]`, `fields` (partial object), `updated_at` | Edits per user, applied on read |
 | `note` | `owner`, `target` (any record), `kind` (note\|mnemonic), `text` | |
 | `media` | `owner?` (NONE for shared audio), `target`, `kind` (audio\|image), `path`, `mime`, `source` (wiktionary\|edge_tts\|pixabay\|upload), `attribution?`, `accent?` | |
-| `memory` | id `memory:[user:<id>, <sense record>]`, FSRS card state (`state`, `step`, `stability`, `difficulty`, `due`, `last_review`) | One per user and sense, shared across projects |
-| `review_log` | `owner`, `memory`, `project`, `exercise`, `rating`, `auto_rating`, `correct`, `duration_ms`, `at` | |
+| `memory` | id `memory:[user:<id>, <sense record>]`, `owner`, `sense`, FSRS card state (`card_id`, `state`, `step?`, `stability?`, `difficulty?`, `due`, `last_review?`), `introduced` | One per user and sense, shared across projects |
+| `review_log` | `owner`, `memory`, `project`, `exercise`, `rating`, `auto_rating`, `correct`, `hint_used`, `duration_ms`, `at`, `is_introduction`, `attempt_id` | Completed reviews only; unique `(owner, attempt_id)` |
 | `job` | `type`, `payload`, `status` (queued\|running\|done\|failed), `attempts`, `run_after`, `error?`, `owner?` | |
 | `_migration` | id = version, `name`, `checksum`, `applied_at` | |
+
+Migration `0013_memory_review_log.surql` adds two SCHEMAFULL normal tables, not relation
+tables. Memory's required owner/sense references must match its array ID; `(owner, sense)`
+is unique. `card_id` is the py-fsrs integer identifier (not the database ID and not globally
+unique), `state` is Learning=1/Review=2/Relearning=3, and `step` is an optional nonnegative
+integer. Stability/difficulty are optional floats; due and last_review are UTC datetimes.
+These are all seven fields serialized by py-fsrs 6.3.0 `Card.to_dict()`/`from_dict()`;
+convert datetime fields to/from ISO strings at that library boundary, and map absent
+optional database fields to Python `None`. An unreviewed Learning card has step 0,
+absent stability/difficulty/last_review and `introduced=false`. Queue reads must not
+change that marker; the first completed review sets it and logs `is_introduction=true`.
+
+Logs require an owner matching the owner component of their memory ID, both ratings
+(Again=1/Hard=2/Good=3/Easy=4), correctness, hint use, a validated integer duration in
+0..60,000 ms, exercise type string, UTC timestamp, project record reference and nonempty
+opaque attempt ID. `(owner, attempt_id)` uniqueness prevents duplicate completed receipts;
+atomic scheduling, conflicting-retry validation and stale-card handling belong to the
+review service, not this migration. No attempt-table dependency is introduced.
+Project references deliberately do not enforce existence or cascade: deleting a project
+removes its memberships but preserves cards and completed history (including its original
+project ID). Hiding/removing memberships also leaves cards and logs untouched.
 
 Migration `0006_project_overlays.surql` adds only `project`, `includes`, `override` and `note`.
 All four are SCHEMAFULL with required `owner: record<user>` (no shared/NONE/NULL owners).
@@ -377,8 +398,9 @@ and is deferred to media ingestion. Source examples retain their text, Chinese g
 
 ## Indexes (minimum)
 
-`lemma(lang, text)` unique · `user(username)` unique · `project(owner)` · `memory(due)` filtered by
-user via ID prefix · `review_log(owner, at)` · `job(status, run_after)` · `note(owner, target)` ·
+`lemma(lang, text)` unique · `user(username)` unique · `project(owner)` · `memory(owner, due)` ·
+`memory(owner, sense)` unique · `review_log(owner, at)` · `review_log(owner, attempt_id)` unique ·
+`job(status, run_after)` · `note(owner, target)` ·
 `media(target)` · `refresh_token(token_hash)` unique · `user(role)` (admin bootstrap) ·
 `refresh_token(user)` (session revocation) · `refresh_token(expires_at)` (expiry cleanup).
 

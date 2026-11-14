@@ -1,5 +1,38 @@
 # Testing
 
+## Memory and completed review schema (3.1.1)
+
+From `backend`, with the existing loopback SurrealDB 3.3 server on **8101**, run:
+
+```powershell
+uv run --no-sync pytest -q tests\integration\test_memory_schema.py tests\integration\test_schema_snapshot.py tests\integration\test_migrations.py tests\integration\test_project_schema.py
+```
+
+The memory tests use `fresh_db` and migrate each isolated database, removing only their own
+database on teardown. Actual `INFO FOR TABLE` field types and all four access/unique indexes
+are checked. Writes exercise all seven upstream py-fsrs 6.3.0 serialized card fields for
+Learning, Review and Relearning, including optional values and UTC microseconds; they do not
+yet execute the FSRS scheduler (task 3.1.2). Invalid types, missing/foreign owners,
+noncanonical card IDs, duplicate cards, duplicate completed attempts across projects,
+rating/state/duration boundaries, two owners and owner-filtered history are covered.
+Two project memberships share one card; hide/restore and the production project-delete
+transaction preserve cards/history. Another owner's delete fails without removing the project.
+Migration replay preserves data/schema; the standard fresh snapshot tests check drift and
+the diagnostic for a new migration. Update explicitly with the snapshot flag/runner described
+below, then run without it to verify the committed artifact.
+
+Pylance's file-syntax tool could not resolve the worktree's new test file; ruff, basedpyright
+and real runtime tests provide validation instead. The initial schema test used an invalid
+dictionary register scalar, then an unencoded user subject in the deletion probe; both fixture
+errors were corrected to the existing array and opaque-subject contracts.
+
+Verification on 2026-11-14: repository `dev.ps1 check` passed; the focused schema/migration
+suite passed **65 tests**, explicit snapshot generation passed, and the subsequent normal
+`dev.ps1 test -Backend` passed **587 tests** with the existing Starlette/httpx deprecation
+warning. The first check found missing ruff; manifest-based `uv sync` and `pnpm install`
+restored this worktree's tools without dependency changes. No E2E, stack lifecycle operation,
+dev-database mutation or bulk cleanup was performed.
+
 ## Project tree API (2.3.4)
 
 From `backend`, run `uv run --no-sync pytest -q tests\api\test_project_tree.py

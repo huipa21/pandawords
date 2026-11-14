@@ -4,6 +4,36 @@ Check here before writing SurrealQL. **Status:** ✅ verified on the version sho
 form is wrong (a working, verified replacement is given). New, unverified beliefs must be
 tested before being used.
 
+### Memory and completed review history (3.1.1) ✅
+
+Verified **2026-11-14**, SurrealDB **3.3.5** / SDK **3.0.0**, against fresh isolated
+databases on the existing **8101** server (no dev database changes):
+
+- Migration `0013` uses normal SCHEMAFULL tables for `memory` and `review_log`.
+  `DEFINE FIELD ... id ON memory ASSERT $value =
+  type::record('memory', [$this.owner, $this.sense])` enforces the nested array ID.
+  Required owner/sense fields can independently assert against `record::id($this.id)[0/1]`.
+  Valid IDs containing two bound RecordIDs round-trip; arbitrary IDs, mismatched owners
+  and mismatched senses fail. Replay with `IF NOT EXISTS` preserves schema and records.
+- `option<int>`, `option<float>` and `option<datetime>` retain absent FSRS values as NONE,
+  not NULL; NULL is rejected. UTC datetime microseconds and fractional floats survive.
+  State/rating range assertions and 0..60,000 ms duration assertions reject invalid writes.
+- `(owner, sense)` UNIQUE plus the canonical memory ID establish one card per owner/sense;
+  `(owner, due)` and `(owner, at)` index owner-scoped queue/history access.
+  `(owner, attempt_id)` UNIQUE rejects a second completed log even in a different project,
+  while another owner can use that attempt string without sharing the receipt.
+- `record<project>` on a normal log table does not cascade or require project existence.
+  The production project-delete transaction removes memberships and projects, preserving
+  both users' cards and logs, including the original project references. Log owner asserts
+  against its memory ID's owner component, without depending on project existence.
+
+Retained probes: `tests/integration/test_memory_schema.py`, `test_schema_snapshot.py`.
+The card field contract was checked against upstream
+[py-fsrs v6.3.0 Card](https://github.com/open-spaced-repetition/py-fsrs/blob/v6.3.0/fsrs/card.py):
+`card_id`, `state`, `step`, `stability`, `difficulty`, `due`, `last_review`.
+The dependency/wrapper are task 3.1.2; no package installation or runtime scheduler behavior
+is claimed by these schema tests.
+
 ### Project tree visibility (2.3.4) ✅
 
 Verified **2026-11-14**, SurrealDB **3.3.5** / SDK **3.0.0**, using only random migrated
