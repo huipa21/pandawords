@@ -140,10 +140,88 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/admin/users': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List Users */
+    get: operations['list_users_api_admin_users_get']
+    put?: never
+    /** Create User */
+    post: operations['create_user_api_admin_users_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/admin/users/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Update User */
+    patch: operations['update_user_api_admin_users__id__patch']
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
   schemas: {
+    /** AdminUserCreate */
+    AdminUserCreate: {
+      /** Username */
+      username: string
+      /**
+       * Role
+       * @default user
+       * @enum {string}
+       */
+      role: 'admin' | 'user'
+    }
+    /** AdminUserPage */
+    AdminUserPage: {
+      /** Items */
+      items: components['schemas']['UserRead'][]
+      /** Total */
+      total: number
+      /** Page */
+      page: number
+      /** Page Size */
+      page_size: number
+    }
+    /** AdminUserResult */
+    AdminUserResult: {
+      user: components['schemas']['UserRead']
+      /** Temporary Password */
+      temporary_password?: string | null
+    }
+    /** AdminUserUpdate */
+    AdminUserUpdate: {
+      /** Disabled */
+      disabled?: boolean
+      /**
+       * Role
+       * @enum {string}
+       */
+      role?: 'admin' | 'user'
+      /**
+       * Reset Password
+       * @default false
+       */
+      reset_password: boolean
+    }
     /** AuthRead */
     AuthRead: {
       /** Access Token */
@@ -467,6 +545,106 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['JobRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  list_users_api_admin_users_get: {
+    parameters: {
+      query?: {
+        page?: number
+        page_size?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AdminUserPage']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  create_user_api_admin_users_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AdminUserCreate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AdminUserResult']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  update_user_api_admin_users__id__patch: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AdminUserUpdate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AdminUserResult']
         }
       }
       /** @description Validation Error */

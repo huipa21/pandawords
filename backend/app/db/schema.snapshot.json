@@ -12,6 +12,7 @@
     "sequences": {},
     "tables": {
       "_migration": "DEFINE TABLE _migration TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
+      "admin_guard": "DEFINE TABLE admin_guard TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "job": "DEFINE TABLE job TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "refresh_token": "DEFINE TABLE refresh_token TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "user": "DEFINE TABLE user TYPE NORMAL SCHEMAFULL PERMISSIONS NONE"
@@ -30,6 +31,15 @@
       "indexes": {
         "migration_version": "DEFINE INDEX migration_version ON _migration FIELDS version UNIQUE"
       },
+      "lives": {},
+      "tables": {}
+    },
+    "admin_guard": {
+      "events": {},
+      "fields": {
+        "version": "DEFINE FIELD version ON admin_guard TYPE int PERMISSIONS FULL"
+      },
+      "indexes": {},
       "lives": {},
       "tables": {}
     },
