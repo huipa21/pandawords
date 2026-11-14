@@ -1,0 +1,9 @@
+DEFINE FIELD IF NOT EXISTS frequencies ON lemma TYPE option<array<object>>;
+DEFINE FIELD IF NOT EXISTS frequencies.*.source ON lemma TYPE string;
+DEFINE FIELD IF NOT EXISTS frequencies.*.zipf ON lemma TYPE option<number>;
+DEFINE FIELD IF NOT EXISTS frequencies.*.bnc ON lemma TYPE option<int>;
+DEFINE FIELD IF NOT EXISTS frequencies.*.coca ON lemma TYPE option<int>;
+DEFINE FIELD IF NOT EXISTS exam_tag_sources ON lemma TYPE option<array<object>>;
+DEFINE FIELD IF NOT EXISTS exam_tag_sources.*.tag ON lemma TYPE string;
+DEFINE FIELD IF NOT EXISTS exam_tag_sources.*.source ON lemma TYPE string;
+DEFINE FIELD IF NOT EXISTS source ON derives_to TYPE option<string>;

@@ -39,6 +39,22 @@ class Materialization:
     edges: list[SharedEdge]
 
 
+async def relation_edges(reader: LexiconReader, sense: DictionaryKey) -> list[SharedEdge]:
+    edges = []
+    for direction in ("outgoing", "incoming"):
+        for relation in await reader.relations(sense, direction=direction):
+            edges.append(
+                SharedEdge(
+                    "relates_to",
+                    RecordID("sense", relation.source_sense_id),
+                    RecordID("sense", relation.target_sense_id),
+                    {"type": relation.type, "source": relation.source},
+                    [relation.type, relation.source],
+                )
+            )
+    return edges
+
+
 def _sense_fields(sense: LexiconSense) -> dict[str, JsonValue]:
     return {
         "definition": sense.definition,
@@ -132,17 +148,7 @@ async def prepare(
                 tag_id = RecordID("tag", ["domain", lemma_key(lemma.lang, domain)[1]])
                 plan.rows.append(SharedRow(tag_id, {"kind": "domain", "name": domain}))
                 plan.edges.append(SharedEdge("member_of", sense_id, tag_id))
-            for direction in ("outgoing", "incoming"):
-                for relation in await reader.relations(sense.id, direction=direction):
-                    plan.edges.append(
-                        SharedEdge(
-                            "relates_to",
-                            RecordID("sense", relation.source_sense_id),
-                            RecordID("sense", relation.target_sense_id),
-                            {"type": relation.type, "source": relation.source},
-                            [relation.type, relation.source],
-                        )
-                    )
+            plan.edges.extend(await relation_edges(reader, sense.id))
     if selected_senses is not None and any(key not in found for key in selected_senses):
         raise AppError(
             "dictionary.invalid_selection", 422, "Selected senses must belong to this lemma."

@@ -13,29 +13,37 @@ from app.db.dictionary_source import Materialization
 from app.domain.dictionary import MaterializedDictionary
 
 
+async def shared_exists(
+    db: AsyncSurrealConnection, record: RecordID, txn: UUID, *, conflict: bool = True
+) -> bool:
+    rows = await _rows(
+        db, "SELECT id FROM $record WHERE owner = NONE;", {"record": record}, txn_id=txn
+    )
+    if rows:
+        return True
+    if conflict:
+        existence = await _rows(
+            db, "RETURN [{exists: record::exists($record)}];", {"record": record}, txn_id=txn
+        )
+        if existence[0]["exists"]:
+            raise AppError(
+                "dictionary.identity_conflict",
+                409,
+                "Shared dictionary identity is occupied by user content.",
+            )
+    return False
+
+
 async def materialize(
-    db: AsyncSurrealConnection, plan: Materialization, *, txn_id: UUID | None = None
+    db: AsyncSurrealConnection,
+    plan: Materialization,
+    *,
+    txn_id: UUID | None = None,
+    skip_private_endpoints: bool = False,
 ) -> MaterializedDictionary:
     async def operation(txn: UUID) -> MaterializedDictionary:
-        async def shared_exists(record: RecordID) -> bool:
-            rows = await _rows(
-                db, "SELECT id FROM $record WHERE owner = NONE;", {"record": record}, txn_id=txn
-            )
-            if rows:
-                return True
-            existence = await _rows(
-                db, "RETURN [{exists: record::exists($record)}];", {"record": record}, txn_id=txn
-            )
-            if existence[0]["exists"]:
-                raise AppError(
-                    "dictionary.identity_conflict",
-                    409,
-                    "Shared dictionary identity is occupied by user content.",
-                )
-            return False
-
         for row in plan.rows:
-            if not await shared_exists(row.record):
+            if not await shared_exists(db, row.record, txn):
                 await _rows(
                     db,
                     "CREATE $record CONTENT $fields;",
@@ -44,9 +52,11 @@ async def materialize(
                 )
         for edge in plan.edges:
             # Semantic targets are connected only after both selected endpoints exist.
-            if not await shared_exists(edge.start) or not await shared_exists(edge.end):
+            if not await shared_exists(
+                db, edge.start, txn, conflict=not skip_private_endpoints
+            ) or not await shared_exists(db, edge.end, txn, conflict=not skip_private_endpoints):
                 continue
-            if not await shared_exists(edge.record):
+            if not await shared_exists(db, edge.record, txn):
                 await _rows(
                     db,
                     "RELATE $start->$edge->$end CONTENT $fields;",

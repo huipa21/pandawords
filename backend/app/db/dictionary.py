@@ -19,7 +19,17 @@ from app.domain.dictionary import (
 from app.domain.identity import user_key, user_subject
 
 TABLE_FIELDS: dict[str, set[str]] = {
-    "lemma": {"text", "lang", "kind", "freq_zipf", "cefr", "exam_tags", "source"},
+    "lemma": {
+        "text",
+        "lang",
+        "kind",
+        "freq_zipf",
+        "cefr",
+        "exam_tags",
+        "source",
+        "frequencies",
+        "exam_tag_sources",
+    },
     "lexeme": {"pos", "etymology_no", "etymology_text", "forms", "pron"},
     "sense": {"definition", "gloss", "register", "domain", "examples", "rank", "common", "source"},
     "morpheme": {"text", "type", "meaning"},
