@@ -99,7 +99,14 @@ async function search() {
 }
 beforeEach(() => {
   vi.resetAllMocks()
-  client.GET.mockResolvedValue(success(project))
+  client.GET.mockImplementation((path: string) => Promise.resolve(path === '/api/projects/{project_id}/tree'
+    ? success({
+        items: [],
+        total: 0,
+        page: 1,
+        page_size: 20,
+      })
+    : success(project)))
   client.POST.mockResolvedValue(success({
     normalized: 'running',
     candidates: [first],
@@ -158,13 +165,13 @@ describe('add word from a project', () => {
     expect(app.wrapper.findComponent(AddWordDialog).emitted('jobsSettled')).toBeTruthy()
     expect(element('[data-job-id="job:enrich"]').attributes('data-job-status')).toBe('done')
     expect(document.body.querySelectorAll('[data-job-id="job:enrich"]')).toHaveLength(1)
-    expect(client.GET).toHaveBeenCalledTimes(1)
+    expect(client.GET.mock.calls.filter(([path]) => path === '/api/projects/{id}')).toHaveLength(1)
     await element('[data-testid="add-word-close"]').trigger('click')
     await flushPromises()
     await app.wrapper.get('[data-testid="project-add-word"]').trigger('click')
     await flushPromises()
     expect(element('[data-job-id="job:enrich"]').attributes('data-job-status')).toBe('done')
-    expect(client.GET).toHaveBeenCalledTimes(1)
+    expect(client.GET.mock.calls.filter(([path]) => path === '/api/projects/{id}')).toHaveLength(1)
   })
 
   it('shows candidate loading, no matches, localized recoverable search and add errors without losing selection', async () => {

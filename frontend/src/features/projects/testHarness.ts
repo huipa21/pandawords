@@ -41,6 +41,10 @@ export async function setup(path = '/projects', locale: 'en' | 'zh-CN' = 'en') {
       { path: '/projects/new', name: 'project-create', component: ProjectEditorPage },
       { path: '/projects/:id/edit', name: 'project-edit', component: ProjectEditorPage },
       { path: '/projects/:id', name: 'project', component: ProjectPage },
+      {
+        path: '/words/:lemmaId',
+        component: { template: '<div />' },
+      },
     ],
   })
   await router.push(path)

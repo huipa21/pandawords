@@ -14,7 +14,14 @@ let cleanup: (() => void) | undefined
 
 beforeEach(() => {
   vi.resetAllMocks()
-  client.GET.mockResolvedValue(success(project))
+  client.GET.mockImplementation((path: string) => Promise.resolve(path === '/api/projects/{project_id}/tree'
+    ? success({
+        items: [],
+        total: 0,
+        page: 1,
+        page_size: 20,
+      })
+    : success(project)))
   client.POST.mockResolvedValue(success(project))
   client.PATCH.mockResolvedValue(success(project))
 })

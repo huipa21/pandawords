@@ -118,20 +118,26 @@ describe('project list', () => {
     })
   })
 
-  it('opens the project detail shell without fetching a speculative tree', async () => {
+  it('opens the project detail and loads its tree', async () => {
     const app = await setup()
     cleanup = app.cleanup
     client.GET.mockResolvedValueOnce(success(project))
+    client.GET.mockResolvedValueOnce(success({
+      items: [],
+      total: 0,
+      page: 1,
+      page_size: 20,
+    }))
     await app.wrapper.get('[data-testid="project-card"] a').trigger('click')
     await flushPromises()
     expect(app.router.currentRoute.value.params.id).toBe(project.id)
-    expect(app.wrapper.text()).toContain('The project is ready.')
-    expect(client.GET).toHaveBeenLastCalledWith('/api/projects/{id}', {
+    expect(app.wrapper.text()).toContain('No words in this project yet.')
+    expect(client.GET).toHaveBeenCalledWith('/api/projects/{id}', {
       params: {
         path: { id: project.id },
       },
     })
-    expect(client.GET).toHaveBeenCalledTimes(2)
+    expect(client.GET).toHaveBeenCalledTimes(3)
     client.GET.mockResolvedValueOnce(success(project))
     await app.wrapper.get('[data-testid="project-edit"]').trigger('click')
     await flushPromises()

@@ -61,7 +61,7 @@ models while preserving structured keys for submission.
 | `SenseItem` | Definition, zh gloss, register/domain tags, examples (collapsed), override marker, actions (edit, hide, note). `sense` (effective view), `selectable?`, `hidden?`, `editable?` |
 | `SenseSelectList` | Checklist of candidate senses, grouped by lexeme, with common ones pre-checked. `v-model:selected`, `candidates` |
 | `LexemeBlock` | POS + pronunciation chips + its SenseItems |
-| `LemmaTree` | Presentational NTree of `items: LemmaBranch[]`; controlled `expandedKeys` / `selectedKeys` and update events. Word headers, lexeme labels and effective senses; no project fetching |
+| `LemmaTree` | Presentational NTree of `items: LemmaBranch[]`; controlled `expandedKeys` / `selectedKeys` and update events, optional `defaultExpandAll`, and an `actions` slot with `table` and `id` for page-owned controls. Word headers, lexeme labels and effective senses; no project fetching |
 | `NoteEditor` | Controlled `modelValue` text, `target`, `kind: note \| mnemonic`, `saving`, `disabled`; emits model update, `save({target, kind, text})`, `cancel`. Persistence belongs to pages |
 
 Implemented word components live in `src/components/word/`. `types.ts` defines presentation
