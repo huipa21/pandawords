@@ -10,7 +10,8 @@ Podman, transferred manually, and loaded with Docker on the server (Korea, 2 vCP
 | `dist/pandawords-x.y.z-images.tar.gz` | `pandawords-api:x.y.z` and `pandawords-web:x.y.z` (`podman build --platform linux/amd64`, `podman save --format docker-archive --multi-image-archive`, gzip) |
 | `dist/pandawords-x.y.z-deploy.tar.gz` | `compose.yml`, `.env.example`, `Caddyfile.snippet`, `VERSION` (`restore.sh` deferred to 6.1.5) |
 | `dist/SHA256SUMS` | SHA-256 checksums of the two release archives, with relative filenames |
-| `dist/pandawords-lexicon-<date>.tar.gz` | `lexicon.sqlite` + `manifest.json` (only when the lexicon changes) |
+| `dist/pandawords-lexicon-<date>.tar.gz` | `lexicon.sqlite`, `manifest.json`, `SHA256SUMS` (`dev.ps1 lexicon`, only when the lexicon changes) |
+| `dist/pandawords-lexicon-<date>.tar.gz.sha256` | SHA-256 of that lexicon archive; independent of application-release `SHA256SUMS` |
 
 SurrealDB is pulled on the server from the official `surrealdb/surrealdb:v3.3.x` image (pinned patch
 version). `DOCKER_REGISTRY_MIRROR` is used only if Docker Hub fails.
@@ -30,6 +31,32 @@ diagnose that failure before considering an explicitly configured fallback.
 The archive uses explicit `docker.io/library/pandawords-{api,web}:x.y.z` tags, not Podman's
 implicit `localhost/` prefix. These identify the same Docker images as the unqualified
 `pandawords-{api,web}:x.y.z` names in production Compose.
+
+### Lexicon transfer
+
+Run `.\scripts\dev.ps1 lexicon [-Date yyyy-MM-dd]` explicitly after installing dependencies.
+It uses the selected worktree's code and the main worktree's ignored data/output locations,
+verifies or downloads official sources, then builds with ECDICT, wordfreq and OEWN. For
+snapshot/output overrides and overwrite guards, see [setup.md](setup.md#lexicon-release).
+No containers or application images are needed. Both archive and sidecar must be absent
+before publication; failures identify their stage and do not leave partial releases.
+
+Transfer both files, then verify on the server before installing into the read-only lexicon
+mount. Use a new unpack directory rather than replacing a running database in place:
+
+```sh
+sha256sum -c pandawords-lexicon-2026-11-14.tar.gz.sha256
+mkdir lexicon-2026-11-14
+tar -xzf pandawords-lexicon-2026-11-14.tar.gz -C lexicon-2026-11-14
+(cd lexicon-2026-11-14 && sha256sum -c SHA256SUMS)
+sqlite3 lexicon-2026-11-14/lexicon.sqlite 'PRAGMA integrity_check; PRAGMA foreign_key_check;'
+```
+
+The SQLite checks must print `ok` and no foreign-key rows. The manifest includes original
+download records/licenses, all source attributions, installed wordfreq version, database
+schema version, size, hash and build counts. Keep it alongside the database. The lexicon is
+a separately transferred rebuildable artifact, **not part of site backups**; no backup
+command or retention policy changes.
 
 ### Verified release round trip (task 1.6.5)
 

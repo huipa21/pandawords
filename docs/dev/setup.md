@@ -16,7 +16,7 @@
 
 ```powershell
 ./scripts/dev.ps1 setup      # checks tools, uv python install 3.14, uv sync, pnpm install, .env.dev from .env.example
-./scripts/dev.ps1 lexicon    # one-off, downloads ~GBs; builds data/lexicon/lexicon.sqlite (Phase 2+)
+./scripts/dev.ps1 lexicon    # explicit one-off: downloads ~GBs, builds SQLite + dated transfer archive
 ./scripts/dev.ps1 up         # DB + migrate + seed + API + worker + Vite
 ```
 
@@ -56,6 +56,37 @@ defaults to backend plus frontend tests; selectors combine, and E2E is explicit 
 tools fail with diagnostics: restore this worktree's dependencies with `uv sync --locked` in
 `backend` and `pnpm install --frozen-lockfile` at the root, then retry. Commands do not install
 dependencies or edit the private environment file.
+
+## Lexicon release
+
+`.\scripts\dev.ps1 lexicon` runs the selected worktree's Python code, but shares the main
+worktree's ignored `data\lexicon\raw` sources and `data\lexicon\lexicon.sqlite`, including
+from linked worktrees. It verifies cached files against the downloader manifest and official
+pins, downloads only missing sources from official URLs, then streams the Wiktionary build
+with ECDICT, installed offline wordfreq data and OEWN enrichment. It does not start the stack
+or import dictionary rows into SurrealDB.
+
+The UTC date defaults to today. The main worktree's ignored `dist` receives
+`pandawords-lexicon-yyyy-MM-dd.tar.gz` plus its `.sha256` sidecar. The archive contains
+`lexicon.sqlite`, `manifest.json` (input provenance, licenses, wordfreq version, database
+checksum/counts/schema version) and `SHA256SUMS` for those two files.
+
+For intentional snapshot changes or isolated builds, use explicit paths (relative paths are
+resolved from the selected worktree's `backend` directory):
+
+```powershell
+.\scripts\dev.ps1 lexicon -RawDir C:\lexicon-snapshot\raw -Output C:\lexicon-snapshot\lexicon.sqlite -DistDir C:\lexicon-snapshot\dist -Date 2026-11-14
+```
+
+No dependency installation or source replacement is implicit. An existing dated archive or
+sidecar is refused; an existing SQLite file is retained only if byte-identical to the new build.
+For a changed build, select another output path or explicitly move the old generated database
+first. Never delete or overwrite raw sources to recover a failure: use another raw directory
+for upgrades. Download/build/package/publish failures identify their stage and exit nonzero;
+unpublished stages and newly published outputs are rolled back. Verified source downloads
+remain cached. A release lock serializes builds targeting the same database directory; after
+an interrupted process, remove a stale `.lexicon-release.lock` only after confirming no build
+is running. See [deployment.md](deployment.md) for transfer verification.
 
 ## Local databases
 
