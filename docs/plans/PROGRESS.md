@@ -21,7 +21,6 @@ browser logs will be committed as source.
 | 2.1.3 | task/2.1.3-ecdict-frequency | ../pandawords.worktrees/2.1.3 | Starting; Chinese/frequency enrichment |
 | 2.1.4 | task/2.1.4-oewn | ../pandawords.worktrees/2.1.4 | Starting; sense relation alignment |
 | 2.3.2 | task/2.3.2-project-api | ../pandawords.worktrees/2.3.2 | Starting; owner-scoped CRUD |
-| 2.5.1 | task/2.5.1-media | ../pandawords.worktrees/2.5.1 | Starting; authenticated media |
 
 ## Blocked
 
@@ -47,6 +46,19 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 2.5.1 Authorized media storage and serving
+- Result / completed: typed media metadata/storage and authenticated internal nginx redirect;
+  migration 0007, traversal/junction containment and owner visibility checks; `27866e7` merged.
+  Regenerated frontend contracts after integration.
+- Dependencies: 2.2.1 and 1.6.3 checked ✅.
+- Verification: agent focused 18 passed, final normal backend 339 passed, frontend and `check`
+  passed. Main merge `check`, `gen-api`, combined backend/frontend passed (378 backend).
+- Skipped / deferred: live nginx playback and browser integration remain final integration;
+  audio generation belongs to 2.5.2.
+- Failures / causes / corrections: initial Windows symlink test skip replaced with junction
+  coverage; final suite no skips. Missing environment and typing issue fixed.
+- Blockers: none. Branch/worktree removed after verification; audio still waits for add API.
 
 ### 2026-11-14 — 2.1.2 Streaming core lexicon
 - Result / completed: atomic streaming Kaikki builder, indexed SQLite v1 schema, attribution,
