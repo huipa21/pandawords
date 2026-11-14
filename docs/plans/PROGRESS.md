@@ -64,6 +64,20 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
 
+### 2026-11-15 — Phase 6/7 task details
+- Result / completed: added [phase-6.md](phase-6.md) and [phase-7.md](phase-7.md) with task
+  goals, deliverables, acceptance criteria and related docs; linked both from [PLAN.md](PLAN.md).
+  Existing Phase 4/5 Current run and task statuses were left unchanged.
+- Dependencies: PLAN task graph and import/export, auth, data-model, learning-engine, deployment
+  and testing contracts reviewed; no implementation dependency was changed or marked complete.
+- Verification: documentation reviewed against PLAN.md and existing architecture contracts;
+  `git diff --check` passed. No code tests apply to this documentation-only change.
+- Skipped / deferred: no Phase 6/7 implementation, migrations or code tests were run.
+- Failures / causes / corrections: none.
+- Findings: offline review criteria preserve server-authoritative grading and receipts, and require
+  an explicit bounded lease for prefetched attempts.
+- Blockers / follow-ups: none.
+
 ### 2026-11-15 — 4.2.3 Reading and inline vocabulary
 - Result / completed: `865a5ae` merged as `c56af3a`; reachable bilingual passage library/ingestion,
   effective project-only highlights, explicit sense selection and resumable add/link drafts.

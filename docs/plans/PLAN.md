@@ -120,7 +120,7 @@ are in `phase-N.md`. If a phase file doesn't exist yet, the agent asks before wr
 | 5.1.2 | Mnemonic notes UI + DeepSeek suggestions | 3.2.5, 2.6.5 | 1 | S | ✅ |
 | 5.1.3 | `image2word` exercise + media preferences in review | 5.1.1, 3.3.2 | 2 | M | 🟡 |
 
-## Phase 6 — Import/export & backups
+## Phase 6 — Import/export & backups ([details](phase-6.md))
 
 | ID | Task | Depends on | Wave | Size | Status |
 |---|---|---|---|---|---|
@@ -131,7 +131,7 @@ are in `phase-N.md`. If a phase file doesn't exist yet, the agent asks before wr
 | 6.1.5 | Admin site backup/restore, scheduled `backup` service, `restore.sh` | 1.6.4 | 1 | M | ⬜ |
 | 6.1.6 | UI for export, import and backup | 6.1.2, 6.1.3, 6.1.4, 6.1.5 | 5 | M | ⬜ |
 
-## Phase 7 — PWA & hardening
+## Phase 7 — PWA & hardening ([details](phase-7.md))
 
 | ID | Task | Depends on | Wave | Size | Status |
 |---|---|---|---|---|---|
