@@ -77,7 +77,10 @@ It emits `play(src | undefined)` on playback requests and `error` on media failu
 browser-playable URLs use one shared audio element; another play stops the preceding sound.
 An omitted URL is event-only (caller may resolve audio); use `disabled` for unavailable audio.
 `PronunciationChip` forwards play requests and accepts `ipa`, `accent: US | UK`, `audioUrl`.
-No bearer-token fetching is performed here; authenticated audio serving is a later integration.
+For externally managed playback, `playbackState` controls the button's pressed state and each
+click emits a play request, allowing the caller to toggle playback.
+No bearer-token fetching is performed here; the lemma detail page resolves protected media IDs
+through its authenticated blob adapter before using the shared player.
 The design preview includes a locally generated tone, not a remote pronunciation dependency.
 Both theme panels demonstrate all word components, selection, hidden/customized senses,
 word/phrase trees and empty states at responsive widths.

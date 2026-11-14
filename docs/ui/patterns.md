@@ -90,6 +90,36 @@
   Route IDs are opaque record IDs passed via
   named routes, not manually split or concatenated.
 
+## Lemma detail
+
+- `/words/:lemmaId` (named route `word`, opaque `lemmaId` parameter) shows effective dictionary
+  data with shared word, POS, pronunciation and sense components. It shows all visible cached
+  senses, independent of any project's membership or hidden-state selection.
+- Personal field editors support lemma headword/CEFR, lexeme etymology and sense definition/
+  Chinese gloss. PATCH preserves other fields and gloss languages. Reset uses `ConfirmAction`
+  and removes the item's **entire** own override, not just the fields shown in the editor.
+  Shared dictionary rows are never edited. Saved changes are re-read from the effective endpoint.
+- The target selector and sense Note action manage own lemma/lexeme/sense notes. Add and edit
+  preserve failed drafts; delete requires confirmation. Refresh retains confirmed content and
+  unsaved text. Drafts remain in Pinia memory across project navigation (reopen the same editor);
+  changing the signed-in user clears them. Drafts do not enter browser storage; browser reload
+  restores only saved server data.
+- Pronunciation pointers are opaque media IDs, not public URLs. Fetch with the authenticated API
+  client (`parseAs: 'blob'`), then play a temporary object URL through the shared player. Empty
+  blobs, missing audio, transport/API and playback errors are explicit; navigation/unmount aborts
+  pending fetches, stops playback and revokes object URLs. The pronunciation button toggles
+  playback or cancels an in-flight request, and exposes its state to assistive technology.
+- Browser selectors: `word-detail`, `word-refresh`, `word-lemma-edit`, `word-lemma-reset`,
+  `word-lexeme` (`data-lexeme-id`), `word-lexeme-edit`, `word-lexeme-reset`, `word-sense`
+  (`data-sense-id`), `word-sense-edit`, `word-sense-reset`, `word-sense-note`,
+  `word-override-editor`, `word-override-save`, `word-notes` (`data-target-id`),
+  `word-note` (`data-note-id`), `word-note-editor`, `word-note-edit`, `word-note-delete`,
+  `word-pronunciation` (`data-media-id`) and `word-missing-audio`.
+  Override inputs have `word-override-text`, `word-override-cefr`,
+  `word-override-etymology_text`, `word-override-definition`, `word-override-gloss` IDs.
+  The note editor's `textarea` is scoped beneath `word-note-editor`. Project tree links should
+  use `{ name: 'word', params: { lemmaId: opaqueLemmaId } }`, without splitting record IDs.
+
 ## Review session
 
 - Full-screen focus mode. The prompt is centered and the headword uses `text-3xl` on desktop and

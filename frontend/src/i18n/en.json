@@ -1,4 +1,29 @@
 {
+  "lemmaDetail": {
+    "cefr": "CEFR: {level}",
+    "refresh": "Refresh",
+    "unavailable": "This word is unavailable.",
+    "emptySenses": "No senses are available.",
+    "missingAudio": "No pronunciation audio is available.",
+    "editOverride": "Edit my fields",
+    "resetOverride": "Reset my override",
+    "resetConfirm": "Remove all your customized fields for this item? The shared dictionary is unchanged.",
+    "saved": "Saved.",
+    "invalidText": "Enter valid text (up to 10,000 characters).",
+    "invalidNote": "Enter a note between 1 and 10,000 characters.",
+    "notes": "My notes",
+    "noteTarget": "Notes for",
+    "emptyNotes": "No personal notes yet.",
+    "deleteNote": "Delete note",
+    "deleteNoteConfirm": "Permanently delete this personal note?",
+    "fields": {
+      "text": "Headword",
+      "cefr": "CEFR level",
+      "etymology_text": "Etymology",
+      "definition": "Definition",
+      "gloss": "Chinese gloss"
+    }
+  },
   "word": {
     "frequency": "Frequency: {band}",
     "common": "Common",

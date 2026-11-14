@@ -7,24 +7,30 @@ const props = withDefaults(defineProps<{
   src?: string
   disabled?: boolean
   size?: 'small' | 'medium' | 'large'
+  playbackState?: 'playing' | 'stopped'
 }>(), { size: 'large' })
 const emit = defineEmits<{ play: [src: string | undefined], error: [] }>()
 const { t } = useI18n()
 const owner = Symbol('audio')
 const player = useWordAudio()
-const playing = computed(() => player.active.value === owner)
+const playing = computed(() => props.playbackState === undefined
+  ? player.active.value === owner
+  : props.playbackState === 'playing')
 const failed = ref(false)
 function stop() {
   player.stop(owner)
 }
 function play() {
   if (playing.value) {
-    stop()
+    if (props.playbackState === undefined)
+      stop()
+    else
+      emit('play', props.src)
     return
   }
   failed.value = false
   emit('play', props.src)
-  if (props.src) {
+  if (props.src && props.playbackState === undefined) {
     void player.play(owner, props.src, () => {
       failed.value = true
       emit('error')

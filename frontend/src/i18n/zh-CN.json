@@ -1,4 +1,29 @@
 {
+  "lemmaDetail": {
+    "cefr": "CEFR 等级：{level}",
+    "refresh": "刷新",
+    "unavailable": "该单词不可用。",
+    "emptySenses": "暂无可用词义。",
+    "missingAudio": "暂无可用发音音频。",
+    "editOverride": "编辑我的字段",
+    "resetOverride": "重置我的覆盖",
+    "resetConfirm": "移除此条目中你自定义的所有字段？共享词典不会改变。",
+    "saved": "已保存。",
+    "invalidText": "请输入有效文本（最多 10,000 个字符）。",
+    "invalidNote": "请输入 1 至 10,000 个字符的笔记。",
+    "notes": "我的笔记",
+    "noteTarget": "笔记对象",
+    "emptyNotes": "暂无个人笔记。",
+    "deleteNote": "删除笔记",
+    "deleteNoteConfirm": "永久删除这条个人笔记？",
+    "fields": {
+      "text": "词头",
+      "cefr": "CEFR 等级",
+      "etymology_text": "词源",
+      "definition": "释义",
+      "gloss": "中文释义"
+    }
+  },
   "word": {
     "frequency": "词频：{band}",
     "common": "常用",

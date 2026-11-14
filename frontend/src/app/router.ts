@@ -11,7 +11,6 @@ const pages = [
   ['projects/:id/plan', 'project-plan', 'plan'],
   ['review', 'review', 'review'],
   ['words', 'words', 'words'],
-  ['words/:lemmaId', 'word', 'word'],
   ['reading/:passageId', 'reading', 'reading'],
   ['settings', 'settings', 'settings'],
   ['admin/backup', 'admin-backup', 'backup'],
@@ -20,6 +19,12 @@ const pages = [
 export function createAppRouter(history: RouterHistory = createWebHistory()) {
   const children: RouteRecordRaw[] = [
     { path: '', redirect: '/projects' },
+    {
+      path: 'words/:lemmaId',
+      name: 'word',
+      component: () => import('@/features/words/LemmaDetailPage.vue'),
+      meta: { title: 'word' },
+    },
     {
       path: 'projects',
       name: 'projects',
