@@ -16,6 +16,7 @@
       "composed_of": "DEFINE TABLE composed_of TYPE RELATION IN lexeme OUT morpheme ENFORCED SCHEMAFULL PERMISSIONS NONE",
       "contains": "DEFINE TABLE contains TYPE RELATION IN lemma OUT lexeme ENFORCED SCHEMAFULL PERMISSIONS NONE",
       "derives_to": "DEFINE TABLE derives_to TYPE RELATION IN lexeme OUT lexeme ENFORCED SCHEMAFULL PERMISSIONS NONE",
+      "exercise_attempt": "DEFINE TABLE exercise_attempt TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "has_lexeme": "DEFINE TABLE has_lexeme TYPE RELATION IN lemma OUT lexeme ENFORCED SCHEMAFULL PERMISSIONS NONE",
       "has_sense": "DEFINE TABLE has_sense TYPE RELATION IN lexeme OUT sense ENFORCED SCHEMAFULL PERMISSIONS NONE",
       "includes": "DEFINE TABLE includes TYPE RELATION IN project OUT lemma | lexeme | sense | sentence | passage ENFORCED SCHEMAFULL PERMISSIONS NONE",
@@ -102,6 +103,23 @@
         "via": "DEFINE FIELD via ON derives_to TYPE none | string PERMISSIONS FULL"
       },
       "indexes": {},
+      "lives": {},
+      "tables": {}
+    },
+    "exercise_attempt": {
+      "events": {},
+      "fields": {
+        "expires_at": "DEFINE FIELD expires_at ON exercise_attempt TYPE datetime ASSERT $value > $this.issued_at PERMISSIONS FULL",
+        "issued_at": "DEFINE FIELD issued_at ON exercise_attempt TYPE datetime PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON exercise_attempt TYPE record<user> PERMISSIONS FULL",
+        "payload": "DEFINE FIELD payload ON exercise_attempt TYPE string PERMISSIONS FULL",
+        "project": "DEFINE FIELD project ON exercise_attempt TYPE record<project> PERMISSIONS FULL",
+        "sense": "DEFINE FIELD sense ON exercise_attempt TYPE record<sense> PERMISSIONS FULL",
+        "status": "DEFINE FIELD status ON exercise_attempt TYPE 'open' | 'graded' | 'confirmed' PERMISSIONS FULL"
+      },
+      "indexes": {
+        "exercise_attempt_owner_expiry": "DEFINE INDEX exercise_attempt_owner_expiry ON exercise_attempt FIELDS owner, expires_at"
+      },
       "lives": {},
       "tables": {}
     },

@@ -86,6 +86,64 @@ never be a synonym of the answer.
 mostly recall types as stability grows. Types whose requirements are missing (no audio, LLM off)
 are skipped.
 
+### Exercise framework and durable attempts (3.2.1)
+
+`services.exercise_registry.ExerciseRegistry.register(ExercisePlugin(exercise, kind,
+generate, grade))` registers one unique stable type ID. `generate(context: ExerciseContext)`
+is async and returns `GeneratedExercise(prompt: ExercisePrompt, private: AnswerSpec)` or
+`Unavailable(exercise, reason)`; the synchronous grader takes `(AnswerSpec, answer: str)` and
+returns `ExerciseFeedback(correct, answer)`. Plugins import the domain and registry contracts,
+not the attempt service. Register plugins at application composition time; this framework
+intentionally ships **no placeholder production generators**. Until 3.2.3/3.2.4/3.2.6 register
+real generators, creation returns `409 exercise.no_usable`, without calling a provider.
+
+The context contains effective owner-visible lemma/selected lexeme/sense records and normalized
+`forms`. It is resolved through visible selected ancestry, not by searching every lexeme of
+a headword. `DistractorProvider`, `ClozeProvider`, `ListeningProvider` and `ScenarioProvider`
+protocols return their corresponding concrete domain source models or `Unavailable`.
+Recognition uses public `Choice(id, label)` values and a **private** `choice_id`.
+Cloze/scenario use private `accepted_forms`; listening sets `restriction="audio_form"` and
+`answer` to the form represented by its protected `media_id`, never all inflections.
+Provider closures may capture configured DB/settings dependencies; the registry has no network
+or provider imports.
+
+Selection first skips incompatible states/prerequisites, then chooses a **kind**, then a type
+uniformly within that kind. New/unintroduced, Learning and Relearning use recognition only.
+Introduced Review uses recall:recognition **1:1 below seven days**, **2:1 at/above seven**.
+A sole usable kind receives all weight. Skips are returned on successful attempts; no-usable
+errors include the reasons in the existing error message and structured `exercise_no_usable`
+log. A seeded/injected random callable makes boundaries reproducible.
+
+`normalize_answer` performs Unicode NFKC, curly apostrophe/quote and nonbreaking hyphen folding,
+casefolding and whitespace collapse/trim. It does **not** stem, remove punctuation/accents or
+accept arbitrary related words. `selected_lexeme_forms(lemma, lexeme)` returns sorted unique
+normalized headword + that effective lexeme's forms. `grade_answer` compares whole normalized
+recall answers; choice IDs use exact matching. Listening's audio-form restriction is separate
+from this common normalization.
+
+Attempts have opaque random IDs and persist `open → graded → confirmed`, expiring **30 minutes
+after issuance** while unconfirmed. Create/read/hint/answer/giveup/confirm are owner-scoped;
+unconfirmed operations recheck effective membership, existence and the issuance `MemoryRead.version`.
+An expired attempt is `410 exercise.expired`; stale memory is `409 exercise.stale`; hidden or
+removed membership is explicitly ineligible. Only open attempts accept hints; a successful hint
+is persisted before returning it, retries are safe, and missing hints return `exercise.hint_unavailable`.
+
+The first submission stores its exact answer/give-up + client-duration fingerprint,
+`FrameworkGrade`, feedback and the `srs.grade_review` result. Identical retries return that
+grade; changed answers, give-up intent or durations return `409 exercise.answer_conflict`.
+There is no scheduling write until confirmation supplies the final rating to `srs.apply_review`.
+That boundary atomically saves the card, review log and receipt; marking the attempt confirmed
+is recoverable from the durable receipt after a process interruption. Conflicting confirmations
+fail. Confirmed receipt reads/retries remain valid after expiry, later reviews or project
+deletion; unconfirmed abandoned/stale attempts do not.
+
+The shell measures monotonic elapsed milliseconds with `performance.now()` from prompt display
+to submit and sends a nonnegative **integer** `duration_ms` (floor before submission). The server
+rejects negative, boolean, string, fractional and nonfinite durations; records issuance-to-answer
+`server_elapsed_ms`; and rates/logs `min(client_duration_ms, server_elapsed_ms, 60000)`.
+Thus a client displaying a prompt late may report less elapsed than the server, but cannot claim
+more than server elapsed or exceed the one-minute cap. Identical retries do not recompute timing.
+
 ## Daily plan (per project)
 
 ### Optional JSON generation (3.2.5)

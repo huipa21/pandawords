@@ -15,6 +15,26 @@ at the read instant. Actual API tests verify persisted hidden slots, shared card
 content/edge ownership layer, UTC counts, schedules and forecasts. Existing membership/graph
 lookup indexes and transaction helpers are reused. No persistent dev DB was modified.
 
+### Durable exercise attempts (3.2.1) ✅
+
+Verified 2026-11-14 against the existing SurrealDB 3.3 test server on **127.0.0.1:8101**,
+using random harness databases, migration 0017 and real API/integration/snapshot tests:
+
+- SCHEMAFULL enum status and `expires_at TYPE datetime ASSERT $value > $this.issued_at`
+  migrate successfully. Required typed owner/project/sense references and the owner/expiry
+  index are included in the regenerated table-level schema snapshot.
+- Bound `CREATE $attempt CONTENT $content` and owner-filtered
+  `UPDATE $attempt CONTENT $content WHERE owner = $user RETURN AFTER` preserve JSON-text
+  Pydantic state (including UTC times, private keys, exact submissions and review receipts).
+- Concurrent answer/hint mutations conflict on the same row; the existing SDK `_atomic`
+  retry re-reads state, preserving one grade and the winning hint flag. Concurrent identical
+  confirmations still produce exactly one atomic SRS update/log.
+- A simulated failure after SRS commit but before the attempt status write leaves a durable
+  review-log receipt. Retrying confirmation repairs attempt state without another review,
+  even after expiry/project deletion; a different final rating remains a conflict.
+
+No persistent dev database was changed.
+
 ### Atomic scheduling and preferences (3.1.2) ✅
 
 Verified 2026-11-14 against SurrealDB 3.3.5 / SDK 3.0.0, isolated random harness databases

@@ -104,8 +104,29 @@ word/phrase trees and empty states at responsive widths.
 
 | Component | Purpose / key props |
 |---|---|
-| `ExerciseShell` | Common frame: prompt slot, answer slot, hint, submit, feedback, timer (hidden). Emits `answered {correct, durationMs, usedHint, answer}` |
+| `ExerciseShell` | Planned common frame: prompt/answer slots, server hint, submit/give up, feedback, hidden monotonic timer. Uses generated `AttemptRead`; emits answer + duration only, never client correctness |
 | `ChoiceGrid` | 2–4 options for recognition exercises. Keys 1–4 select; Enter submits |
 | `TypedAnswerInput` | Recall input. Accepts any valid form. Shows a diff highlight on a wrong answer |
 | `RatingBar` | Again / Hard / Good / Easy in `--pw-rating-*` colors, with the auto-rating preselected. Keys 1–4; Space/Enter confirms |
 | `ReviewProgress` | Done / remaining, new vs review counts |
+
+### Framework contract for the study shell (3.2.1)
+
+Use generated `components['schemas']['AttemptRead']` and its `status` discriminator; do not
+hand-write API shapes. Render `prompt.text`, `prompt.input`, `choices[{id,label}]` and optional
+protected `media_id`; media IDs still require the authenticated blob adapter, not direct URLs.
+Open attempts have no correctness/feedback/accepted forms. Hint requests use the persisted
+`/hint` response; the shell must not synthesize `hint_used`.
+
+On prompt display capture `performance.now()`. Submit `AttemptAnswer {answer, duration_ms}`
+or `AttemptGiveUp {duration_ms}`, flooring the elapsed nonnegative milliseconds. Preserve the
+same body for retries; a different answer/duration after grading is a conflict. Render only
+the server's `feedback`, `auto_rating`, bounded `duration_ms` and `server_elapsed_ms`.
+The rating bar may override any suggestion, including Easy for recognition. Send only
+`AttemptConfirm {rating}` and advance after the confirmed receipt; answer submission alone
+never updates the card. Retry the same confirmation after network uncertainty.
+
+Handle `exercise.no_usable`, expiry, unavailable hints, hidden/removed membership and stale
+attempt errors explicitly. Receipt-backed completed retries survive expiry; abandoned attempts
+require a new issuance. Concrete Vue shell implementation remains the study-UI task; these
+transport contracts do not import generators or expose their private answer specifications.

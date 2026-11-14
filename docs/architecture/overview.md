@@ -94,6 +94,29 @@ an empty body cannot silently reset a saved setting. Auth's public `UserPreferen
 The generated OpenAPI/types include this contract. Server timing defaults are configurable
 with the four `SRS_{RECOGNITION,RECALL}_{FAST,SLOW}_MS` environment settings.
 
+### Exercise attempt API (3.2.1)
+
+Authenticated routes use opaque attempt IDs, owner-scoped services and `Cache-Control: no-store`:
+
+| Route | Request → response |
+|---|---|
+| `POST /api/exercise-attempts` | `AttemptCreate {project_id, sense_id}` → `201 AttemptRead` |
+| `GET /api/exercise-attempts/{id}` | → `AttemptRead` |
+| `POST /api/exercise-attempts/{id}/hint` | no body → `AttemptRead` |
+| `POST /api/exercise-attempts/{id}/answer` | `AttemptAnswer {answer, duration_ms}` → `AttemptRead` |
+| `POST /api/exercise-attempts/{id}/giveup` | `AttemptGiveUp {duration_ms}` → `AttemptRead` |
+| `POST /api/exercise-attempts/{id}/confirm` | `AttemptConfirm {rating: 1..4}` → `AttemptRead` |
+
+Generated `AttemptRead` is discriminated by `status`: `AttemptOpen` exposes only
+prompt/options/media, requested hint and skip reasons; `AttemptGraded` adds feedback, auto-rating
+and validated timing; `AttemptConfirmed` adds the persisted final-rating receipt. No endpoint
+accepts client correctness, answer keys, auto-ratings or scheduling versions. The private
+`Attempt`, `AnswerSpec`, `FrameworkGrade` and `GradedReview` are absent from OpenAPI.
+The framework uses typed plugin contracts and owner-visible selected-lexeme form readers;
+later generator tasks register real types without making startup depend on a live provider.
+Until registration, creation returns explicit `exercise.no_usable`. See learning-engine.md
+for weighting, normalization, timing, expiry and retry semantics.
+
 ## Backend modules
 
 ### Optional LLM boundary

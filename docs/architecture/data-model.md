@@ -20,6 +20,29 @@ shared (`NONE`); `NULL`, strings and references to other tables are rejected. Th
 contract, not database-level authorization: repositories must apply the owner filter on every
 record and edge read.
 
+## Exercise attempts (3.2.1)
+
+Forward migration `0017_exercise_attempts.surql` adds SCHEMAFULL `exercise_attempt`:
+`owner: record<user>`, `project: record<project>`, `sense: record<sense>`,
+`status: 'open' | 'graded' | 'confirmed'`, `issued_at`, `expires_at` (strictly later than
+issuance) and `payload: string`. Index `exercise_attempt_owner_expiry(owner, expires_at)`
+supports owner-bound expiry maintenance; point operations use the random primary ID plus owner
+filter. Version 0016 is independently allocated to daily planning.
+
+The private payload is validated/serialized by `domain.exercises.Attempt`, including the
+public prompt, private answer specification, issuance memory version, hint flag, immutable
+submission fingerprint/grade, server elapsed, `GradedReview` and optional confirmed receipt.
+JSON text preserves Pydantic's exact contract without SurrealDB dropping optional/nested fields.
+All mutations use conflict-retried SDK transactions; simultaneous hint/answer writes serialize
+on this record. No public dictionary or graph read traverses attempt payloads.
+
+Every repository read/update filters `owner = $user`; services also validate the payload's owner
+and identity. Foreign, missing and malformed IDs return indistinguishable `exercise.not_found`.
+Attempts do not replace `review_log`'s unique owner/attempt completion identity: the existing SRS
+transaction remains the authority for exactly-once scheduling and durable receipts. No cascade
+removes confirmed attempts or review receipts on project deletion. Unconfirmed rows stop being
+usable after 30 minutes; this task does not delete historical rows automatically.
+
 ## Record IDs
 
 Shared rows use deterministic IDs, so materialization is idempotent and imports merge cleanly:

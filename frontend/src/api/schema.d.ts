@@ -349,6 +349,108 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/exercise-attempts': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Create */
+    post: operations['create_api_exercise_attempts_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/exercise-attempts/{attempt_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Read */
+    get: operations['read_api_exercise_attempts__attempt_id__get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/exercise-attempts/{attempt_id}/hint': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Hint */
+    post: operations['hint_api_exercise_attempts__attempt_id__hint_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/exercise-attempts/{attempt_id}/answer': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Answer */
+    post: operations['answer_api_exercise_attempts__attempt_id__answer_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/exercise-attempts/{attempt_id}/giveup': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Give Up */
+    post: operations['give_up_api_exercise_attempts__attempt_id__giveup_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/exercise-attempts/{attempt_id}/confirm': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Confirm */
+    post: operations['confirm_api_exercise_attempts__attempt_id__confirm_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/projects/{id}/dictionary': {
     parameters: {
       query?: never
@@ -527,6 +629,166 @@ export interface components {
        */
       reset_password: boolean
     }
+    /** AttemptAnswer */
+    'AttemptAnswer': {
+      /** Answer */
+      answer: string
+      /** Duration Ms */
+      duration_ms: number
+    }
+    /** AttemptConfirm */
+    'AttemptConfirm': {
+      rating: components['schemas']['Rating']
+    }
+    /** AttemptConfirmed */
+    'AttemptConfirmed': {
+      /** Id */
+      id: string
+      /** Project Id */
+      project_id: string
+      /** Sense Id */
+      sense_id: string
+      /** Exercise */
+      exercise: string
+      /**
+       * Kind
+       * @enum {string}
+       */
+      kind: 'recognition' | 'recall'
+      prompt: components['schemas']['ExercisePrompt']
+      /**
+       * Issued At
+       * Format: date-time
+       */
+      issued_at: string
+      /**
+       * Expires At
+       * Format: date-time
+       */
+      expires_at: string
+      /** Hint Used */
+      hint_used: boolean
+      /** Hint */
+      hint?: string | null
+      /**
+       * Skipped
+       * @default []
+       */
+      skipped: components['schemas']['Unavailable'][]
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      status: 'confirmed'
+      feedback: components['schemas']['ExerciseFeedback']
+      auto_rating: components['schemas']['Rating']
+      /** Duration Ms */
+      duration_ms: number
+      /** Server Elapsed Ms */
+      server_elapsed_ms: number
+      receipt: components['schemas']['ReviewReceipt']
+    }
+    /** AttemptCreate */
+    'AttemptCreate': {
+      /** Project Id */
+      project_id: string
+      /** Sense Id */
+      sense_id: string
+    }
+    /** AttemptGiveUp */
+    'AttemptGiveUp': {
+      /** Duration Ms */
+      duration_ms: number
+    }
+    /** AttemptGraded */
+    'AttemptGraded': {
+      /** Id */
+      id: string
+      /** Project Id */
+      project_id: string
+      /** Sense Id */
+      sense_id: string
+      /** Exercise */
+      exercise: string
+      /**
+       * Kind
+       * @enum {string}
+       */
+      kind: 'recognition' | 'recall'
+      prompt: components['schemas']['ExercisePrompt']
+      /**
+       * Issued At
+       * Format: date-time
+       */
+      issued_at: string
+      /**
+       * Expires At
+       * Format: date-time
+       */
+      expires_at: string
+      /** Hint Used */
+      hint_used: boolean
+      /** Hint */
+      hint?: string | null
+      /**
+       * Skipped
+       * @default []
+       */
+      skipped: components['schemas']['Unavailable'][]
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      status: 'graded'
+      feedback: components['schemas']['ExerciseFeedback']
+      auto_rating: components['schemas']['Rating']
+      /** Duration Ms */
+      duration_ms: number
+      /** Server Elapsed Ms */
+      server_elapsed_ms: number
+    }
+    /** AttemptOpen */
+    'AttemptOpen': {
+      /** Id */
+      id: string
+      /** Project Id */
+      project_id: string
+      /** Sense Id */
+      sense_id: string
+      /** Exercise */
+      exercise: string
+      /**
+       * Kind
+       * @enum {string}
+       */
+      kind: 'recognition' | 'recall'
+      prompt: components['schemas']['ExercisePrompt']
+      /**
+       * Issued At
+       * Format: date-time
+       */
+      issued_at: string
+      /**
+       * Expires At
+       * Format: date-time
+       */
+      expires_at: string
+      /** Hint Used */
+      hint_used: boolean
+      /** Hint */
+      hint?: string | null
+      /**
+       * Skipped
+       * @default []
+       */
+      skipped: components['schemas']['Unavailable'][]
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      status: 'open'
+    }
+    'AttemptRead': components['schemas']['AttemptOpen'] | components['schemas']['AttemptGraded'] | components['schemas']['AttemptConfirmed']
     /** AuthRead */
     'AuthRead': {
       /** Access Token */
@@ -589,6 +851,13 @@ export interface components {
       due: string
       /** Last Review */
       last_review?: string | null
+    }
+    /** Choice */
+    'Choice': {
+      /** Id */
+      id: string
+      /** Label */
+      label: string
     }
     /** CompletedCounts */
     'CompletedCounts': {
@@ -691,6 +960,30 @@ export interface components {
       impossible: boolean
       /** Buffer At Risk */
       buffer_at_risk: boolean
+    }
+    /** ExerciseFeedback */
+    'ExerciseFeedback': {
+      /** Correct */
+      correct: boolean
+      /** Answer */
+      answer: string
+    }
+    /** ExercisePrompt */
+    'ExercisePrompt': {
+      /** Text */
+      text: string
+      /**
+       * Input
+       * @enum {string}
+       */
+      input: 'choice' | 'text'
+      /**
+       * Choices
+       * @default []
+       */
+      choices: components['schemas']['Choice'][]
+      /** Media Id */
+      media_id?: string | null
     }
     /** ForecastDay */
     'ForecastDay': {
@@ -1142,6 +1435,31 @@ export interface components {
       ipa: components['schemas']['Text-Output']
     }
     'Rank': number
+    /**
+     * Rating
+     * @description Enum representing the four possible ratings when reviewing a card.
+     * @enum {integer}
+     */
+    'Rating': 1 | 2 | 3 | 4
+    /** ReviewReceipt */
+    'ReviewReceipt': {
+      /** Attempt Id */
+      attempt_id: string
+      /** Project Id */
+      project_id: string
+      memory: components['schemas']['MemoryRead']
+      auto_rating: components['schemas']['Rating']
+      rating: components['schemas']['Rating']
+      /** Correct */
+      correct: boolean
+      /**
+       * At
+       * Format: date-time
+       */
+      at: string
+      /** Is Introduction */
+      is_introduction: boolean
+    }
     /** SenseOrderRead */
     'SenseOrderRead': {
       /** Project Id */
@@ -1218,6 +1536,13 @@ export interface components {
       readonly memory_version: string
     }
     'Text-Output': string
+    /** Unavailable */
+    'Unavailable': {
+      /** Exercise */
+      exercise: string
+      /** Reason */
+      reason: string
+    }
     /** UserPreferences */
     'UserPreferences': {
       /**
@@ -2034,6 +2359,206 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['CandidateResponse']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  create_api_exercise_attempts_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AttemptCreate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AttemptRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  read_api_exercise_attempts__attempt_id__get: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        attempt_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AttemptRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  hint_api_exercise_attempts__attempt_id__hint_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        attempt_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AttemptRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  answer_api_exercise_attempts__attempt_id__answer_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        attempt_id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AttemptAnswer']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AttemptRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  give_up_api_exercise_attempts__attempt_id__giveup_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        attempt_id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AttemptGiveUp']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AttemptRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  confirm_api_exercise_attempts__attempt_id__confirm_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        attempt_id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AttemptConfirm']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AttemptRead']
         }
       }
       /** @description Validation Error */

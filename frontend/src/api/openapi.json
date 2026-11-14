@@ -1190,6 +1190,317 @@
         ]
       }
     },
+    "/api/exercise-attempts": {
+      "post": {
+        "tags": [
+          "exercises"
+        ],
+        "summary": "Create",
+        "operationId": "create_api_exercise_attempts_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttemptCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/exercise-attempts/{attempt_id}": {
+      "get": {
+        "tags": [
+          "exercises"
+        ],
+        "summary": "Read",
+        "operationId": "read_api_exercise_attempts__attempt_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "attempt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Attempt Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/exercise-attempts/{attempt_id}/hint": {
+      "post": {
+        "tags": [
+          "exercises"
+        ],
+        "summary": "Hint",
+        "operationId": "hint_api_exercise_attempts__attempt_id__hint_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "attempt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Attempt Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/exercise-attempts/{attempt_id}/answer": {
+      "post": {
+        "tags": [
+          "exercises"
+        ],
+        "summary": "Answer",
+        "operationId": "answer_api_exercise_attempts__attempt_id__answer_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "attempt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Attempt Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttemptAnswer"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/exercise-attempts/{attempt_id}/giveup": {
+      "post": {
+        "tags": [
+          "exercises"
+        ],
+        "summary": "Give Up",
+        "operationId": "give_up_api_exercise_attempts__attempt_id__giveup_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "attempt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Attempt Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttemptGiveUp"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/exercise-attempts/{attempt_id}/confirm": {
+      "post": {
+        "tags": [
+          "exercises"
+        ],
+        "summary": "Confirm",
+        "operationId": "confirm_api_exercise_attempts__attempt_id__confirm_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "attempt_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Attempt Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttemptConfirm"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AttemptRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/projects/{id}/dictionary": {
       "post": {
         "tags": [
@@ -2055,6 +2366,387 @@
         "type": "object",
         "title": "AdminUserUpdate"
       },
+      "AttemptAnswer": {
+        "properties": {
+          "answer": {
+            "type": "string",
+            "maxLength": 4096,
+            "title": "Answer"
+          },
+          "duration_ms": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Duration Ms"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "answer",
+          "duration_ms"
+        ],
+        "title": "AttemptAnswer"
+      },
+      "AttemptConfirm": {
+        "properties": {
+          "rating": {
+            "$ref": "#/components/schemas/Rating"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "rating"
+        ],
+        "title": "AttemptConfirm"
+      },
+      "AttemptConfirmed": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "project_id": {
+            "type": "string",
+            "title": "Project Id"
+          },
+          "sense_id": {
+            "type": "string",
+            "title": "Sense Id"
+          },
+          "exercise": {
+            "type": "string",
+            "title": "Exercise"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "recognition",
+              "recall"
+            ],
+            "title": "Kind"
+          },
+          "prompt": {
+            "$ref": "#/components/schemas/ExercisePrompt"
+          },
+          "issued_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Issued At"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          },
+          "hint_used": {
+            "type": "boolean",
+            "title": "Hint Used"
+          },
+          "hint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hint"
+          },
+          "skipped": {
+            "items": {
+              "$ref": "#/components/schemas/Unavailable"
+            },
+            "type": "array",
+            "title": "Skipped",
+            "default": []
+          },
+          "status": {
+            "type": "string",
+            "const": "confirmed",
+            "title": "Status"
+          },
+          "feedback": {
+            "$ref": "#/components/schemas/ExerciseFeedback"
+          },
+          "auto_rating": {
+            "$ref": "#/components/schemas/Rating"
+          },
+          "duration_ms": {
+            "type": "integer",
+            "title": "Duration Ms"
+          },
+          "server_elapsed_ms": {
+            "type": "integer",
+            "title": "Server Elapsed Ms"
+          },
+          "receipt": {
+            "$ref": "#/components/schemas/ReviewReceipt"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "project_id",
+          "sense_id",
+          "exercise",
+          "kind",
+          "prompt",
+          "issued_at",
+          "expires_at",
+          "hint_used",
+          "status",
+          "feedback",
+          "auto_rating",
+          "duration_ms",
+          "server_elapsed_ms",
+          "receipt"
+        ],
+        "title": "AttemptConfirmed"
+      },
+      "AttemptCreate": {
+        "properties": {
+          "project_id": {
+            "type": "string",
+            "title": "Project Id"
+          },
+          "sense_id": {
+            "type": "string",
+            "title": "Sense Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "project_id",
+          "sense_id"
+        ],
+        "title": "AttemptCreate"
+      },
+      "AttemptGiveUp": {
+        "properties": {
+          "duration_ms": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Duration Ms"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "duration_ms"
+        ],
+        "title": "AttemptGiveUp"
+      },
+      "AttemptGraded": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "project_id": {
+            "type": "string",
+            "title": "Project Id"
+          },
+          "sense_id": {
+            "type": "string",
+            "title": "Sense Id"
+          },
+          "exercise": {
+            "type": "string",
+            "title": "Exercise"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "recognition",
+              "recall"
+            ],
+            "title": "Kind"
+          },
+          "prompt": {
+            "$ref": "#/components/schemas/ExercisePrompt"
+          },
+          "issued_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Issued At"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          },
+          "hint_used": {
+            "type": "boolean",
+            "title": "Hint Used"
+          },
+          "hint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hint"
+          },
+          "skipped": {
+            "items": {
+              "$ref": "#/components/schemas/Unavailable"
+            },
+            "type": "array",
+            "title": "Skipped",
+            "default": []
+          },
+          "status": {
+            "type": "string",
+            "const": "graded",
+            "title": "Status"
+          },
+          "feedback": {
+            "$ref": "#/components/schemas/ExerciseFeedback"
+          },
+          "auto_rating": {
+            "$ref": "#/components/schemas/Rating"
+          },
+          "duration_ms": {
+            "type": "integer",
+            "title": "Duration Ms"
+          },
+          "server_elapsed_ms": {
+            "type": "integer",
+            "title": "Server Elapsed Ms"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "project_id",
+          "sense_id",
+          "exercise",
+          "kind",
+          "prompt",
+          "issued_at",
+          "expires_at",
+          "hint_used",
+          "status",
+          "feedback",
+          "auto_rating",
+          "duration_ms",
+          "server_elapsed_ms"
+        ],
+        "title": "AttemptGraded"
+      },
+      "AttemptOpen": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "project_id": {
+            "type": "string",
+            "title": "Project Id"
+          },
+          "sense_id": {
+            "type": "string",
+            "title": "Sense Id"
+          },
+          "exercise": {
+            "type": "string",
+            "title": "Exercise"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "recognition",
+              "recall"
+            ],
+            "title": "Kind"
+          },
+          "prompt": {
+            "$ref": "#/components/schemas/ExercisePrompt"
+          },
+          "issued_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Issued At"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Expires At"
+          },
+          "hint_used": {
+            "type": "boolean",
+            "title": "Hint Used"
+          },
+          "hint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hint"
+          },
+          "skipped": {
+            "items": {
+              "$ref": "#/components/schemas/Unavailable"
+            },
+            "type": "array",
+            "title": "Skipped",
+            "default": []
+          },
+          "status": {
+            "type": "string",
+            "const": "open",
+            "title": "Status"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "project_id",
+          "sense_id",
+          "exercise",
+          "kind",
+          "prompt",
+          "issued_at",
+          "expires_at",
+          "hint_used",
+          "status"
+        ],
+        "title": "AttemptOpen"
+      },
+      "AttemptRead": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/AttemptOpen"
+          },
+          {
+            "$ref": "#/components/schemas/AttemptGraded"
+          },
+          {
+            "$ref": "#/components/schemas/AttemptConfirmed"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "status",
+          "mapping": {
+            "confirmed": "#/components/schemas/AttemptConfirmed",
+            "graded": "#/components/schemas/AttemptGraded",
+            "open": "#/components/schemas/AttemptOpen"
+          }
+        }
+      },
       "AuthRead": {
         "properties": {
           "access_token": {
@@ -2260,6 +2952,25 @@
           "due"
         ],
         "title": "CardState"
+      },
+      "Choice": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "label"
+        ],
+        "title": "Choice"
       },
       "CompletedCounts": {
         "properties": {
@@ -2540,6 +3251,67 @@
           "buffer_at_risk"
         ],
         "title": "ExamPacing"
+      },
+      "ExerciseFeedback": {
+        "properties": {
+          "correct": {
+            "type": "boolean",
+            "title": "Correct"
+          },
+          "answer": {
+            "type": "string",
+            "title": "Answer"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "correct",
+          "answer"
+        ],
+        "title": "ExerciseFeedback"
+      },
+      "ExercisePrompt": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "input": {
+            "type": "string",
+            "enum": [
+              "choice",
+              "text"
+            ],
+            "title": "Input"
+          },
+          "choices": {
+            "items": {
+              "$ref": "#/components/schemas/Choice"
+            },
+            "type": "array",
+            "title": "Choices",
+            "default": []
+          },
+          "media_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Media Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text",
+          "input"
+        ],
+        "title": "ExercisePrompt"
       },
       "ForecastDay": {
         "properties": {
@@ -4103,6 +4875,63 @@
         "maximum": 9.223372036854776e+18,
         "minimum": 0.0
       },
+      "Rating": {
+        "type": "integer",
+        "enum": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "title": "Rating",
+        "description": "Enum representing the four possible ratings when reviewing a card."
+      },
+      "ReviewReceipt": {
+        "properties": {
+          "attempt_id": {
+            "type": "string",
+            "title": "Attempt Id"
+          },
+          "project_id": {
+            "type": "string",
+            "title": "Project Id"
+          },
+          "memory": {
+            "$ref": "#/components/schemas/MemoryRead"
+          },
+          "auto_rating": {
+            "$ref": "#/components/schemas/Rating"
+          },
+          "rating": {
+            "$ref": "#/components/schemas/Rating"
+          },
+          "correct": {
+            "type": "boolean",
+            "title": "Correct"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "At"
+          },
+          "is_introduction": {
+            "type": "boolean",
+            "title": "Is Introduction"
+          }
+        },
+        "type": "object",
+        "required": [
+          "attempt_id",
+          "project_id",
+          "memory",
+          "auto_rating",
+          "rating",
+          "correct",
+          "at",
+          "is_introduction"
+        ],
+        "title": "ReviewReceipt"
+      },
       "SenseOrderRead": {
         "properties": {
           "project_id": {
@@ -4319,6 +5148,25 @@
       "Text-Output": {
         "type": "string",
         "maxLength": 10000
+      },
+      "Unavailable": {
+        "properties": {
+          "exercise": {
+            "type": "string",
+            "title": "Exercise"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "exercise",
+          "reason"
+        ],
+        "title": "Unavailable"
       },
       "UserPreferences": {
         "properties": {
