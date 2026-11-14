@@ -758,10 +758,63 @@
           }
         }
       }
+    },
+    "/api/dictionary/candidates": {
+      "post": {
+        "tags": [
+          "dictionary"
+        ],
+        "summary": "Candidates",
+        "operationId": "candidates_api_dictionary_candidates_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CandidateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CandidateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
     }
   },
   "components": {
     "schemas": {
+      "Accent": {
+        "type": "string",
+        "enum": [
+          "US",
+          "UK"
+        ]
+      },
       "AdminUserCreate": {
         "properties": {
           "username": {
@@ -888,6 +941,133 @@
         ],
         "title": "AuthRead"
       },
+      "Candidate": {
+        "properties": {
+          "lemma": {
+            "$ref": "#/components/schemas/LexiconLemma"
+          },
+          "matched_by": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "exact",
+                "form",
+                "spacy"
+              ]
+            },
+            "type": "array",
+            "title": "Matched By"
+          },
+          "lexemes": {
+            "items": {
+              "$ref": "#/components/schemas/CandidateLexeme"
+            },
+            "type": "array",
+            "title": "Lexemes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lemma",
+          "matched_by",
+          "lexemes"
+        ],
+        "title": "Candidate"
+      },
+      "CandidateLexeme": {
+        "properties": {
+          "lexeme": {
+            "$ref": "#/components/schemas/LexiconLexeme"
+          },
+          "senses": {
+            "items": {
+              "$ref": "#/components/schemas/LexiconSense"
+            },
+            "type": "array",
+            "title": "Senses"
+          },
+          "pronunciations": {
+            "items": {
+              "$ref": "#/components/schemas/LexiconPronunciation"
+            },
+            "type": "array",
+            "title": "Pronunciations"
+          },
+          "glosses": {
+            "items": {
+              "$ref": "#/components/schemas/LexiconGloss"
+            },
+            "type": "array",
+            "title": "Glosses"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lexeme",
+          "senses",
+          "pronunciations",
+          "glosses"
+        ],
+        "title": "CandidateLexeme"
+      },
+      "CandidateRequest": {
+        "properties": {
+          "text": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Text"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "title": "CandidateRequest"
+      },
+      "CandidateResponse": {
+        "properties": {
+          "normalized": {
+            "type": "string",
+            "title": "Normalized"
+          },
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/Candidate"
+            },
+            "type": "array",
+            "title": "Candidates"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/LexiconSource"
+            },
+            "type": "array",
+            "title": "Sources"
+          }
+        },
+        "type": "object",
+        "required": [
+          "normalized",
+          "candidates",
+          "sources"
+        ],
+        "title": "CandidateResponse"
+      },
+      "DictionaryKey": {
+        "items": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "integer"
+            }
+          ]
+        },
+        "type": "array"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -951,6 +1131,346 @@
           "run_after"
         ],
         "title": "JobRead"
+      },
+      "JsonValue": {},
+      "LexiconGloss": {
+        "properties": {
+          "lexeme_id": {
+            "$ref": "#/components/schemas/DictionaryKey"
+          },
+          "gloss": {
+            "type": "string",
+            "title": "Gloss"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "sense_id": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DictionaryKey"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "lexeme_id",
+          "gloss",
+          "source",
+          "sense_id"
+        ],
+        "title": "LexiconGloss"
+      },
+      "LexiconLemma": {
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/DictionaryKey"
+          },
+          "text": {
+            "type": "string",
+            "title": "Text"
+          },
+          "lang": {
+            "type": "string",
+            "title": "Lang"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "word",
+              "phrase"
+            ],
+            "title": "Kind"
+          },
+          "freq_zipf": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Freq Zipf"
+          },
+          "cefr": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cefr"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "text",
+          "lang",
+          "kind",
+          "freq_zipf",
+          "cefr",
+          "source"
+        ],
+        "title": "LexiconLemma"
+      },
+      "LexiconLexeme": {
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/DictionaryKey"
+          },
+          "lemma_id": {
+            "$ref": "#/components/schemas/DictionaryKey"
+          },
+          "pos": {
+            "type": "string",
+            "title": "Pos"
+          },
+          "etymology_no": {
+            "type": "integer",
+            "title": "Etymology No"
+          },
+          "etymology_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Etymology Text"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "lemma_id",
+          "pos",
+          "etymology_no",
+          "etymology_text",
+          "source"
+        ],
+        "title": "LexiconLexeme"
+      },
+      "LexiconPronunciation": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "lexeme_id": {
+            "$ref": "#/components/schemas/DictionaryKey"
+          },
+          "accent": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Accent"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ipa": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ipa"
+          },
+          "audio": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "type": "object",
+            "title": "Audio"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tags"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "lexeme_id",
+          "accent",
+          "ipa",
+          "audio",
+          "tags",
+          "source"
+        ],
+        "title": "LexiconPronunciation"
+      },
+      "LexiconSense": {
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/DictionaryKey"
+          },
+          "lexeme_id": {
+            "$ref": "#/components/schemas/DictionaryKey"
+          },
+          "definition": {
+            "type": "string",
+            "title": "Definition"
+          },
+          "glosses": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Glosses"
+          },
+          "gloss_zh": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gloss Zh"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Tags"
+          },
+          "register": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Register"
+          },
+          "domain": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Domain"
+          },
+          "examples": {
+            "items": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/JsonValue"
+              },
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Examples"
+          },
+          "rank": {
+            "type": "integer",
+            "title": "Rank"
+          },
+          "common": {
+            "type": "boolean",
+            "title": "Common"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "source_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Id"
+          },
+          "lexname": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lexname"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "lexeme_id",
+          "definition",
+          "glosses",
+          "gloss_zh",
+          "tags",
+          "register",
+          "domain",
+          "examples",
+          "rank",
+          "common",
+          "source",
+          "source_id",
+          "lexname"
+        ],
+        "title": "LexiconSense"
+      },
+      "LexiconSource": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "metadata": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/JsonValue"
+            },
+            "type": "object",
+            "title": "Metadata"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "metadata"
+        ],
+        "title": "LexiconSource"
       },
       "LoginRequest": {
         "properties": {

@@ -10,6 +10,7 @@ from app.core.security import invalid_credentials
 from app.db.client import get_db
 from app.domain.auth import User
 from app.services import auth
+from app.services.lexicon import LexiconReader
 
 bearer = HTTPBearer(auto_error=False)
 Db = Annotated[AsyncSurrealConnection, Depends(get_db)]
@@ -17,6 +18,10 @@ Db = Annotated[AsyncSurrealConnection, Depends(get_db)]
 
 def get_settings(request: Request) -> Settings:
     return cast(Settings, request.app.state.settings)
+
+
+def get_lexicon_reader(settings: Annotated[Settings, Depends(get_settings)]) -> LexiconReader:
+    return LexiconReader(settings.lexicon_path or settings.lexicon_dir / "lexicon.sqlite")
 
 
 async def current_user(

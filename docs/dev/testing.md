@@ -150,6 +150,25 @@ missing/invalid databases and invalid record payloads. A read-only probe attempt
 the actual connection before the service sets `query_only`; concurrent reads preserve the
 file's hash/mtime and leave no open Windows file handle or journal. No full lexicon is loaded.
 
+### Candidate resolution and API (2.4.1)
+
+From `backend`, run `uv run --no-sync pytest -q tests\unit\test_candidates.py
+tests\api\test_candidates_endpoints.py`. API tests use the authorized isolated 8101 harness
+and real auth, explicitly configuring `Settings.lexicon_path` to the committed small fixture.
+They cover normalized exact lookup, inflections, phrase forms, unknown input, shared results
+for two independent users, invalid/empty payloads, anonymous/invalid-token access,
+password-change and disabled-user gates, plus missing/corrupt configured artifacts.
+The response preserves structured IDs, bilingual sense content, common defaults and provenance.
+Unit tests preserve multiple form-index candidates without duplication, and prove that cold
+spaCy initialization and inference have no running request event loop. `walks` deliberately
+has no fixture form-index row, so its successful `walk` result proves the real offline spaCy
+fallback, rather than only testing the dictionary index. No model or LLM download occurs.
+
+For fixture-backed add-word dialog/E2E wiring, set an absolute `LEXICON_PATH` in the
+test-controlled API process environment, or pass `lexicon_path=fixture_path` when constructing
+test `Settings`. Do not modify the private shared `.env.dev` or restart the shared dev stack
+for unit/API verification. The default remains `LEXICON_DIR/lexicon.sqlite`.
+
 ## What to test
 
 Focused development-command guards (no shared dev ports or private environment changes):
