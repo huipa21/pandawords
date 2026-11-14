@@ -36,11 +36,10 @@ The images agent was notified before integration. Other additions require coordi
 |---|---|---|---|
 | 4.3.2 | task/4.3.2-morphology | ../pandawords.worktrees/4.3.2 | Agent running |
 | 4.2.3 | task/4.2.3-reading | ../pandawords.worktrees/4.2.3 | Agent running |
-| 4.4.2 | task/4.4.2-graph-ui | ../pandawords.worktrees/4.4.2 | Ready; prerequisite 4.4.1 verified |
+| 4.4.2 | task/4.4.2-graph-ui | ../pandawords.worktrees/4.4.2 | Agent running |
 | 4.4.4 | task/4.4.4-context-exercises | ../pandawords.worktrees/4.4.4 | Waiting for 4.2.2, 4.3.2 |
 | 4.4.3 | task/4.4.3-relations | ../pandawords.worktrees/4.4.3 | Waiting for 4.4.2 |
 | 5.1.1 | task/5.1.1-images | ../pandawords.worktrees/5.1.1 | Merged af3820b; proxy storage failure under investigation |
-| 5.1.2 | task/5.1.2-mnemonics | ../pandawords.worktrees/5.1.2 | Committed 42981cc; awaiting integration |
 | 5.1.3 | task/5.1.3-image-review | ../pandawords.worktrees/5.1.3 | Waiting for 5.1.1 |
 
 ## Blocked
@@ -67,6 +66,19 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-15 — 5.1.2 Mnemonic notes and optional suggestions
+- Result / completed: `42981cc` merged as `30c5caa`; kind-separated retained mnemonic drafts,
+  explicit save-only suggestions, owner-bound worker/cache, late-result/cancel safeguards and
+  localization. No migration needed.
+- Dependencies: 3.2.5 and 2.6.5 checked ✅.
+- Verification: agent gen-api/check, 58 backend and 22 frontend focused/regression cases and
+  build passed; main regenerated combined API, check, 19 backend and 23 note/detail UI cases passed.
+- Failures / causes / corrections: initial missing local dependencies, test signing-setting
+  mismatch and formatting fixed. Worker registry/locale/docs conflicts resolved preserving
+  image handlers, all feature labels and every existing document section.
+- Skipped / deferred: final full suites/browser sweep; no live provider call required.
+- Blockers / follow-ups: none; branch/folder cleanup pending.
 
 ### 2026-11-15 — 4.4.1 Bounded graph API
 - Result / completed: `6108e07` merged as `e0d7bd2`; owner-safe effective typed graph with
@@ -107,7 +119,8 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
   updates preserve record identity. Plain scalar aliases preserve existing generated schema names.
   Router/docs conflicts merged retaining all routes; generated files rebuilt from integrated API.
 - Skipped / deferred: final full suites/browser sweep; no migration or live provider needed.
-- Blockers / follow-ups: none; reading ready, context exercise awaits morphology. Cleanup pending.
+- Blockers / follow-ups: none; reading running, context exercise awaits morphology.
+  Task branch/folder safely removed after unlinking 1,631 reparse points without traversal.
 
 ### 2026-11-15 — 4.1.2 Phrase discovery and add flow
 - Result / completed: `93a9848` merged as `866458e`; bounded exact containing-phrase lookup,
@@ -119,7 +132,8 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
   Detail imports and locale object conflicts merged preserving tags and phrases; generated
   contracts regenerated from integrated backend rather than choosing a conflict side.
 - Skipped / deferred: final full suites/browser sweep later; no migration/provider required.
-- Blockers / follow-ups: none; branch/folder cleanup pending.
+- Blockers / follow-ups: none; task branch/folder safely removed after unlinking 1,631 reparse points
+  without following targets.
 
 ### 2026-11-14 — First-wave browser environment verification
 - Result / completed: initial real-stack E2E run passed first-login but failed word-add and review.
