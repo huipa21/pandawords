@@ -58,6 +58,15 @@
 - Refresh with existing data: keep the data and show a small spinner in `PageHeader`.
 - Empty collection: `EmptyState` with a call to action (e.g. "Add your first word").
 - Every async view must handle all four states: loading, empty, error, data.
+- Admin users uses NDataTable from `lg` and a card list below it. Pagination retains the
+  confirmed page on failure; retry repeats the failed request. Existing rows remain visible.
+  Create and password reset show a transient, copyable temporary password, cleared on dismissal
+  or page disposal (never stored or logged). Clipboard failures offer localized manual-copy
+  guidance. Disable, password reset and role changes require `ConfirmAction`; enable is immediate.
+  Self-disable/demotion are unavailable. Since the signed-in administrator is enabled, any other
+  administrator is not the last enabled one; concurrent last-admin conflicts are enforced by the
+  backend and surfaced in both locales. New shared page-state/dialog components are previewed
+  in `/dev/design`.
 
 ## Review session
 

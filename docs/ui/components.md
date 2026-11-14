@@ -31,10 +31,10 @@ size (`text-base` = 16, `text-lg` = 20, `text-xl` = 24).
 | `AppShell` | Implemented: header, sidebar (≥ `lg`) / bottom nav (< `lg`), router outlet; root `app/App.vue` owns Naive providers and theme sync |
 | `AppHeader` | Shared brand link and preference controls; authenticated password-change link and logout action |
 | `AppNavigation` | Localized router links with active/keyboard states; admin-only links; `mobile?` selects bottom navigation |
-| `PageHeader` | `title`, `subtitle?`, `back?`; `actions` slot |
-| `EmptyState` | Wraps NEmpty. `icon`, `titleKey`, `descKey?`; `action` slot |
-| `ErrorState` | Wraps NResult with retry. `error`, `@retry` |
-| `ConfirmAction` | Wraps a destructive action with a dialog. `titleKey`, `contentKey`, `@confirm` |
+| `PageHeader` | Implemented: `title`, `subtitle?`; wrapping `actions` slot |
+| `EmptyState` | Implemented: NEmpty with `titleKey`, `descKey?`; `action` slot |
+| `ErrorState` | Implemented: NResult with localized retry; `error` (localized text), `loading?`, `@retry` |
+| `ConfirmAction` | Implemented: controlled destructive dialog; `show`, `titleKey`, `contentKey`, `params?`, `loading?`, `@confirm`, `@cancel`. Parent closes after success; loading blocks dismissal |
 | `ThemeToggle` | Implemented: accessible icon button cycles system → light → dark; persists via preferences store |
 | `LocaleSwitch` | Implemented: accessible icon button toggles zh-CN / en, including Naive locale and document language |
 | `JobStatus` | Inline progress for background jobs. `jobId` or `jobs[]` |
