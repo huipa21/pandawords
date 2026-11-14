@@ -10,12 +10,12 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 ## Current run
 
 Request: resume and complete Phase 1, proceeding through waves in dependency order.
-Next step: recover and assemble wave 8 security core with parallel implementation and test agents;
+Next step: implement wave 9 Auth API with disjoint implementation and API-test components;
 then continue remaining Phase 1 waves in dependency order.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 1.5.2 | `task/1.5.2-security-core` | `../pandawords.worktrees/1.5.2` | Resuming existing uncommitted work; disjoint implementation/tests agents, parent commits; dependency 1.5.1 is ✅ |
+| 1.5.3 | `task/1.5.3-auth-api` | `../pandawords.worktrees/1.5.3` | Starting with parallel implementation/tests; dependency 1.5.2 is ✅ |
 
 ## Blocked
 
@@ -41,6 +41,24 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 1.5.2 Security core
+- Result / completed: recovered and assembled unfinished work with parallel implementation and
+  test agents; Argon2id, validated HS256 JWT, opaque refresh hashing, atomic rotation/reuse-chain
+  revocation, logout, exactly-once admin bootstrap and readiness initialization; `a21d81f` merged.
+- Dependencies: 1.5.1 is ✅.
+- Verification: integrated Ruff/format/basedpyright clean; backend132 tests and frontend43 tests,
+  lint/typecheck passed. Independent WebSocket refresh/bootstrap race, cancellation, isolation,
+  expired/tampered claims and startup failure cases passed. Hooks passed.
+- Skipped / deferred: aggregate script remains1.6.1; public auth endpoints remain1.5.3.
+- Failures / causes / corrections: stopped shared Podman machine restarted and test8101 verified;
+  conflict retry/cancellation cleanup fixed with focused regressions; missing worktree hook deps
+  restored from locked offline cache. Existing Starlette warning remains. Pylance worktree
+  unavailable; standalone typecheck and runtime tests passed.
+- Findings: reuse revokes its family, not independent sessions or other owners; rollback failures
+  logged safely; health remains200 while readiness awaits bootstrap.
+- Blockers / follow-ups: none;1.5.3 now ready. Corrected previously omitted1.6.5 completion status
+  using its already committed verification log; unrelated Phase2 edits preserved.
 
 ### 2026-11-14 — 1.5.1 Auth schema
 - Result / completed: immutable0002_auth user/refresh-token schema, indexes and regenerated
