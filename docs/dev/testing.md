@@ -14,11 +14,44 @@
 
 `./scripts/dev.ps1 test` runs everything except E2E. `-Backend`, `-Frontend` and `-E2E` select one
 layer, and selectors can combine (duplicates run only once). E2E is explicit only: it requires
-the main worktree, a ready stack on 5173, and `frontend/playwright.config.*` (task 1.6.6); a
+the main worktree, a ready stack on 5173, and `frontend/playwright.config.ts`; a
 missing config or tool fails rather than silently skipping tests. The hook runs
 `pnpm exec playwright test`, using that config. `-UpdateSnapshot` requires the backend selector.
 The output is quiet (`pytest -q`, vitest `dot` reporter). On failure it prints the full
 failure output.
+
+### First-login E2E
+
+From `main`, run `.\scripts\dev.ps1 up`, then `.\scripts\dev.ps1 test -E2E`.
+The runner imports the main worktree's `.env.dev`; both `ADMIN_USERNAME` and
+`ADMIN_PASSWORD` must identify an enabled administrator whose initial password change
+is already complete. Missing credentials fail the test without printing their values.
+The existing API, worker, database, and Vite stack must remain running. Playwright uses
+`http://localhost:5173` and never starts another stack.
+
+Install the matching Chromium binary once from `frontend` with
+`pnpm exec playwright install chromium` if Playwright reports that it is missing.
+`pnpm test:e2e` runs the same test directly with the credentials already exported.
+`pnpm exec playwright test --list` checks discovery without credentials or a running stack.
+Only Chromium runs, with one worker, no retries, and no skipped/fallback cases.
+Vitest's `src/**/*.test.ts` include keeps `e2e/**/*.spec.ts` out of unit runs.
+
+The single flow selects English via the existing browser preference format, signs in as
+the administrator, creates a unique `e2e_<UUID>` learner, reads the temporary-password
+dialog, signs out, and signs in as that learner. It verifies the public forced-change
+flag, the `/change-password` guard (including a direct `/projects` visit), then changes
+the password and reaches Projects. API response types come from the generated schema.
+Finally, the captured administrator token disables **only** the learner created by
+this run, even after an assertion failure. The record remains in the dev database:
+there is no delete API. An interrupted process or failed cleanup can leave an enabled
+`e2e_` learner; an administrator must disable that specific account via User management.
+Do not bulk-modify users or wipe the dev database to clean up these records.
+
+Trace, video, and screenshots are off. Automatic error-context page snapshots are also
+disabled via Playwright's `PLAYWRIGHT_NO_COPY_PROMPT` switch because the temporary-password
+dialog contains a secret. Credential inputs avoid value-bearing `fill` call logs.
+Do not enable debug/protocol logging, recording, or secret-bearing assertions when
+running this flow. Normal Playwright reports/results remain gitignored.
 
 ## Test database
 
