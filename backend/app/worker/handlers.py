@@ -3,6 +3,7 @@ from collections.abc import Awaitable, Callable
 from app.domain.jobs import Job
 from app.worker.audio import audio
 from app.worker.enrich import enrich
+from app.worker.mnemonic import mnemonic
 from app.worker.scenario import scenario
 
 type Handler = Callable[[Job], Awaitable[None]]
@@ -17,4 +18,5 @@ HANDLERS: dict[str, Handler] = {
     "audio": audio,
     "enrich": enrich,
     "scenario": scenario,
+    "mnemonic": mnemonic,
 }

@@ -377,8 +377,24 @@ languages. Reset DELETE removes the complete own overlay and re-reads effective 
 
 Notes are queried and mutated for the selected visible lemma, lexeme or sense using generated
 contracts. Saved annotations are server-backed and therefore survive project navigation and
-reload; unsaved drafts survive in memory within the same signed-in session, never browser
-storage. Frontend controls do not substitute for backend owner checks.
+reload. Unsaved note and mnemonic drafts use separate target/kind or existing-note keys in
+owner-scoped tab session storage; they survive refresh/navigation, with an in-memory fallback
+when storage is unavailable. Switching users clears the visible drafts before restoring that
+owner's tab drafts. Frontend controls do not substitute for backend owner checks.
+
+### Mnemonic suggestions (5.1.2)
+
+`POST /api/notes/suggestions` accepts only `{target_table: lemma|lexeme|sense, target_id}`.
+`GET /api/notes/suggestions/{job_id}` returns the caller's suggestion state. Both require
+authentication, return `no-store`, and recheck target visibility. Responses are
+`MnemonicSuggestion {status: pending|ready|unavailable, job_id?, text?, reason?}`.
+The existing job stores only owner-bound target IDs/table and a content hash. Workers and
+retrieval reject changed target/visible ancestry content. Suggestions use the existing
+owner-scoped, prompt/schema/model/input-versioned `llm_cache`; even canonical shared targets
+do not make mnemonic responses shared. No new schema or migration is needed.
+Generation, rejection and acceptance create no notes. Acceptance changes only an editable
+mnemonic draft; the existing notes POST/PATCH runs only on explicit Save. Ordinary notes keep
+their identity and kind.
 
 `lexemes[*].lexeme.fields.pron[*].audio` is an opaque media record ID. Protected media must be
 fetched with bearer authentication, not assigned directly to an HTML audio source. The detail

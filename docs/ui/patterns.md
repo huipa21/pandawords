@@ -17,6 +17,18 @@
 - The root provides Naive config, message, dialog and notification contexts to both layouts.
   Bottom navigation reserves token-based space plus the device safe area.
 
+## Mnemonics
+
+The selected lemma, lexeme or sense notes section labels both ordinary notes and mnemonics.
+New-note kind controls keep separate drafts; editing an existing note does not change its kind.
+`MnemonicSuggestion` is feature-local: its explicit action displays a separate text-only
+result with Use in draft and Cancel. A nonempty draft requires `ConfirmAction` before
+replacement. Acceptance remains editable and never calls the notes API; only Save persists.
+Disabled/budget/provider/timeout states have localized retry feedback and never disable manual
+editing. Cancellation, disposal and target/user changes invalidate pending responses and polling.
+Drafts use owner-scoped tab session storage; failed requests retain text, and storage failure
+falls back to memory. Auth identity/tokens remain exclusively in the auth store.
+
 ## Forms
 
 - `NForm` with `rules`. Labels sit on top. The submit button goes at the end and shows `loading`

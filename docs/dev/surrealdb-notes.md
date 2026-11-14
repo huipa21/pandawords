@@ -1,5 +1,15 @@
 # SurrealDB 3.3 notes
 
+### Mnemonic context traversal (5.1.2) ✅
+
+Verified with the existing isolated random-database harness on loopback **8101**:
+bound `SELECT in FROM has_sense/has_lexeme WHERE out = $target AND
+(owner = NONE OR owner = $user) ORDER BY id` supports canonical reverse ancestry reads.
+Every returned endpoint is separately checked with `require_visible` in the same transaction;
+edge visibility alone is not authorization. Changing/deleting target/ancestor content changes
+the job content key. Existing `job`, `note.kind = mnemonic`, private `llm_cache` and atomic
+per-owner daily budgets suffice; no migration or schema snapshot change is required.
+
 ### Sentence and passage schema contract (4.2.1) ✅
 
 Verified 2026-11-14 against **SurrealDB 3.3.5 / SDK 3.0**, using fresh random databases on
