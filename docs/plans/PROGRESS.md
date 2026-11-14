@@ -18,7 +18,7 @@ browser logs will be committed as source.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 2.3.3 | task/2.3.3-user-dictionary-api | ../pandawords.worktrees/2.3.3 | Starting; overrides/custom senses/notes |
+| 2.3.4 | task/2.3.4-project-tree-api | ../pandawords.worktrees/2.3.4 | Starting; membership/effective tree and reversible visibility |
 | 2.4.3 | task/2.4.3-enrichment | ../pandawords.worktrees/2.4.3 | Starting; relation/tag/frequency worker |
 | 2.5.2 | task/2.5.2-audio | ../pandawords.worktrees/2.5.2 | Starting; source audio and optional TTS |
 | 2.6.3 | task/2.6.3-add-dialog | ../pandawords.worktrees/2.6.3 | Starting; candidates, selection and job status |
@@ -47,6 +47,19 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — 2.3.3 User dictionary edits and notes
+- Result / completed: effective entry API, owner-scoped field override/reset, custom senses
+  and notes CRUD with validation and isolation; `c9e8ca3` merged.
+- Dependencies: 2.3.1 and 2.2.3 checked ✅; project-tree API now ready and starting.
+- Verification: agent generation, `check`, backend 516 and frontend 85 passed. Main merged
+  all route registrations, regenerated contracts, `check` and combined backend/frontend passed
+  (521 backend).
+- Failures / causes / corrections: parallel router and generated-contract conflicts resolved
+  by preserving all handlers and regenerating OpenAPI/types, not hand editing schemas.
+  Agent test fixture/cache interference corrected. No unresolved failures.
+- Skipped / deferred: E2E belongs to 2.6.6. No blockers.
+  Branch/worktree removed after verification; shared dictionary mutations remain isolated.
 
 ### 2026-11-14 — 2.4.2 Atomic add-to-project workflow
 - Result / completed: owner-authorized atomic materialization/memberships/job enqueue,
