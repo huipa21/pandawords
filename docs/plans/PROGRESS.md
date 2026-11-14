@@ -35,12 +35,11 @@ The images agent was notified before integration. Other additions require coordi
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
 | 4.3.2 | task/4.3.2-morphology | ../pandawords.worktrees/4.3.2 | Agent running |
-| 4.4.1 | task/4.4.1-graph-api | ../pandawords.worktrees/4.4.1 | Agent running; all prerequisites verified |
-| 4.2.3 | task/4.2.3-reading | ../pandawords.worktrees/4.2.3 | Ready; prerequisite 4.2.2 verified |
-| 4.4.2 | task/4.4.2-graph-ui | ../pandawords.worktrees/4.4.2 | Waiting for 4.4.1 |
+| 4.2.3 | task/4.2.3-reading | ../pandawords.worktrees/4.2.3 | Agent running |
+| 4.4.2 | task/4.4.2-graph-ui | ../pandawords.worktrees/4.4.2 | Ready; prerequisite 4.4.1 verified |
 | 4.4.4 | task/4.4.4-context-exercises | ../pandawords.worktrees/4.4.4 | Waiting for 4.2.2, 4.3.2 |
 | 4.4.3 | task/4.4.3-relations | ../pandawords.worktrees/4.4.3 | Waiting for 4.4.2 |
-| 5.1.1 | task/5.1.1-images | ../pandawords.worktrees/5.1.1 | Committed fbe0c1f; awaiting integration |
+| 5.1.1 | task/5.1.1-images | ../pandawords.worktrees/5.1.1 | Merged af3820b; proxy storage failure under investigation |
 | 5.1.2 | task/5.1.2-mnemonics | ../pandawords.worktrees/5.1.2 | Committed 42981cc; awaiting integration |
 | 5.1.3 | task/5.1.3-image-review | ../pandawords.worktrees/5.1.3 | Waiting for 5.1.1 |
 
@@ -68,6 +67,33 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-15 — 4.4.1 Bounded graph API
+- Result / completed: `6108e07` merged as `e0d7bd2`; owner-safe effective typed graph with
+  focus/depth/direction/type filters, deterministic induced edges and explicit 300-node cap.
+- Dependencies: 2.3.4, 4.1.1, 4.2.1 and 4.3.1 checked ✅.
+- Verification: agent generation/check and 30 focused cases (22 graph) passed; main regenerated
+  combined API, check and 22 real-database graph/cap/isolation cases passed.
+- Failures / causes / corrections: initial fixture/parser/dense seed-timeout issues fixed.
+  Import/docs conflicts resolved preserving every feature; API regenerated, not hand-merged.
+- Skipped / deferred: final full suites/browser sweep; no migration/provider needed.
+- Blockers / follow-ups: none; graph UI ready. Cleanup pending.
+
+### 2026-11-15 — 5.1.1 Image integration and deployed-proxy finding
+- Result / completed: `fbe0c1f` merged as `af3820b`; private images, validated bounded upload,
+  owner-cached explicit Pixabay search/download jobs, attribution, localized protected display,
+  additive 0019 migration/snapshot and essential locked Pillow dependency.
+- Dependencies: 2.5.1 and 2.6.5 checked ✅.
+- Verification: agent 50 backend/12 frontend/check/gen-api passed; main locked sync, combined
+  gen-api/check, 50 backend and 13 image/detail frontend cases passed.
+- Failure / cause / correction: actual isolated production API image plus deployed nginx config
+  accepted routing/auth/candidates/add but returned 500 `media.storage_failed` on a valid exact
+  10 MiB PNG upload. Cause not yet confirmed; images agent investigating runtime storage and
+  fixing any tightly coupled code/deployment issue before task completion.
+- Skipped / deferred: proxy delivery/oversize/delete assertions blocked by storage failure;
+  5.1.3 waits for this acceptance fix. No live providers called.
+- Cleanup: all scratch proxy containers, network and media volume removed; shared services intact.
+- Blockers / follow-ups: resolve proxy failure; do not mark 5.1.1 complete yet.
 
 ### 2026-11-15 — 4.2.2 Owner-scoped sentence/passage ingestion
 - Result / completed: `4724129` merged as `40436cb`; private CRUD, atomic retry-safe ingestion,
