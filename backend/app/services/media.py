@@ -77,6 +77,12 @@ async def store(
     return _public(media)
 
 
+async def content_exists(settings: Settings, record: Media) -> bool:
+    """Validate the stored path before reusing trusted worker cache metadata."""
+    path = await asyncio.to_thread(_file, settings.media_dir, record.path)
+    return await asyncio.to_thread(path.is_file)
+
+
 async def _load(db: AsyncSurrealConnection, settings: Settings, rid: str, owner: str) -> Media:
     try:
         media = await repository.read(db, decode_rid(rid, "media"), owner)

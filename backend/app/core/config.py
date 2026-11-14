@@ -84,8 +84,32 @@ class Settings(BaseSettings):
     caddy_network: str = "pandawords"
     pixabay_api_key: str = "replace-with-your-api-key"
     audio_provider_order: str = "wiktionary,edge-tts"
+    audio_network_enabled: bool = True
+    wikimedia_user_agent: str = "PandaWords/0.1 (personal vocabulary app)"
+    wikimedia_request_interval_seconds: float = Field(default=0.5, ge=0.5)
+    audio_timeout_seconds: float = Field(default=30.0, gt=0)
+    audio_max_bytes: int = Field(default=10 * 1024 * 1024, gt=0)
     edge_tts_voice_us: str = "en-US-AriaNeural"
     edge_tts_voice_uk: str = "en-GB-SoniaNeural"
+
+    @field_validator("audio_provider_order")
+    @classmethod
+    def validate_audio_providers(cls, value: str) -> str:
+        providers = [
+            part.strip().replace("edge_tts", "edge-tts")
+            for part in value.split(",")
+            if part.strip()
+        ]
+        if providers not in ([], ["wiktionary"], ["edge-tts"], ["wiktionary", "edge-tts"]):
+            raise ValueError("Audio providers must be wiktionary then optional edge-tts")
+        return ",".join(providers)
+
+    @field_validator("wikimedia_user_agent")
+    @classmethod
+    def validate_wikimedia_user_agent(cls, value: str) -> str:
+        if not value.strip() or any(ord(char) < 32 or ord(char) == 127 for char in value):
+            raise ValueError("Expected a descriptive Wikimedia User-Agent")
+        return value.strip()
 
     pip_fallback_index_url: str = ""
     npm_fallback_registry: str = ""

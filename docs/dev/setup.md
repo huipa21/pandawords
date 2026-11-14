@@ -88,6 +88,28 @@ remain cached. A release lock serializes builds targeting the same database dire
 an interrupted process, remove a stale `.lexicon-release.lock` only after confirming no build
 is running. See [deployment.md](deployment.md) for transfer verification.
 
+## Optional pronunciation audio
+
+The worker consumes version-1 `audio` jobs; requests never wait for external audio.
+`AUDIO_PROVIDER_ORDER=wiktionary,edge-tts` tries source recordings before speech synthesis.
+Use `wiktionary` or `edge-tts` alone to enable one provider; `edge_tts` is accepted as a
+compatibility spelling. An empty value disables acquisition. Edge TTS is locked as a backend
+dependency and needs no API key. `EDGE_TTS_VOICE_US` and `EDGE_TTS_VOICE_UK` select voices;
+blank voices disable synthesis for that accent without failing an add operation.
+
+Set `WIKIMEDIA_USER_AGENT` to a descriptive application name and contact URL/email.
+`WIKIMEDIA_REQUEST_INTERVAL_SECONDS` is at least 0.5 (≤ 2 requests/s per worker process).
+Run only one audio-fetching worker or increase intervals to keep the aggregate rate ≤ 2/s.
+`AUDIO_TIMEOUT_SECONDS` defaults to 30 and `AUDIO_MAX_BYTES` to 10485760.
+Downloaded/generated audio is saved under `MEDIA_DIR` through the safe media service,
+with source/attribution and shared cache reuse.
+
+For offline fixture-backed API/worker/E2E runs, supply `AUDIO_NETWORK_ENABLED=false`
+in the process environment or pass
+`settings.model_copy(update={"audio_network_enabled": False, "lexicon_path": fixture_path})`.
+This prevents both Wikimedia and TTS calls while allowing existing cached audio playback.
+It needs no private env edits, provider credentials or live external test calls.
+
 ## Local databases
 
 Start the Podman machine and ensure the main worktree's `.env.dev` has `SURREAL_USER` and

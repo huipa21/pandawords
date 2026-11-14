@@ -77,6 +77,29 @@ running this flow. Normal Playwright reports/results remain gitignored.
 
 ## Fixtures
 
+### Pronunciation audio (2.5.2)
+
+`tests/unit/test_audio_sources.py` uses `httpx.MockTransport` for Commons metadata/downloads
+and a fake Edge streaming client. It checks attribution, configured User-Agent, throttling,
+redirect/host/MIME/size rejection, and voice selection without live external calls.
+`tests/integration/test_audio.py` uses the isolated 8101 database and the actual registered
+`run_once(..., settings=...)` dispatcher. It verifies source/fallback/missing-voice outcomes,
+retryable versus unexpected failures, shared cache reuse across independently owned jobs,
+private-cache exclusion, and effective-entry `pron.audio` references (including missing IPA).
+Media test files retain the authenticated delivery/owner-isolation and safe-storage checks.
+All new media test directories are created inside the worktree and removed on teardown.
+
+Focused validation from `backend`:
+
+```powershell
+uv run --no-sync pytest -q tests\unit\test_audio_sources.py tests\integration\test_audio.py tests\unit\test_media.py tests\api\test_media_endpoints.py
+```
+
+Final fixture-backed E2E can use `AUDIO_NETWORK_ENABLED=false` on its API/worker processes;
+audio jobs then complete as explicitly unavailable unless shared cached files already exist.
+This does not fabricate audio or alter the add response. Live Wikimedia/Edge availability
+and audio playback through production nginx are not claimed by the mocked backend suite.
+
 ### Add to project (2.4.2)
 
 `tests/api/test_add_to_project.py` and `tests/integration/test_project_add_atomic.py`
