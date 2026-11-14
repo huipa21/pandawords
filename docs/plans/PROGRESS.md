@@ -9,15 +9,28 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 
 ## Current run
 
-Request: implement all Phase 2 tasks with dependency-driven parallel agents (maximum five).
-Phase 1 dependencies are all ✅. Schedule ready tasks immediately after their prerequisites
+Request: implement all Phase 3 tasks with dependency-driven parallel agents (maximum five).
+Phase 1 and Phase 2 dependencies are all ✅. Schedule ready tasks immediately after their prerequisites
 are merged and verified, without waiting for unrelated tasks in the same wave.
-Pre-existing Phase 2 plan/details are included unchanged except task statuses.
-Pre-existing browser output is preserved pending final artifact review; no secrets or transient
-browser logs will be committed as source.
+Pre-existing Phase 3 plan/details are included unchanged except task statuses, as requested.
+Migration allocations: 0013 memory/history; 0014 LLM; 0015 SRS preferences;
+0016 project ordering; 0017 exercise attempts. Snapshot merges are serialized.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
+| 3.1.1 | task/3.1.1-memory | ../pandawords.worktrees/3.1.1 | Ready; migration 0013 |
+| 3.2.5 | task/3.2.5-llm | ../pandawords.worktrees/3.2.5 | Ready; migration 0014 |
+| 3.1.2 | task/3.1.2-srs | ../pandawords.worktrees/3.1.2 | Waiting for 3.1.1 |
+| 3.1.3 | task/3.1.3-plan | ../pandawords.worktrees/3.1.3 | Waiting for 3.1.2 |
+| 3.2.1 | task/3.2.1-exercises | ../pandawords.worktrees/3.2.1 | Waiting for 3.1.2 |
+| 3.2.2 | task/3.2.2-distractors | ../pandawords.worktrees/3.2.2 | Waiting for 3.2.1 |
+| 3.2.3 | task/3.2.3-recognition | ../pandawords.worktrees/3.2.3 | Waiting for 3.2.2 |
+| 3.2.4 | task/3.2.4-recall | ../pandawords.worktrees/3.2.4 | Waiting for 3.2.1 |
+| 3.2.6 | task/3.2.6-scenario | ../pandawords.worktrees/3.2.6 | Waiting for 3.2.1 and 3.2.5 |
+| 3.3.1 | task/3.3.1-components | ../pandawords.worktrees/3.3.1 | Waiting for 3.2.1 |
+| 3.3.2 | task/3.3.2-review | ../pandawords.worktrees/3.3.2 | Waiting for review prerequisites |
+| 3.3.3 | task/3.3.3-dashboard | ../pandawords.worktrees/3.3.3 | Waiting for 3.1.3 |
+| 3.3.4 | task/3.3.4-e2e | ../pandawords.worktrees/3.3.4 | Waiting for 3.3.2 and 3.3.3 |
 
 ## Blocked
 
@@ -43,6 +56,15 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-14 — Phase 3 start
+- Result / completed: execution set recorded; existing user-authored Phase 3 planning included.
+- Dependencies: all external Phase 1/2 prerequisites checked ✅; internal dependencies pending.
+- Verification: repository state and tool availability inspected; implementation checks not run yet.
+- Skipped / deferred: none; queued tasks wait for their dependencies.
+- Failures / causes / corrections: dirty main contained only requested planning input; preserved
+  in the start commit under the user's explicit instruction to commit all files.
+- Blockers / follow-ups: none; start 3.1.1 and 3.2.5 concurrently, maximum five agents.
 
 ### 2026-11-14 — Phase 2 complete
 - Result / completed: all Phase 2 tasks merged to `main`; every `task/*` branch and worktree

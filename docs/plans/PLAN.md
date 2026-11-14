@@ -78,23 +78,23 @@ are in `phase-N.md`. If a phase file doesn't exist yet, the agent asks before wr
 | 2.6.5 | Lemma detail page (overrides, notes, audio) | 2.3.3, 2.5.2, 2.6.1 | 8 | M | ✅ |
 | 2.6.6 | E2E: project → add word → edit sense → hide sense | 2.6.3, 2.6.4, 2.6.5 | 9 | S | ✅ |
 
-## Phase 3 — Learning engine
+## Phase 3 — Learning engine ([details](phase-3.md))
 
 | ID | Task | Depends on | Wave | Size | Status |
 |---|---|---|---|---|---|
-| 3.1.1 | Migrations: `memory`, `review_log` | 2.3.1 | 1 | S | ⬜ |
-| 3.1.2 | SRS service: FSRS wrapper, card creation on add, review apply, auto-rating | 3.1.1, 2.4.2 | 2 | M | ⬜ |
-| 3.1.3 | Daily plan, exam-date pacing, queue builder + plan API | 3.1.2 | 3 | M | ⬜ |
-| 3.2.1 | Exercise framework: registry, generate/grade API, server-side timing | 3.1.2 | 3 | M | ⬜ |
-| 3.2.2 | Distractor service (tags, morph groups, confusables, frequency band) | 3.2.1, 2.4.3 | 4 | M | ⬜ |
-| 3.2.3 | Exercises: `def2word`, `word2def`, `relation` | 3.2.2 | 5 | M | ⬜ |
-| 3.2.4 | Exercises: `cloze`, `listen` | 3.2.1, 2.5.2 | 4 | M | ⬜ |
-| 3.2.5 | DeepSeek client (JSON mode, caching, budget, fallback) | 1.2.2 | 1 | S | ⬜ |
-| 3.2.6 | Exercise: `scenario` (cached generation) | 3.2.5, 3.2.1 | 4 | M | ⬜ |
-| 3.3.1 | Exercise components (ExerciseShell, ChoiceGrid, TypedAnswerInput, RatingBar, ReviewProgress) | 2.6.1, 3.2.1 | 4 | M | ⬜ |
-| 3.3.2 | Review session page | 3.3.1, 3.1.3, 3.2.3, 3.2.4 | 6 | M | ⬜ |
-| 3.3.3 | Plan settings + dashboard | 3.1.3, 2.6.2 | 4 | M | ⬜ |
-| 3.3.4 | E2E: review session | 3.3.2, 3.3.3 | 7 | S | ⬜ |
+| 3.1.1 | Migrations: `memory`, `review_log` | 2.3.1 | 1 | S | 🟡 |
+| 3.1.2 | SRS service: FSRS wrapper, card creation on add, review apply, auto-rating | 3.1.1, 2.4.2 | 2 | M | 🟡 |
+| 3.1.3 | Daily plan, exam-date pacing, queue builder + plan API | 3.1.2 | 3 | M | 🟡 |
+| 3.2.1 | Exercise framework: registry, generate/grade API, server-side timing | 3.1.2 | 3 | M | 🟡 |
+| 3.2.2 | Distractor service (tags, morph groups, confusables, frequency band) | 3.2.1, 2.4.3 | 4 | M | 🟡 |
+| 3.2.3 | Exercises: `def2word`, `word2def`, `relation` | 3.2.2 | 5 | M | 🟡 |
+| 3.2.4 | Exercises: `cloze`, `listen` | 3.2.1, 2.5.2 | 4 | M | 🟡 |
+| 3.2.5 | DeepSeek client (JSON mode, caching, budget, fallback) | 1.2.2, 1.5.1 | 1 | S | 🟡 |
+| 3.2.6 | Exercise: `scenario` (cached generation) | 3.2.5, 3.2.1 | 4 | M | 🟡 |
+| 3.3.1 | Exercise components (ExerciseShell, ChoiceGrid, TypedAnswerInput, RatingBar, ReviewProgress) | 2.6.1, 3.2.1 | 4 | M | 🟡 |
+| 3.3.2 | Review session page | 3.3.1, 3.1.3, 3.2.3, 3.2.4 | 6 | M | 🟡 |
+| 3.3.3 | Plan settings + dashboard | 3.1.3, 2.6.2 | 4 | M | 🟡 |
+| 3.3.4 | E2E: review session | 3.3.2, 3.3.3 | 7 | S | 🟡 |
 
 ## Phase 4 — Context & graph
 
