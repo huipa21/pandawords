@@ -2,8 +2,9 @@
 
 ## Layout & navigation
 
-- Mobile-first. Below `lg`: header + bottom nav (Projects · Review · Words · Me). From `lg`: header
-  + sidebar (Projects, All words, Review, Settings, Admin when the user is an admin).
+- Mobile-first. Below `lg`: header + bottom nav (Projects · Review · Words · Reading · Me).
+  From `lg`: header + sidebar (Projects, All words, Reading, Review, Settings, Admin when the
+  user is an admin).
 - Each page: `PageHeader`, then content in a `max-w-content` container with `p-4 lg:p-6` and
   `gap-6` between sections.
 - Detail pages on mobile open full screen. On desktop, list + detail can sit side by side
@@ -29,6 +30,21 @@ project add request; no discovery or navigation automatically adds memberships.
 Missing projects and project-fetch failures are localized and recoverable.
 
 ## Forms
+
+### Reading (4.2.3)
+
+`/reading` is the bilingual passage library and paste-to-ingest surface. Failed ingestion
+retains title, source and exact original text. The passage view renders original Unicode
+code-point spans without rebuilding punctuation or whitespace from tokens; missing sentence
+associations leave readable original text. Project choice is explicit. Highlighted tokens
+represent only effective visible selected senses, dotted underlines mark other confirmed
+links and plain tokens remain unlinked; accessible labels and a legend explain all states.
+Selecting a highlighted token displays its effective definition/gloss overlays.
+The inline panel requires explicit lookup/sense choice (including single-candidate results).
+Dismissal retains lookup drafts and choices; failed add/link requests keep the passage and
+selection, and retries do not repeat an already-successful project add. Unavailable content,
+empty results, loading and retry controls are localized. All controls are keyboard reachable
+and reading-word targets use the shared touch-target token.
 
 ### Tags (4.3.1)
 

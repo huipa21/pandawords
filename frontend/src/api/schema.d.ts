@@ -1602,6 +1602,8 @@ export interface components {
        * @default not_requested
        */
       assistance: string
+      /** Project Senses */
+      project_senses?: components['schemas']['DictionaryRecordRead'][]
     }
     /** PasswordChange */
     'PasswordChange': {
@@ -3750,7 +3752,9 @@ export interface operations {
   }
   reading_api_content_passage__id__reading_get: {
     parameters: {
-      query?: never
+      query?: {
+        project_id?: string | null
+      }
       header?: never
       path: {
         id: string

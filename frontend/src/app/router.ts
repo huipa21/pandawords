@@ -8,7 +8,6 @@ const placeholder = () => import('./pages/PlaceholderPage.vue')
 
 const pages = [
   ['words', 'words', 'words'],
-  ['reading/:passageId', 'reading', 'reading'],
   ['settings', 'settings', 'settings'],
   ['admin/backup', 'admin-backup', 'backup'],
 ] as const
@@ -16,6 +15,12 @@ const pages = [
 export function createAppRouter(history: RouterHistory = createWebHistory()) {
   const children: RouteRecordRaw[] = [
     { path: '', redirect: '/projects' },
+    {
+      path: 'reading/:passageId?',
+      name: 'reading',
+      component: () => import('@/features/reading/ReadingPage.vue'),
+      meta: { title: 'reading' },
+    },
     {
       path: 'tags',
       name: 'tags',

@@ -59,6 +59,19 @@ inherited environment variables take precedence.
 
 ### Private sentence/passage API (4.2.2)
 
+The reading entry `/reading` lists the owner's passages and ingests pasted original text.
+`/reading/{opaque-passage-id}` preserves the complete original text, source, sentence ordering
+and gaps. `GET /api/content/passage/{id}/reading?project_id={opaque-project-id}` additionally
+returns `project_senses`: effective records from the existing owner-safe project tree snapshot,
+excluding hidden lemma/lexeme/sense ancestors and unselected senses. Omitting the project
+returns an empty selection. Both passage and project ownership are checked independently.
+The existing 10,000-membership/2,000-tree-node bounds fail explicitly rather than truncate.
+Only resolved occurrences in this effective selection are highlighted; other links are dotted
+and unresolved tokens remain plain. Inline dictionary lookup requires an explicit candidate
+sense, uses the ordinary project-add API, then confirms the sentence-local occurrence. A
+partial failure retains the chosen sense and retries only the unfinished occurrence link.
+No provider, private-text cache or new schema is required.
+
 All routes below require the current user, use opaque IDs, return `Cache-Control: no-store`,
 and treat foreign/missing/malformed record IDs alike (404).
 

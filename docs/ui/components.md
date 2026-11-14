@@ -1,5 +1,15 @@
 # Component catalogue
 
+## Reading feature (`src/features/reading/`)
+
+`ReadingPage` owns the authenticated passage library, ingestion draft, project selection and
+ordered original-text reading surface. `ReadingLookup` is a feature-only inline panel with
+generated candidate types, explicit sense selection and resumable add-then-link requests.
+It emits `linked` after occurrence confirmation and `dismiss` without discarding its draft.
+`readingText` maps sentence-local code-point spans back to original passage slices and classifies
+only server-authorized effective project selections as highlighted. These are not shared
+components and require no design-preview entry.
+
 ## Study feature components (`src/features/study/`)
 
 - `StudyCounts`: due-now/due-today, unintroduced/available-today and completed-today counters.

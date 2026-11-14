@@ -21,6 +21,11 @@ describe('auth route guards', () => {
     const router = createAppRouter(createMemoryHistory())
     await router.push('/dev/design')
     expect(router.currentRoute.value.name).toBe('design')
+    for (const path of ['/reading', '/reading/opaque-passage']) {
+      await router.push(path)
+      expect(router.currentRoute.value.name).toBe('reading')
+      expect(router.currentRoute.value.path).toBe(path)
+    }
     for (const path of ['/admin/users', '/admin/backup', '/login']) {
       await router.push(path)
       expect(router.currentRoute.value.name).toBe('projects')
@@ -75,6 +80,8 @@ describe('auth route guards', () => {
     const router = createAppRouter(createMemoryHistory())
     for (const path of [
       '/projects',
+      '/reading',
+      '/reading/opaque-passage',
       '/admin/backup',
       '/dev/design',
       '/change-password',

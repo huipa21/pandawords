@@ -25,7 +25,7 @@ from app.domain.content import (
     Suggestion,
 )
 from app.domain.dictionary_keys import DictionaryKey
-from app.services import llm
+from app.services import llm, project_tree
 from app.services.content_analysis import analyze, split
 from app.services.lexicon import LexiconReader
 
@@ -85,7 +85,11 @@ async def occurrences(
 
 
 async def passage(
-    db: AsyncSurrealConnection, reader: LexiconReader, owner: str, id: str
+    db: AsyncSurrealConnection,
+    reader: LexiconReader,
+    owner: str,
+    id: str,
+    project_id: str | None = None,
 ) -> PassageRead:
     item = await get(db, owner, "passage", id)
     parts = await repository.parts(db, owner, target(id, "passage"))
@@ -104,7 +108,18 @@ async def passage(
                 occurrences=await occurrences(db, reader, owner, sentence),
             )
         )
-    return PassageRead(passage=item, sentences=sentences)
+    result = PassageRead(passage=item, sentences=sentences)
+    if project_id is not None:
+        # Reuse the effective, owner-safe selection snapshot, including ancestor visibility.
+        tree = await project_tree.read_tree(db, owner, project_id, 1, 10_000, False)
+        result.project_senses = [
+            node.sense
+            for lemma in tree.items
+            for lexeme in lemma.lexemes
+            for node in lexeme.senses
+            if not (lemma.effective_hidden or lexeme.effective_hidden or node.effective_hidden)
+        ]
+    return result
 
 
 async def ingest(

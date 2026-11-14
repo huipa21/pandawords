@@ -2821,6 +2821,22 @@
               "type": "string",
               "title": "Id"
             }
+          },
+          {
+            "name": "project_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Project Id"
+            }
           }
         ],
         "responses": {
@@ -5885,6 +5901,13 @@
             "type": "string",
             "title": "Assistance",
             "default": "not_requested"
+          },
+          "project_senses": {
+            "items": {
+              "$ref": "#/components/schemas/DictionaryRecordRead"
+            },
+            "type": "array",
+            "title": "Project Senses"
           }
         },
         "type": "object",
