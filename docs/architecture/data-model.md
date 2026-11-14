@@ -70,7 +70,33 @@ Shared rows use deterministic IDs, so materialization is idempotent and imports 
 | `morpheme` | `morpheme:['en', 'pre-', 'prefix']` |
 | `tag` (shared) | `tag:[<kind>, <slug>]` |
 
-User-created rows use random IDs (ULID strings).
+User-created rows generally use random IDs. Private sentence/passage ingestion uses SHA-256
+identities over the authenticated owner and exact input fields: identical retries and identical
+sentence text/language/source/translation reuse rows; changing a passage title produces a separate
+passage sharing unchanged sentences. These IDs still use the opaque record-ID transport.
+
+### Private reading content (4.2.2)
+
+`/api/content` CRUD exposes only `owner = $user` sentences/passages, never shared rows.
+`part_of` is sentence → passage with zero-based `order`; repeated identical sentence text
+can reuse one sentence row at multiple positions through distinct deterministic edges.
+Offsets are half-open **Unicode code-point** pairs, not UTF-8 bytes or JavaScript UTF-16 indices.
+Passage parts include their original passage span; occurrences use sentence-relative spans.
+Whitespace, combining characters, punctuation and original casing are never normalized in storage.
+
+Ingestion inserts the passage, reused/new sentences, ordered associations, materialized unambiguous
+dictionary senses and owner-bound `used_in` edges in one conflict-retried SDK transaction.
+Unmatched/ambiguous occurrences are reconstructed from persisted source text and the offline lexicon;
+only confirmed/unambiguous resolutions are persisted as edges. Lexicon upgrades may therefore change
+unresolved candidates, but persisted confirmations remain authoritative.
+Both edge ownership and endpoint visibility are checked; ENFORCED alone is not authorization.
+An exact retry preserves manual resolutions. If a deterministic row was edited, retry returns 409
+rather than overwriting it. Full replacement updates clear that row's own stale associations.
+Passage deletion removes only its owned relationships and passage row, never sentence or dictionary
+rows. Sentence deletion clears its owned associations but never deletes passages or senses.
+Because SurrealDB automatically deletes all graph edges when deleting an endpoint, malformed
+foreign-owned associations block deletion with 409 instead of silently cascading another
+owner's edges. Full replacement updates use UPDATE, not DELETE/recreate, to preserve such edges.
 
 `app/domain/dictionary_keys.py` is the shared source of lemma, lexeme and sense keys:
 `lemma_key(lang, text)`, `lexeme_key(lang, text, pos, etymology_no=1)` and

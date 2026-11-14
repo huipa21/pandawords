@@ -1,5 +1,24 @@
 # Lexicon pipeline & enrichment
 
+## Private reading ingestion (4.2.2)
+
+`services/content_analysis.py` splits original source text without normalization, retaining every
+character and code-point span. Its Unicode word tokenizer includes combining marks and queries
+`LexiconReader.lookup_form` and direct lemma lookup; dictionary forms provide offline
+inflection-to-lemma resolution. Missing English forms also use the existing spaCy lookup
+lemmatizer in a worker thread, then retry offline lexicon lookup (no downloaded language model).
+Every candidate sense is returned, including uncommon senses, rather than silently selecting the
+common/default sense. Repeated tokens share lookup work but keep distinct offsets. Unknown words
+remain visible with no candidates. Per-token expansion bounds are 8 lemmas, 8 lexemes per lemma,
+32 senses per lexeme and 32 total senses; exceeding a bound fails explicitly rather than
+mistaking truncation for an unambiguous match.
+
+Only single-candidate occurrences are materialized/linked during the ingestion transaction.
+Ambiguous occurrences require explicit user confirmation. Optional validated LLM suggestions
+receive private input only through the authenticated owner's LLM scope, never shared-source mode,
+and cannot introduce candidate IDs/spans outside the supplied set. They do not confirm a sense.
+No provider, spaCy model download or network lexicon query is required for this path.
+
 ## Distractor consumers (3.2.2)
 
 The learning service consumes already-materialized Phase 2 concept/domain tags and semantic

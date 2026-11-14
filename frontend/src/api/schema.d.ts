@@ -648,6 +648,130 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/content/passage/{id}/sentences/{order}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    /** Assign Part */
+    put: operations['assign_part_api_content_passage__id__sentences__order__put']
+    post?: never
+    /** Remove Part */
+    delete: operations['remove_part_api_content_passage__id__sentences__order__delete']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/content/ingest': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Ingest */
+    post: operations['ingest_api_content_ingest_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/content/passage/{id}/reading': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Reading */
+    get: operations['reading_api_content_passage__id__reading_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/content/sentence/{id}/occurrences': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Occurrences */
+    get: operations['occurrences_api_content_sentence__id__occurrences_get']
+    /** Resolve */
+    put: operations['resolve_api_content_sentence__id__occurrences_put']
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/content/sentence/{id}/occurrences/{edge_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Remove Occurrence */
+    delete: operations['remove_occurrence_api_content_sentence__id__occurrences__edge_id__delete']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/content/{kind}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Listing */
+    get: operations['listing_api_content__kind__get']
+    put?: never
+    /** Create */
+    post: operations['create_api_content__kind__post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/content/{kind}/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Read */
+    get: operations['read_api_content__kind___id__get']
+    /** Update */
+    put: operations['update_api_content__kind___id__put']
+    post?: never
+    /** Delete */
+    delete: operations['delete_api_content__kind___id__delete']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -717,6 +841,19 @@ export interface components {
        * @default false
        */
       reset_password: boolean
+    }
+    /** AnalysisRead */
+    'AnalysisRead': {
+      sentence: components['schemas']['ContentRead']
+      /** Occurrences */
+      occurrences: components['schemas']['Occurrence'][]
+      /**
+       * Assistance
+       * @default not_requested
+       */
+      assistance: string
+      /** Suggestions */
+      suggestions?: components['schemas']['Resolution'][]
     }
     /** AttemptAnswer */
     'AttemptAnswer': {
@@ -978,6 +1115,68 @@ export interface components {
       limit: number
       /** Has More */
       has_more: boolean
+    }
+    /** ContentCandidate */
+    'ContentCandidate': {
+      /** Lemma */
+      lemma: string
+      /** Sense Id */
+      sense_id: string
+      /** Definition */
+      definition: string
+    }
+    /** ContentCreate */
+    'ContentCreate': {
+      /** Text */
+      text: string
+      /**
+       * Lang
+       * @default en
+       */
+      lang: string
+      /**
+       * Source
+       * @default
+       */
+      source: string
+      /**
+       * Title
+       * @default
+       */
+      title: string
+      /** Translation */
+      translation?: {
+        [key: string]: string
+      }
+    }
+    /** @enum {string} */
+    'ContentKind': 'sentence' | 'passage'
+    /** ContentRead */
+    'ContentRead': {
+      /** Text */
+      text: string
+      /**
+       * Lang
+       * @default en
+       */
+      lang: string
+      /**
+       * Source
+       * @default
+       */
+      source: string
+      /**
+       * Title
+       * @default
+       */
+      title: string
+      /** Translation */
+      translation?: {
+        [key: string]: string
+      }
+      /** Id */
+      id: string
+      kind: components['schemas']['ContentKind']
     }
     /** CustomSenseCreate */
     'CustomSenseCreate': {
@@ -1285,6 +1484,27 @@ export interface components {
       kind?: components['schemas']['NoteKind'] | null
       text?: components['schemas']['NoteText'] | null
     }
+    /** Occurrence */
+    'Occurrence': {
+      /** Text */
+      text: string
+      /** Span */
+      span: [
+        number,
+        number,
+      ]
+      /** Candidates */
+      candidates: components['schemas']['ContentCandidate'][]
+      /**
+       * Status
+       * @enum {string}
+       */
+      status: 'unmatched' | 'unresolved' | 'ambiguous' | 'resolved'
+      /** Sense Id */
+      sense_id?: string | null
+      /** Edge Id */
+      edge_id?: string | null
+    }
     /** OverrideFields */
     'OverrideFields-Input': {
       text?: components['schemas']['app__domain__overrides__Text__1'] | null
@@ -1366,6 +1586,22 @@ export interface components {
     /** OverrideUpdate */
     'OverrideUpdate': {
       fields: components['schemas']['OverrideFields-Input']
+    }
+    /** PartAssignment */
+    'PartAssignment': {
+      /** Sentence Id */
+      sentence_id: string
+    }
+    /** PassageRead */
+    'PassageRead': {
+      passage: components['schemas']['ContentRead']
+      /** Sentences */
+      sentences: components['schemas']['SentencePart'][]
+      /**
+       * Assistance
+       * @default not_requested
+       */
+      assistance: string
     }
     /** PasswordChange */
     'PasswordChange': {
@@ -1548,6 +1784,16 @@ export interface components {
      * @enum {integer}
      */
     'Rating': 1 | 2 | 3 | 4
+    /** Resolution */
+    'Resolution': {
+      /** Span */
+      span: [
+        number,
+        number,
+      ]
+      /** Sense Id */
+      sense_id: string
+    }
     /** ReviewReceipt */
     'ReviewReceipt': {
       /** Attempt Id */
@@ -1578,6 +1824,19 @@ export interface components {
     'SenseOrderUpdate': {
       /** Sense Ids */
       sense_ids: string[]
+    }
+    /** SentencePart */
+    'SentencePart': {
+      sentence: components['schemas']['ContentRead']
+      /** Order */
+      order: number
+      /** Span */
+      span: [
+        number,
+        number,
+      ]
+      /** Occurrences */
+      occurrences?: components['schemas']['Occurrence'][]
     }
     /** SrsPreferences */
     'SrsPreferences': {
@@ -3368,6 +3627,399 @@ export interface operations {
       }
       header?: never
       path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  assign_part_api_content_passage__id__sentences__order__put: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        order: number
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['PartAssignment']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  remove_part_api_content_passage__id__sentences__order__delete: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        order: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  ingest_api_content_ingest_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ContentCreate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PassageRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  reading_api_content_passage__id__reading_get: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PassageRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  occurrences_api_content_sentence__id__occurrences_get: {
+    parameters: {
+      query?: {
+        assist?: boolean
+      }
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AnalysisRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  resolve_api_content_sentence__id__occurrences_put: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['Resolution']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AnalysisRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  remove_occurrence_api_content_sentence__id__occurrences__edge_id__delete: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+        edge_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  listing_api_content__kind__get: {
+    parameters: {
+      query?: {
+        limit?: number
+        offset?: number
+      }
+      header?: never
+      path: {
+        kind: 'sentence' | 'passage'
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ContentRead'][]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  create_api_content__kind__post: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        kind: 'sentence' | 'passage'
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ContentCreate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ContentRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  read_api_content__kind___id__get: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        kind: 'sentence' | 'passage'
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ContentRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  update_api_content__kind___id__put: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        kind: 'sentence' | 'passage'
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ContentCreate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ContentRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  delete_api_content__kind___id__delete: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        kind: 'sentence' | 'passage'
         id: string
       }
       cookie?: never
