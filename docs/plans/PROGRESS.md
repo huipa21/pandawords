@@ -34,10 +34,9 @@ The images agent was notified before integration. Other additions require coordi
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 4.4.2 | task/4.4.2-graph-ui | ../pandawords.worktrees/4.4.2 | Merged e1edc02; visual follow-up for fit/search controls running |
 | 4.4.4 | task/4.4.4-context-exercises | ../pandawords.worktrees/4.4.4 | Agent running |
-| 4.4.3 | task/4.4.3-relations | ../pandawords.worktrees/4.4.3 | Waiting for 4.4.2 |
-| 5.1.3 | task/5.1.3-image-review | ../pandawords.worktrees/5.1.3 | Agent running |
+| 4.4.3 | task/4.4.3-relations | ../pandawords.worktrees/4.4.3 | Ready; prerequisite 4.4.2 verified |
+| 5.1.3 | task/5.1.3-image-review | ../pandawords.worktrees/5.1.3 | Merged c13322c; focused verification passed, browser pending |
 
 ### Phase 6 run (separate coordinator)
 
@@ -94,6 +93,23 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Findings: offline review criteria preserve server-authoritative grading and receipts, and require
   an explicit bounded lease for prefetched attempts.
 - Blockers / follow-ups: none.
+
+### 2026-11-15 — 4.4.2 Graph exploration and visual acceptance
+- Result / completed: `1d4940` merged as `e1edc02`, follow-up `f554bb1` merged; Cytoscape catalogue,
+  bounded seeds, all-words view and preserved project tree/graph focus, bilingual controls/previews.
+- Dependencies: 4.4.1 and 2.6.4 checked ✅.
+- Verification: agent check/build, API 23 then 24 and focused UI 19 then 20 passed. Main first
+  integration check, 24 API and 33 frontend passed; follow-up check, 24 API and 7 graph UI passed.
+  Real-stack browser passed including exactly two expected lemma/lexeme nodes, mobile/desktop,
+  and sparse/dense light/dark design previews; all screenshots inspected.
+- Failures / causes / corrections: visual review caught excessive single-node auto-zoom and narrow
+  mobile search controls; bounded fit and stacked inputs corrected. Browser's one-node observation
+  exposed missing implicit lexeme ancestry in graph authorization; regression proves normal add
+  yields has_lexeme at depth 1 and selected sense/has_sense at depth 2, respecting hiding/owner union.
+  Initial added browser preview object formatting was fixed before passing check.
+- Skipped / deferred: final full suites; no acceptance work skipped. Build's existing large graph
+  chunk warning recorded, no unrelated optimization added.
+- Blockers / follow-ups: none; relation editing ready. Task cleanup pending.
 
 ### 2026-11-15 — Cross-feature desktop/mobile browser verification
 - Result / completed: `ac3de8b` adds real-stack isolated-learner passage ingestion, project-only

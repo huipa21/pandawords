@@ -117,6 +117,7 @@ test('private reading highlights and bounded graphs work on desktop and mobile',
     await page.getByRole('button', { name: 'Graph', exact: true }).click()
     await page.getByTestId('graph-explorer').getByRole('button', { name: 'cat', exact: true }).click()
     await expect(page.getByTestId('graph-canvas')).toBeVisible()
+    await expect(page.getByText('Keyboard and touch node list (2)', { exact: true })).toBeVisible()
     await page.getByRole('button', { name: 'Tree', exact: true }).click()
     await expect(page.getByTestId('project-tree')).toBeVisible()
     await page.getByRole('button', { name: 'Graph', exact: true }).click()
@@ -141,6 +142,15 @@ test('private reading highlights and bounded graphs work on desktop and mobile',
       path: test.info().outputPath('graph-mobile.png'),
       fullPage: true,
     })
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await page.goto('/dev/design')
+    for (const theme of ['light', 'dark']) {
+      const preview = page.locator(`[data-preview-theme="${theme}"] [data-testid="graph-preview"]`)
+      await expect(preview).toBeVisible()
+      await preview.screenshot({
+        path: test.info().outputPath(`graph-preview-${theme}.png`),
+      })
+    }
   }
   finally {
     if (api && passageId) {
