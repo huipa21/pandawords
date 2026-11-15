@@ -26,7 +26,7 @@ Agents must not edit PLAN/PROGRESS or merge. Shared topic-doc changes are integr
 |---|---|---|---|
 | 7.1.1 | merged | removed | ✅ merged at b5d79d1; worktree and branch removed |
 | 7.1.2 | task/7.1.2-offline-review | ../pandawords.worktrees/7.1.2 | Ready: 7.1.1 merged and verified |
-| 7.1.3 | task/7.1.3-hardening | ../pandawords.worktrees/7.1.3 | Agent running: rate limits, headers, isolation |
+| 7.1.3 | merged | removed | ✅ rate limits, deployed CSP and isolation verified |
 | 7.1.4 | task/7.1.4-performance | ../pandawords.worktrees/7.1.4 | Agent running: measured graph and bundle budgets |
 | 7.1.5 | task/7.1.5-fsrs-optimization | ../pandawords.worktrees/7.1.5 | Agent running: bounded per-user optimization |
 
@@ -118,6 +118,24 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-15 — 7.1.3 Security hardening
+- Result / completed: checkpoint `bc2e8d0` finished and merged; bounded process-local
+  limits, trusted-proxy validation, retry headers, CSP/security headers and isolation matrix.
+- Dependencies: 1.5.4 and 1.6.4 ✅. No Phase 6 worktrees modified.
+- Verification: 69 focused backend cases passed; frontend 218/218 passed; production build
+  and worktree/main `dev.ps1 check` passed. Actual nginx container/browser test passed
+  English and Chinese flows, protected media, CSP enforcement, URL-log privacy and all
+  three direct/trusted-ingress forwarding-spoof probes.
+- Failures / causes / corrections: fixed two typing/format issues; nginx ordinary error logs
+  exposed synthetic private query text, now restricted to critical errors. Reused both-locale
+  image fixture required a non-ambiguous locator. Restored packages after pnpm build failure.
+  Concurrent test scratch staging interrupted a hook; scratch removed, clean commit succeeded.
+- Skipped / deferred: backup/import/export endpoints do not exist on main; their isolation
+  remains Phase 6 acceptance, explicitly documented. No other requested hardening deferred.
+- Findings: one API worker is required for process-local limits; documented deployment pins
+  proxy trust. Generated fixture/scratch files from the interrupted work were removed.
+- Blockers / follow-ups: none for this task; full backend suite at Phase 7 closeout.
 
 ### 2026-11-15 — 7.1.1 PWA installable static shell
 - Result / completed: `c28e0b1` + `1c7f6f5` merged as `b5d79d1`. Manifest, versioned icons,
