@@ -28,6 +28,21 @@ components and require no design-preview entry.
 
 These are feature-owned, not shared exercise components. The project plan reuses `ProjectForm`.
 
+## Portability feature (`src/features/portability/`, 6.1.6)
+
+- `ProjectExportButton`: project-header export with busy/cancel and skipped-media notice.
+- `ProjectImportDialog`: `NModal` wrapper around `ArchiveImportForm kind="project"`.
+- `UserBackupSection`: `/settings` full-backup download plus restore form.
+- `ArchiveImportForm`: file pre-check, progress choice, live status/cancel, staged localized
+  errors, retry with retained file/options; `kind="user"` adds `ConfirmAction` before restore.
+- `ArchiveSummary`: created/merged/skipped totals, progress/source, notices, restored/kept
+  preferences, and Open project for imports.
+- `useArchiveDownload` / `useArchiveUpload`: abortable transfer state; `archive.ts` holds
+  pre-checks, safe download names, blob saving and bundle-error localization.
+
+`features/admin/AdminBackupPage` (+ `useSiteBackups`) is the admin-only site-backup list with
+create, polling and protected download. These are feature-owned; no design-preview entry.
+
 Use these. If something is missing, add it here **and** to `src/components/`, with an entry on the
 `/dev/design` preview page. Feature-only components stay in `src/features/<x>/components/`.
 

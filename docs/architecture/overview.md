@@ -391,6 +391,14 @@ priority components live in `src/features/study/`.
 `/words` (all-words graph) · `/words/:lemmaId` · `/reading/:passageId` · `/settings` ·
 `/admin/users` · `/admin/backup` · `/dev/design` (dev only)
 
+Portability UI (6.1.6) lives in `src/features/portability/`: the project page exports the
+owned project, `/projects` opens a project-import dialog, and `/settings` offers the current
+user's full backup and restore. These only call `/api/projects/{id}/export`,
+`/api/projects/import`, `/api/me/backup` and `/api/me/restore` (no user id is ever sent);
+archives stream as raw gzip bodies and downloads are saved from authenticated blobs. The
+admin-only `/admin/backup` page creates, polls and downloads site backups via
+`/api/admin/backups`; site restore is never exposed in the browser (`deploy/restore.sh`).
+
 ## Media storage and delivery
 
 `api/media.py` → `services/media.py` → `db/media.py` serves authenticated
