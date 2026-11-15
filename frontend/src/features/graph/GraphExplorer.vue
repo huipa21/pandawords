@@ -8,6 +8,7 @@ import GraphCanvas from '@/components/graph/GraphCanvas.vue'
 import GraphLegend from '@/components/graph/GraphLegend.vue'
 import GraphToolbar from '@/components/graph/GraphToolbar.vue'
 import { presentGraph, presentNode } from '@/components/graph/types'
+import SenseRelations from './SenseRelations.vue'
 
 const props = defineProps<{ projectId?: string, initialFocus?: string }>()
 const emit = defineEmits<{ focus: [id: string] }>()
@@ -72,11 +73,14 @@ async function loadSeeds(page = 1) {
   }
 }
 
-async function load() {
+async function load(preserveSelection = false) {
   const current = ++request
+  const selectedId = preserveSelection ? selected.value?.id : undefined
   error.value = ''
-  elements.value = { nodes: [], edges: [] }
-  selected.value = undefined
+  if (!preserveSelection) {
+    elements.value = { nodes: [], edges: [] }
+    selected.value = undefined
+  }
   if (!focus.value)
     return
   loading.value = true
@@ -96,7 +100,7 @@ async function load() {
       return
     if (result.data) {
       elements.value = presentGraph(result.data)
-      selected.value = elements.value.nodes.find(node => node.id === focus.value)
+      selected.value = elements.value.nodes.find(node => node.id === (selectedId ?? focus.value))
     }
     else {
       error.value = result.response.status === 413
@@ -132,7 +136,7 @@ watch([
   direction,
   nodes,
   relations,
-], load, { immediate: true })
+], () => load(), { immediate: true })
 watch(() => props.projectId, () => {
   focus.value = props.initialFocus ?? ''
   void loadSeeds()
@@ -177,6 +181,7 @@ onScopeDispose(() => {
             {{ t('graph.next') }}
           </NButton>
         </div>
+        <SenseRelations v-if="selected?.type === 'sense'" :key="selected.id" :sense-id="selected.id" @changed="load(true)" />
       </template>
     </section>
     <p v-if="loading" role="status">
@@ -184,11 +189,11 @@ onScopeDispose(() => {
     </p>
     <div v-else-if="error" role="alert" data-testid="graph-error">
       <p>{{ t(error) }}</p>
-      <NButton size="large" @click="load">
+      <NButton size="large" @click="load()">
         {{ t('common.retry') }}
       </NButton>
     </div>
-    <template v-else-if="focus">
+    <template v-if="focus && !error">
       <p v-if="!elements.nodes.length" role="status">
         {{ t('graph.emptyGraph') }}
       </p>
@@ -203,7 +208,7 @@ onScopeDispose(() => {
         </NButton>
       </div>
     </template>
-    <p v-else role="status">
+    <p v-else-if="!focus" role="status">
       {{ t('graph.choose') }}
     </p>
   </section>

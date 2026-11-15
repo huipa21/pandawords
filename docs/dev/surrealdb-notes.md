@@ -1,5 +1,18 @@
 # SurrealDB 3.3 notes
 
+## Personal semantic relation identities (4.4.3) ✅
+
+Verified with the existing isolated loopback 8101 SurrealDB 3.3 harness:
+bound deterministic edge records in `RELATE $start->$edge->$end SET ...` and
+insert-only SDK transactions serialize four concurrent identical creates to one 201
+and three explicit 200 duplicates using the existing `_atomic` conflict retry.
+Including the owner in the primary identity keeps two legitimate users' identical
+endpoint/type links independent. Existing shared or foreign identity collisions fail
+closed before RELATE; DELETE rechecks the owner and both current endpoint owners and
+selection visibility. Ordered LIMIT/START pagination and effective label batches reuse
+the graph authorization snapshot. Retained probes: `tests/api/test_relations.py`.
+The existing 0005 relation fields suffice; no migration or persistent dev data change.
+
 ## Scoped graph seed discovery (4.4.2) ✅
 
 Visible selected senses also authorize their implicit lexeme/lemma ancestors, even without

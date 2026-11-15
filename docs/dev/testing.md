@@ -1,5 +1,23 @@
 # Testing
 
+## Personal semantic relations (4.4.3)
+
+Using the existing test DB on 8101:
+
+```powershell
+Set-Location backend
+uv run --no-sync pytest -q tests/api/test_relations.py tests/api/test_graph.py tests/api/test_graph_bounds.py
+Set-Location ../frontend
+pnpm exec vitest run src/features/graph/SenseRelations.test.ts src/features/graph/GraphExplorer.test.ts src/features/words/LemmaDetailPage.test.ts --maxWorkers=2 --testTimeout=60000
+```
+
+The integrated selectors passed 34 backend and 16 frontend cases. Coverage includes all seven
+relation types, self-links, malformed IDs and caller-injected ownership/provenance, hidden and
+foreign endpoints, shared/foreign edge immutability, four concurrent retries, independent owner
+identities and protected identity collisions. UI cases cover both locales, explicit target
+selection, retained choices after failures, retry/removal confirmation and graph refresh.
+`dev.ps1 check` passed. No migration or external provider is required.
+
 ## Reading and inline vocabulary (4.2.3)
 
 Using the existing healthy 8101 server and random isolated database fixture, from `backend`:

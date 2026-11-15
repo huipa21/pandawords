@@ -6,6 +6,7 @@ import GraphLegend from '@/components/graph/GraphLegend.vue'
 import GraphToolbar from '@/components/graph/GraphToolbar.vue'
 import { createAppI18n } from '@/i18n'
 import GraphExplorer from './GraphExplorer.vue'
+import SenseRelations from './SenseRelations.vue'
 
 const client = vi.hoisted(() => ({
   GET: vi.fn(),
@@ -145,5 +146,30 @@ describe('bounded graph exploration', () => {
     await flushPromises()
     expect(wrapper.find('[role="alert"]').exists()).toBe(true)
     expect(client.GET.mock.calls.some(call => call[0] === '/api/graph')).toBe(false)
+  })
+
+  it('refreshes the same bounded neighborhood after relation changes without losing the selection', async () => {
+    const sense = {
+      id: 'sense',
+      table: 'sense',
+      fields: { definition: 'Meaning' },
+    }
+    client.GET.mockImplementation((path: string) => Promise.resolve(ok(path === '/api/graph'
+      ? {
+          ...graph,
+          nodes: [lemma, sense],
+        }
+      : [])))
+    await setup({ initialFocus: lemma.id })
+    wrapper.findComponent({ name: 'GraphCanvas' }).vm.$emit('select', sense.id)
+    await flushPromises()
+    const editor = wrapper.findComponent(SenseRelations)
+    expect(editor.props('senseId')).toBe(sense.id)
+    editor.vm.$emit('changed')
+    await flushPromises()
+    const graphCalls = client.GET.mock.calls.filter(call => call[0] === '/api/graph')
+    expect(graphCalls).toHaveLength(2)
+    expect(graphCalls[1]?.[1].params.query).toEqual(graphCalls[0]?.[1].params.query)
+    expect(wrapper.findComponent(SenseRelations).props('senseId')).toBe(sense.id)
   })
 })

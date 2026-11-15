@@ -27,7 +27,14 @@ async def seeds(
         user = RecordID("user", user_key(owner))
         authorized = await visible(db, user, txn, project)
         # Fetch in bounded batches to apply effective overrides before text matching.
-        records = sorted(authorized, key=str)
+        records = sorted(
+            (
+                record
+                for record in authorized
+                if not query.node_types or record.table_name in query.node_types
+            ),
+            key=str,
+        )
         matches: list[GraphNode] = []
         start = (query.page - 1) * query.page_size
         for offset in range(0, len(records), NODE_LIMIT):

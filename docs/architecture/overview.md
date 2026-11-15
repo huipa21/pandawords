@@ -1,5 +1,23 @@
 # Architecture overview
 
+## Personal relation editing (4.4.3)
+
+Authenticated `POST /api/relations` accepts `{start, end, type}` with opaque sense
+IDs. It returns `{relation, created}`: 201 for a new personal link, 200 with
+`created: false` for an identical retry/duplicate. Owner/ID/source injection and
+unsupported types are rejected; self-links return 422 `relation.self_link`.
+`GET /api/relations?sense_id=...&page=1&page_size=20` lists incoming/outgoing
+visible shared/personal links with effective endpoint labels and edge-level `readonly`.
+Pages are at most 100 records. `DELETE /api/relations/{id}` removes only a currently
+visible requester-owned edge (204); missing, shared, foreign or inaccessible links
+return 404. Identity collisions return 409. Successful reads/creates are no-store.
+Router → service → repository preserves the existing domain-error boundary.
+
+`GET /api/graph/seeds` also accepts repeated `node_types` filters, applied before
+effective-label matching and pagination. The relation editor requests only senses,
+never a full graph. Graph/detail panels share `SenseRelations`; successful graph edits
+reload the same bounded neighborhood while preserving its selected sense.
+
 ## Graph presentation and discovery (4.4.2)
 
 `GET /api/graph/seeds?q=&page=1&page_size=20&project_id=` is authenticated,

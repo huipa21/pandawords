@@ -1,4 +1,32 @@
 {
+  "relations": {
+    "title": "个人语义关联",
+    "policy": "请选择已收录且可见的义项。关联有方向，两个义项必须不同。来源关联仅供查看。",
+    "search": "查找可见义项",
+    "noCandidates": "请搜索已收录的词汇或自建义项。",
+    "selected": "已选择：{label}",
+    "choose": "请先选择另一个目标义项。",
+    "invalid": "请检查所选义项和关联类型后重试。",
+    "type": "关联类型",
+    "create": "创建关联",
+    "created": "已创建个人关联。",
+    "duplicate": "此个人关联已存在，未重复创建。",
+    "remove": "移除个人关联",
+    "confirmRemove": "要移除此个人关联吗？来源关联不受影响。",
+    "removed": "已移除个人关联。",
+    "failed": "操作失败，已保留选择。请重试加载、创建或移除关联。",
+    "empty": "暂无可见的语义关联。",
+    "source": "只读来源关联",
+    "types": {
+      "synonym": "近义",
+      "antonym": "反义",
+      "hypernym": "上位",
+      "hyponym": "下位",
+      "confusable": "易混淆",
+      "collocation": "搭配",
+      "default": "相关"
+    }
+  },
   "reading": {
     "title": "阅读",
     "library": "文章列表",

@@ -30,6 +30,8 @@ async def relate(
     start: RecordID,
     end: RecordID,
     attributes: dict[str, Value],
+    *,
+    record: RecordID | None = None,
 ) -> dict[str, Any]:
     return (
         await checked_query(
@@ -37,7 +39,7 @@ async def relate(
             "RELATE $start->$edge->$end CONTENT $attributes;",
             {
                 "start": start,
-                "edge": RecordID(edge, uuid4().hex),
+                "edge": record or RecordID(edge, uuid4().hex),
                 "end": end,
                 "attributes": attributes,
             },

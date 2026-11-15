@@ -69,6 +69,19 @@
               "default": 20,
               "title": "Page Size"
             }
+          },
+          {
+            "name": "node_types",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/DictionaryTable"
+              },
+              "maxItems": 7,
+              "title": "Node Types"
+            }
           }
         ],
         "responses": {
@@ -181,6 +194,167 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/relations": {
+      "post": {
+        "tags": [
+          "relations"
+        ],
+        "summary": "Create Relation",
+        "operationId": "create_relation_api_relations_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RelationCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelationResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "relations"
+        ],
+        "summary": "List Relations",
+        "operationId": "list_relations_api_relations_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "sense_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 16384,
+              "title": "Sense Id"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 10000,
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 20,
+              "title": "Page Size"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelationRead"
+                  },
+                  "title": "Response List Relations Api Relations Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/relations/{id}": {
+      "delete": {
+        "tags": [
+          "relations"
+        ],
+        "summary": "Delete Relation",
+        "operationId": "delete_relation_api_relations__id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
           },
           "422": {
             "description": "Validation Error",
@@ -7922,6 +8096,109 @@
         ],
         "title": "Rating",
         "description": "Enum representing the four possible ratings when reviewing a card."
+      },
+      "RelationCreate": {
+        "properties": {
+          "start": {
+            "type": "string",
+            "maxLength": 16384,
+            "minLength": 1,
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "maxLength": 16384,
+            "minLength": 1,
+            "title": "End"
+          },
+          "type": {
+            "$ref": "#/components/schemas/RelationType"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "start",
+          "end",
+          "type"
+        ],
+        "title": "RelationCreate"
+      },
+      "RelationRead": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "start": {
+            "type": "string",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "title": "End"
+          },
+          "start_label": {
+            "type": "string",
+            "title": "Start Label"
+          },
+          "end_label": {
+            "type": "string",
+            "title": "End Label"
+          },
+          "type": {
+            "$ref": "#/components/schemas/RelationType"
+          },
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "readonly": {
+            "type": "boolean",
+            "title": "Readonly"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "start",
+          "end",
+          "start_label",
+          "end_label",
+          "type",
+          "source",
+          "readonly"
+        ],
+        "title": "RelationRead"
+      },
+      "RelationResult": {
+        "properties": {
+          "relation": {
+            "$ref": "#/components/schemas/RelationRead"
+          },
+          "created": {
+            "type": "boolean",
+            "title": "Created"
+          }
+        },
+        "type": "object",
+        "required": [
+          "relation",
+          "created"
+        ],
+        "title": "RelationResult"
+      },
+      "RelationType": {
+        "type": "string",
+        "enum": [
+          "synonym",
+          "antonym",
+          "hypernym",
+          "hyponym",
+          "confusable",
+          "collocation",
+          "default"
+        ]
       },
       "Resolution": {
         "properties": {

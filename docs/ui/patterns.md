@@ -1,5 +1,19 @@
 # UI patterns
 
+## Personal semantic links (4.4.3)
+
+Sense selection in the graph exposes `SenseRelations`; word detail has an expandable
+panel per sense. Source links are labelled read-only and never have removal controls.
+Bounded, paginated sense-only discovery requires explicit search and target selection;
+the current sense is excluded. The selected target remains visible across pages/errors.
+Relation direction and the distinct-sense policy are explained before submission.
+Validation, created/already-existing feedback, load/search failures and successful
+removal are bilingual. Failed creation retains both target and type for retry.
+Removal requires `ConfirmAction`; failed removal retains the confirmation for retry.
+The graph refreshes its current bounded snapshot only after successful mutation, without
+changing focus, filters, depth or selected sense. All controls use existing tokens,
+localized accessible labels and large touch targets.
+
 ## Sense images (5.1.1)
 
 Each visible sense has a private image section. Manual upload is independent of provider
