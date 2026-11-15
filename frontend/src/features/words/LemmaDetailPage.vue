@@ -11,6 +11,7 @@ import PosBadge from '@/components/word/PosBadge.vue'
 import PronunciationChip from '@/components/word/PronunciationChip.vue'
 import SenseItem from '@/components/word/SenseItem.vue'
 import WordHeader from '@/components/word/WordHeader.vue'
+import SenseRelations from '@/features/graph/SenseRelations.vue'
 import TagAssignments from '@/features/tags/TagAssignments.vue'
 import ContainingPhrases from './ContainingPhrases.vue'
 import { entryRecords, lemmaView, posView, pronunciations, senseView, text } from './dictionaryView'
@@ -32,6 +33,7 @@ const editing = ref<DictionaryRecord>()
 const resetting = ref<DictionaryRecord>()
 const noteTarget = ref<string>()
 const tagTarget = ref<string>()
+const relationTarget = ref<string>()
 const records = computed(() => entry.value
   ? entryRecords(entry.value)
   : [])
@@ -45,6 +47,7 @@ watch(id, () => {
   resetting.value = undefined
   noteTarget.value = undefined
   tagTarget.value = undefined
+  relationTarget.value = undefined
 })
 function edit(record: DictionaryRecord) {
   fieldError.value = ''
@@ -143,8 +146,12 @@ async function reset() {
               <NButton size="large" :disabled="busy" data-testid="word-sense-tags" @click="tagTarget = tagTarget === sense.id ? undefined : sense.id">
                 {{ t('tags.title') }}
               </NButton>
+              <NButton size="large" :disabled="busy" data-testid="word-sense-relations" @click="relationTarget = relationTarget === sense.id ? undefined : sense.id">
+                {{ t('relations.title') }}
+              </NButton>
             </div>
             <TagAssignments v-if="tagTarget === sense.id" :key="sense.id" :target="{ target_table: 'sense', target_id: sense.id }" />
+            <SenseRelations v-if="relationTarget === sense.id" :key="sense.id" :sense-id="sense.id" />
           </div>
         </div>
       </NCard>

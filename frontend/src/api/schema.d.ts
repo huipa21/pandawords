@@ -38,6 +38,41 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/relations': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List Relations */
+    get: operations['list_relations_api_relations_get']
+    put?: never
+    /** Create Relation */
+    post: operations['create_relation_api_relations_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/relations/{id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /** Delete Relation */
+    delete: operations['delete_relation_api_relations__id__delete']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/healthz': {
     parameters: {
       query?: never
@@ -2219,6 +2254,40 @@ export interface components {
      * @enum {integer}
      */
     'Rating': 1 | 2 | 3 | 4
+    /** RelationCreate */
+    'RelationCreate': {
+      /** Start */
+      start: string
+      /** End */
+      end: string
+      type: components['schemas']['RelationType']
+    }
+    /** RelationRead */
+    'RelationRead': {
+      /** Id */
+      id: string
+      /** Start */
+      start: string
+      /** End */
+      end: string
+      /** Start Label */
+      start_label: string
+      /** End Label */
+      end_label: string
+      type: components['schemas']['RelationType']
+      /** Source */
+      source: string
+      /** Readonly */
+      readonly: boolean
+    }
+    /** RelationResult */
+    'RelationResult': {
+      relation: components['schemas']['RelationRead']
+      /** Created */
+      created: boolean
+    }
+    /** @enum {string} */
+    'RelationType': 'synonym' | 'antonym' | 'hypernym' | 'hyponym' | 'confusable' | 'collocation' | 'default'
     /** Resolution */
     'Resolution': {
       /** Span */
@@ -2573,6 +2642,7 @@ export interface operations {
         project_id?: string | null
         page?: number
         page_size?: number
+        node_types?: components['schemas']['DictionaryTable'][]
       }
       header?: never
       path?: never
@@ -2623,6 +2693,101 @@ export interface operations {
         content: {
           'application/json': components['schemas']['GraphRead']
         }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  list_relations_api_relations_get: {
+    parameters: {
+      query: {
+        sense_id: string
+        page?: number
+        page_size?: number
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RelationRead'][]
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  create_relation_api_relations_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RelationCreate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RelationResult']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  delete_relation_api_relations__id__delete: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Validation Error */
       422: {

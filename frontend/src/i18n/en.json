@@ -1,4 +1,32 @@
 {
+  "relations": {
+    "title": "Personal semantic links",
+    "policy": "Choose a visible selected sense. Links are directional and require two different senses. Source links are read-only.",
+    "search": "Find a visible sense",
+    "noCandidates": "Search your selected vocabulary or your own senses.",
+    "selected": "Selected: {label}",
+    "choose": "Choose a different target sense before creating a link.",
+    "invalid": "Check the selected senses and relation type, then try again.",
+    "type": "Relation type",
+    "create": "Create link",
+    "created": "Personal link created.",
+    "duplicate": "This personal link already exists. No duplicate was created.",
+    "remove": "Remove personal link",
+    "confirmRemove": "Remove this personal link? Source links will not change.",
+    "removed": "Personal link removed.",
+    "failed": "Could not complete the request. Your selection is kept; retry loading, creating or removing the link.",
+    "empty": "No visible semantic links.",
+    "source": "Read-only source link",
+    "types": {
+      "synonym": "Synonym",
+      "antonym": "Antonym",
+      "hypernym": "Hypernym",
+      "hyponym": "Hyponym",
+      "confusable": "Confusable",
+      "collocation": "Collocation",
+      "default": "Related"
+    }
+  },
   "reading": {
     "title": "Reading",
     "library": "Passage library",

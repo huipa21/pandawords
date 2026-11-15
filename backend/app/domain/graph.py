@@ -10,10 +10,13 @@ type GraphDirection = Literal["both", "outgoing", "incoming"]
 
 
 class GraphSeedsQuery(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     q: str = Field(default="", max_length=200)
     project_id: str | None = Field(default=None, max_length=16384)
     page: int = Field(default=1, ge=1, le=10000)
     page_size: int = Field(default=20, ge=1, le=100)
+    node_types: list[DictionaryTable] = Field(default_factory=list, max_length=7)
 
 
 class GraphQuery(BaseModel):

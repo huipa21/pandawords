@@ -1,5 +1,22 @@
 # Data model (SurrealDB 3.3)
 
+## Personal semantic relations (4.4.3)
+
+The existing `relates_to` schema supports synonym, antonym, hypernym, hyponym,
+confusable, collocation and default (related). All personal links are directional;
+all seven types require distinct sense endpoints. Shared senses must actually be
+selected and visible in the learner's project union; requester-owned senses are also
+eligible. General dictionary lookup alone does not grant relation-editing visibility.
+Both endpoint owners and the edge owner are checked independently, including on list
+and removal. Shared source edges remain read-only and foreign edges are not exposed.
+
+Creation fixes `owner` to the authenticated user and `source` to `user`; neither
+ownership, provenance nor IDs can be submitted. A deterministic primary identity
+hashes owner, ordered endpoints and type. Insert-only transactions with conflict
+retries give concurrent identical requests one edge; an existing matching personal
+edge is returned explicitly with `created: false`. Protected identity collisions
+return 409 and are never overwritten. No migration or source-row change is needed.
+
 ### Evidenced morphology (4.3.2)
 
 Migration 0021 adds optional `source` to morpheme/composed_of/member_of and an
