@@ -13,6 +13,10 @@ AppEnvironment = Literal["development", "production"]
 
 
 def configure_logging(environment: AppEnvironment) -> None:
+    # HTTP client/SDK logs may contain query credentials, authorization headers and prompts.
+    for name in ("httpx", "httpcore", "openai"):
+        logging.getLogger(name).setLevel(logging.CRITICAL + 1)
+
     renderer: structlog.processors.JSONRenderer | structlog.dev.ConsoleRenderer
     if environment == "production":
         renderer = structlog.processors.JSONRenderer()

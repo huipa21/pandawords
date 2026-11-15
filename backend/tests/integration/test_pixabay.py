@@ -74,6 +74,9 @@ async def test_cached_search_selection_worker_owner_and_attribution(
     with pytest.raises(AppError) as limited:
         await pixabay.search(db, test_settings, owner.id, "pear")
     assert limited.value.status == 429
+    assert limited.value.headers is not None
+    assert 1 <= int(limited.value.headers["Retry-After"]) <= 2
+    assert limited.value.headers["Cache-Control"] == "no-store"
     selection = ImageSelection(
         request_id="pixabay-request-0001", search_id=result.search_id, result_id=123
     )
@@ -124,6 +127,7 @@ async def test_cached_search_selection_worker_owner_and_attribution(
             ),
         )
     assert full.value.status == 429
+    assert full.value.headers == {"Retry-After": "5", "Cache-Control": "no-store"}
     await repository.cache(db, owner.id, result.search_id, {"hits": []})
     payload["request_id"] = "pixabay-expired-0001"
     with pytest.raises(JobRejected, match="expired"):
@@ -226,6 +230,20 @@ async def test_bounded_provider_http(case: str, monkeypatch: pytest.MonkeyPatch)
         return real_client(transport=httpx.MockTransport(handler))
 
     monkeypatch.setattr(pixabay.httpx, "AsyncClient", client)
-    with pytest.raises(AppError):
+    with pytest.raises(AppError) as error:
         await pixabay.fetch("https://cdn.pixabay.com/image", limit=10)
+    if case == "rate":
+        assert error.value.headers == {"Retry-After": "3600", "Cache-Control": "no-store"}
     assert all(url.startswith("https://cdn.pixabay.com/") for url in seen)
+
+
+async def test_global_provider_cooldown_reports_remaining_retry(
+    job_db: AsyncWsSurrealConnection,
+) -> None:
+    await repository.provider_slot(job_db, cooldown=True)
+    with pytest.raises(AppError) as error:
+        await repository.provider_slot(job_db)
+    assert error.value.status == 429
+    assert error.value.headers is not None
+    assert 3595 <= int(error.value.headers["Retry-After"]) <= 3600
+    assert error.value.headers["Cache-Control"] == "no-store"

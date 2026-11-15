@@ -1,0 +1,13 @@
+DEFINE TABLE IF NOT EXISTS srs_optimization SCHEMAFULL;
+DEFINE FIELD IF NOT EXISTS owner ON srs_optimization TYPE record<user> ASSERT $value = record::id($this.id)[0];
+DEFINE FIELD IF NOT EXISTS id ON srs_optimization ASSERT $value = type::record('srs_optimization', [$this.owner]);
+DEFINE FIELD IF NOT EXISTS run_id ON srs_optimization TYPE string;
+DEFINE FIELD IF NOT EXISTS attempted_at ON srs_optimization TYPE datetime;
+DEFINE FIELD IF NOT EXISTS result ON srs_optimization TYPE object FLEXIBLE;
+DEFINE FIELD IF NOT EXISTS parameters ON srs_optimization TYPE option<array<float>>;
+DEFINE FIELD IF NOT EXISTS parameters_version ON srs_optimization TYPE option<string>;
+DEFINE FIELD IF NOT EXISTS optimized_at ON srs_optimization TYPE option<datetime>;
+DEFINE FIELD IF NOT EXISTS trained_reviews ON srs_optimization TYPE int DEFAULT 0;
+DEFINE FIELD IF NOT EXISTS parameters_fingerprint ON srs_optimization TYPE option<string>;
+DEFINE INDEX IF NOT EXISTS srs_optimization_owner ON srs_optimization FIELDS owner UNIQUE;
+DEFINE INDEX IF NOT EXISTS memory_owner_last_review ON memory FIELDS owner, last_review;

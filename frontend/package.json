@@ -6,7 +6,8 @@
   "packageManager": "pnpm@11.2.2",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc -b && vite build",
+    "build": "vue-tsc -b && vite build --manifest && node bundle-budget.ts",
+    "budget": "node bundle-budget.ts",
     "typecheck": "vue-tsc -b --noEmit",
     "lint": "eslint .",
     "test": "vitest run",

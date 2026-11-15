@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import type { Component } from 'vue'
+import { ref, shallowRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import ErrorState from '@/components/app/ErrorState.vue'
 import PageHeader from '@/components/app/PageHeader.vue'
-import GraphExplorer from '@/features/graph/GraphExplorer.vue'
 import AddWordDialog from './AddWordDialog.vue'
+import { loadProjectGraph } from './graphLoader'
 import ProjectTree from './ProjectTree.vue'
 import { useProject } from './useProject'
 
@@ -17,6 +18,27 @@ const adding = ref(false)
 const tree = ref<InstanceType<typeof ProjectTree>>()
 const view = ref<'tree' | 'graph'>('tree')
 const graphFocus = ref('')
+const graphComponent = shallowRef<Component>()
+const graphLoading = ref(false)
+const graphError = ref(false)
+
+async function showGraph() {
+  view.value = 'graph'
+  if (graphComponent.value || graphLoading.value)
+    return
+  graphLoading.value = true
+  graphError.value = false
+  try {
+    graphComponent.value = (await loadProjectGraph()).default
+  }
+  catch {
+    graphError.value = true
+  }
+  finally {
+    graphLoading.value = false
+  }
+}
+
 watch(() => route.params.id, () => {
   graphFocus.value = ''
   view.value = 'tree'
@@ -62,12 +84,16 @@ watch(() => route.params.id, () => {
         <NButton size="large" :aria-pressed="view === 'tree'" @click="view = 'tree'">
           {{ t('graph.tree') }}
         </NButton>
-        <NButton size="large" :aria-pressed="view === 'graph'" @click="view = 'graph'">
+        <NButton size="large" :aria-pressed="view === 'graph'" @click="showGraph">
           {{ t('graph.title') }}
         </NButton>
       </div>
       <ProjectTree v-show="view === 'tree'" :key="project.id" ref="tree" :project-id="project.id" :source-lang="project.source_lang" @add="adding = true" />
-      <GraphExplorer v-if="view === 'graph'" :key="project.id" :project-id="project.id" :initial-focus="graphFocus" @focus="graphFocus = $event" />
+      <div v-if="view === 'graph' && graphLoading" role="status" :aria-label="t('common.loading')">
+        <NSkeleton text :repeat="4" />
+      </div>
+      <ErrorState v-else-if="view === 'graph' && graphError" :error="t('graph.error')" @retry="showGraph" />
+      <component :is="graphComponent" v-else-if="view === 'graph' && graphComponent" :key="project.id" :project-id="project.id" :initial-focus="graphFocus" @focus="graphFocus = $event" />
       <AddWordDialog v-model:show="adding" :project-id="project.id" @added="tree?.refresh()" @jobs-settled="tree?.refresh()" />
     </template>
   </section>

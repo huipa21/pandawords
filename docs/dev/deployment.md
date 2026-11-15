@@ -19,6 +19,20 @@ Native prompt failures instead show a localized in-page alert. No API responses,
 media or personal page responses enter the worker cache; the offline shell alone does not
 provide offline review.
 
+## Frontend transfer budget (7.1.4)
+
+Node 24/Vite 8 production manifest measurements, including the PWA install script,
+use nginx gzip level 1. Before/after initial JS: 183,977 -> 181,846 bytes; CSS:
+4,715 -> 4,593. Lazy layouts and project graph splitting reduce project-tree JS
+501,680 -> 246,342 bytes. Project graph remains 505,881, all words 469,769 and
+login 210,451 after the change (before: 501,680 / 466,293 / 209,650).
+Total static JS increases slightly (642,452 -> 647,424 bytes) because of splitting.
+First PWA install precaches 78 files / 2,331,222 raw bytes / 1,116,445 modeled
+transfer bytes (before: 69 / 2,326,525 / 1,111,148), plus 5,131 worker transfer
+bytes. This background traffic is separate from foreground initial JS; it is not
+a first-install bandwidth saving. Actual wire bytes also include HTTP overhead.
+The build enforces explicit budgets documented in [testing.md](testing.md).
+
 ## Image request limits
 
 Nginx permits **11 MiB** request bodies (`client_max_body_size 11m`), leaving 1 MiB
@@ -103,6 +117,52 @@ download records/licenses, all source attributions, installed wordfreq version, 
 schema version, size, hash and build counts. Keep it alongside the database. The lexicon is
 a separately transferred rebuildable artifact, **not part of site backups**; no backup
 command or retention policy changes.
+
+### Security proxy and headers (7.1.3)
+
+Nginx access logs are disabled and its server error log is restricted to `crit`:
+ordinary request errors include full URLs (potentially private query text). Use
+sanitized API events and health probes for routine diagnosis; do not turn on request
+logging in production without a separately reviewed redaction strategy.
+
+Production serves the app **only behind the HTTPS Caddy site** in `Caddyfile.snippet`; do not
+publish nginx or the API directly. Choose a non-overlapping `PANDAWORDS_INTERNAL_SUBNET` and
+reserve its `PANDAWORDS_WEB_INTERNAL_IP` exclusively for web. Compose configures the API to trust
+only that web address as `/32`; `TRUSTED_PROXY_CIDRS` in the environment cannot widen this
+production trust. The API image must keep one worker and `--no-proxy-headers --no-access-log`.
+Nginx overwrites `X-Forwarded-For` with its vetted peer and sets `X-Forwarded-Proto: https`
+because the edge is HTTPS; this prevents an API trailing-slash redirect from downgrading a
+body-bearing request to HTTP. Caddy overwrites `X-Panda-Client-IP` with `{remote_host}`.
+
+On the external Caddy network, assign Caddy a stable IP and create `proxy-trust` next to
+`compose.yml` before startup. Place a file such as `proxy-trust/caddy.conf` there, replacing
+the documentation-only IP with **that one Caddy IP**:
+
+```nginx
+set_real_ip_from 192.0.2.10/32;
+real_ip_header X-Panda-Client-IP;
+real_ip_recursive off;
+```
+
+Use the corresponding `/128` for a fixed IPv6 peer. Never trust a whole untrusted network or
+client-supplied forwarding chains. Without this file nginx safely ignores the header but every
+proxied client shares Caddy's rate-limit/backoff bucket. Reconfigure the exact trusted address
+if Caddy moves, then validate/reload nginx. Keep access/query logging disabled at Caddy and nginx:
+provider keys, private searches and content must not enter logs.
+
+Nginx 1.30 merges its server security headers into asset/cache and error responses: CSP uses
+`default-src 'none'` and same-origin script/connect/font/manifest/worker, with `blob:` only for
+protected image/media object URLs. `style-src 'unsafe-inline'` is the documented Naive UI runtime
+style exception; scripts do not allow inline code, `unsafe-eval`, or wildcards. `nosniff`,
+`X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`, and a disabled
+camera/microphone/geolocation Permissions Policy are always sent. Caddy sends one-year HSTS on
+HTTPS responses; nginx itself is HTTP internally and must not emit HSTS there. Fingerprinted
+assets remain immutable, the shell is `no-cache`, and protected media is `private, no-store`.
+The 429 contract and single-process limitation are in [auth.md](../architecture/auth.md).
+
+The database-only pre-migration export does **not** include media and is not a full-site backup.
+The Phase 6 project/user/site import/export, scheduled backup and restore features are not present
+in this branch; see [import-export.md](../architecture/import-export.md#availability-and-security-scope).
 
 ### Verified release round trip (task 1.6.5)
 
@@ -266,6 +326,23 @@ bind mount. Do not run `down -v` on production. Exports contain the selected dat
 Protect and separately copy those assets and the `.env` file. Keep backup volumes
 private, copy exports off-host, and prune only after a newer restore-tested backup
 exists. Automatic retention and `restore.sh` are not implemented yet (task 6.1.5).
+
+### Optional FSRS optimizer image (7.1.5)
+
+Normal releases omit the upstream optimizer's large PyTorch, NumPy, pandas and tqdm extra;
+ordinary scheduling works and eligible optimization requests report `unavailable`. To opt in,
+run `.\scripts\dev.ps1 release -Version x.y.z -FsrsOptimizer` on the build machine. This passes
+`INSTALL_FSRS_OPTIMIZER=true` only to the backend image build; the same image supplies the
+worker. The corresponding local development install is `uv sync --frozen --extra optimizer`
+from `backend`. The default release does not install these packages.
+
+The extra is required by the supported py-fsrs optimizer, not by any external provider. Its
+download/image footprint is substantial (Linux resolution may include CUDA packages even
+though optimization runs on CPU). Assess disk, memory and throughput before enabling it:
+the existing worker limit is 768 MiB and the whole server has 4 GiB. Adjust deployment
+capacity only after measuring the opt-in image; its production resource fit has not been
+verified. Training is limited to one CPU thread, 1,024 sampled reviews and 240 seconds;
+missing/failed optimization leaves the last valid or default scheduler intact.
 
 ### Verified local production smoke (task 1.6.4)
 

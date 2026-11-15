@@ -121,7 +121,7 @@ function Invoke-DevLifecycle {
             }
             finally { Pop-Location }
             $state.Processes.api = Start-OwnedProcess api uv @(
-                'run', '--no-sync', 'uvicorn', 'app.main:app', '--reload', '--host', '127.0.0.1', '--port', '8000'
+                'run', '--no-sync', 'uvicorn', 'app.main:app', '--reload', '--host', '127.0.0.1', '--port', '8000', '--no-proxy-headers', '--no-access-log'
             ) $backend $directory
             Save-DevState $state $path
             Wait-DevReady $state.Processes.api -Url 'http://127.0.0.1:8000/api/readyz'

@@ -1,3 +1,4 @@
+import math
 from collections.abc import Mapping
 from http import HTTPStatus
 from typing import Literal
@@ -12,6 +13,10 @@ from starlette.responses import Response
 from starlette.types import ASGIApp, Message, Receive, Scope, Send
 
 _HANDLED_ERROR_KEY = "pandawords.handled_error"
+
+
+def retry_headers(seconds: float) -> dict[str, str]:
+    return {"Retry-After": str(max(1, math.ceil(seconds))), "Cache-Control": "no-store"}
 
 
 class AppError(Exception):

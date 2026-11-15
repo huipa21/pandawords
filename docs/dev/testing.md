@@ -1,5 +1,48 @@
 # Testing
 
+## Security boundaries (7.1.3)
+
+Run the unit rate-limit/logging and API `test_security_*` suites plus exercise-attempt
+and Pixabay integration regressions against the isolated 8101 fixture. They cover
+anonymous/per-user fixed-window boundaries, recovery, proxy spoofing, and independent
+owner checks on projects, graph records/edges, content, media, jobs and review attempts.
+Build the frontend, then run `.\scripts\test-security-proxy.ps1` with a locally
+available API image (`-ApiImage`): this uses actual production nginx responses,
+both locales, protected images, graph/reading flows, CSP enforcement, URL-log privacy,
+and direct/trusted-ingress spoofing probes. It cleans up only its own containers.
+Backup/import/export endpoints are not implemented yet (Phase 6); their isolation
+acceptance remains with those tasks rather than claiming coverage of nonexistent APIs.
+
+## Measured graph and bundle budgets (7.1.4)
+
+Run `tests/integration/test_graph_performance.py` with `-s` against the isolated
+SurrealDB 3.3.5 test server (Python 3.14.3). It alternates 40 baseline/optimized
+runs per workload, checks exact authorized results and deterministic ordering for
+both directions, depth zero and relation/node filters, and records EXPLAIN plans.
+Fixtures contain 30 nodes/42 edges and the maximum 300 nodes/449 edges, plus
+foreign nodes/edges and unrelated/dense foreign tags. On the local Windows/Podman
+run, median/p95 milliseconds were 121.27/165.20 -> 53.36/70.84 (30 nodes)
+and 455.40/545.82 -> 179.76/239.30 (300 nodes). Queries fell from 54 to 22.
+These are local measurements, not server latency guarantees. The test enforces
+at most 22 queries and a deliberately loose 2-second p95 ceiling.
+
+`pnpm run build` emits the Vite manifest and runs `bundle-budget.ts`; it reports
+all initial, route and individual chunk transfer bytes and separately the PWA
+install precache. Compression models production nginx gzip level 1/minimum 1024
+bytes. Bounds: initial JS 183,500 bytes, initial CSS 4,800, per-JS chunk 225,000,
+all static JS 665,000, project tree 255,000, project graph 525,000, all words
+485,000, login 215,000 and PWA precache 1,160,000. Missing budgeted routes fail.
+Focused frontend regressions cover graph lazy-load failure/retry and analyzer
+dependency accounting; run the existing graph/router/project suites as well.
+
+## Optimizer execution evidence (7.1.5)
+
+The Phase 7 closeout additionally executed the real optional py-fsrs 6.3.3
+optimizer in its bounded subprocess with 512 eligible transitions across 16
+synthetic cards: success with 21 finite, bounds-validated parameters. Focused
+optimizer suites passed 36 cases and existing SRS/attempt regressions passed 70;
+the release test script also verified the opt-in image build argument.
+
 ## Personal semantic relations (4.4.3)
 
 Using the existing test DB on 8101:
@@ -752,6 +795,30 @@ test initially hit its 20-second timeout under concurrent checks; the unchanged 
 on rerun. Backend emits the existing Starlette/httpx deprecation warning. Pylance editor tools
 could not resolve this worktree's new Python file; `basedpyright`, ruff and runtime tests
 provide the validation instead. No E2E or persistent dev-database operations were performed.
+
+## Per-user FSRS optimization (7.1.5)
+
+From `backend`, run:
+
+```powershell
+uv run --no-sync pytest -q tests\unit\test_fsrs_optimization_unit.py tests\integration\test_fsrs_optimization_integration.py tests\integration\test_fsrs_optimization_resilience.py tests\integration\test_fsrs_optimization_migration.py tests\api\test_fsrs_optimization_api.py tests\integration\test_srs_reviews.py tests\integration\test_schema_snapshot.py
+```
+
+The real optimizer probe uses 512 qualifying transitions and checks that the installed
+py-fsrs optimizer changes its defaults, or explicitly reports `unavailable` when its optional
+extra is absent. Other deterministic tests use injected outputs and isolated owner histories:
+511/512 boundaries, same-day transitions, incomplete/foreign/corrupt/outlier records,
+bounded recent-window selection, repeat/cooldown/new-history behavior, concurrent/stale claims,
+invalid outputs, unavailable/failure preservation, default fallback and future-only reviews.
+They check unchanged cards, receipts, history and nondefault user preferences, plus the actual
+authenticated API → job → worker path. No LLM, audio or image provider is contacted.
+
+Fresh and pre-0024 upgrade databases verify replay, owner identity, data preservation and
+indexes on the existing isolated 8101 harness. Regenerate only the snapshot when needed with
+`uv run --no-sync pytest -q tests\integration\test_schema_snapshot.py --update-snapshot`,
+then rerun without the flag. `pwsh -NoProfile -File scripts\tests\release.Tests.ps1` verifies
+that the optimizer release flag affects only the API image build. No shared service lifecycle
+operation is necessary.
 
 ## Layers
 

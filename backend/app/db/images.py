@@ -6,7 +6,7 @@ from uuid import UUID
 
 from surrealdb import AsyncSurrealConnection, RecordID
 
-from app.core.errors import AppError
+from app.core.errors import AppError, retry_headers
 from app.db import jobs as job_repository
 from app.db.auth import _atomic, _rows
 from app.db.media import _media, _owner
@@ -125,7 +125,12 @@ async def provider_slot(db: AsyncSurrealConnection, *, cooldown: bool = False) -
         active = row.get("until", now) > now
         count = row.get("count", 0) if active else 0
         if not cooldown and count >= 80:
-            raise AppError("image.rate_limit", 429, "Pixabay rate limit reached.")
+            raise AppError(
+                "image.rate_limit",
+                429,
+                "Pixabay rate limit reached.",
+                headers=retry_headers((row["until"] - now).total_seconds()),
+            )
         await _rows(
             db,
             "UPSERT $id CONTENT $data;",
@@ -226,7 +231,12 @@ async def rate_limit(db: AsyncSurrealConnection, owner: str, seconds: int = 2) -
             txn_id=txn,
         )
         if rows and rows[0]["until"] > now:
-            raise AppError("image.rate_limit", 429, "Please wait before another provider request.")
+            raise AppError(
+                "image.rate_limit",
+                429,
+                "Please wait before another provider request.",
+                headers=retry_headers((rows[0]["until"] - now).total_seconds()),
+            )
         await _rows(
             db,
             "UPSERT $id CONTENT $data;",
@@ -288,7 +298,12 @@ async def enqueue_download(db: AsyncSurrealConnection, owner: str, payload: dict
         if job.payload != payload:
             raise AppError("image.request_conflict", 409, "Request identity already used.")
         if len(pending) >= 10 and job.id not in {str(row["id"].id) for row in pending}:
-            raise AppError("image.queue_full", 429, "Too many pending image downloads.")
+            raise AppError(
+                "image.queue_full",
+                429,
+                "Too many pending image downloads.",
+                headers=retry_headers(5),
+            )
         if job.status == "failed":
             await _rows(
                 db,

@@ -2,6 +2,7 @@ import type { components } from '@/api/schema'
 import { flushPromises } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import AddWordDialog from './AddWordDialog.vue'
+import * as graphLoader from './graphLoader'
 import { button, failure, project, setup, success } from './testHarness'
 
 const client = vi.hoisted(() => ({
@@ -95,24 +96,81 @@ beforeEach(() => {
 })
 afterEach(() => {
   cleanup?.()
+  vi.restoreAllMocks()
   document.body.innerHTML = ''
 })
 
 describe('project tree', () => {
   it('switches to an on-demand graph and back without discarding the project tree', async () => {
+    const loadGraph = vi.spyOn(graphLoader, 'loadProjectGraph')
     const app = await setup(`/projects/${project.id}`)
     cleanup = app.cleanup
     const tree = app.wrapper.findComponent({ name: 'ProjectTree' })
     const element = tree.element
     expect(client.GET.mock.calls.some(call => call[0] === '/api/graph')).toBe(false)
+    expect(loadGraph).not.toHaveBeenCalled()
     await button('Graph').trigger('click')
     await flushPromises()
-    expect(app.wrapper.find('[data-testid="graph-explorer"]').exists()).toBe(true)
+    await vi.waitFor(() => {
+      expect(app.wrapper.find('[data-testid="graph-explorer"]').exists()).toBe(true)
+    })
+    expect(loadGraph).toHaveBeenCalledOnce()
     expect(app.wrapper.findComponent({ name: 'ProjectTree' }).element).toBe(element)
+    app.wrapper.findComponent({ name: 'GraphExplorer' }).vm.$emit('focus', 'lemma:run/a')
     await button('Tree').trigger('click')
     await flushPromises()
     expect(app.wrapper.findComponent({ name: 'ProjectTree' }).element).toBe(element)
     expect(app.wrapper.find('[data-testid="graph-explorer"]').exists()).toBe(false)
+    await button('Graph').trigger('click')
+    await flushPromises()
+    expect(app.wrapper.findComponent({ name: 'GraphExplorer' }).props('initialFocus')).toBe('lemma:run/a')
+    expect(loadGraph).toHaveBeenCalledOnce()
+  })
+
+  it.each([
+    [
+      'en',
+      'Graph',
+      'Tree',
+      'Loading',
+      'Retry',
+      'The graph is unavailable',
+    ],
+    [
+      'zh-CN',
+      '图谱',
+      '树形',
+      '加载中',
+      '重试',
+      '暂时无法加载图谱',
+    ],
+  ] as const)('shows localized loading and retry for a failed graph chunk (%s)', async (locale, graph, tree, loading, retry, error) => {
+    const module = await import('../graph/GraphExplorer.vue')
+    let reject!: (reason: Error) => void
+    const pending = new Promise<typeof module>((_, fail) => {
+      reject = fail
+    })
+    const loadGraph = vi.spyOn(graphLoader, 'loadProjectGraph')
+      .mockReturnValueOnce(pending)
+      .mockResolvedValueOnce(module)
+    const app = await setup(`/projects/${project.id}`, locale)
+    cleanup = app.cleanup
+    const treeElement = app.wrapper.findComponent({ name: 'ProjectTree' }).element
+    expect(loadGraph).not.toHaveBeenCalled()
+    await button(graph).trigger('click')
+    expect(app.wrapper.get('[role="status"]').attributes('aria-label')).toBe(loading)
+    await button(tree).trigger('click')
+    await button(graph).trigger('click')
+    expect(loadGraph).toHaveBeenCalledOnce()
+    reject(new Error('private network detail'))
+    await flushPromises()
+    expect(app.wrapper.text()).toContain(error)
+    expect(app.wrapper.text()).not.toContain('private network detail')
+    await button(retry).trigger('click')
+    await flushPromises()
+    expect(loadGraph).toHaveBeenCalledTimes(2)
+    expect(app.wrapper.find('[data-testid="graph-explorer"]').exists()).toBe(true)
+    expect(app.wrapper.findComponent({ name: 'ProjectTree' }).element).toBe(treeElement)
   })
   it('renders effective fields and accessible hidden management, preserving descendant flags', async () => {
     const app = await setup(`/projects/${project.id}`)

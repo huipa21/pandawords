@@ -101,6 +101,23 @@ volumes: surreal-data, media, lexicon (read-only, transferred separately), backu
 
 Only `web` joins the Caddy network. SurrealDB is never exposed publicly.
 
+## Security boundaries (7.1.3)
+
+The single API process applies bounded anonymous-IP, authenticated-user, authentication-IP and
+costly-operation windows before routing; ordinary authorization still checks the current user
+and each relevant row, edge and endpoint. Shared dictionary records remain visible only under
+their existing `owner = NONE` rules, and administrator account management does not grant access
+to another user's learning records. Jobs and protected media are owner-scoped. The regression
+matrix and its unavailable Phase 6 backup/import/export paths are documented in
+[testing.md](../dev/testing.md#security-isolation-and-production-proxy-713).
+
+The HTTPS edge is Caddy → nginx → API. Nginx enforces same-origin CSP/security headers and serves
+media only through authorized internal redirects; only explicitly trusted immediate proxies can
+supply client IP/scheme. The deployment's static internal web IP and Caddy trust configuration are
+mandatory to separate users safely, not a reason to trust arbitrary forwarded chains. See
+[auth.md](auth.md#admission-control-and-privacy-713) and
+[deployment.md](../dev/deployment.md#security-proxy-and-headers-713).
+
 ## Local development
 
 | Process | How it runs | Port |

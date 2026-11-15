@@ -4,9 +4,8 @@
   `ADMIN_PASSWORD` with `must_change_password = true` in production.
 - **No self-signup.** The admin submits a username and optional role; the API generates a random
   temporary password. Admin-created accounts must change it at first login in every environment.
-- **Roles**: `admin` (user management, site backup) and `user`. Every user's data is isolated.
-  Admins do not browse other users' learning data in the UI. They can only back up or restore the
-  whole site.
+- **Roles**: `admin` (user management) and `user`. Every user's learning data is isolated,
+  including from admins. Site backup/restore is planned but is not implemented on this branch.
 - **Passwords**: argon2id via `pwdlib`. Minimum 10 characters.
 - **Tokens**:
   - Access token: JWT (HS256, `JWT_SECRET`), 60 min, `sub` = user id, `role`. The client keeps it
@@ -38,6 +37,36 @@
   authorization is done in Python (see ADR 0006). SurrealDB record-level permissions are not used.
 - **Login protection**: exponential backoff per username + IP (in-process, since there is a single
   API instance). Generic error messages.
+
+## Admission control and privacy (7.1.3)
+
+The API uses bounded, process-local fixed windows starting at the first request. Defaults per
+60 seconds are 30 authentication operations per client IP, 60 anonymous requests per client IP,
+600 requests per signed user, and 120 expensive operations per identity. Login/refresh always
+spend the anonymous IP budget, even with a bearer token; login/refresh/password also spend the
+authentication IP budget. Invalid or expired tokens are anonymous for budgeting; a valid JWT's
+subject identifies the user bucket, but authorization still reloads current database state.
+All writes and bounded costly reads (graph, dictionary, content, images, media, relations, tag
+assignments, dashboard, project tree and study plan) spend the expensive budget. Health/readiness
+are exempt. Limits, window and 16,384-entry capacity are configurable in `.env.example`.
+At capacity, new identities fail closed rather than evicting an active restriction. A restart
+clears these in-memory windows; keep **one API worker and one replica** unless admission control
+is moved to a shared store. Login backoff remains separately bounded.
+
+The immediate peer is the client address unless it belongs to `TRUSTED_PROXY_CIDRS`. Only one
+valid `X-Forwarded-For` IP from that peer is accepted; duplicate, chained, malformed or scoped
+IPv6 values are ignored and IPv4-mapped IPv6 is canonicalized. A trusted proxy can also set one
+valid `X-Forwarded-Proto` value; other peers cannot influence the request scheme. The proxy must
+overwrite both headers, not append client-supplied values. The same canonical IP feeds login
+backoff. Production trusts only the web container's fixed `/32`; the web container trusts only
+an explicitly configured Caddy address as described in [deployment.md](../dev/deployment.md).
+
+Rate rejections use the standard `{code, message, field}` envelope, `Retry-After` seconds
+(rounded up, at least one), and `Cache-Control: no-store`; Pixabay cooldown and full-queue 429s
+also include retry guidance. Rate-limit logs contain only the category, never an identity or
+request content. HTTP client/provider library logs and web/API access logs are disabled because
+URLs can carry credentials or private queries; operators must not re-enable such logging without
+equivalent redaction. Tests use synthetic secrets only.
 
 ## Security core (1.5.2)
 
@@ -110,8 +139,8 @@
   Login rechecks the verified hash when issuing its session, preventing a concurrent password
   change from allowing a stale-password login. Logout revokes only a cookie family belonging
   to the authenticated user; a foreign user's cookie is cleared locally but not revoked.
-- Login protection is per application process, keyed by the username and direct transport IP
-  (untrusted forwarded headers are ignored). Failed credentials impose 1, 2, 4, … up to 60
+- Login protection is per application process, keyed by the username and canonical trusted-client
+  IP (or direct transport IP when no proxy is trusted). Failed credentials impose 1, 2, 4, … up to 60
   seconds of backoff; early/concurrent retries return generic 429 `auth.login_throttled`.
   Success resets the counter. State expires after 15 minutes and is capped at 4096 hashed
   keys; a full active map rejects new attempts rather than evicting live restrictions.

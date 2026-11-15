@@ -26,9 +26,9 @@ Agents must not edit PLAN/PROGRESS or merge. Shared topic-doc changes are integr
 |---|---|---|---|
 | 7.1.1 | merged | removed | ✅ merged at b5d79d1; worktree and branch removed |
 | 7.1.2 | task/7.1.2-offline-review | ../pandawords.worktrees/7.1.2 | Ready: 7.1.1 merged and verified |
-| 7.1.3 | task/7.1.3-hardening | ../pandawords.worktrees/7.1.3 | Agent running: rate limits, headers, isolation |
-| 7.1.4 | task/7.1.4-performance | ../pandawords.worktrees/7.1.4 | Agent running: measured graph and bundle budgets |
-| 7.1.5 | task/7.1.5-fsrs-optimization | ../pandawords.worktrees/7.1.5 | Agent running: bounded per-user optimization |
+| 7.1.3 | merged | removed | ✅ rate limits, deployed CSP and isolation verified |
+| 7.1.4 | merged | removed | ✅ measured batching and enforced bundle budgets |
+| 7.1.5 | merged | removed | ✅ bounded per-user optimization; optional optimizer verified |
 
 Verification: baseline `dev.ps1 check` passed; bounded full frontend baseline passed 218/218
 (34 files). Full isolated backend baseline passed 1124/1124 with one existing Starlette
@@ -118,6 +118,60 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-15 — 7.1.5 Per-user FSRS optimization
+- Result / completed: checkpoint `4c512ec` completed and merged (`be69190` plus optional-import
+  follow-up). Owner-scoped validated history/parameters, explicit worker statuses, bounded
+  subprocess, cooldown/idempotency and future-only scheduling; migration 0024 and snapshot.
+- Dependencies: 3.1.2 ✅. Optional optimizer dependency decision recorded in existing ADR 0004.
+- Verification: 36 optimizer tests and 70 existing SRS/attempt regressions passed in worktree;
+  actual upstream optimizer ran 512 transitions/16 synthetic cards and returned 21 valid
+  parameters. Migration fresh/upgrade/drift tests passed; generated API unchanged after regeneration.
+  Release focused tests passed. Main `dev.ps1 check` and 20 targeted default-install tests passed.
+- Failures / causes / corrections: initial check found one formatting issue. Main correctly
+  lacked optional torch; a static import broke default type-checking, replaced by an explicit
+  optional runtime import (unavailable remains a public status, not a success fallback).
+- Skipped / deferred: no new optimizer image built/transferred; opt-in build argument tested.
+  No real learner history used; deterministic synthetic histories and real CPU optimizer tested.
+- Findings: upstream optimizer dependencies are large and remain opt-in for API/worker images;
+  ordinary review needs neither torch nor any provider and retains last-good/default parameters.
+- Blockers / follow-ups: none for this task; final full suites remain.
+
+### 2026-11-15 — 7.1.4 Measured performance
+- Result / completed: checkpoint `e1494cc` finished, merged as `8b8454c`.
+  Batched graph relation queries, lazy layouts/project graph, measured/enforced transfer budgets.
+- Dependencies: 4.4.2 ✅; PWA integration retained.
+- Verification: 28 real-DB graph tests passed, including 40 alternating baseline/optimized
+  samples at 30 and maximum 300 nodes and exact authorized output equivalence. Queries 54 -> 22;
+  median/p95 ms 121.27/165.20 -> 53.36/70.84 and 455.40/545.82 -> 179.76/239.30.
+  Focused frontend 43/43 passed; production bundle budget passed in worktree and merged main;
+  `dev.ps1 check` passed in both. Before/after foreground and background PWA bytes recorded
+  in deployment/testing docs. No new index warranted by EXPLAIN; no schema change.
+- Failures / causes / corrections: interrupted agent left nested scratch build/test copies;
+  checks initially included their generated files. All scratch removed after recording evidence.
+  Integration conflicts in docs and tsconfig resolved preserving both PWA and performance.
+- Skipped / deferred: none; server latency guarantees are not inferred from local measurements.
+- Findings: tree route JS roughly halved; graph remains the heavy route. PWA precaching
+  still downloads all hashed assets; separate install budget prevents claiming false savings.
+- Blockers / follow-ups: none for this task; integrated full suites at closeout.
+
+### 2026-11-15 — 7.1.3 Security hardening
+- Result / completed: checkpoint `bc2e8d0` finished and merged; bounded process-local
+  limits, trusted-proxy validation, retry headers, CSP/security headers and isolation matrix.
+- Dependencies: 1.5.4 and 1.6.4 ✅. No Phase 6 worktrees modified.
+- Verification: 69 focused backend cases passed; frontend 218/218 passed; production build
+  and worktree/main `dev.ps1 check` passed. Actual nginx container/browser test passed
+  English and Chinese flows, protected media, CSP enforcement, URL-log privacy and all
+  three direct/trusted-ingress forwarding-spoof probes.
+- Failures / causes / corrections: fixed two typing/format issues; nginx ordinary error logs
+  exposed synthetic private query text, now restricted to critical errors. Reused both-locale
+  image fixture required a non-ambiguous locator. Restored packages after pnpm build failure.
+  Concurrent test scratch staging interrupted a hook; scratch removed, clean commit succeeded.
+- Skipped / deferred: backup/import/export endpoints do not exist on main; their isolation
+  remains Phase 6 acceptance, explicitly documented. No other requested hardening deferred.
+- Findings: one API worker is required for process-local limits; documented deployment pins
+  proxy trust. Generated fixture/scratch files from the interrupted work were removed.
+- Blockers / follow-ups: none for this task; full backend suite at Phase 7 closeout.
 
 ### 2026-11-15 — 7.1.1 PWA installable static shell
 - Result / completed: `c28e0b1` + `1c7f6f5` merged as `b5d79d1`. Manifest, versioned icons,
