@@ -15,6 +15,18 @@ without reading content). `FOR $r IN $rows { CREATE $r.id CONTENT $r; }` works b
 result list, so `_rows` rejects it — use `INSERT`. A cancelled transaction leaves none of the
 inserted rows. Retained probes: `tests/api/test_project_import*.py`. No migration.
 
+## Restore receipt and owner scans (6.1.4) ✅
+
+Verified on the isolated 8101 SurrealDB 3.3.5 harness (`tests/api/test_user_*.py`): migration
+`0027_user_restore` defines `restore_receipt` with
+`id ASSERT $value = type::record('restore_receipt', [$this.owner, $this.bundle])`;
+`UPSERT $id CONTENT $content RETURN NONE;` with `owner`/`bundle` in the content satisfies the
+assertion inside an `_atomic` transaction and is rolled back with the rest of the restore.
+`SELECT id FROM $projects WHERE owner = $user` over an array of (possibly deleted) project IDs
+returns only existing rows. `_rows` requires object rows, so use `SELECT id …`, not
+`SELECT VALUE id …`. Concurrent restores of the same backup: one commits, the other either
+sees the receipt on its conflict retry or fails as `bundle.apply_failed`; never both apply.
+
 ## Offline issuance guard (7.1.2) ✅
 
 Verified with the isolated 8101 SurrealDB 3.3.5 harness: owner-bound

@@ -75,6 +75,17 @@ owned refs to fresh `uuid4().hex` IDs of the importer, except an owned lemma who
 (existing memory wins), overrides as `override:[importer, target]` (existing wins), and
 `review_log.project = null` points at the imported project. Media rows get a fresh
 `{kind}/{id}{ext}` path. See [import-export.md](import-export.md#project-bundle-format-pandawordsproject).
+
+User restore (6.1.4, migration `0027_user_restore`) uses the same mapping for every bundled
+project and adds `restore_receipt:[user, data_sha256]` (`owner`, `bundle` = sha256 of the
+backup's `data.json`, `restored_at`, `projects: array<record<project>>`, `summary` object). It is
+written in the restore transaction; a later restore of the same backup returns the stored
+summary (`already_restored`) without writing while any of `projects` still exists (or the backup
+had none). The migration also adds plain `owner` indexes on `lemma`, `lexeme`, `sense`,
+`morpheme`, `sentence`, `passage`, `media`, `override` and the edge tables without an
+owner-first index, used by the full-user snapshot. Restored preferences update only
+`user.prefs`, `source_lang` and `target_lang`.
+
 ## Two layers
 
 ### Review media preferences (5.1.3)

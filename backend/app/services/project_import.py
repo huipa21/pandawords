@@ -30,7 +30,7 @@ PROJECT_FORMATS = frozenset({"pandawords.project"})
 UPLOAD_NAME = "upload.tar.gz"
 
 
-async def _private_dir(settings: Settings) -> Path:
+async def private_dir(settings: Settings) -> Path:
     work_dir = settings.bundle_work_dir
     if work_dir is not None:
         await asyncio.to_thread(work_dir.mkdir, parents=True, exist_ok=True)
@@ -56,7 +56,24 @@ async def receive_upload(chunks: AsyncIterator[bytes], directory: Path, limit: i
     return path
 
 
-async def _warnings(settings: Settings, bundle: LoadedBundle) -> list[str]:
+async def receive_bundle(
+    settings: Settings, chunks: AsyncIterator[bytes], directory: Path, formats: frozenset[str]
+) -> LoadedBundle:
+    """Bounded upload into ``directory``, then full archive/data/reference validation."""
+    limit = settings.bundle_import_max_bytes
+    upload = await receive_upload(chunks, directory, limit)
+    limits = ArchiveLimits(
+        max_entries=DEFAULT_LIMITS.max_entries,
+        max_entry_bytes=min(DEFAULT_LIMITS.max_entry_bytes, 4 * limit),
+        max_total_bytes=min(DEFAULT_LIMITS.max_total_bytes, 8 * limit),
+        max_archive_bytes=limit,
+    )
+    return await asyncio.to_thread(
+        load_bundle, upload, directory, expected_formats=formats, limits=limits
+    )
+
+
+async def bundle_warnings(settings: Settings, bundle: LoadedBundle) -> list[str]:
     manifest = bundle.archive.manifest
     lexicon = await lexicon_version(settings) if manifest.lexicon_version else None
     return compatibility_warnings(
@@ -75,24 +92,10 @@ async def import_project(
     include_progress: bool | None,
 ) -> ImportSummary:
     """``include_progress=None`` means: on only for a verified same-user restore."""
-    directory = await _private_dir(settings)
+    directory = await private_dir(settings)
     bundle: LoadedBundle | None = None
     try:
-        limit = settings.bundle_import_max_bytes
-        upload = await receive_upload(chunks, directory, limit)
-        limits = ArchiveLimits(
-            max_entries=DEFAULT_LIMITS.max_entries,
-            max_entry_bytes=min(DEFAULT_LIMITS.max_entry_bytes, 4 * limit),
-            max_total_bytes=min(DEFAULT_LIMITS.max_total_bytes, 8 * limit),
-            max_archive_bytes=limit,
-        )
-        bundle = await asyncio.to_thread(
-            load_bundle,
-            upload,
-            directory,
-            expected_formats=PROJECT_FORMATS,
-            limits=limits,
-        )
+        bundle = await receive_bundle(settings, chunks, directory, PROJECT_FORMATS)
         same = same_source(settings, owner, bundle.archive.manifest)
         progress = same if include_progress is None else include_progress
         options = ImportOptions(progress, fallback_project=bundle.data.projects[0].ref)
@@ -105,7 +108,7 @@ async def import_project(
             merged=dict(sorted(plan.merged.items())),
             skipped=dict(sorted(plan.skipped.items())),
             conflicts=sorted(plan.notices),
-            warnings=await _warnings(settings, bundle),
+            warnings=await bundle_warnings(settings, bundle),
         )
     finally:
         if bundle is not None:

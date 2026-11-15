@@ -32,6 +32,7 @@ from app.api.relations import router as relations_router
 from app.api.srs_optimization import router as srs_optimization_router
 from app.api.study_plan import router as study_plan_router
 from app.api.tags import router as tags_router
+from app.api.user_backup import router as user_backup_router
 from app.api.user_dictionary import router as user_dictionary_router
 from app.core.config import Settings
 from app.core.errors import (
@@ -129,6 +130,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(project_tree_router)
     app.include_router(project_export_router)
     app.include_router(project_import_router)
+    app.include_router(user_backup_router)
     app.include_router(candidates_router)
     app.include_router(phrases_router)
     app.include_router(exercise_attempts_router)

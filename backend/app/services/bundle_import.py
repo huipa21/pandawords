@@ -7,6 +7,7 @@ if anything fails (including commit), so a failed import leaves neither rows nor
 
 import asyncio
 import shutil
+from collections.abc import Awaitable, Callable
 from pathlib import Path
 from uuid import UUID
 
@@ -96,8 +97,13 @@ async def apply_bundle(
     owner: str,
     bundle: LoadedBundle,
     options: ImportOptions,
+    finalize: Callable[[UUID, ImportPlan], Awaitable[None]] | None = None,
 ) -> ImportPlan:
-    """Merge a fully validated bundle into ``owner``'s data; all-or-nothing."""
+    """Merge a fully validated bundle into ``owner``'s data; all-or-nothing.
+
+    ``finalize`` runs inside the same transaction after the rows are written (user restore
+    records preferences and its receipt there); raising from it rolls everything back.
+    """
     user = RecordID("user", user_key(owner))
     check_size(bundle.data)
     await asyncio.to_thread(validate_media_files, bundle, settings)
@@ -111,6 +117,8 @@ async def apply_bundle(
         plan = build_plan(bundle.data, bundle.index, user, local, state, options)
         await asyncio.to_thread(_copy_files, bundle, settings.media_dir, plan.files, written)
         await repository.write_plan(db, user, plan, txn)
+        if finalize is not None:
+            await finalize(txn, plan)
         return plan
 
     try:

@@ -41,6 +41,7 @@
       "project": "DEFINE TABLE project TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "refresh_token": "DEFINE TABLE refresh_token TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "relates_to": "DEFINE TABLE relates_to TYPE RELATION IN sense OUT sense ENFORCED SCHEMAFULL PERMISSIONS NONE",
+      "restore_receipt": "DEFINE TABLE restore_receipt TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "review_log": "DEFINE TABLE review_log TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "sense": "DEFINE TABLE sense TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "sentence": "DEFINE TABLE sentence TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
@@ -98,7 +99,9 @@
         "owner": "DEFINE FIELD owner ON contains TYPE none | record<user> PERMISSIONS FULL",
         "position": "DEFINE FIELD position ON contains TYPE int PERMISSIONS FULL"
       },
-      "indexes": {},
+      "indexes": {
+        "contains_owner": "DEFINE INDEX contains_owner ON contains FIELDS owner"
+      },
       "lives": {},
       "tables": {}
     },
@@ -111,7 +114,9 @@
         "source": "DEFINE FIELD source ON derives_to TYPE none | string PERMISSIONS FULL",
         "via": "DEFINE FIELD via ON derives_to TYPE none | string PERMISSIONS FULL"
       },
-      "indexes": {},
+      "indexes": {
+        "derives_to_owner": "DEFINE INDEX derives_to_owner ON derives_to FIELDS owner"
+      },
       "lives": {},
       "tables": {}
     },
@@ -141,6 +146,7 @@
         "owner": "DEFINE FIELD owner ON has_lexeme TYPE none | record<user> PERMISSIONS FULL"
       },
       "indexes": {
+        "has_lexeme_owner": "DEFINE INDEX has_lexeme_owner ON has_lexeme FIELDS owner",
         "has_lexeme_tree_lookup": "DEFINE INDEX has_lexeme_tree_lookup ON has_lexeme FIELDS in, owner, out"
       },
       "lives": {},
@@ -155,6 +161,7 @@
         "rank": "DEFINE FIELD rank ON has_sense TYPE int PERMISSIONS FULL"
       },
       "indexes": {
+        "has_sense_owner": "DEFINE INDEX has_sense_owner ON has_sense FIELDS owner",
         "has_sense_tree_lookup": "DEFINE INDEX has_sense_tree_lookup ON has_sense FIELDS in, owner, out"
       },
       "lives": {},
@@ -267,7 +274,8 @@
         "text": "DEFINE FIELD text ON lemma TYPE string PERMISSIONS FULL"
       },
       "indexes": {
-        "lemma_lang_text": "DEFINE INDEX lemma_lang_text ON lemma FIELDS lang, text UNIQUE"
+        "lemma_lang_text": "DEFINE INDEX lemma_lang_text ON lemma FIELDS lang, text UNIQUE",
+        "lemma_owner": "DEFINE INDEX lemma_owner ON lemma FIELDS owner"
       },
       "lives": {},
       "tables": {}
@@ -290,7 +298,9 @@
         "pron.*.audio": "DEFINE FIELD pron.*.audio ON lexeme TYPE none | record<media> PERMISSIONS FULL",
         "pron.*.ipa": "DEFINE FIELD pron.*.ipa ON lexeme TYPE string PERMISSIONS FULL"
       },
-      "indexes": {},
+      "indexes": {
+        "lexeme_owner": "DEFINE INDEX lexeme_owner ON lexeme FIELDS owner"
+      },
       "lives": {},
       "tables": {}
     },
@@ -334,6 +344,7 @@
         "target": "DEFINE FIELD target ON media TYPE record<lemma | lexeme | sense | morpheme | tag | sentence | passage> PERMISSIONS FULL"
       },
       "indexes": {
+        "media_owner": "DEFINE INDEX media_owner ON media FIELDS owner",
         "media_target": "DEFINE INDEX media_target ON media FIELDS target"
       },
       "lives": {},
@@ -386,7 +397,9 @@
         "text": "DEFINE FIELD text ON morpheme TYPE string PERMISSIONS FULL",
         "type": "DEFINE FIELD type ON morpheme TYPE 'prefix' | 'root' | 'suffix' | 'infix' PERMISSIONS FULL"
       },
-      "indexes": {},
+      "indexes": {
+        "morpheme_owner": "DEFINE INDEX morpheme_owner ON morpheme FIELDS owner"
+      },
       "lives": {},
       "tables": {}
     },
@@ -424,7 +437,9 @@
         "owner": "DEFINE FIELD owner ON override TYPE record<user> PERMISSIONS FULL",
         "updated_at": "DEFINE FIELD updated_at ON override TYPE datetime PERMISSIONS FULL"
       },
-      "indexes": {},
+      "indexes": {
+        "override_owner": "DEFINE INDEX override_owner ON override FIELDS owner"
+      },
       "lives": {},
       "tables": {}
     },
@@ -436,7 +451,9 @@
         "out": "DEFINE FIELD out ON part_of TYPE record<passage> PERMISSIONS FULL",
         "owner": "DEFINE FIELD owner ON part_of TYPE none | record<user> PERMISSIONS FULL"
       },
-      "indexes": {},
+      "indexes": {
+        "part_of_owner": "DEFINE INDEX part_of_owner ON part_of FIELDS owner"
+      },
       "lives": {},
       "tables": {}
     },
@@ -449,7 +466,9 @@
         "text": "DEFINE FIELD text ON passage TYPE string PERMISSIONS FULL",
         "title": "DEFINE FIELD title ON passage TYPE string PERMISSIONS FULL"
       },
-      "indexes": {},
+      "indexes": {
+        "passage_owner": "DEFINE INDEX passage_owner ON passage FIELDS owner"
+      },
       "lives": {},
       "tables": {}
     },
@@ -500,7 +519,26 @@
         "source": "DEFINE FIELD source ON relates_to TYPE string PERMISSIONS FULL",
         "type": "DEFINE FIELD type ON relates_to TYPE 'synonym' | 'antonym' | 'hypernym' | 'hyponym' | 'confusable' | 'collocation' | 'default' PERMISSIONS FULL"
       },
-      "indexes": {},
+      "indexes": {
+        "relates_to_owner": "DEFINE INDEX relates_to_owner ON relates_to FIELDS owner"
+      },
+      "lives": {},
+      "tables": {}
+    },
+    "restore_receipt": {
+      "events": {},
+      "fields": {
+        "bundle": "DEFINE FIELD bundle ON restore_receipt TYPE string ASSERT string::len($value) = 64 PERMISSIONS FULL",
+        "id": "DEFINE FIELD id ON restore_receipt ASSERT $value = type::record('restore_receipt', [$this.owner, $this.bundle]) PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON restore_receipt TYPE record<user> ASSERT $value = record::id($this.id)[0] PERMISSIONS FULL",
+        "projects": "DEFINE FIELD projects ON restore_receipt TYPE array<record<project>> PERMISSIONS FULL",
+        "projects.*": "DEFINE FIELD projects.* ON restore_receipt TYPE record<project> PERMISSIONS FULL",
+        "restored_at": "DEFINE FIELD restored_at ON restore_receipt TYPE datetime PERMISSIONS FULL",
+        "summary": "DEFINE FIELD summary ON restore_receipt TYPE object FLEXIBLE PERMISSIONS FULL"
+      },
+      "indexes": {
+        "restore_receipt_owner": "DEFINE INDEX restore_receipt_owner ON restore_receipt FIELDS owner"
+      },
       "lives": {},
       "tables": {}
     },
@@ -546,7 +584,9 @@
         "register.*": "DEFINE FIELD register.* ON sense TYPE string PERMISSIONS FULL",
         "source": "DEFINE FIELD source ON sense TYPE string PERMISSIONS FULL"
       },
-      "indexes": {},
+      "indexes": {
+        "sense_owner": "DEFINE INDEX sense_owner ON sense FIELDS owner"
+      },
       "lives": {},
       "tables": {}
     },
@@ -560,7 +600,9 @@
         "translation": "DEFINE FIELD translation ON sentence TYPE object FLEXIBLE PERMISSIONS FULL",
         "translation.*": "DEFINE FIELD translation.* ON sentence TYPE string PERMISSIONS FULL"
       },
-      "indexes": {},
+      "indexes": {
+        "sentence_owner": "DEFINE INDEX sentence_owner ON sentence FIELDS owner"
+      },
       "lives": {},
       "tables": {}
     },
@@ -607,7 +649,9 @@
         "span": "DEFINE FIELD span ON used_in TYPE none | array<int, 2> PERMISSIONS FULL",
         "span.*": "DEFINE FIELD span.* ON used_in TYPE int PERMISSIONS FULL"
       },
-      "indexes": {},
+      "indexes": {
+        "used_in_owner": "DEFINE INDEX used_in_owner ON used_in FIELDS owner"
+      },
       "lives": {},
       "tables": {}
     },
