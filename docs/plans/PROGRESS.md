@@ -82,7 +82,7 @@ needed) now use 0027 (6.1.1-6.1.4 chain) and 0028 (6.1.5) to keep versions ascen
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 6.1.4 | task/6.1.4-user-backup | ../pandawords.worktrees/6.1.4 | Agent running |
+| 6.1.6 | task/6.1.6-portability-ui | ../pandawords.worktrees/6.1.6 | Agent running |
 
 ## Blocked
 
@@ -99,6 +99,24 @@ needed) now use 0027 (6.1.1-6.1.4 chain) and 0028 (6.1.5) to keep versions ascen
 Newest first. One entry per finished, blocked, or interrupted task. Every entry records completed
 work, dependencies, verification outcomes, skipped work and reasons, failures and known causes,
 and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets.
+
+### 2026-11-15 — 6.1.4 User full backup and restore
+- Result / completed: merged (`5d740d1` wip, `ebd9320`). `GET /api/me/backup` downloads a
+  `pandawords.user` bundle (all owned projects, records, edges, notes, media, memory, review logs,
+  preferences; no account/role/password/tokens). `POST /api/me/restore?include_progress=true`
+  (raw gzip, `BUNDLE_IMPORT_MAX_BYTES`) merges into the current user via the 6.1.3 import core in one
+  transaction. Migration 0027 adds `restore_receipt` (owner + bundle hash) so a repeated restore is
+  idempotent, plus owner indexes on owned dictionary/edge tables; schema snapshot regenerated.
+  nginx gets a matching unbuffered upload location.
+- Dependencies: 6.1.3 checked ✅.
+- Verification: interrupted agent's full backend run: 1281 passed, 1 failed (0026 replay test
+  hard-coded the latest migration). Coordinator fixed that test, formatted 3 files, ran gen-api;
+  worktree `check` passed; 30 focused tests (user backup/restore, project import/export, admin
+  backup, migration tests) passed. Main after clean merge: gen-api no diff, `check` passed.
+- Skipped / deferred: none.
+- Failures / causes / corrections: agent failed on DNS/model-service error after implementation but
+  before commit; partial work committed as WIP and finished directly by the coordinator.
+- Findings / follow-ups: 6.1.6 now ready and started.
 
 ### 2026-11-15 — 6.1.3 Project import and merge
 - Result / completed: merged (`1208b75`, `8211744`). `POST /api/projects/import?include_progress=`
