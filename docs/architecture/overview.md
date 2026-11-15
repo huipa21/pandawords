@@ -31,6 +31,21 @@ rendering. `/words` and project graph mode share `GraphExplorer`; Cytoscape/fcos
 presentation-only and never infer authorization or relations. Focus expansion replaces the
 bounded neighborhood; neither initial discovery nor layout changes fetch a full graph.
 
+## Installable static shell (7.1.1)
+
+Production builds provide a root-scoped manifest and service worker. The generated precache
+contains only the built `index.html`, content-versioned public assets and explicitly versioned
+manifest, install-listener script and icons. Every install request omits credentials, rejects
+redirects and verifies the build's SHA-256 integrity; a failed update leaves the active cache
+intact. Only exact precached asset URLs are served from Cache Storage. Navigations use the
+network and fall back to the generic shell when offline; their responses are never stored.
+API responses, private media and user-specific pages are never cached by the worker.
+
+Updates wait for existing controlled clients to close before activation; activation removes
+only older `pandawords-shell-` caches. The worker does not force activation or claim open tabs.
+The shell still uses the normal authentication guards and network-backed login; it contains no
+offline review data and cannot establish an authenticated session without the server.
+
 ## Private image flow (5.1.1)
 
 `/api/images/senses/{sense_id}` provides authenticated list/raw upload and

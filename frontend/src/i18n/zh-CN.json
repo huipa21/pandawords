@@ -1,4 +1,10 @@
 {
+  "pwa": {
+    "installTitle": "安装 PandaWords",
+    "installDescription": "从主屏幕打开 PandaWords。学习功能仍需网络连接。",
+    "install": "安装",
+    "dismiss": "暂不安装"
+  },
   "relations": {
     "title": "个人语义关联",
     "policy": "请选择已收录且可见的义项。关联有方向，两个义项必须不同。来源关联仅供查看。",

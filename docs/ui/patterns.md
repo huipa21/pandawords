@@ -14,6 +14,17 @@ The graph refreshes its current bounded snapshot only after successful mutation,
 changing focus, filters, depth or selected sense. All controls use existing tokens,
 localized accessible labels and large touch targets.
 
+## Install prompt (7.1.1)
+
+The root layout offers a non-modal, labelled install region only after a supported browser
+provides its native install event and the user has not dismissed or completed installation.
+An early public script retains the event until the UI mounts. Standalone and unsupported
+browsers see no prompt; failed native prompts do not count as a dismissal. Dismissal is a
+device-local preference without user or credential data; if storage is unavailable it lasts
+for the current page. Both locales explain that learning still requires a connection. Large
+token-based buttons wrap on narrow screens, expose visible keyboard focus and invoke the native
+dialog only from an explicit user action.
+
 ## Sense images (5.1.1)
 
 Each visible sense has a private image section. Manual upload is independent of provider

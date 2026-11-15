@@ -4,6 +4,7 @@ import { watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { darkThemeOverrides, themeOverrides } from '@/design/naive-theme'
 import AuthFeedback from '@/features/auth/AuthFeedback.vue'
+import PwaInstallPrompt from '@/features/pwa/PwaInstallPrompt.vue'
 import { usePreferencesStore } from '@/stores/preferences'
 
 const preferences = usePreferencesStore()
@@ -29,6 +30,7 @@ watchEffect(() => {
       <NDialogProvider>
         <NNotificationProvider>
           <AuthFeedback>
+            <PwaInstallPrompt />
             <RouterView />
           </AuthFeedback>
         </NNotificationProvider>

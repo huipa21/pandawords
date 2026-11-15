@@ -1,4 +1,10 @@
 {
+  "pwa": {
+    "installTitle": "Install PandaWords",
+    "installDescription": "Open PandaWords from your home screen. Learning still requires a connection.",
+    "install": "Install",
+    "dismiss": "Not now"
+  },
   "relations": {
     "title": "Personal semantic links",
     "policy": "Choose a visible selected sense. Links are directional and require two different senses. Source links are read-only.",
