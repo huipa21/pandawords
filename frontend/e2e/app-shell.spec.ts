@@ -1,0 +1,154 @@
+import type { Page } from '@playwright/test'
+import type { components } from '../src/api/schema'
+import { expect, test } from '@playwright/test'
+
+async function openShell(page: Page, locale: 'en' | 'zh-CN') {
+  const session: components['schemas']['AuthRead'] = {
+    access_token: 'ui-layout-test',
+    token_type: 'bearer',
+    user: {
+      id: 'user:ui-layout-test',
+      username: 'ui-layout-test',
+      role: 'user',
+      disabled: false,
+      must_change_password: false,
+      source_lang: 'zh',
+      target_lang: 'en',
+      prefs: {
+        theme: 'light',
+        locale,
+        accent: 'US',
+        desired_retention: 0.9,
+        review_images_enabled: true,
+        review_audio_enabled: true,
+      },
+    },
+  }
+  await page.addInitScript((language) => {
+    localStorage.setItem('pandawords.preferences', JSON.stringify({ theme: 'light', locale: language }))
+  }, locale)
+  await page.route(url => url.pathname.startsWith('/api/'), async (route) => {
+    const path = new URL(route.request().url()).pathname
+    if (path === '/api/auth/refresh') {
+      await route.fulfill({ json: session })
+    }
+    else if (path === '/api/projects') {
+      await route.fulfill({
+        json: {
+          items: [],
+          page: 1,
+          page_size: 20,
+          total: 0,
+        },
+      })
+    }
+    else {
+      await route.abort()
+      throw new Error(`Unexpected API request in UI-only test: ${path}`)
+    }
+  })
+  await page.goto('/projects')
+  await expect(page.getByTestId('projects-page')).toBeVisible()
+}
+
+for (const locale of ['en', 'zh-CN'] as const) {
+  test(`desktop shell separates panels and left-aligns menu labels (${locale})`, async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 })
+    await openShell(page, locale)
+    const header = page.getByRole('banner')
+    const sidebar = page.locator('aside')
+    const main = page.locator('#main-content')
+    const headerBox = await header.boundingBox()
+    const sidebarBox = await sidebar.boundingBox()
+    const mainBox = await main.boundingBox()
+    expect(headerBox).not.toBeNull()
+    expect(sidebarBox).not.toBeNull()
+    expect(mainBox).not.toBeNull()
+    expect(headerBox!.x).toBeGreaterThan(0)
+    expect(headerBox!.y).toBeGreaterThan(0)
+    expect(sidebarBox!.y).toBeGreaterThan(headerBox!.y + headerBox!.height)
+    expect(mainBox!.x).toBeGreaterThan(sidebarBox!.x + sidebarBox!.width)
+    expect(mainBox!.y).toBe(sidebarBox!.y)
+    expect(mainBox!.x + mainBox!.width).toBeCloseTo(headerBox!.x + headerBox!.width)
+    await expect(page.locator('.bg-page').first()).toHaveCSS('background-color', 'rgb(238, 238, 238)')
+    for (const panel of [header, sidebar, main]) {
+      const style = await panel.evaluate(element => ({
+        radius: Number.parseFloat(getComputedStyle(element).borderRadius),
+        background: getComputedStyle(element).backgroundColor,
+      }))
+      expect(style.radius).toBeGreaterThan(0)
+      expect(style.background).toBe('rgb(255, 255, 255)')
+    }
+    const brand = header.getByRole('link', { name: 'PandaWords', exact: true })
+    const iconBox = await brand.locator('svg').boundingBox()
+    expect(iconBox).not.toBeNull()
+    const labelStart = await brand.evaluate((element) => {
+      const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT)
+      while (walker.nextNode()) {
+        if (walker.currentNode.textContent?.includes('PandaWords')) {
+          const range = document.createRange()
+          range.selectNodeContents(walker.currentNode)
+          return range.getBoundingClientRect().left
+        }
+      }
+      throw new Error('Missing brand text')
+    })
+    expect(iconBox!.x + iconBox!.width).toBeLessThanOrEqual(labelStart)
+    const links = sidebar.locator('a')
+    for (const link of await links.all()) {
+      expect(await link.evaluate(element => getComputedStyle(element).justifyContent)).toBe('flex-start')
+      const icon = await link.locator('svg').boundingBox()
+      const box = await link.boundingBox()
+      expect(icon!.x - box!.x).toBeLessThanOrEqual(16)
+      expect(box!.height).toBeGreaterThanOrEqual(44)
+    }
+    await expect(sidebar.locator('[aria-current="page"]')).toHaveAttribute('href', '/projects')
+    const active = await sidebar.locator('[aria-current="page"]').evaluate(element => ({
+      foreground: getComputedStyle(element).color,
+      background: getComputedStyle(element).backgroundColor,
+    }))
+    expect(active).toEqual({ foreground: 'rgb(25, 118, 210)', background: 'rgb(227, 242, 253)' })
+    await expect(page.locator('.bottom-navigation')).toBeHidden()
+  })
+}
+
+test('responsive shell keeps mobile links centered without horizontal overflow', async ({ page }) => {
+  await openShell(page, 'en')
+  for (const width of [320, 390, 1023, 1024]) {
+    await page.setViewportSize({ width, height: 844 })
+    const mobile = width < 1024
+    const sidebar = page.locator('aside')
+    const bottom = page.locator('.bottom-navigation')
+    if (mobile) {
+      await expect(sidebar).toBeHidden()
+      await expect(bottom).toBeVisible()
+      await expect(bottom.locator('a')).toHaveCount(5)
+      for (const link of await bottom.locator('a').all()) {
+        expect(await link.evaluate(element => getComputedStyle(element).justifyContent)).toBe('center')
+      }
+      const main = await page.locator('#main-content').boundingBox()
+      const navigation = await bottom.boundingBox()
+      expect(main!.y + main!.height).toBeLessThanOrEqual(navigation!.y)
+    }
+    else {
+      await expect(sidebar).toBeVisible()
+      await expect(bottom).toBeHidden()
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width)
+  }
+})
+
+test('panel styling preserves the existing dark-theme toggle', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 })
+  await openShell(page, 'en')
+  await page.getByRole('button', { name: /^Theme: Light/ }).click()
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
+  for (const panel of [
+    page.getByRole('banner'),
+    page.locator('aside'),
+    page.locator('#main-content'),
+  ]) {
+    await expect(panel).toHaveCSS('background-color', 'rgb(26, 26, 26)')
+  }
+  await expect(page.locator('aside [aria-current="page"]')).toHaveCSS('color', 'rgb(100, 181, 246)')
+})
