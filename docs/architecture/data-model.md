@@ -57,6 +57,15 @@ created through another owner's tag API, but the guard also protects imported/co
 The source of truth for the current schema is `backend/app/db/schema.snapshot.json` (generated)
 plus the migrations. This doc explains the intent. Syntax details: [../dev/surrealdb-notes.md](../dev/surrealdb-notes.md).
 
+## Bundle representation (6.1.1)
+
+Import/export bundles ([import-export.md](import-export.md#bundle-contract-611)) mirror the two
+layers without a migration. Shared rows keep their deterministic IDs as canonical refs
+(`sense:["en","run","verb",1,"s1"]`) and shared edges keep their ID suffix as `identity`;
+owner-owned rows become bundle-local refs (`sense:@1`) and are remapped on import. `owner` is
+only `shared`/`owned`, never a user ID. Memory is keyed by sense, overrides by target and
+memberships by project/target, matching their deterministic database IDs. Storage-only fields
+(media `path`, revisions, review receipts/fingerprints) and all account fields are excluded.
 ## Two layers
 
 ### Review media preferences (5.1.3)

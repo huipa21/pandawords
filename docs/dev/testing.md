@@ -961,6 +961,25 @@ dialog contains a secret. Credential inputs avoid value-bearing `fill` call logs
 Do not enable debug/protocol logging, recording, or secret-bearing assertions when
 running this flow. Normal Playwright reports/results remain gitignored.
 
+## Bundle contract tests (6.1.1)
+
+Pure unit tests (no database): `tests/bundle_support.py` holds repository-shaped rows for all
+seven dictionary tables, all nine edges (shared and owned), a project with hidden/ordered
+memberships, an override, a note, owned image + shared audio media, memory, review logs and
+preferences. From `backend`:
+
+```powershell
+uv run --no-sync pytest -q --basetemp=.pytest_bundle tests\unit\test_bundle_contract.py tests\unit\test_bundle_archive.py
+```
+
+They cover: schema file drift, full round trip (rows → `data.json` → validated entries → row
+fields/IDs), byte-stable repeated serialization and archives, absence of private IDs and
+credentials, foreign-owner rejection, invalid data (missing fields, wrong types, newer
+revisions, dangling refs, owner/edge combinations, unsafe media metadata), unsupported
+versions failing before extraction, unsafe archive members (traversal, absolute, backslash,
+symlink, device, duplicates, extras), integrity mismatches, size/count limits and
+no-partial-archive cleanup. Regenerate the schema after model changes with
+`uv run python -m app.domain.bundle`.
 ## Test database
 
 - The `test` command starts the in-memory SurrealDB container on 8101 if it isn't running.
