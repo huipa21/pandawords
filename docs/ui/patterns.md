@@ -52,6 +52,21 @@ replacement/unmount. Late responses after a sense change are ignored. Removal us
 `ConfirmAction`; empty, loading, unavailable and retry states remain visible. Failed uploads
 retain the original file and request identity for retry; provider retries reuse their selection.
 
+## Export, import and backup (6.1.6)
+
+Project export sits in the project page header; `/projects` opens an import dialog; `/settings`
+holds the user's full backup and restore. Downloads go through the authenticated client and are
+saved from a blob (no URL is shown); a skipped-media count is reported. Import/restore forms
+pre-check the extension, empty file and size limit, then offer a progress choice (project:
+Automatic/Import/Start fresh; restore: Import/Start fresh) with an explanatory hint. Restore
+always passes `ConfirmAction`, which explains merge/duplicate/conflict behavior. Uploads show a
+live status with Cancel (`AbortController`); failures show the localized reason, the failed
+stage and the server's path-free problem list. Failure and cancellation keep the file and
+options, and the submit button becomes Retry. Success shows `ArchiveSummary`
+(created/merged/skipped totals, progress/source, notices, and Open project for imports). The
+admin-only `/admin/backup` page creates a site backup, polls while it runs, lists and downloads
+archives, and states that restore is operator-only (`deploy/restore.sh`).
+
 ## Image review and media preferences (5.1.3)
 
 The project plan exposes separate image/audio switches plus existing US/UK accent. Saving is

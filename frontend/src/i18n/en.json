@@ -582,6 +582,9 @@
     }
   },
   "errors": {
+    "site_backup_in_progress": "A site backup or restore is already running.",
+    "site_backup_not_found": "This backup no longer exists. Refresh the list.",
+    "backup_export_too_large": "Your data exceeds the backup size limits. Please contact an administrator.",
     "offline_storage": "Offline data could not be cleared. Clear this site's browser data before sharing this device.",
     "study_invalid_order": "The project selection changed. Reset the priority draft and try again.",
     "study_too_large": "This project or learning history exceeds planning limits. Reduce the selection or contact an administrator.",

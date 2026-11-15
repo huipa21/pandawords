@@ -1,0 +1,112 @@
+{
+  "portability": {
+    "chooseFile": "Choose archive",
+    "changeFile": "Choose another archive",
+    "noFile": "No archive selected.",
+    "selected": "{name} ({size})",
+    "details": "Problem details",
+    "uploading": "Uploading and validating {size}… The server checks the whole archive before changing anything.",
+    "cancelled": "Upload cancelled. Your file and options are kept; nothing was imported.",
+    "failedStage": "Failed at: {stage}",
+    "retryHint": "Nothing was changed. Your file and options are kept, so you can retry.",
+    "exporting": "Preparing…",
+    "skippedMedia": "{count} media file(s) could not be included.",
+    "alreadyRestored": "This backup was already restored; nothing was changed.",
+    "problems": {
+      "extension": "Choose a .tar.gz archive exported by PandaWords.",
+      "empty": "This file is empty.",
+      "tooLarge": "This archive is larger than the {max} upload limit."
+    },
+    "progress": {
+      "label": "Learning progress",
+      "auto": "Automatic",
+      "on": "Import progress",
+      "off": "Start fresh",
+      "autoHint": "Progress is imported only when the server verifies the archive was exported by your own account; otherwise words start as new cards.",
+      "onHint": "Import review cards and review history. Memory you already have for a sense is kept and never overwritten.",
+      "offHint": "Import words only. Every word becomes a new card with no review history."
+    },
+    "stages": {
+      "upload": "upload",
+      "archive": "archive structure",
+      "manifest": "manifest",
+      "data": "data",
+      "references": "references",
+      "media": "media files",
+      "apply": "saving"
+    },
+    "summary": {
+      "progressOn": "Learning progress was imported.",
+      "progressOff": "Learning progress was not imported.",
+      "sameSource": "The archive was exported by your account.",
+      "otherSource": "The archive comes from another account or server.",
+      "projects": "{count} project(s) added.",
+      "created": "Created",
+      "merged": "Merged",
+      "skipped": "Skipped",
+      "notices": "{count} notice(s)",
+      "preferencesRestored": "Preferences restored: {fields}",
+      "preferencesKept": "Preferences kept (you had changed them): {fields}"
+    },
+    "project": {
+      "export": "Export",
+      "exported": "Project archive downloaded.",
+      "import": "Import project",
+      "importTitle": "Import a project",
+      "importHint": "Import a .pandawords-project.tar.gz archive. It always creates a new project copy; shared dictionary entries are merged and never overwritten.",
+      "submit": "Import",
+      "success": "Project imported.",
+      "open": "Open the imported project"
+    },
+    "user": {
+      "backupTitle": "Full backup",
+      "backupHint": "Download all of your projects, words, notes, media, learning progress and preferences. Your password and account settings are never included.",
+      "download": "Download backup",
+      "downloaded": "Saved {name}.",
+      "restoreTitle": "Restore from backup",
+      "importHint": "Restore a .pandawords-user.tar.gz backup into this account. Data is merged: projects are added as copies, and existing memory, overrides and changed preferences are kept.",
+      "submit": "Restore",
+      "success": "Backup restored.",
+      "confirmTitle": "Restore this backup?",
+      "confirm": "Restore {name} into your account? Projects are added as new copies (restoring a different backup over existing data creates duplicates), and words whose spelling belongs to another account cause a conflict. Existing memory, overrides and preferences you changed are kept. This cannot be undone automatically."
+    },
+    "errors": {
+      "too_large": "The archive exceeds the server upload limit.",
+      "empty_upload": "The uploaded file is empty.",
+      "malformed_archive": "This file is not a valid PandaWords archive.",
+      "missing_manifest": "This archive has no PandaWords manifest.",
+      "malformed_manifest": "The archive manifest is damaged.",
+      "unexpected_format": "This archive is a different kind of PandaWords export (project vs. full backup).",
+      "unsupported_version": "This archive comes from an unsupported PandaWords version.",
+      "unsupported_schema": "This archive uses an unsupported data version.",
+      "integrity": "The archive failed its integrity check; it may be damaged or modified.",
+      "identity_conflict": "The archive conflicts with data that belongs to another account.",
+      "unsafe_entry": "The archive contains unsafe entries and was rejected.",
+      "invalid_media": "A media file in the archive is invalid.",
+      "apply_failed": "The import could not be saved. Nothing was changed; please retry.",
+      "rejected": "The archive was rejected and nothing was imported. Check the details below.",
+      "export_too_large": "Your data exceeds the backup size limits. Please contact an administrator."
+    }
+  },
+  "siteBackup": {
+    "hint": "Create an on-demand backup of the whole site database and media.",
+    "start": "Create backup",
+    "running": "A backup is running. This page refreshes its status automatically.",
+    "failed": "The last backup failed at: {stage}",
+    "empty": "No site backups yet.",
+    "list": "Site backups",
+    "meta": "{date} · {size}",
+    "download": "Download",
+    "downloadNamed": "Download {name}",
+    "restoreNotice": "Site restore is not available in the browser. Operators restore with deploy/restore.sh on the server.",
+    "stages": {
+      "preflight": "preflight checks",
+      "configuration": "configuration",
+      "database": "database export",
+      "media": "media",
+      "archive": "archive",
+      "publish": "publishing",
+      "internal": "an internal error"
+    }
+  }
+}

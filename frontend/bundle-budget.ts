@@ -20,11 +20,11 @@ const ALL_WORDS = 'src/features/graph/AllWordsPage.vue'
 const LOGIN = 'src/features/auth/LoginPage.vue'
 
 export const budgets = {
-  initialJs: 184_000,
+  initialJs: 185_500,
   initialCss: 4_800,
   chunk: 225_000,
-  staticJs: 665_000,
-  projectTree: 255_000,
+  staticJs: 675_000,
+  projectTree: 258_000,
   projectGraph: 525_000,
   allWords: 485_000,
   login: 215_000,

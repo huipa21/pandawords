@@ -2,16 +2,17 @@
 import type { Project } from './useProject'
 import { useMessage } from 'naive-ui'
 import { computed, onMounted, onScopeDispose, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { api } from '@/api/client'
 import ConfirmAction from '@/components/app/ConfirmAction.vue'
 import EmptyState from '@/components/app/EmptyState.vue'
 import ErrorState from '@/components/app/ErrorState.vue'
 import PageHeader from '@/components/app/PageHeader.vue'
+import { usePortabilityI18n } from '@/features/portability/messages'
+import ProjectImportDialog from '@/features/portability/ProjectImportDialog.vue'
 import { useProjectErrors } from './useProject'
 
-const { t } = useI18n()
+const { t } = usePortabilityI18n()
 const router = useRouter()
 const message = useMessage()
 const errorText = useProjectErrors()
@@ -23,6 +24,7 @@ const loaded = ref(false)
 const error = ref('')
 const pending = ref<Project>()
 const deleting = ref(false)
+const importing = ref(false)
 const pages = computed(() => Math.max(1, Math.ceil(total.value / 20)))
 let requested = 1
 let request = 0
@@ -109,6 +111,12 @@ onScopeDispose(() => {
         <NButton size="large" :disabled="loading || deleting" @click="load()">
           {{ t('common.refresh') }}
         </NButton>
+        <NButton size="large" data-testid="project-import" @click="importing = true">
+          <template #icon>
+            <i-lucide-upload aria-hidden="true" />
+          </template>
+          {{ t('portability.project.import') }}
+        </NButton>
         <NButton size="large" type="primary" data-testid="project-create" @click="router.push({ name: 'project-create' })">
           {{ t('projects.create') }}
         </NButton>
@@ -122,6 +130,9 @@ onScopeDispose(() => {
       <template #action>
         <NButton size="large" @click="router.push({ name: 'project-create' })">
           {{ t('projects.create') }}
+        </NButton>
+        <NButton size="large" @click="importing = true">
+          {{ t('portability.project.import') }}
         </NButton>
       </template>
     </EmptyState>
@@ -160,6 +171,7 @@ onScopeDispose(() => {
       :params="{ name: pending?.name ?? '' }" :loading="deleting"
       @confirm="remove" @cancel="pending = undefined"
     />
+    <ProjectImportDialog v-model:show="importing" @imported="load(1)" />
   </section>
 </template>
 

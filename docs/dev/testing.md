@@ -1,5 +1,23 @@
 # Testing
 
+## Export, import and backup UI (6.1.6)
+
+Vitest (mocked generated API client, both locales):
+- `src/features/portability/ArchiveImportForm.test.ts`: client pre-check (extension, empty,
+  size), project import with `auto`/`on`/`off` progress sent as `include_progress`, localized
+  422/409/413 and unmapped `bundle.*` rejections with the failed stage and path-free problems,
+  transport errors, retry with the same file and options, upload status and `AbortController`
+  cancellation, the user-restore confirmation, on/off-only restore progress and an already
+  restored backup. Requests target only `/api/projects/import` and `/api/me/restore`.
+- `src/features/portability/downloads.test.ts`: project export and user backup downloads
+  (safe file name, skipped-media notice, no URL shown), localized errors, retry, cancellation;
+  the backup request carries no user id.
+- `src/features/admin/AdminBackupPage.test.ts`: loading/empty/error states, create → poll →
+  download, 409/404/failed-stage feedback, no restore control, and site-backup navigation shown
+  only to admins. `src/app/router.test.ts` already proves the `/admin/backup` route guard.
+
+E2E: `frontend/e2e/portability.spec.ts` (see [Portability E2E](#portability-e2e-616)).
+
 ## Site backup and restore (6.1.5)
 
 Backend selectors:
@@ -47,6 +65,14 @@ retaining all route/chunk/precache bounds. The measured final payload remains
 below the pre-optimization PWA baseline (183,977 bytes); build enforcement is
 not skipped. Storage implementation is loaded lazily from auth cleanup.
 
+6.1.6 adds the settings and admin-backup routes plus the project import dialog.
+Portability messages load lazily (`src/i18n/portability/`) and bundle-error
+parsing stays in the feature, but the new lazy routes and shared Naive UI chunks
+(modal, scrollbar split) still add about 1.1 KB to the foreground: measured initial
+JS **184,978** and static JS **671,278**; the project page gains the export button
+(**256,461**). Initial JS is explicitly revised to **185,500**, static JS to
+**675,000** and project tree to **258,000**; all other bounds are unchanged.
+
 ## Security boundaries (7.1.3)
 
 Run the unit rate-limit/logging and API `test_security_*` suites plus exercise-attempt
@@ -78,8 +104,8 @@ at most 22 queries and a deliberately loose 2-second p95 ceiling.
 `pnpm run build` emits the Vite manifest and runs `bundle-budget.ts`; it reports
 all initial, route and individual chunk transfer bytes and separately the PWA
 install precache. Compression models production nginx gzip level 1/minimum 1024
-bytes. Bounds: initial JS 184,000 bytes, initial CSS 4,800, per-JS chunk 225,000,
-all static JS 665,000, project tree 255,000, project graph 525,000, all words
+bytes. Bounds: initial JS 185,500 bytes, initial CSS 4,800, per-JS chunk 225,000,
+all static JS 675,000, project tree 258,000, project graph 525,000, all words
 485,000, login 215,000 and PWA precache 1,160,000. Missing budgeted routes fail.
 Focused frontend regressions cover graph lazy-load failure/retry and analyzer
 dependency accounting; run the existing graph/router/project suites as well.
@@ -918,6 +944,18 @@ $env:AUDIO_NETWORK_ENABLED = 'false'
 `pnpm exec playwright test --list` checks discovery without credentials or a running stack.
 Only Chromium runs, with one worker, no retries, and no skipped/fallback cases.
 Vitest's `src/**/*.test.ts` include keeps `e2e/**/*.spec.ts` out of unit runs.
+
+### Portability E2E (6.1.6)
+
+`frontend/e2e/portability.spec.ts` signs in as the administrator, creates a uniquely named
+project with the fixture word `cat` through the API, exports it from the project page (checking
+the saved file name and that the archive carries neither the password nor the access token),
+then imports the archive twice from `/projects` with **Import progress** and **Start fresh**.
+It asserts the `include_progress` query, the server summary and the localized success text,
+opens each imported project, and checks that page text and `src`/`href` attributes contain no
+local paths, `/api/media` URLs, external URLs or credentials. `finally` deletes the original and
+both imported projects. Use the same fixture-backed stack as the project-to-word E2E, then run
+`pnpm --dir frontend exec playwright test portability.spec.ts` (or `dev.ps1 test -E2E`).
 
 ### Review-session E2E (3.3.4)
 

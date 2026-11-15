@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import ErrorState from '@/components/app/ErrorState.vue'
 import PageHeader from '@/components/app/PageHeader.vue'
+import ProjectExportButton from '@/features/portability/ProjectExportButton.vue'
 import AddWordDialog from './AddWordDialog.vue'
 import { loadProjectGraph } from './graphLoader'
 import ProjectTree from './ProjectTree.vue'
@@ -58,6 +59,7 @@ watch(() => route.params.id, () => {
         <NButton v-if="project" size="large" type="primary" data-testid="project-add-word" @click="adding = true">
           {{ t('addWord.title') }}
         </NButton>
+        <ProjectExportButton v-if="project" :project-id="project.id" />
         <NButton size="large" @click="router.push({ name: 'projects' })">
           {{ t('pages.projects') }}
         </NButton>
