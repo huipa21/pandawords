@@ -135,7 +135,7 @@ are in `phase-N.md`. If a phase file doesn't exist yet, the agent asks before wr
 
 | ID | Task | Depends on | Wave | Size | Status |
 |---|---|---|---|---|---|
-| 7.1.1 | PWA: manifest, icons, service worker precache, install prompt | 1.4.3 | 1 | S | 🟡 |
+| 7.1.1 | PWA: manifest, icons, service worker precache, install prompt | 1.4.3 | 1 | S | ✅ |
 | 7.1.2 | Offline review queue (prefetch due cards, sync answers) | 7.1.1, 3.3.2 | 2 | L | 🟡 |
 | 7.1.3 | Security hardening: rate limits, nginx headers/CSP, ownership audit | 1.5.4, 1.6.4 | 1 | M | 🟡 |
 | 7.1.4 | Performance pass: graph queries, indexes, bundle size | 4.4.2 | 1 | M | 🟡 |

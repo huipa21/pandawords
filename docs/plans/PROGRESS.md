@@ -24,8 +24,8 @@ Agents must not edit PLAN/PROGRESS or merge. Shared topic-doc changes are integr
 
 | Task | Branch | Worktree | State / next step |
 |---|---|---|---|
-| 7.1.1 | task/7.1.1-pwa | ../pandawords.worktrees/7.1.1 | Agent running: static-only PWA and install UI |
-| 7.1.2 | task/7.1.2-offline-review | ../pandawords.worktrees/7.1.2 | Waiting for verified 7.1.1 merge |
+| 7.1.1 | merged | removed | ✅ merged at b5d79d1; worktree and branch removed |
+| 7.1.2 | task/7.1.2-offline-review | ../pandawords.worktrees/7.1.2 | Ready: 7.1.1 merged and verified |
 | 7.1.3 | task/7.1.3-hardening | ../pandawords.worktrees/7.1.3 | Agent running: rate limits, headers, isolation |
 | 7.1.4 | task/7.1.4-performance | ../pandawords.worktrees/7.1.4 | Agent running: measured graph and bundle budgets |
 | 7.1.5 | task/7.1.5-fsrs-optimization | ../pandawords.worktrees/7.1.5 | Agent running: bounded per-user optimization |
@@ -119,6 +119,24 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
 
+### 2026-11-15 — 7.1.1 PWA installable static shell
+- Result / completed: `c28e0b1` + `1c7f6f5` merged as `b5d79d1`. Manifest, versioned icons,
+  production-only service worker that precaches only the integrity-checked static shell (never
+  `/api`, media, authorized, cross-origin or non-GET requests), network-first navigation with
+  offline shell fallback, versioned cache cleanup, localized accessible install prompt; registration
+  and native-prompt failures are now reported (console warning / localized alert) instead of ignored.
+- Dependencies: 1.4.3 ✅.
+- Verification: focused PWA vitest 21/21 passed; production build passed (existing large-chunk
+  warning); `pwa.playwright.config.ts` Chromium 11/11 passed; `dev.ps1 check` passed in the worktree
+  and again on main after merge. Live smoke against an isolated real API (random 8101 test DB) with
+  `vite preview`: real login, reload, static-only cache contents and offline shell passed.
+- Skipped / deferred: real OS-level install is simulated (`beforeinstallprompt`) — no browser
+  automation exposes native install. Full suites run at Phase 7 closeout.
+- Failures / causes / corrections: initial agents timed out (model network/DNS); work resumed from
+  the same worktree. Review found silent catch blocks; fixed with regression tests.
+- Findings: offline review data (7.1.2) must use an owner-partitioned client store, not the
+  service-worker cache. Precaching hashed assets adds background bytes on SW install (7.1.4 reports it).
+- Blockers / follow-ups: 7.1.2 is ready.
 ### 2026-11-15 — Final Phase 4/5 integration and cleanup
 - Result / completed: all 11 Phase 4 and three Phase 5 tasks are committed and merged into main.
   Final closeout follow-ups through `06dfb6e` merged as `c284758`; no task files remain unstaged.
