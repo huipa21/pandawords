@@ -654,6 +654,25 @@ selection passed **15 tests**. Ruff check/format and basedpyright are clean; gen
 OpenAPI/TypeScript contracts pass scoped ESLint and frontend typecheck. Production
 image/Compose/browser acceptance is deferred to the integrated parent run.
 
+### Owner-scoped optimizer state and bounded history (7.1.5) ✅
+
+Verified against SurrealDB 3.3.5 / SDK 3.0 using random migrated databases on the existing
+loopback 8101 server. Migration 0024's array identity assertion and unique owner index reject
+a record whose ID names another user. Bound owner-filtered `UPSERT` inside retryable
+transactions admits only one concurrent run; a conditional `UPDATE` matching owner, run ID and
+running status rejects a stale completion. Replaying the migration preserves state and schema.
+
+`SELECT id, last_review FROM memory ... ORDER BY last_review DESC, id DESC LIMIT $limit`
+uses `memory_owner_last_review` backwards. One bounded `review_log` scan checks both `owner`
+and `memory.owner`, orders by `at DESC, id DESC` and uses the existing `review_log_owner_at`
+backwards; a 65th row for a card identifies a truncated 64-review window. `EXPLAIN FULL` on
+3.3.5 showed that a `memory, at` index was ignored for these composite memory IDs (a table
+scan resulted even when hinted), so that unused index was not added. The retained fresh/upgrade,
+query-plan and mature-card
+probes are in `tests/integration/test_fsrs_optimization_migration.py`; concurrent claims and
+stale completion are in `test_fsrs_optimization_integration.py`. No 8100 data or shared
+service lifecycle was touched.
+
 ### Connection and result shape (N02, N03)
 
 Run Python snippets with `backend` as the working directory. Credentials are read from

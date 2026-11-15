@@ -28,8 +28,8 @@ the same memory.
 
 ## Scheduling (py-fsrs 6.x)
 
-- `Scheduler` with default parameters at first. Per-user parameter optimization (from `review_log`)
-  comes later.
+- `Scheduler` uses defaults until valid owner-specific parameters are available; see
+  [per-user optimization](#per-user-fsrs-optimization-715).
 - Desired retention: per-user setting, default 0.9.
 - A new card is created in the add-to-project transaction for each selected sense. It remains
   unintroduced until its first completed review. Repeat adds, second projects and hide/restore
@@ -371,6 +371,45 @@ or zero at/past the instant. `impossible` compares remaining new with exam capac
 `buffer_at_risk` independently compares it with capacity before the instant seven days earlier.
 For 20 remaining/10 daily/12 windows the suggestion is 4; 20/3/10 suggests 3 and risks only
 the buffer. A future midnight contributes no window on that midnight's date.
+
+## Per-user FSRS optimization (7.1.5)
+
+`POST /api/srs/optimization` explicitly queues an owner-bound worker job, deduplicated per
+user and UTC day. `GET` returns the last run's status (`not_run`, `running`, `unavailable`,
+`insufficient_history`, `failed` or `success`) and safe counts/version/fingerprint, never
+review data or parameters. Both require authentication and return `Cache-Control: no-store`;
+202 means queued, so the returned last status can still be `not_run` until the worker starts.
+There is no user-facing optimization control yet.
+
+The worker reads only that owner's completed, receipt-backed `review_log` records and
+owner-matching memories. It considers at most 64 recently reviewed cards and fetches each
+card's latest records from a single bounded scan of at most 4,160 owner logs; at most 65 per
+card enter validation. Identities, receipt consistency, ratings, UTC times and duration bounds
+are checked. A malformed candidate invalidates its card sequence rather than inventing a
+missing transition. A sequence of at most 64 records must begin with an introduction; when
+an older 65th record proves the history is truncated, the most recent 64 form a contiguous
+training window. Up to 1,024 reviews are retained: two per card first, then prefixes of the
+most recently reviewed valid windows up to 64 each. This lets new reviews enter a full sample
+even for mature cards. Older eligible history can be omitted by the global bound, and the
+exclusion count covers candidate windows rather than all fetched or historical records.
+
+The locked [py-fsrs 6.3.3 optimizer](https://github.com/open-spaced-repetition/py-fsrs/blob/v6.3.3/fsrs/optimizer.py)
+returns defaults below its 512-transition mini-batch;
+a transition counts only when at least 24 hours separate consecutive reviews. Training requires
+at least 512 such transitions across 10 cards. A successful current-version vector is retained
+for at least 30 days, and another run needs 100 sampled transitions newer than its training
+time. Failed, unavailable and insufficient runs cool down for one day; a stale running lease
+expires after ten minutes. A version change or invalid saved vector can be retrained without
+the new-history rule. The bounded worker process uses one CPU thread and is killed after
+240 seconds; no optimization runs during ordinary review confirmation.
+
+The upstream optimizer's heavy optional extra (`torch`, `numpy`, `pandas` and `tqdm`) is enabled
+explicitly. With it missing, an eligible request reports `unavailable`; learning and scheduling
+still use the last valid vector or py-fsrs defaults. LLM, audio and image providers are not
+involved. Only a validated 21-parameter, finite, upstream-bounded vector is committed, with
+optimizer/version metadata. Subsequent confirmations use it together with the independently
+stored desired retention; optimization never rewrites existing due dates, cards, receipts,
+review history or preferences.
 
 ## Project review session (3.3.2)
 

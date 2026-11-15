@@ -1707,6 +1707,56 @@
         ]
       }
     },
+    "/api/srs/optimization": {
+      "get": {
+        "tags": [
+          "srs"
+        ],
+        "summary": "Read",
+        "operationId": "read_api_srs_optimization_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OptimizationRead"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "srs"
+        ],
+        "summary": "Request",
+        "operationId": "request_api_srs_optimization_post",
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OptimizationRead"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/api/projects/{project_id}/tree": {
       "get": {
         "tags": [
@@ -6989,6 +7039,75 @@
           "status"
         ],
         "title": "Occurrence"
+      },
+      "OptimizationRead": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "not_run",
+              "running",
+              "unavailable",
+              "insufficient_history",
+              "failed",
+              "success"
+            ],
+            "title": "Status",
+            "default": "not_run"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "optimizer_version": {
+            "type": "string",
+            "title": "Optimizer Version",
+            "default": "py-fsrs/6.3.3:pandawords-v1"
+          },
+          "at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "At"
+          },
+          "eligible_reviews": {
+            "type": "integer",
+            "title": "Eligible Reviews",
+            "default": 0
+          },
+          "excluded_reviews": {
+            "type": "integer",
+            "title": "Excluded Reviews",
+            "default": 0
+          },
+          "history_fingerprint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "History Fingerprint"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "OptimizationRead"
       },
       "OverrideFields-Input": {
         "properties": {

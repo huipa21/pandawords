@@ -3,12 +3,17 @@ ARG UV_IMAGE=ghcr.io/astral-sh/uv:0.11.18
 
 FROM ${UV_IMAGE} AS uv
 FROM ${PYTHON_IMAGE} AS build
+ARG INSTALL_FSRS_OPTIMIZER=false
 COPY --from=uv /uv /usr/local/bin/uv
 ENV UV_PYTHON_DOWNLOADS=never \
     UV_LINK_MODE=copy
 WORKDIR /app/backend
 COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-dev --no-cache
+RUN case "$INSTALL_FSRS_OPTIMIZER" in \
+      true) uv sync --frozen --no-dev --no-cache --extra optimizer ;; \
+      false) uv sync --frozen --no-dev --no-cache ;; \
+      *) echo "INSTALL_FSRS_OPTIMIZER must be true or false" >&2; exit 1 ;; \
+    esac
 
 FROM ${PYTHON_IMAGE} AS runtime
 ENV PATH="/app/backend/.venv/bin:${PATH}" \

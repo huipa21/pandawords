@@ -10,5 +10,13 @@ Ratings are derived automatically from correctness, response time and hint use (
 exercises are capped at Good), and the user can change the rating before continuing. Every answer is
 logged in `review_log` with both the auto and the final rating.
 
-**Consequences.** One forgetting curve per meaning. The logs allow per-user FSRS parameter
-optimization later. Project queues are filtered views over the same cards.
+**Consequences.** One forgetting curve per meaning. The logs support per-user FSRS parameter
+optimization. Project queues are filtered views over the same cards.
+
+**2026-11-15 extension (7.1.5).** Use the supported optimizer in the locked py-fsrs 6.3.3,
+not a second optimization implementation. Its published optimizer extra requires PyTorch,
+NumPy, pandas and tqdm, so it remains an explicit image/development opt-in rather than
+burdening default installs. Isolated, bounded training and last-good/default fallback preserve
+ordinary reviews without that extra or any external provider. See
+[learning-engine.md](../architecture/learning-engine.md#per-user-fsrs-optimization-715)
+for eligibility, metadata and future-only scheduling.

@@ -10,6 +10,7 @@ from app.core.config import Settings
 from app.core.errors import AppError
 from app.core.record_ids import decode_rid
 from app.db import srs as repository
+from app.db import srs_optimization
 from app.db.auth import _atomic
 from app.domain.srs import (
     CardState,
@@ -150,7 +151,13 @@ async def apply_review(
         review_time = at
         if memory.card.last_review is not None and review_time <= memory.card.last_review:
             review_time = memory.card.last_review + timedelta(microseconds=1)
-        updated, _ = Scheduler(desired_retention=prefs.desired_retention).review_card(
+        parameters = await srs_optimization.parameters(db, owner, txn)
+        scheduler = (
+            Scheduler(parameters=parameters, desired_retention=prefs.desired_retention)
+            if parameters is not None
+            else Scheduler(desired_retention=prefs.desired_retention)
+        )
+        updated, _ = scheduler.review_card(
             memory.card.to_card(),
             rating,
             review_datetime=review_time,

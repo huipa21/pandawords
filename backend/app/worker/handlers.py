@@ -6,6 +6,7 @@ from app.worker.enrich import enrich
 from app.worker.images import image
 from app.worker.mnemonic import mnemonic
 from app.worker.scenario import scenario
+from app.worker.srs_optimization import srs_optimize
 
 type Handler = Callable[[Job], Awaitable[None]]
 
@@ -21,4 +22,5 @@ HANDLERS: dict[str, Handler] = {
     "scenario": scenario,
     "image": image,
     "mnemonic": mnemonic,
+    "srs_optimize": srs_optimize,
 }
