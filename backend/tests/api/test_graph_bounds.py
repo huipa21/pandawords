@@ -16,6 +16,25 @@ from tests.conftest import UserFactory
 pytestmark = pytest.mark.integration
 
 
+async def test_exact_edge_limit_then_overflow(
+    client: AsyncClient, db: AsyncWsSurrealConnection, make_user: UserFactory
+) -> None:
+    alice = await make_user()
+    user = RecordID("user", user_key(alice.id))
+    headers = bearer(await login(client, alice.username))
+    records = await tags(db, user, 100, dense=True)
+    params = {"focus_id": encode_rid(records[0], "tag"), "depth": 1}
+    response = await client.get("/api/graph", headers=headers, params=params)
+    assert response.status_code == 200, response.text
+    assert len(response.json()["nodes"]) == 100
+    assert len(response.json()["edges"]) == 10_000
+    await relate(db, "member_of", records[0], records[0], {"owner": user})
+    overflow = await client.get("/api/graph", headers=headers, params=params)
+    assert overflow.status_code == 413, overflow.text
+    assert overflow.json()["code"] == "graph.too_large"
+    assert "nodes" not in overflow.json() and "edges" not in overflow.json()
+
+
 @pytest.mark.parametrize("dense", [False, True])
 async def test_hard_node_and_dense_edge_bounds(
     dense: bool,

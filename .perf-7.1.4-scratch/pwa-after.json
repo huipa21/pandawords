@@ -1,0 +1,948 @@
+{
+  "initialJs": 180311,
+  "initialJsTransfer": 180921,
+  "initialCss": 4593,
+  "initialCssTransfer": 4593,
+  "chunks": [
+    {
+      "file": "assets/AdminUsersPage-CEDJbefJ.js",
+      "initial": false,
+      "gzipBytes": 35063,
+      "transferBytes": 35063
+    },
+    {
+      "file": "assets/Alert-CZZOBsRp.js",
+      "initial": false,
+      "gzipBytes": 2563,
+      "transferBytes": 2563
+    },
+    {
+      "file": "assets/AllWordsPage-98jqFjDB.js",
+      "initial": false,
+      "gzipBytes": 297,
+      "transferBytes": 391
+    },
+    {
+      "file": "assets/AppHeader-D0p7RCwW.js",
+      "initial": false,
+      "gzipBytes": 1320,
+      "transferBytes": 1320
+    },
+    {
+      "file": "assets/AppShell-Dbh3geX7.js",
+      "initial": false,
+      "gzipBytes": 2005,
+      "transferBytes": 2005
+    },
+    {
+      "file": "assets/AudioButton-B_k2wxxB.js",
+      "initial": false,
+      "gzipBytes": 1299,
+      "transferBytes": 1299
+    },
+    {
+      "file": "assets/AuthLayout-DFO9ftT-.js",
+      "initial": false,
+      "gzipBytes": 299,
+      "transferBytes": 387
+    },
+    {
+      "file": "assets/Button-DuXbPZjg.js",
+      "initial": true,
+      "gzipBytes": 75383,
+      "transferBytes": 75383
+    },
+    {
+      "file": "assets/ChangePasswordPage-CNbBq1P2.js",
+      "initial": false,
+      "gzipBytes": 1122,
+      "transferBytes": 1122
+    },
+    {
+      "file": "assets/CheckboxGroup-CxvQaUn2.js",
+      "initial": false,
+      "gzipBytes": 4100,
+      "transferBytes": 4100
+    },
+    {
+      "file": "assets/ConfirmAction-2ipd5Jzt.js",
+      "initial": false,
+      "gzipBytes": 593,
+      "transferBytes": 593
+    },
+    {
+      "file": "assets/DashboardPage-DxLcoL2s.js",
+      "initial": false,
+      "gzipBytes": 1343,
+      "transferBytes": 1343
+    },
+    {
+      "file": "assets/Empty-D8Y60Lex.js",
+      "initial": false,
+      "gzipBytes": 1914,
+      "transferBytes": 1914
+    },
+    {
+      "file": "assets/EmptyState-BC5l13PW.js",
+      "initial": false,
+      "gzipBytes": 344,
+      "transferBytes": 496
+    },
+    {
+      "file": "assets/ErrorState-BOlfnBcv.js",
+      "initial": false,
+      "gzipBytes": 3710,
+      "transferBytes": 3710
+    },
+    {
+      "file": "assets/Form-BCYMY3hk.js",
+      "initial": false,
+      "gzipBytes": 1141,
+      "transferBytes": 1141
+    },
+    {
+      "file": "assets/FormItem-CNH33-ts.js",
+      "initial": false,
+      "gzipBytes": 10608,
+      "transferBytes": 10608
+    },
+    {
+      "file": "assets/Forward-CdLr7BII.js",
+      "initial": false,
+      "gzipBytes": 1760,
+      "transferBytes": 1760
+    },
+    {
+      "file": "assets/GraphExplorer-D3Kz4hQP.js",
+      "initial": false,
+      "gzipBytes": 217253,
+      "transferBytes": 217253
+    },
+    {
+      "file": "assets/Input-ChYuor6n.js",
+      "initial": false,
+      "gzipBytes": 11272,
+      "transferBytes": 11272
+    },
+    {
+      "file": "assets/LemmaDetailPage-DxETqERu.js",
+      "initial": false,
+      "gzipBytes": 9271,
+      "transferBytes": 9271
+    },
+    {
+      "file": "assets/LoginPage-BOkXU0c-.js",
+      "initial": false,
+      "gzipBytes": 996,
+      "transferBytes": 996
+    },
+    {
+      "file": "assets/PageHeader-3CIRu5xv.js",
+      "initial": false,
+      "gzipBytes": 372,
+      "transferBytes": 582
+    },
+    {
+      "file": "assets/PlaceholderPage-DpabEpTV.js",
+      "initial": false,
+      "gzipBytes": 470,
+      "transferBytes": 713
+    },
+    {
+      "file": "assets/ProjectEditorPage-BWVNXJVj.js",
+      "initial": false,
+      "gzipBytes": 812,
+      "transferBytes": 812
+    },
+    {
+      "file": "assets/ProjectForm-C4Zegkdk.js",
+      "initial": false,
+      "gzipBytes": 45167,
+      "transferBytes": 45167
+    },
+    {
+      "file": "assets/ProjectPage-Dg1UnItD.js",
+      "initial": false,
+      "gzipBytes": 17780,
+      "transferBytes": 17780
+    },
+    {
+      "file": "assets/ProjectPlanPage-DDs4jyMq.js",
+      "initial": false,
+      "gzipBytes": 8127,
+      "transferBytes": 8127
+    },
+    {
+      "file": "assets/ProjectsPage-Nqp9S8T6.js",
+      "initial": false,
+      "gzipBytes": 2098,
+      "transferBytes": 2098
+    },
+    {
+      "file": "assets/PronunciationChip-Chulkkvn.js",
+      "initial": false,
+      "gzipBytes": 5583,
+      "transferBytes": 5583
+    },
+    {
+      "file": "assets/RadioGroup-D3oNdJ8m.js",
+      "initial": false,
+      "gzipBytes": 10989,
+      "transferBytes": 10989
+    },
+    {
+      "file": "assets/ReadingPage-hPpnUxUj.js",
+      "initial": false,
+      "gzipBytes": 4272,
+      "transferBytes": 4272
+    },
+    {
+      "file": "assets/ReviewSessionPage-9lfita1j.js",
+      "initial": false,
+      "gzipBytes": 7433,
+      "transferBytes": 7433
+    },
+    {
+      "file": "assets/Select-Dg5-Gmyz.js",
+      "initial": false,
+      "gzipBytes": 23956,
+      "transferBytes": 23956
+    },
+    {
+      "file": "assets/SenseRelations-DDAZHYjH.js",
+      "initial": false,
+      "gzipBytes": 2340,
+      "transferBytes": 2340
+    },
+    {
+      "file": "assets/Skeleton-DurqXpXu.js",
+      "initial": false,
+      "gzipBytes": 1173,
+      "transferBytes": 1173
+    },
+    {
+      "file": "assets/Spin-D4Rag5Zm.js",
+      "initial": false,
+      "gzipBytes": 1615,
+      "transferBytes": 1615
+    },
+    {
+      "file": "assets/TagAssignments-CVPLgR02.js",
+      "initial": false,
+      "gzipBytes": 1818,
+      "transferBytes": 1818
+    },
+    {
+      "file": "assets/TagsPage-BP2m4uGU.js",
+      "initial": false,
+      "gzipBytes": 1704,
+      "transferBytes": 1704
+    },
+    {
+      "file": "assets/ThemeToggle-Ci2xNbm8.js",
+      "initial": false,
+      "gzipBytes": 1040,
+      "transferBytes": 1040
+    },
+    {
+      "file": "assets/VirtualList-CiVqd9VM.js",
+      "initial": false,
+      "gzipBytes": 3443,
+      "transferBytes": 3443
+    },
+    {
+      "file": "assets/_plugin-vue_export-helper-BDNMzG2s.js",
+      "initial": false,
+      "gzipBytes": 99,
+      "transferBytes": 84
+    },
+    {
+      "file": "assets/create-1vs1ElIQ.js",
+      "initial": false,
+      "gzipBytes": 5905,
+      "transferBytes": 5905
+    },
+    {
+      "file": "assets/focus-detector-DNmZ2Jp_.js",
+      "initial": false,
+      "gzipBytes": 3864,
+      "transferBytes": 3864
+    },
+    {
+      "file": "assets/format-length-DM-8T0Yf.js",
+      "initial": false,
+      "gzipBytes": 925,
+      "transferBytes": 925
+    },
+    {
+      "file": "assets/index-BtHCC9vK.js",
+      "initial": true,
+      "gzipBytes": 91186,
+      "transferBytes": 91186
+    },
+    {
+      "file": "assets/light-CL45eESq.js",
+      "initial": true,
+      "gzipBytes": 1335,
+      "transferBytes": 1335
+    },
+    {
+      "file": "assets/light-ClFh49AT.js",
+      "initial": true,
+      "gzipBytes": 739,
+      "transferBytes": 739
+    },
+    {
+      "file": "assets/light-D-h7tz6q.js",
+      "initial": true,
+      "gzipBytes": 269,
+      "transferBytes": 485
+    },
+    {
+      "file": "assets/replaceable-DaPuVwfS.js",
+      "initial": true,
+      "gzipBytes": 10926,
+      "transferBytes": 10926
+    },
+    {
+      "file": "assets/use-compitable-nw6BjZMG.js",
+      "initial": false,
+      "gzipBytes": 148,
+      "transferBytes": 152
+    },
+    {
+      "file": "assets/use-locale-DRlFaCDw.js",
+      "initial": false,
+      "gzipBytes": 211,
+      "transferBytes": 276
+    },
+    {
+      "file": "assets/useApi-il6ACzUc-DagQNauW.js",
+      "initial": true,
+      "gzipBytes": 473,
+      "transferBytes": 867
+    },
+    {
+      "file": "assets/useAuthForm-BAKsgJEt.js",
+      "initial": false,
+      "gzipBytes": 378,
+      "transferBytes": 556
+    },
+    {
+      "file": "assets/useProject-B-e8AV8h.js",
+      "initial": false,
+      "gzipBytes": 747,
+      "transferBytes": 747
+    },
+    {
+      "file": "assets/usePronunciation-BJJC6AjR.js",
+      "initial": false,
+      "gzipBytes": 2478,
+      "transferBytes": 2478
+    },
+    {
+      "file": "assets/useStudyResource-hqm9XOL0.js",
+      "initial": false,
+      "gzipBytes": 1339,
+      "transferBytes": 1339
+    }
+  ],
+  "routes": [
+    {
+      "route": "src/app/pages/PlaceholderPage.vue",
+      "gzipBytes": 185245,
+      "transferBytes": 186083,
+      "cssGzipBytes": 4883,
+      "cssTransferBytes": 5035,
+      "files": [
+        "assets/AppHeader-D0p7RCwW.js",
+        "assets/AppShell-Dbh3geX7.js",
+        "assets/Button-DuXbPZjg.js",
+        "assets/PlaceholderPage-DpabEpTV.js",
+        "assets/ThemeToggle-Ci2xNbm8.js",
+        "assets/_plugin-vue_export-helper-BDNMzG2s.js",
+        "assets/index-BtHCC9vK.js",
+        "assets/light-CL45eESq.js",
+        "assets/light-ClFh49AT.js",
+        "assets/light-D-h7tz6q.js",
+        "assets/replaceable-DaPuVwfS.js",
+        "assets/useApi-il6ACzUc-DagQNauW.js"
+      ],
+      "css": [
+        "assets/AppHeader-Cszd2Wu2.css",
+        "assets/AppShell-BuF4jkcU.css",
+        "assets/index-8DxExXOH.css"
+      ]
+    },
+    {
+      "route": "src/features/admin/AdminUsersPage.vue",
+      "gzipBytes": 307881,
+      "transferBytes": 308907,
+      "cssGzipBytes": 4883,
+      "cssTransferBytes": 5035,
+      "files": [
+        "assets/AdminUsersPage-CEDJbefJ.js",
+        "assets/AppHeader-D0p7RCwW.js",
+        "assets/AppShell-Dbh3geX7.js",
+        "assets/Button-DuXbPZjg.js",
+        "assets/CheckboxGroup-CxvQaUn2.js",
+        "assets/ConfirmAction-2ipd5Jzt.js",
+        "assets/Empty-D8Y60Lex.js",
+        "assets/EmptyState-BC5l13PW.js",
+        "assets/ErrorState-BOlfnBcv.js",
+        "assets/Form-BCYMY3hk.js",
+        "assets/FormItem-CNH33-ts.js",
+        "assets/Forward-CdLr7BII.js",
+        "assets/Input-ChYuor6n.js",
+        "assets/PageHeader-3CIRu5xv.js",
+        "assets/RadioGroup-D3oNdJ8m.js",
+        "assets/Select-Dg5-Gmyz.js",
+        "assets/Skeleton-DurqXpXu.js",
+        "assets/Spin-D4Rag5Zm.js",
+        "assets/ThemeToggle-Ci2xNbm8.js",
+        "assets/VirtualList-CiVqd9VM.js",
+        "assets/_plugin-vue_export-helper-BDNMzG2s.js",
+        "assets/create-1vs1ElIQ.js",
+        "assets/focus-detector-DNmZ2Jp_.js",
+        "assets/format-length-DM-8T0Yf.js",
+        "assets/index-BtHCC9vK.js",
+        "assets/light-CL45eESq.js",
+        "assets/light-ClFh49AT.js",
+        "assets/light-D-h7tz6q.js",
+        "assets/replaceable-DaPuVwfS.js",
+        "assets/use-compitable-nw6BjZMG.js",
+        "assets/use-locale-DRlFaCDw.js",
+        "assets/useApi-il6ACzUc-DagQNauW.js"
+      ],
+      "css": [
+        "assets/AppHeader-Cszd2Wu2.css",
+        "assets/AppShell-BuF4jkcU.css",
+        "assets/index-8DxExXOH.css"
+      ]
+    },
+    {
+      "route": "src/features/auth/ChangePasswordPage.vue",
+      "gzipBytes": 208726,
+      "transferBytes": 209652,
+      "cssGzipBytes": 4697,
+      "cssTransferBytes": 4707,
+      "files": [
+        "assets/AppHeader-D0p7RCwW.js",
+        "assets/AuthLayout-DFO9ftT-.js",
+        "assets/Button-DuXbPZjg.js",
+        "assets/ChangePasswordPage-CNbBq1P2.js",
+        "assets/Form-BCYMY3hk.js",
+        "assets/FormItem-CNH33-ts.js",
+        "assets/Input-ChYuor6n.js",
+        "assets/ThemeToggle-Ci2xNbm8.js",
+        "assets/_plugin-vue_export-helper-BDNMzG2s.js",
+        "assets/format-length-DM-8T0Yf.js",
+        "assets/index-BtHCC9vK.js",
+        "assets/light-CL45eESq.js",
+        "assets/light-ClFh49AT.js",
+        "assets/light-D-h7tz6q.js",
+        "assets/replaceable-DaPuVwfS.js",
+        "assets/use-locale-DRlFaCDw.js",
+        "assets/useApi-il6ACzUc-DagQNauW.js",
+        "assets/useAuthForm-BAKsgJEt.js"
+      ],
+      "css": [
+        "assets/AppHeader-Cszd2Wu2.css",
+        "assets/index-8DxExXOH.css"
+      ]
+    },
+    {
+      "route": "src/features/auth/LoginPage.vue",
+      "gzipBytes": 208600,
+      "transferBytes": 209526,
+      "cssGzipBytes": 4697,
+      "cssTransferBytes": 4707,
+      "files": [
+        "assets/AppHeader-D0p7RCwW.js",
+        "assets/AuthLayout-DFO9ftT-.js",
+        "assets/Button-DuXbPZjg.js",
+        "assets/Form-BCYMY3hk.js",
+        "assets/FormItem-CNH33-ts.js",
+        "assets/Input-ChYuor6n.js",
+        "assets/LoginPage-BOkXU0c-.js",
+        "assets/ThemeToggle-Ci2xNbm8.js",
+        "assets/_plugin-vue_export-helper-BDNMzG2s.js",
+        "assets/format-length-DM-8T0Yf.js",
+        "assets/index-BtHCC9vK.js",
+        "assets/light-CL45eESq.js",
+        "assets/light-ClFh49AT.js",
+        "assets/light-D-h7tz6q.js",
+        "assets/replaceable-DaPuVwfS.js",
+        "assets/use-locale-DRlFaCDw.js",
+        "assets/useApi-il6ACzUc-DagQNauW.js",
+        "assets/useAuthForm-BAKsgJEt.js"
+      ],
+      "css": [
+        "assets/AppHeader-Cszd2Wu2.css",
+        "assets/index-8DxExXOH.css"
+      ]
+    },
+    {
+      "route": "src/features/graph/AllWordsPage.vue",
+      "gzipBytes": 467876,
+      "transferBytes": 468844,
+      "cssGzipBytes": 4883,
+      "cssTransferBytes": 5035,
+      "files": [
+        "assets/AllWordsPage-98jqFjDB.js",
+        "assets/AppHeader-D0p7RCwW.js",
+        "assets/AppShell-Dbh3geX7.js",
+        "assets/Button-DuXbPZjg.js",
+        "assets/ConfirmAction-2ipd5Jzt.js",
+        "assets/Empty-D8Y60Lex.js",
+        "assets/FormItem-CNH33-ts.js",
+        "assets/GraphExplorer-D3Kz4hQP.js",
+        "assets/Input-ChYuor6n.js",
+        "assets/PageHeader-3CIRu5xv.js",
+        "assets/Select-Dg5-Gmyz.js",
+        "assets/SenseRelations-DDAZHYjH.js",
+        "assets/ThemeToggle-Ci2xNbm8.js",
+        "assets/VirtualList-CiVqd9VM.js",
+        "assets/_plugin-vue_export-helper-BDNMzG2s.js",
+        "assets/create-1vs1ElIQ.js",
+        "assets/focus-detector-DNmZ2Jp_.js",
+        "assets/format-length-DM-8T0Yf.js",
+        "assets/index-BtHCC9vK.js",
+        "assets/light-CL45eESq.js",
+        "assets/light-ClFh49AT.js",
+        "assets/light-D-h7tz6q.js",
+        "assets/replaceable-DaPuVwfS.js",
+        "assets/use-compitable-nw6BjZMG.js",
+        "assets/use-locale-DRlFaCDw.js",
+        "assets/useApi-il6ACzUc-DagQNauW.js"
+      ],
+      "css": [
+        "assets/AppHeader-Cszd2Wu2.css",
+        "assets/AppShell-BuF4jkcU.css",
+        "assets/index-8DxExXOH.css"
+      ]
+    },
+    {
+      "route": "src/features/projects/ProjectEditorPage.vue",
+      "gzipBytes": 269980,
+      "transferBytes": 270850,
+      "cssGzipBytes": 4883,
+      "cssTransferBytes": 5035,
+      "files": [
+        "assets/AppHeader-D0p7RCwW.js",
+        "assets/AppShell-Dbh3geX7.js",
+        "assets/Button-DuXbPZjg.js",
+        "assets/ErrorState-BOlfnBcv.js",
+        "assets/Form-BCYMY3hk.js",
+        "assets/FormItem-CNH33-ts.js",
+        "assets/Forward-CdLr7BII.js",
+        "assets/Input-ChYuor6n.js",
+        "assets/PageHeader-3CIRu5xv.js",
+        "assets/ProjectEditorPage-BWVNXJVj.js",
+        "assets/ProjectForm-C4Zegkdk.js",
+        "assets/Skeleton-DurqXpXu.js",
+        "assets/ThemeToggle-Ci2xNbm8.js",
+        "assets/VirtualList-CiVqd9VM.js",
+        "assets/_plugin-vue_export-helper-BDNMzG2s.js",
+        "assets/focus-detector-DNmZ2Jp_.js",
+        "assets/format-length-DM-8T0Yf.js",
+        "assets/index-BtHCC9vK.js",
+        "assets/light-CL45eESq.js",
+        "assets/light-ClFh49AT.js",
+        "assets/light-D-h7tz6q.js",
+        "assets/replaceable-DaPuVwfS.js",
+        "assets/use-locale-DRlFaCDw.js",
+        "assets/useApi-il6ACzUc-DagQNauW.js",
+        "assets/useProject-B-e8AV8h.js"
+      ],
+      "css": [
+        "assets/AppHeader-Cszd2Wu2.css",
+        "assets/AppShell-BuF4jkcU.css",
+        "assets/index-8DxExXOH.css"
+      ]
+    },
+    {
+      "route": "src/features/projects/ProjectPage.vue",
+      "gzipBytes": 244391,
+      "transferBytes": 245417,
+      "cssGzipBytes": 5171,
+      "cssTransferBytes": 5586,
+      "files": [
+        "assets/AppHeader-D0p7RCwW.js",
+        "assets/AppShell-Dbh3geX7.js",
+        "assets/AudioButton-B_k2wxxB.js",
+        "assets/Button-DuXbPZjg.js",
+        "assets/CheckboxGroup-CxvQaUn2.js",
+        "assets/Empty-D8Y60Lex.js",
+        "assets/EmptyState-BC5l13PW.js",
+        "assets/ErrorState-BOlfnBcv.js",
+        "assets/Input-ChYuor6n.js",
+        "assets/PageHeader-3CIRu5xv.js",
+        "assets/ProjectPage-Dg1UnItD.js",
+        "assets/PronunciationChip-Chulkkvn.js",
+        "assets/Skeleton-DurqXpXu.js",
+        "assets/Spin-D4Rag5Zm.js",
+        "assets/ThemeToggle-Ci2xNbm8.js",
+        "assets/VirtualList-CiVqd9VM.js",
+        "assets/_plugin-vue_export-helper-BDNMzG2s.js",
+        "assets/create-1vs1ElIQ.js",
+        "assets/index-BtHCC9vK.js",
+        "assets/light-CL45eESq.js",
+        "assets/light-ClFh49AT.js",
+        "assets/light-D-h7tz6q.js",
+        "assets/replaceable-DaPuVwfS.js",
+        "assets/use-compitable-nw6BjZMG.js",
+        "assets/use-locale-DRlFaCDw.js",
+        "assets/useApi-il6ACzUc-DagQNauW.js",
+        "assets/useProject-B-e8AV8h.js"
+      ],
+      "css": [
+        "assets/AppHeader-Cszd2Wu2.css",
+        "assets/AppShell-BuF4jkcU.css",
+        "assets/AudioButton-DeT_cSZ1.css",
+        "assets/ProjectPage-D1uqwL1t.css",
+        "assets/index-8DxExXOH.css"
+      ]
+    },
+    {
+      "route": "src/features/projects/ProjectsPage.vue",
+      "gzipBytes": 197700,
+      "transferBytes": 198726,
+      "cssGzipBytes": 4975,
+      "cssTransferBytes": 5108,
+      "files": [
+        "assets/AppHeader-D0p7RCwW.js",
+        "assets/AppShell-Dbh3geX7.js",
+        "assets/Button-DuXbPZjg.js",
+        "assets/ConfirmAction-2ipd5Jzt.js",
+        "assets/Empty-D8Y60Lex.js",
+        "assets/EmptyState-BC5l13PW.js",
+        "assets/ErrorState-BOlfnBcv.js",
+        "assets/PageHeader-3CIRu5xv.js",
+        "assets/ProjectsPage-Nqp9S8T6.js",
+        "assets/Skeleton-DurqXpXu.js",
+        "assets/Spin-D4Rag5Zm.js",
+        "assets/ThemeToggle-Ci2xNbm8.js",
+        "assets/_plugin-vue_export-helper-BDNMzG2s.js",
+        "assets/index-BtHCC9vK.js",
+        "assets/light-CL45eESq.js",
+        "assets/light-ClFh49AT.js",
+        "assets/light-D-h7tz6q.js",
+        "assets/replaceable-DaPuVwfS.js",
+        "assets/use-compitable-nw6BjZMG.js",
+        "assets/use-locale-DRlFaCDw.js",
+        "assets/useApi-il6ACzUc-DagQNauW.js",
+        "assets/useProject-B-e8AV8h.js"
+      ],
+      "css": [
+        "assets/AppHeader-Cszd2Wu2.css",
+        "assets/AppShell-BuF4jkcU.css",
+        "assets/ProjectsPage-BdNm400D.css",
+        "assets/index-8DxExXOH.css"
+      ]
+    },
+    {
+      "route": "src/features/reading/ReadingPage.vue",
+      "gzipBytes": 242230,
+      "transferBytes": 243104,
+      "cssGzipBytes": 5010,
+      "cssTransferBytes": 5186,
+      "files": [
+        "assets/AppHeader-D0p7RCwW.js",
+        "assets/AppShell-Dbh3geX7.js",
+        "assets/Button-DuXbPZjg.js",
+        "assets/Empty-D8Y60Lex.js",
+        "assets/Input-ChYuor6n.js",
+        "assets/PageHeader-3CIRu5xv.js",
+        "assets/ReadingPage-hPpnUxUj.js",
+        "assets/Select-Dg5-Gmyz.js",
+        "assets/Skeleton-DurqXpXu.js",
+        "assets/ThemeToggle-Ci2xNbm8.js",
+        "assets/VirtualList-CiVqd9VM.js",
+        "assets/_plugin-vue_export-helper-BDNMzG2s.js",
+        "assets/create-1vs1ElIQ.js",
+        "assets/focus-detector-DNmZ2Jp_.js",
+        "assets/format-length-DM-8T0Yf.js",
+        "assets/index-BtHCC9vK.js",
+        "assets/light-CL45eESq.js",
+        "assets/light-ClFh49AT.js",
+        "assets/light-D-h7tz6q.js",
+        "assets/replaceable-DaPuVwfS.js",
+        "assets/use-compitable-nw6BjZMG.js",
+        "assets/use-locale-DRlFaCDw.js",
+        "assets/useApi-il6ACzUc-DagQNauW.js"
+      ],
+      "css": [
+        "assets/AppHeader-Cszd2Wu2.css",
+        "assets/AppShell-BuF4jkcU.css",
+        "assets/ReadingPage-CuKpBCcG.css",
+        "assets/index-8DxExXOH.css"
+      ]
+    },
+    {
+      "route": "src/features/study/DashboardPage.vue",
+      "gzipBytes": 198491,
+      "transferBytes": 199513,
+      "cssGzipBytes": 4883,
+      "cssTransferBytes": 5035,
+      "files": [
+        "assets/Alert-CZZOBsRp.js",
+        "assets/AppHeader-D0p7RCwW.js",
+        "assets/AppShell-Dbh3geX7.js",
+        "assets/Button-DuXbPZjg.js",
+        "assets/DashboardPage-DxLcoL2s.js",
+        "assets/Empty-D8Y60Lex.js",
+        "assets/EmptyState-BC5l13PW.js",
+        "assets/ErrorState-BOlfnBcv.js",
+        "assets/PageHeader-3CIRu5xv.js",
+        "assets/Skeleton-DurqXpXu.js",
+        "assets/ThemeToggle-Ci2xNbm8.js",
+        "assets/_plugin-vue_export-helper-BDNMzG2s.js",
+        "assets/index-BtHCC9vK.js",
+        "assets/light-CL45eESq.js",
+        "assets/light-ClFh49AT.js",
+        "assets/light-D-h7tz6q.js",
+        "assets/replaceable-DaPuVwfS.js",
+        "assets/use-locale-DRlFaCDw.js",
+        "assets/useApi-il6ACzUc-DagQNauW.js",
+        "assets/useProject-B-e8AV8h.js",
+        "assets/useStudyResource-hqm9XOL0.js"
+      ],
+      "css": [
+        "assets/AppHeader-Cszd2Wu2.css",
+        "assets/AppShell-BuF4jkcU.css",
+        "assets/index-8DxExXOH.css"
+      ]
+    },
+    {
+      "route": "src/features/study/ProjectPlanPage.vue",
+      "gzipBytes": 324453,
+      "transferBytes": 325479,
+      "cssGzipBytes": 4883,
+      "cssTransferBytes": 5035,
+      "files": [
+        "assets/Alert-CZZOBsRp.js",
+        "assets/AppHeader-D0p7RCwW.js",
+        "assets/AppShell-Dbh3geX7.js",
+        "assets/Button-DuXbPZjg.js",
+        "assets/Empty-D8Y60Lex.js",
+        "assets/EmptyState-BC5l13PW.js",
+        "assets/ErrorState-BOlfnBcv.js",
+        "assets/Form-BCYMY3hk.js",
+        "assets/FormItem-CNH33-ts.js",
+        "assets/Forward-CdLr7BII.js",
+        "assets/Input-ChYuor6n.js",
+        "assets/PageHeader-3CIRu5xv.js",
+        "assets/ProjectForm-C4Zegkdk.js",
+        "assets/ProjectPlanPage-DDs4jyMq.js",
+        "assets/RadioGroup-D3oNdJ8m.js",
+        "assets/Select-Dg5-Gmyz.js",
+        "assets/Skeleton-DurqXpXu.js",
+        "assets/ThemeToggle-Ci2xNbm8.js",
+        "assets/VirtualList-CiVqd9VM.js",
+        "assets/_plugin-vue_export-helper-BDNMzG2s.js",
+        "assets/create-1vs1ElIQ.js",
+        "assets/focus-detector-DNmZ2Jp_.js",
+        "assets/format-length-DM-8T0Yf.js",
+        "assets/index-BtHCC9vK.js",
+        "assets/light-CL45eESq.js",
+        "assets/light-ClFh49AT.js",
+        "assets/light-D-h7tz6q.js",
+        "assets/replaceable-DaPuVwfS.js",
+        "assets/use-compitable-nw6BjZMG.js",
+        "assets/use-locale-DRlFaCDw.js",
+        "assets/useApi-il6ACzUc-DagQNauW.js",
+        "assets/useProject-B-e8AV8h.js",
+        "assets/useStudyResource-hqm9XOL0.js"
+      ],
+      "css": [
+        "assets/AppHeader-Cszd2Wu2.css",
+        "assets/AppShell-BuF4jkcU.css",
+        "assets/index-8DxExXOH.css"
+      ]
+    },
+    {
+      "route": "src/features/study/ReviewSessionPage.vue",
+      "gzipBytes": 215597,
+      "transferBytes": 216623,
+      "cssGzipBytes": 5180,
+      "cssTransferBytes": 5662,
+      "files": [
+        "assets/Alert-CZZOBsRp.js",
+        "assets/AppHeader-D0p7RCwW.js",
+        "assets/AppShell-Dbh3geX7.js",
+        "assets/AudioButton-B_k2wxxB.js",
+        "assets/Button-DuXbPZjg.js",
+        "assets/Empty-D8Y60Lex.js",
+        "assets/EmptyState-BC5l13PW.js",
+        "assets/Input-ChYuor6n.js",
+        "assets/PageHeader-3CIRu5xv.js",
+        "assets/ReviewSessionPage-9lfita1j.js",
+        "assets/Skeleton-DurqXpXu.js",
+        "assets/Spin-D4Rag5Zm.js",
+        "assets/ThemeToggle-Ci2xNbm8.js",
+        "assets/_plugin-vue_export-helper-BDNMzG2s.js",
+        "assets/index-BtHCC9vK.js",
+        "assets/light-CL45eESq.js",
+        "assets/light-ClFh49AT.js",
+        "assets/light-D-h7tz6q.js",
+        "assets/replaceable-DaPuVwfS.js",
+        "assets/use-compitable-nw6BjZMG.js",
+        "assets/use-locale-DRlFaCDw.js",
+        "assets/useApi-il6ACzUc-DagQNauW.js",
+        "assets/usePronunciation-BJJC6AjR.js"
+      ],
+      "css": [
+        "assets/AppHeader-Cszd2Wu2.css",
+        "assets/AppShell-BuF4jkcU.css",
+        "assets/AudioButton-DeT_cSZ1.css",
+        "assets/ReviewSessionPage-IrnQ2tVv.css",
+        "assets/index-8DxExXOH.css"
+      ]
+    },
+    {
+      "route": "src/features/tags/TagsPage.vue",
+      "gzipBytes": 257532,
+      "transferBytes": 258406,
+      "cssGzipBytes": 4883,
+      "cssTransferBytes": 5035,
+      "files": [
+        "assets/AppHeader-D0p7RCwW.js",
+        "assets/AppShell-Dbh3geX7.js",
+        "assets/Button-DuXbPZjg.js",
+        "assets/ConfirmAction-2ipd5Jzt.js",
+        "assets/Empty-D8Y60Lex.js",
+        "assets/ErrorState-BOlfnBcv.js",
+        "assets/Form-BCYMY3hk.js",
+        "assets/FormItem-CNH33-ts.js",
+        "assets/Input-ChYuor6n.js",
+        "assets/PageHeader-3CIRu5xv.js",
+        "assets/Select-Dg5-Gmyz.js",
+        "assets/Skeleton-DurqXpXu.js",
+        "assets/TagAssignments-CVPLgR02.js",
+        "assets/TagsPage-BP2m4uGU.js",
+        "assets/ThemeToggle-Ci2xNbm8.js",
+        "assets/VirtualList-CiVqd9VM.js",
+        "assets/_plugin-vue_export-helper-BDNMzG2s.js",
+        "assets/create-1vs1ElIQ.js",
+        "assets/focus-detector-DNmZ2Jp_.js",
+        "assets/format-length-DM-8T0Yf.js",
+        "assets/index-BtHCC9vK.js",
+        "assets/light-CL45eESq.js",
+        "assets/light-ClFh49AT.js",
+        "assets/light-D-h7tz6q.js",
+        "assets/replaceable-DaPuVwfS.js",
+        "assets/use-compitable-nw6BjZMG.js",
+        "assets/use-locale-DRlFaCDw.js",
+        "assets/useApi-il6ACzUc-DagQNauW.js"
+      ],
+      "css": [
+        "assets/AppHeader-Cszd2Wu2.css",
+        "assets/AppShell-BuF4jkcU.css",
+        "assets/index-8DxExXOH.css"
+      ]
+    },
+    {
+      "route": "src/features/words/LemmaDetailPage.vue",
+      "gzipBytes": 286168,
+      "transferBytes": 287194,
+      "cssGzipBytes": 4978,
+      "cssTransferBytes": 5146,
+      "files": [
+        "assets/Alert-CZZOBsRp.js",
+        "assets/AppHeader-D0p7RCwW.js",
+        "assets/AppShell-Dbh3geX7.js",
+        "assets/AudioButton-B_k2wxxB.js",
+        "assets/Button-DuXbPZjg.js",
+        "assets/CheckboxGroup-CxvQaUn2.js",
+        "assets/ConfirmAction-2ipd5Jzt.js",
+        "assets/Empty-D8Y60Lex.js",
+        "assets/EmptyState-BC5l13PW.js",
+        "assets/ErrorState-BOlfnBcv.js",
+        "assets/Form-BCYMY3hk.js",
+        "assets/FormItem-CNH33-ts.js",
+        "assets/Input-ChYuor6n.js",
+        "assets/LemmaDetailPage-DxETqERu.js",
+        "assets/PageHeader-3CIRu5xv.js",
+        "assets/PronunciationChip-Chulkkvn.js",
+        "assets/Select-Dg5-Gmyz.js",
+        "assets/SenseRelations-DDAZHYjH.js",
+        "assets/Skeleton-DurqXpXu.js",
+        "assets/Spin-D4Rag5Zm.js",
+        "assets/TagAssignments-CVPLgR02.js",
+        "assets/ThemeToggle-Ci2xNbm8.js",
+        "assets/VirtualList-CiVqd9VM.js",
+        "assets/_plugin-vue_export-helper-BDNMzG2s.js",
+        "assets/create-1vs1ElIQ.js",
+        "assets/focus-detector-DNmZ2Jp_.js",
+        "assets/format-length-DM-8T0Yf.js",
+        "assets/index-BtHCC9vK.js",
+        "assets/light-CL45eESq.js",
+        "assets/light-ClFh49AT.js",
+        "assets/light-D-h7tz6q.js",
+        "assets/replaceable-DaPuVwfS.js",
+        "assets/use-compitable-nw6BjZMG.js",
+        "assets/use-locale-DRlFaCDw.js",
+        "assets/useApi-il6ACzUc-DagQNauW.js",
+        "assets/useProject-B-e8AV8h.js",
+        "assets/usePronunciation-BJJC6AjR.js"
+      ],
+      "css": [
+        "assets/AppHeader-Cszd2Wu2.css",
+        "assets/AppShell-BuF4jkcU.css",
+        "assets/AudioButton-DeT_cSZ1.css",
+        "assets/index-8DxExXOH.css"
+      ]
+    },
+    {
+      "route": "src/features/projects/ProjectPage.vue#graph",
+      "gzipBytes": 503930,
+      "transferBytes": 504956,
+      "cssGzipBytes": 5171,
+      "cssTransferBytes": 5586,
+      "files": [
+        "assets/AppHeader-D0p7RCwW.js",
+        "assets/AppShell-Dbh3geX7.js",
+        "assets/AudioButton-B_k2wxxB.js",
+        "assets/Button-DuXbPZjg.js",
+        "assets/CheckboxGroup-CxvQaUn2.js",
+        "assets/ConfirmAction-2ipd5Jzt.js",
+        "assets/Empty-D8Y60Lex.js",
+        "assets/EmptyState-BC5l13PW.js",
+        "assets/ErrorState-BOlfnBcv.js",
+        "assets/FormItem-CNH33-ts.js",
+        "assets/GraphExplorer-D3Kz4hQP.js",
+        "assets/Input-ChYuor6n.js",
+        "assets/PageHeader-3CIRu5xv.js",
+        "assets/ProjectPage-Dg1UnItD.js",
+        "assets/PronunciationChip-Chulkkvn.js",
+        "assets/Select-Dg5-Gmyz.js",
+        "assets/SenseRelations-DDAZHYjH.js",
+        "assets/Skeleton-DurqXpXu.js",
+        "assets/Spin-D4Rag5Zm.js",
+        "assets/ThemeToggle-Ci2xNbm8.js",
+        "assets/VirtualList-CiVqd9VM.js",
+        "assets/_plugin-vue_export-helper-BDNMzG2s.js",
+        "assets/create-1vs1ElIQ.js",
+        "assets/focus-detector-DNmZ2Jp_.js",
+        "assets/format-length-DM-8T0Yf.js",
+        "assets/index-BtHCC9vK.js",
+        "assets/light-CL45eESq.js",
+        "assets/light-ClFh49AT.js",
+        "assets/light-D-h7tz6q.js",
+        "assets/replaceable-DaPuVwfS.js",
+        "assets/use-compitable-nw6BjZMG.js",
+        "assets/use-locale-DRlFaCDw.js",
+        "assets/useApi-il6ACzUc-DagQNauW.js",
+        "assets/useProject-B-e8AV8h.js"
+      ],
+      "css": [
+        "assets/AppHeader-Cszd2Wu2.css",
+        "assets/AppShell-BuF4jkcU.css",
+        "assets/AudioButton-DeT_cSZ1.css",
+        "assets/ProjectPage-D1uqwL1t.css",
+        "assets/index-8DxExXOH.css"
+      ]
+    }
+  ]
+}

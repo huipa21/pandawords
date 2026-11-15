@@ -1,0 +1,301 @@
+{
+  "initialJs": 161849,
+  "initialCss": 4228,
+  "chunks": [
+    {
+      "file": "assets/noto-sans-latin-ext-wght-normal-W1qJv59z.woff2",
+      "initial": false,
+      "gzipBytes": 167807
+    },
+    {
+      "file": "assets/noto-sans-latin-wght-normal-BYSzYMf3.woff2",
+      "initial": false,
+      "gzipBytes": 35853
+    },
+    {
+      "file": "assets/roboto-mono-latin-ext-wght-normal-QAYlOegK.woff2",
+      "initial": false,
+      "gzipBytes": 22944
+    },
+    {
+      "file": "assets/roboto-mono-latin-wght-normal-CZtBPCCa.woff2",
+      "initial": false,
+      "gzipBytes": 32826
+    },
+    {
+      "file": "assets/roboto-serif-latin-ext-wght-normal-B9BEn9Tg.woff2",
+      "initial": false,
+      "gzipBytes": 49841
+    },
+    {
+      "file": "assets/roboto-serif-latin-wght-normal-CusprKnR.woff2",
+      "initial": false,
+      "gzipBytes": 66005
+    },
+    {
+      "file": "assets/roboto-latin-ext-wght-normal-DYIxWhlt.woff2",
+      "initial": false,
+      "gzipBytes": 29420
+    },
+    {
+      "file": "assets/roboto-latin-wght-normal-ccAYIvAh.woff2",
+      "initial": false,
+      "gzipBytes": 43169
+    },
+    {
+      "file": "assets/Alert-CgaXOYO_.js",
+      "initial": false,
+      "gzipBytes": 2417
+    },
+    {
+      "file": "assets/AudioButton-CqeIjxSS.js",
+      "initial": false,
+      "gzipBytes": 1255
+    },
+    {
+      "file": "assets/AudioButton-DeT_cSZ1.css",
+      "initial": false,
+      "gzipBytes": 95
+    },
+    {
+      "file": "assets/Button-D8tExmEB.js",
+      "initial": true,
+      "gzipBytes": 77024
+    },
+    {
+      "file": "assets/CheckboxGroup-CZB_NBV_.js",
+      "initial": false,
+      "gzipBytes": 3786
+    },
+    {
+      "file": "assets/ConfirmAction-DNHLM4Zk.js",
+      "initial": false,
+      "gzipBytes": 587
+    },
+    {
+      "file": "assets/Empty-DGGt9Htl.js",
+      "initial": false,
+      "gzipBytes": 1808
+    },
+    {
+      "file": "assets/EmptyState-Cd4DkpV-.js",
+      "initial": false,
+      "gzipBytes": 340
+    },
+    {
+      "file": "assets/ErrorState-D_xekIR8.js",
+      "initial": false,
+      "gzipBytes": 3549
+    },
+    {
+      "file": "assets/Form-BmvvP0T6.js",
+      "initial": false,
+      "gzipBytes": 1106
+    },
+    {
+      "file": "assets/FormItem-9qifJOkg.js",
+      "initial": false,
+      "gzipBytes": 9669
+    },
+    {
+      "file": "assets/Forward-CPqH8A2T.js",
+      "initial": false,
+      "gzipBytes": 1681
+    },
+    {
+      "file": "assets/GraphExplorer-wIws9dKY.js",
+      "initial": false,
+      "gzipBytes": 190360
+    },
+    {
+      "file": "assets/Input-ycsN-_Bf.js",
+      "initial": false,
+      "gzipBytes": 10066
+    },
+    {
+      "file": "assets/PageHeader-IL9qPTN0.js",
+      "initial": false,
+      "gzipBytes": 366
+    },
+    {
+      "file": "assets/ProjectForm-aYSCZhQn.js",
+      "initial": false,
+      "gzipBytes": 38468
+    },
+    {
+      "file": "assets/PronunciationChip-CSXGLv5u.js",
+      "initial": false,
+      "gzipBytes": 5079
+    },
+    {
+      "file": "assets/RadioGroup-47yz8Sfg.js",
+      "initial": false,
+      "gzipBytes": 9730
+    },
+    {
+      "file": "assets/Select-C1zWk3Ks.js",
+      "initial": false,
+      "gzipBytes": 25561
+    },
+    {
+      "file": "assets/SenseRelations-DIzman4Z.js",
+      "initial": false,
+      "gzipBytes": 2183
+    },
+    {
+      "file": "assets/Skeleton-DcKaLy1S.js",
+      "initial": false,
+      "gzipBytes": 1133
+    },
+    {
+      "file": "assets/Spin-DuKv8IB1.js",
+      "initial": false,
+      "gzipBytes": 1530
+    },
+    {
+      "file": "assets/TagAssignments-DSYvTQGI.js",
+      "initial": false,
+      "gzipBytes": 1733
+    },
+    {
+      "file": "assets/focus-detector-Br7bToM-.js",
+      "initial": false,
+      "gzipBytes": 6421
+    },
+    {
+      "file": "assets/format-length-BtM_6fCQ.js",
+      "initial": false,
+      "gzipBytes": 886
+    },
+    {
+      "file": "assets/light-CRA8V_Xp.js",
+      "initial": true,
+      "gzipBytes": 261
+    },
+    {
+      "file": "assets/light-Dc47DXDP.js",
+      "initial": true,
+      "gzipBytes": 689
+    },
+    {
+      "file": "assets/light-Df0EBZRU.js",
+      "initial": true,
+      "gzipBytes": 1306
+    },
+    {
+      "file": "assets/pinia-DswNIAhd.js",
+      "initial": true,
+      "gzipBytes": 2823
+    },
+    {
+      "file": "assets/use-compitable-BJwj9UHY.js",
+      "initial": false,
+      "gzipBytes": 146
+    },
+    {
+      "file": "assets/use-locale-C1J4ex2p.js",
+      "initial": false,
+      "gzipBytes": 209
+    },
+    {
+      "file": "assets/useApi-il6ACzUc-CjAJEQVf.js",
+      "initial": true,
+      "gzipBytes": 471
+    },
+    {
+      "file": "assets/useAuthForm-BUWeMx2F.js",
+      "initial": false,
+      "gzipBytes": 376
+    },
+    {
+      "file": "assets/useProject-CxncT-FZ.js",
+      "initial": false,
+      "gzipBytes": 740
+    },
+    {
+      "file": "assets/usePronunciation-Bu-Tlj0F.js",
+      "initial": false,
+      "gzipBytes": 2402
+    },
+    {
+      "file": "assets/useStudyResource-JcjF64Kd.js",
+      "initial": false,
+      "gzipBytes": 1293
+    },
+    {
+      "file": "assets/index-CknAsnLH.js",
+      "initial": true,
+      "gzipBytes": 79275
+    },
+    {
+      "file": "assets/PlaceholderPage-BgKDN1Ra.js",
+      "initial": false,
+      "gzipBytes": 448
+    },
+    {
+      "file": "assets/AdminUsersPage-BfmHUWSE.js",
+      "initial": false,
+      "gzipBytes": 30480
+    },
+    {
+      "file": "assets/ChangePasswordPage-CTfABVEp.js",
+      "initial": false,
+      "gzipBytes": 1088
+    },
+    {
+      "file": "assets/LoginPage-DWziGUCB.js",
+      "initial": false,
+      "gzipBytes": 974
+    },
+    {
+      "file": "assets/AllWordsPage-Dn6lVOAR.js",
+      "initial": false,
+      "gzipBytes": 294
+    },
+    {
+      "file": "assets/ProjectEditorPage-DwAePNQY.js",
+      "initial": false,
+      "gzipBytes": 802
+    },
+    {
+      "file": "assets/ProjectPage-doD6Hxoz.js",
+      "initial": false,
+      "gzipBytes": 15351
+    },
+    {
+      "file": "assets/ProjectsPage-BTyQfm4P.js",
+      "initial": false,
+      "gzipBytes": 1983
+    },
+    {
+      "file": "assets/ReadingPage-ECW-C3HY.js",
+      "initial": false,
+      "gzipBytes": 3971
+    },
+    {
+      "file": "assets/DashboardPage-DehwiiKo.js",
+      "initial": false,
+      "gzipBytes": 1282
+    },
+    {
+      "file": "assets/ProjectPlanPage-Dulfk0FA.js",
+      "initial": false,
+      "gzipBytes": 7366
+    },
+    {
+      "file": "assets/ReviewSessionPage-BG5KVmR4.js",
+      "initial": false,
+      "gzipBytes": 6789
+    },
+    {
+      "file": "assets/TagsPage-DSDXnw2y.js",
+      "initial": false,
+      "gzipBytes": 1642
+    },
+    {
+      "file": "assets/LemmaDetailPage-CMVHTzU1.js",
+      "initial": false,
+      "gzipBytes": 8257
+    }
+  ]
+}

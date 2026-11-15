@@ -9,6 +9,7 @@ from surrealdb import RecordID
 from surrealdb.connections.async_ws import AsyncWsSurrealConnection
 
 from app.core.record_ids import encode_rid
+from app.db import graph as graph_store
 from app.db.dictionary import RELATIONS, TABLE_FIELDS
 from app.db.dictionary_schema_test_support import create, relate
 from app.domain.graph import GraphQuery
@@ -365,3 +366,13 @@ async def test_no_unselected_shared_or_foreign_edges_and_endpoints(
     shared = await relate(db, "member_of", graph.nodes["morpheme"], graph.nodes["tag"], {})
     response = (await graph.get(client, "morpheme", depth=1)).json()
     assert encode_rid(shared["id"], "member_of") in {edge["id"] for edge in response["edges"]}
+
+
+async def test_edge_limit_is_global_across_relation_tables(
+    graph: Fixture, client: AsyncClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(graph_store, "MAX_EDGE_ROWS", 1)
+    response = await graph.get(client, depth=1, relation_types=["has_lexeme", "contains"])
+    assert response.status_code == 413
+    assert response.json()["code"] == "graph.too_large"
+    assert "nodes" not in response.json() and "edges" not in response.json()
