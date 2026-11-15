@@ -27,7 +27,7 @@ Agents must not edit PLAN/PROGRESS or merge. Shared topic-doc changes are integr
 | 7.1.1 | merged | removed | ✅ merged at b5d79d1; worktree and branch removed |
 | 7.1.2 | task/7.1.2-offline-review | ../pandawords.worktrees/7.1.2 | Ready: 7.1.1 merged and verified |
 | 7.1.3 | merged | removed | ✅ rate limits, deployed CSP and isolation verified |
-| 7.1.4 | task/7.1.4-performance | ../pandawords.worktrees/7.1.4 | Agent running: measured graph and bundle budgets |
+| 7.1.4 | merged | removed | ✅ measured batching and enforced bundle budgets |
 | 7.1.5 | task/7.1.5-fsrs-optimization | ../pandawords.worktrees/7.1.5 | Agent running: bounded per-user optimization |
 
 Verification: baseline `dev.ps1 check` passed; bounded full frontend baseline passed 218/218
@@ -118,6 +118,24 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-15 — 7.1.4 Measured performance
+- Result / completed: checkpoint `e1494cc` finished, merged as `8b8454c`.
+  Batched graph relation queries, lazy layouts/project graph, measured/enforced transfer budgets.
+- Dependencies: 4.4.2 ✅; PWA integration retained.
+- Verification: 28 real-DB graph tests passed, including 40 alternating baseline/optimized
+  samples at 30 and maximum 300 nodes and exact authorized output equivalence. Queries 54 -> 22;
+  median/p95 ms 121.27/165.20 -> 53.36/70.84 and 455.40/545.82 -> 179.76/239.30.
+  Focused frontend 43/43 passed; production bundle budget passed in worktree and merged main;
+  `dev.ps1 check` passed in both. Before/after foreground and background PWA bytes recorded
+  in deployment/testing docs. No new index warranted by EXPLAIN; no schema change.
+- Failures / causes / corrections: interrupted agent left nested scratch build/test copies;
+  checks initially included their generated files. All scratch removed after recording evidence.
+  Integration conflicts in docs and tsconfig resolved preserving both PWA and performance.
+- Skipped / deferred: none; server latency guarantees are not inferred from local measurements.
+- Findings: tree route JS roughly halved; graph remains the heavy route. PWA precaching
+  still downloads all hashed assets; separate install budget prevents claiming false savings.
+- Blockers / follow-ups: none for this task; integrated full suites at closeout.
 
 ### 2026-11-15 — 7.1.3 Security hardening
 - Result / completed: checkpoint `bc2e8d0` finished and merged; bounded process-local
