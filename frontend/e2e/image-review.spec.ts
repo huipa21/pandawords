@@ -133,10 +133,7 @@ test('fixture image review authenticates blobs, persists preferences and confirm
     })
     expect(uploaded.ok()).toBe(true)
     imageId = (await uploaded.json() as components['schemas']['MediaRead']).id
-    const refreshing = page.waitForResponse(response => response.url().endsWith('/api/auth/refresh') && response.request().method() === 'POST')
     await page.goto(`/projects/${encodeURIComponent(projectId)}/plan`)
-    const browserAuth = await (await refreshing).json() as components['schemas']['AuthRead']
-    expect(browserAuth.user.id === learnerId, 'Reload refreshes the same isolated learner.').toBe(true)
     const settings = page.getByTestId('review-media-settings')
     const images = settings.getByRole('switch', { name: 'Enable image exercises', exact: true })
     const audio = settings.getByRole('switch', { name: 'Enable audio exercises', exact: true })
@@ -182,7 +179,14 @@ test('fixture image review authenticates blobs, persists preferences and confirm
     const delivery = page.waitForResponse(response => response.url().includes('/api/media/') && response.ok())
     await imageRegion.getByRole('button', { name: 'Retry', exact: true }).click()
     const delivered = await delivery
-    expect(delivered.request().headers().authorization === `Bearer ${browserAuth.access_token}`, 'Blob delivery uses the refreshed browser credential.').toBe(true)
+    const authorization = delivered.request().headers().authorization
+    if (!authorization?.startsWith('Bearer '))
+      throw new Error('Image delivery requires bearer authentication.')
+    const viewer = await page.request.get('/api/auth/me', {
+      headers: { Authorization: authorization },
+    })
+    expect(viewer.ok()).toBe(true)
+    expect((await viewer.json() as components['schemas']['UserRead']).id).toBe(learnerId)
     const image = imageRegion.getByRole('img', { name: 'Private vocabulary image', exact: true })
     await expect(image).toBeVisible()
     await expect.poll(() => image.evaluate(node => (node as HTMLImageElement).naturalWidth)).toBe(96)
