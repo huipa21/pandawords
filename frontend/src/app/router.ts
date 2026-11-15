@@ -6,11 +6,6 @@ const AppShell = () => import('@/components/app/AppShell.vue')
 const AuthLayout = () => import('./layouts/AuthLayout.vue')
 const placeholder = () => import('./pages/PlaceholderPage.vue')
 
-const pages = [
-  ['settings', 'settings', 'settings'],
-  ['admin/backup', 'admin-backup', 'backup'],
-] as const
-
 export function createAppRouter(history: RouterHistory = createWebHistory()) {
   const children: RouteRecordRaw[] = [
     { path: '', redirect: '/projects' },
@@ -92,15 +87,18 @@ export function createAppRouter(history: RouterHistory = createWebHistory()) {
       component: () => import('@/features/admin/AdminUsersPage.vue'),
       meta: { title: 'users', admin: true },
     },
-    ...pages.map(([path, name, title]) => ({
-      path,
-      name,
-      component: placeholder,
-      meta: {
-        title,
-        admin: path.startsWith('admin/'),
-      },
-    })),
+    {
+      path: 'admin/backup',
+      name: 'admin-backup',
+      component: () => import('@/features/admin/AdminBackupPage.vue'),
+      meta: { title: 'backup', admin: true },
+    },
+    {
+      path: 'settings',
+      name: 'settings',
+      component: () => import('@/features/settings/SettingsPage.vue'),
+      meta: { title: 'settings' },
+    },
   ]
   if (import.meta.env.DEV) {
     children.push({

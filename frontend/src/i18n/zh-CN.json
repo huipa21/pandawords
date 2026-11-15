@@ -581,7 +581,119 @@
       "exam_date": "考试日期（可选）"
     }
   },
+  "portability": {
+    "chooseFile": "选择归档文件",
+    "changeFile": "选择其他归档文件",
+    "noFile": "尚未选择归档文件。",
+    "selected": "{name}（{size}）",
+    "details": "问题详情",
+    "uploading": "正在上传并校验 {size}… 服务器会在修改任何数据前检查整个归档。",
+    "cancelled": "已取消上传。文件和选项已保留，未导入任何内容。",
+    "failedStage": "失败阶段：{stage}",
+    "retryHint": "未做任何更改。文件和选项已保留，可以重试。",
+    "exporting": "正在准备…",
+    "skippedMedia": "有 {count} 个媒体文件未能包含。",
+    "alreadyRestored": "此备份已恢复过，未做任何更改。",
+    "problems": {
+      "extension": "请选择 PandaWords 导出的 .tar.gz 归档。",
+      "empty": "此文件为空。",
+      "tooLarge": "此归档超过 {max} 的上传上限。"
+    },
+    "progress": {
+      "label": "学习进度",
+      "auto": "自动",
+      "on": "导入进度",
+      "off": "从头开始",
+      "autoHint": "仅当服务器确认归档由你本人账户导出时才导入进度；否则单词作为新卡片开始。",
+      "onHint": "导入复习卡片和复习记录。你已有的义项记忆会保留，不会被覆盖。",
+      "offHint": "只导入单词。每个单词都作为没有复习记录的新卡片。"
+    },
+    "stages": {
+      "upload": "上传",
+      "archive": "归档结构",
+      "manifest": "清单",
+      "data": "数据",
+      "references": "引用",
+      "media": "媒体文件",
+      "apply": "保存"
+    },
+    "summary": {
+      "progressOn": "已导入学习进度。",
+      "progressOff": "未导入学习进度。",
+      "sameSource": "此归档由你的账户导出。",
+      "otherSource": "此归档来自其他账户或服务器。",
+      "projects": "新增 {count} 个项目。",
+      "created": "新建",
+      "merged": "合并",
+      "skipped": "跳过",
+      "notices": "{count} 条提示",
+      "preferencesRestored": "已恢复偏好：{fields}",
+      "preferencesKept": "保留的偏好（你已修改过）：{fields}"
+    },
+    "project": {
+      "export": "导出",
+      "exported": "项目归档已下载。",
+      "import": "导入项目",
+      "importTitle": "导入项目",
+      "importHint": "导入 .pandawords-project.tar.gz 归档。每次都会创建新的项目副本；共享词典条目会合并，绝不会被覆盖。",
+      "submit": "导入",
+      "success": "项目已导入。",
+      "open": "打开导入的项目"
+    },
+    "user": {
+      "backupTitle": "完整备份",
+      "backupHint": "下载你的全部项目、单词、笔记、媒体、学习进度和偏好。密码和账户设置永远不会包含在内。",
+      "download": "下载备份",
+      "downloaded": "已保存 {name}。",
+      "restoreTitle": "从备份恢复",
+      "importHint": "将 .pandawords-user.tar.gz 备份恢复到此账户。数据会合并：项目以副本形式添加，已有的记忆、覆盖和已修改的偏好会保留。",
+      "submit": "恢复",
+      "success": "备份已恢复。",
+      "confirmTitle": "恢复此备份？",
+      "confirm": "将 {name} 恢复到你的账户？项目会作为新副本添加（在已有数据上恢复不同的备份会产生重复项目），拼写属于其他账户的单词会导致冲突。已有的记忆、覆盖和你修改过的偏好会保留。此操作无法自动撤销。"
+    },
+    "errors": {
+      "too_large": "归档超过服务器上传上限。",
+      "empty_upload": "上传的文件为空。",
+      "malformed_archive": "此文件不是有效的 PandaWords 归档。",
+      "missing_manifest": "此归档缺少 PandaWords 清单。",
+      "malformed_manifest": "归档清单已损坏。",
+      "unexpected_format": "此归档是另一种 PandaWords 导出类型（项目或完整备份）。",
+      "unsupported_version": "此归档来自不受支持的 PandaWords 版本。",
+      "unsupported_schema": "此归档使用不受支持的数据版本。",
+      "integrity": "归档完整性校验失败，可能已损坏或被修改。",
+      "identity_conflict": "归档与属于其他账户的数据冲突。",
+      "unsafe_entry": "归档包含不安全的条目，已被拒绝。",
+      "invalid_media": "归档中的媒体文件无效。",
+      "apply_failed": "导入未能保存。未做任何更改，请重试。",
+      "export_too_large": "你的数据超过备份大小上限，请联系管理员。"
+    }
+  },
+  "siteBackup": {
+    "hint": "按需创建整个站点数据库和媒体的备份。",
+    "start": "创建备份",
+    "running": "备份正在进行。此页面会自动刷新状态。",
+    "failed": "上次备份失败阶段：{stage}",
+    "empty": "暂无站点备份。",
+    "list": "站点备份",
+    "meta": "{date} · {size}",
+    "download": "下载",
+    "downloadNamed": "下载 {name}",
+    "restoreNotice": "浏览器中不提供站点恢复。运维人员在服务器上使用 deploy/restore.sh 恢复。",
+    "stages": {
+      "preflight": "预检",
+      "configuration": "配置",
+      "database": "数据库导出",
+      "media": "媒体",
+      "archive": "归档",
+      "publish": "发布",
+      "internal": "内部错误"
+    }
+  },
   "errors": {
+    "site_backup_in_progress": "已有站点备份或恢复正在进行。",
+    "site_backup_not_found": "此备份已不存在，请刷新列表。",
+    "backup_export_too_large": "你的数据超过备份大小上限，请联系管理员。",
     "offline_storage": "无法清除离线数据。共用设备前请清除此站点的浏览器数据。",
     "study_invalid_order": "项目选择已变更，请重置优先级草稿后重试。",
     "study_too_large": "此项目或学习历史超出计划计算上限，请减少选择或联系管理员。",
