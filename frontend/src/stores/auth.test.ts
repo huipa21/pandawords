@@ -1,6 +1,6 @@
 import { createPinia, disposePinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { createApiClient } from '@/api/client'
+import { api, createApiClient } from '@/api/client'
 import { authPayload } from '@/features/auth/testHarness'
 import { activateOfflineOwner, offlineData } from '@/features/study/offlineStorage'
 import { useAuthStore } from './auth'
@@ -62,7 +62,42 @@ describe('memory-only auth store', () => {
   })
   afterEach(() => {
     disposePinia(pinia)
+    vi.restoreAllMocks()
     vi.unstubAllGlobals()
+  })
+
+  it('applies saved profile data only to the still-active account and never persists it locally', async () => {
+    const auth = useAuthStore()
+    auth.accessToken = 'test-access'
+    auth.user = authPayload().user
+    const next = {
+      ...auth.user,
+      full_name: 'Updated Name',
+      email: 'updated@example.com',
+      avatar: '',
+    }
+    const save = vi.spyOn(api, 'PATCH').mockResolvedValue({
+      data: next,
+      response: Response.json(next),
+    })
+    const body = { full_name: 'Updated Name', email: 'updated@example.com', avatar: '' }
+    await auth.updateProfile(body)
+    expect(save).toHaveBeenCalledWith('/api/auth/me/profile', { body })
+    expect(auth.user).toEqual(next)
+    const pending = deferred<{ data: typeof next, response: Response }>()
+    save.mockReturnValueOnce(pending.promise)
+    const updating = auth.updateProfile(body)
+    await vi.waitFor(() => expect(save).toHaveBeenCalledTimes(2))
+    auth.reset()
+    auth.user = authPayload({ id: 'user:other' }).user
+    pending.resolve({
+      data: next,
+      response: Response.json(next),
+    })
+    await updating
+    expect(auth.user.id).toBe('user:other')
+    expect(localStorage.length).toBe(0)
+    expect(sessionStorage.length).toBe(0)
   })
 
   it('uses login credentials for password change and applies fresh usable credentials', async () => {

@@ -89,6 +89,14 @@ keyboard submission, timer, feedback, rating and receipt-driven continuation rem
   before the localized brand name, including on authentication pages.
 - Desktop navigation aligns icons and labels to the left; only mobile bottom-navigation
   links use centered columns. Mobile retains safe-area padding and space for the fixed bar.
+- The header retains the Languages icon, opening a plain menu of English and 简体中文.
+  The theme button shows the destination moon/sun and toggles light/dark only.
+  Signed-in users have an avatar (or up to two name initials) opening Profile and Sign Out.
+  `/profile` edits a raster avatar (PNG/JPEG/WebP, up to 256 KB), email and full name;
+  user ID and login username are read-only. Saving is explicit, with field/global feedback
+  and preserved drafts on failure. Password change is embedded here and reuses the existing
+  current-password validation and token-rotation flow. Forced first-login password change
+  still uses the dedicated guarded route.
 
 ### Vocabulary graph (4.4.2)
 

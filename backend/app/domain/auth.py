@@ -29,6 +29,9 @@ class UserCreate(BaseModel):
 class User(BaseModel):
     id: str
     username: str
+    email: str = ""
+    full_name: str = ""
+    avatar: str = ""
     password_hash: str = Field(repr=False)
     role: Role
     disabled: bool
@@ -41,6 +44,9 @@ class User(BaseModel):
 class UserRead(BaseModel):
     id: str
     username: str
+    email: str = ""
+    full_name: str = ""
+    avatar: str = ""
     role: Role
     disabled: bool
     must_change_password: bool

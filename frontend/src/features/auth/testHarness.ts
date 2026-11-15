@@ -8,6 +8,9 @@ export function authPayload(overrides: Partial<components['schemas']['UserRead']
     user: {
       id: 'user:test',
       username: 'learner',
+      email: '',
+      full_name: '',
+      avatar: '',
       role: 'user',
       disabled: false,
       must_change_password: false,

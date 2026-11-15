@@ -628,6 +628,52 @@
         ]
       }
     },
+    "/api/auth/me/profile": {
+      "patch": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Patch Profile",
+        "operationId": "patch_profile_api_auth_me_profile_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/api/auth/me/srs-preferences": {
       "get": {
         "tags": [
@@ -8241,6 +8287,33 @@
         ],
         "title": "PixabaySearch"
       },
+      "ProfileUpdate": {
+        "properties": {
+          "full_name": {
+            "type": "string",
+            "maxLength": 128,
+            "title": "Full Name"
+          },
+          "email": {
+            "type": "string",
+            "maxLength": 254,
+            "title": "Email"
+          },
+          "avatar": {
+            "type": "string",
+            "maxLength": 349551,
+            "title": "Avatar"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "full_name",
+          "email",
+          "avatar"
+        ],
+        "title": "ProfileUpdate"
+      },
       "ProjectCreate": {
         "properties": {
           "name": {
@@ -9729,6 +9802,21 @@
           "username": {
             "type": "string",
             "title": "Username"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email",
+            "default": ""
+          },
+          "full_name": {
+            "type": "string",
+            "title": "Full Name",
+            "default": ""
+          },
+          "avatar": {
+            "type": "string",
+            "title": "Avatar",
+            "default": ""
           },
           "role": {
             "type": "string",

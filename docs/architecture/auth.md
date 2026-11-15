@@ -35,8 +35,20 @@ cold-start offline login; existing network-backed guards remain in force.
     cookie scoped to `/api/auth`. Only its SHA-256 hash is stored in `refresh_token`. It rotates on
     each use. Reusing a revoked token revokes the whole chain (theft detection).
 - **Endpoints**: `POST /api/auth/login`, `POST /api/auth/refresh`, `POST /api/auth/logout`,
-  `GET /api/auth/me`, `POST /api/auth/password`. Admin: `GET/POST /api/admin/users`,
+  `GET /api/auth/me`, `PATCH /api/auth/me/profile`, `POST /api/auth/password`. Admin: `GET/POST /api/admin/users`,
   `PATCH /api/admin/users/{id}` (disable, role, reset password).
+- **Personal profile**: authenticated users who have completed the password-change gate can
+  update only their own `{full_name, email, avatar}` (all three fields required). Names are
+  stripped and limited to 128 characters; email is stripped, limited to 254 characters,
+  and accepts an empty string or a mailbox address with a DNS domain (IDNA domains supported).
+  Avatar is empty or a canonical PNG/JPEG/WebP base64 data URL, at most 256 KiB decoded. Pillow verifies
+  the declared raster format and fully decodes every frame with existing image safety limits;
+  SVG, malformed, truncated, mismatched or oversized images are rejected.
+  Extra fields, including `id`, `username`, and `role`, are rejected. The fixed user ID and
+  username login never change. These three profile strings default to empty for legacy users
+  and are returned in `UserRead`, including `/me` and login/refresh responses. Successful
+  profile responses use `Cache-Control: no-store`. Migration 0028 backfills legacy records
+  atomically without replacing existing profile values; no unique email/login lookup is added.
 - **Admin account contract (1.5.4):** list accepts `page` (default 1) and `page_size`
   (default 20, maximum 100), returning `{items, total, page, page_size}` ordered by username/id.
   Create accepts `{username, role?}` and returns 201 `{user, temporary_password}`. Patch accepts

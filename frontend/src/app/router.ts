@@ -94,6 +94,12 @@ export function createAppRouter(history: RouterHistory = createWebHistory()) {
       meta: { title: 'backup', admin: true },
     },
     {
+      path: 'profile',
+      name: 'profile',
+      component: () => import('@/features/auth/ProfilePage.vue'),
+      meta: { title: 'profile' },
+    },
+    {
       path: 'settings',
       name: 'settings',
       component: () => import('@/features/settings/SettingsPage.vue'),

@@ -25,6 +25,9 @@ function user(id: string, role: 'admin' | 'user' = 'user', disabled = false): co
   return {
     id: `user:${id}`,
     username: id,
+    email: '',
+    full_name: '',
+    avatar: '',
     role,
     disabled,
     must_change_password: false,

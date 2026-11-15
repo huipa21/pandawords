@@ -1,5 +1,5 @@
 import { flushPromises, mount } from '@vue/test-utils'
-import { NConfigProvider, NMessageProvider } from 'naive-ui'
+import { NConfigProvider, NDropdown, NMessageProvider } from 'naive-ui'
 import { createPinia, disposePinia } from 'pinia'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent, h } from 'vue'
@@ -30,7 +30,7 @@ describe('app header', () => {
 
     const router = createRouter({
       history: createMemoryHistory(),
-      routes: ['projects', 'change-password', 'login'].map(path => ({
+      routes: ['projects', 'profile', 'login'].map(path => ({
         path: `/${path}`,
         component: { template: '<div />' },
       })),
@@ -56,13 +56,18 @@ describe('app header', () => {
     expect(brand.text().trim()).toBe(i18n.global.t('app.name'))
     expect(brand.element.firstElementChild).toBe(badge.element)
     expect(badge.element.querySelector('svg')).not.toBeNull()
-    expect(wrapper.get('a[href="/change-password"]').attributes('aria-label'))
-      .toBe(i18n.global.t('auth.changePassword'))
+    expect(wrapper.find('a[href="/change-password"]').exists()).toBe(false)
+    expect(wrapper.find(`button[aria-label="${i18n.global.t('auth.logout')}"]`).exists()).toBe(false)
+    expect(wrapper.get(`button[aria-label="${i18n.global.t('profile.accountMenu')}"]`).text()).toBe('L')
     expect(wrapper.findComponent(ThemeToggle).exists()).toBe(true)
     expect(wrapper.findComponent(LocaleSwitch).exists()).toBe(true)
 
     const logout = vi.spyOn(auth, 'logout').mockResolvedValue()
-    await wrapper.get(`button[aria-label="${i18n.global.t('auth.logout')}"]`).trigger('click')
+    const account = wrapper.findAllComponents(NDropdown).at(-1)!
+    account.vm.$emit('select', 'profile')
+    await flushPromises()
+    expect(router.currentRoute.value.path).toBe('/profile')
+    account.vm.$emit('select', 'logout')
     await flushPromises()
 
     expect(logout).toHaveBeenCalledOnce()

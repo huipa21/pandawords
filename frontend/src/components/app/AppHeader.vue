@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { NButton, useMessage } from 'naive-ui'
-import { ref } from 'vue'
+import { NButton, NDropdown, useMessage } from 'naive-ui'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+import { layout } from '@/design/tokens'
 import { AuthRequestError, errorKey } from '@/features/auth/errors'
+import ProfileAvatar from '@/features/auth/ProfileAvatar.vue'
 import { useAuthStore } from '@/stores/auth'
 import LocaleSwitch from './LocaleSwitch.vue'
 import ThemeToggle from './ThemeToggle.vue'
@@ -13,6 +15,25 @@ const auth = useAuthStore()
 const router = useRouter()
 const message = useMessage()
 const loggingOut = ref(false)
+const showAccount = ref(false)
+const accountOptions = computed(() => [
+  {
+    key: 'profile',
+    label: t('profile.title'),
+  },
+  {
+    key: 'logout',
+    label: t('auth.logout'),
+    disabled: loggingOut.value,
+  },
+])
+
+async function selectAccount(key: string) {
+  if (key === 'profile')
+    await router.push('/profile')
+  else if (key === 'logout')
+    await logout()
+}
 
 async function logout() {
   loggingOut.value = true
@@ -43,18 +64,13 @@ async function logout() {
       <span>{{ t('app.name') }}</span>
     </RouterLink>
     <div class="flex shrink-0 flex-wrap items-center justify-end gap-2">
-      <RouterLink
-        v-if="auth.accessToken && !auth.user?.must_change_password" to="/change-password"
-        :aria-label="t('auth.changePassword')" :title="t('auth.changePassword')"
-        class="password-link flex items-center justify-center rounded-sm text-lg text-primary no-underline focus-visible:pw-focus-ring"
-      >
-        <i-lucide-key-round aria-hidden="true" />
-      </RouterLink>
-      <NButton v-if="auth.accessToken" size="large" circle quaternary :aria-label="t('auth.logout')" :title="t('auth.logout')" :loading="loggingOut" :disabled="loggingOut" @click="logout">
-        <i-lucide-log-out aria-hidden="true" />
-      </NButton>
-      <ThemeToggle />
       <LocaleSwitch />
+      <ThemeToggle />
+      <NDropdown v-if="auth.accessToken" v-model:show="showAccount" trigger="click" size="large" :menu-props="() => ({ role: 'menu' })" :node-props="() => ({ role: 'menuitem' })" :theme-overrides="{ optionHeightLarge: layout.touchTarget }" :options="accountOptions" @select="selectAccount">
+        <NButton size="large" circle quaternary aria-haspopup="menu" :aria-expanded="showAccount" :aria-label="t('profile.accountMenu')" :title="t('profile.accountMenu')" :loading="loggingOut" :disabled="loggingOut">
+          <ProfileAvatar :name="auth.user?.full_name || auth.user?.username || ''" :avatar="auth.user?.avatar" />
+        </NButton>
+      </NDropdown>
     </div>
   </header>
 </template>
@@ -62,10 +78,5 @@ async function logout() {
 <style scoped>
 header {
   min-height: var(--pw-layout-header-height);
-}
-
-.password-link {
-  min-height: var(--pw-layout-touch-target);
-  min-width: var(--pw-layout-touch-target);
 }
 </style>

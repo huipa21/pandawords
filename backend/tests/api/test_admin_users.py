@@ -44,6 +44,9 @@ async def test_list_pagination_is_credential_free(
     assert set(first.json()["items"][0]) == {
         "id",
         "username",
+        "email",
+        "full_name",
+        "avatar",
         "role",
         "disabled",
         "must_change_password",

@@ -7,6 +7,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useAuthForm } from './useAuthForm'
 
+const props = defineProps<{ embedded?: boolean }>()
 const auth = useAuthStore()
 const router = useRouter()
 const message = useMessage()
@@ -40,16 +41,17 @@ function changePassword() {
     model.current_password = ''
     model.new_password = ''
     message.success(t('auth.passwordChanged'), { duration: 2000 })
-    await router.replace('/projects')
+    if (!props.embedded)
+      await router.replace('/projects')
   }, ['current_password', 'new_password'])
 }
 </script>
 
 <template>
   <section class="flex flex-col gap-6">
-    <h1 class="text-2xl font-semibold">
+    <component :is="embedded ? 'h2' : 'h1'" class="text-2xl font-semibold">
       {{ t('pages.changePassword') }}
-    </h1>
+    </component>
     <p v-if="auth.user?.must_change_password" class="text-muted">
       {{ t('auth.changeRequired') }}
     </p>

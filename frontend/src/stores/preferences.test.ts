@@ -25,21 +25,16 @@ describe('preferences', () => {
     media.dispatchEvent(Object.assign(new Event('change'), { matches }))
   }
 
-  it('follows system changes only in system mode and resumes with the latest value', () => {
-    const remove = vi.spyOn(media, 'removeEventListener')
+  it('uses only explicit light/dark choices and ignores system changes', () => {
     const store = usePreferencesStore()
-    expect(store.theme).toBe('system')
+    expect(store.theme).toBe('light')
     expect(store.resolvedTheme).toBe('light')
     systemChange(true)
-    expect(store.resolvedTheme).toBe('dark')
-    store.theme = 'light'
+    expect(store.resolvedTheme).toBe('light')
+    store.theme = 'dark'
     systemChange(false)
-    systemChange(true)
-    expect(store.resolvedTheme).toBe('light')
-    store.theme = 'system'
     expect(store.resolvedTheme).toBe('dark')
-    store.$dispose()
-    expect(remove).toHaveBeenCalledWith('change', expect.any(Function))
+    expect(store.theme).toBe('dark')
   })
 
   it('restores persisted choices and persists both preferences', () => {
@@ -47,18 +42,23 @@ describe('preferences', () => {
     const store = usePreferencesStore()
     expect(store.resolvedTheme).toBe('dark')
     expect(store.locale).toBe('en')
-    store.theme = 'system'
+    store.theme = 'light'
     store.locale = 'zh-CN'
-    expect(JSON.parse(localStorage.getItem(preferencesKey)!)).toEqual({ theme: 'system', locale: 'zh-CN' })
+    expect(JSON.parse(localStorage.getItem(preferencesKey)!)).toEqual({ theme: 'light', locale: 'zh-CN' })
   })
 
-  it.each(['null', '{broken', '{"theme":"invalid","locale":"invalid"}'])('uses safe defaults for invalid storage: %s', (value) => {
+  it.each([
+    'null',
+    '{broken',
+    '{"theme":"invalid","locale":"invalid"}',
+    '{"theme":"system","locale":"zh-CN"}',
+  ])('uses light for invalid or legacy system preferences: %s', (value) => {
     localStorage.setItem(preferencesKey, value)
     media.matches = true
     const store = usePreferencesStore()
-    expect(store.theme).toBe('system')
+    expect(store.theme).toBe('light')
     expect(store.locale).toBe('zh-CN')
-    expect(store.resolvedTheme).toBe('dark')
+    expect(store.resolvedTheme).toBe('light')
   })
 
   it('keeps preferences usable when storage reads and writes fail', () => {
