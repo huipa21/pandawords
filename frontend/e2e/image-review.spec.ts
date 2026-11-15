@@ -101,7 +101,11 @@ test('fixture image review authenticates blobs, persists preferences and confirm
         path: { table: 'sense', id: senseId },
       },
       body: {
-        fields: { definition: '', gloss: { zh: '' }, examples: [] },
+        fields: {
+          definition: '',
+          gloss: { zh: '' },
+          examples: [],
+        },
       },
     })
     expect(overridden.response.ok).toBe(true)
@@ -139,7 +143,10 @@ test('fixture image review authenticates blobs, persists preferences and confirm
     await page.keyboard.press('Space')
     await audio.focus()
     await page.keyboard.press('Space')
-    await settings.getByRole('radio', { name: 'British English', exact: true }).check()
+    const accent = settings.getByRole('radio', { name: 'British English', exact: true })
+    await accent.focus()
+    await page.keyboard.press('Space')
+    await expect(accent).toBeChecked()
     await settings.getByRole('button', { name: 'Save review media preferences', exact: true }).click()
     await expect(settings.getByRole('status')).toContainText('Saved.')
     const disabled = await api.GET('/api/auth/me/review-preferences')
