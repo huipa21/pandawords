@@ -3,12 +3,14 @@ from __future__ import annotations
 import hashlib
 import io
 import json
+import sys
 import tarfile
 from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
 
+from app.backup import __main__ as cli
 from app.backup.schedule import next_run
 from app.core.config import Settings
 from app.domain.site_backup import SiteBackupError
@@ -154,3 +156,23 @@ def test_next_run_is_the_next_daily_utc_slot() -> None:
     assert next_run(datetime(2026, 1, 1, 3, 30, tzinfo=UTC), "03:30") == datetime(
         2026, 1, 2, 3, 30, tzinfo=UTC
     )
+
+
+@pytest.mark.parametrize(("valid", "code"), [(True, 0), (False, 2)])
+def test_cli_check_reads_stdin_and_cleans_up(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    valid: bool,
+    code: int,
+) -> None:
+    manifest = _manifest() if valid else _manifest(version=9)
+    data = _tar(tmp_path / "a.tar.gz", manifest, []).read_bytes()
+    settings = Settings(site_backup_dir=tmp_path / "backups", media_dir=tmp_path / "media")
+    monkeypatch.setattr(cli, "Settings", lambda: settings)
+    monkeypatch.setattr(sys, "stdin", io.TextIOWrapper(io.BytesIO(data)))
+    assert cli.main(["check", "-"]) == code
+    output = capsys.readouterr()
+    assert ("Archive OK" in output.out) is valid
+    assert ("FAILED at stage 'preflight'" in output.err) is not valid
+    assert list((tmp_path / "backups").iterdir()) == []

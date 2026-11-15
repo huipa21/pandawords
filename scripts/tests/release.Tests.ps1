@@ -56,7 +56,7 @@ function Read-Bundle([string]$Path) {
 
 try {
     New-Item -ItemType Directory -Path (Join-Path $root 'deploy') -Force | Out-Null
-    foreach ($name in @('compose.yml', 'Caddyfile.snippet')) {
+    foreach ($name in @('compose.yml', 'Caddyfile.snippet', 'restore.sh')) {
         [IO.File]::WriteAllText((Join-Path $root "deploy\$name"), "synthetic $name`n")
     }
     [IO.File]::WriteAllText((Join-Path $root '.env.example'), "synthetic .env.example`n")
@@ -91,7 +91,7 @@ try {
     Assert-True (($save[-2..-1] -join ' ') -eq 'docker.io/library/pandawords-api:1.2.3 docker.io/library/pandawords-web:1.2.3') 'Wrong image tags.'
     $dist = Join-Path $root 'dist'
     $entries = Read-Bundle (Join-Path $dist 'pandawords-1.2.3-deploy.tar.gz')
-    Assert-True (($entries.Keys | Sort-Object) -join ',' -eq '.env.example,Caddyfile.snippet,compose.yml,VERSION') 'Wrong deploy bundle members.'
+    Assert-True (($entries.Keys | Sort-Object) -join ',' -eq '.env.example,Caddyfile.snippet,compose.yml,restore.sh,VERSION') 'Wrong deploy bundle members.'
     Assert-True ($entries.VERSION -ceq "1.2.3`n") 'Wrong VERSION content.'
     Assert-True ($entries['.env.example'] -ceq "synthetic .env.example`n") 'Wrong environment example.'
     foreach ($line in Get-Content (Join-Path $dist 'SHA256SUMS')) {
