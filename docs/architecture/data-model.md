@@ -308,6 +308,7 @@ endpoints as well as the edge; `ENFORCED` checks existence and table types, not 
 | `media` | `owner?` (NONE for shared audio), `target`, `kind` (audio\|image), `path`, `mime`, `source` (wiktionary\|edge_tts\|pixabay\|upload), `attribution?`, `accent?` | |
 | `memory` | id `memory:[user:<id>, <sense record>]`, `owner`, `sense`, FSRS card state (`card_id`, `state`, `step?`, `stability?`, `difficulty?`, `due`, `last_review?`), `introduced` | One per user and sense, shared across projects |
 | `review_log` | `owner`, `memory`, `project`, `exercise`, `rating`, `auto_rating`, `correct`, `hint_used`, `duration_ms`, `at`, `is_introduction`, `attempt_id`, `request_fingerprint?`, `receipt?` | Completed reviews only; unique `(owner, attempt_id)` |
+| `srs_optimization` | deterministic owner ID, last run/result, optional validated parameters and training metadata | One private row per user; no card/history mutation |
 | `job` | `type`, `payload`, `status` (queued\|running\|done\|failed), `attempts`, `run_after`, `error?`, `owner?` | |
 | `_migration` | id = version, `name`, `checksum`, `applied_at` | |
 
@@ -630,10 +631,28 @@ and is deferred to media ingestion. Source examples retain their text, Chinese g
 - **Review queue for a project** = the user's `memory` rows for senses included (not hidden) in the
   project with `due <= now`, plus new senses up to the plan's daily limit.
 
+## Per-user optimizer storage (7.1.5)
+
+Forward-only migration `0024_srs_optimization.surql` adds the SCHEMAFULL record
+`srs_optimization:[user:<id>]`. Its owner must match the identity, and a unique owner index
+prevents duplicate state. `run_id`, `attempted_at` and flexible `result` describe the latest
+attempt; optional `parameters`, `parameters_version`, `optimized_at`,
+`parameters_fingerprint` and `trained_reviews` retain the last successful vector and its
+py-fsrs/version, training time, input digest and qualifying-transition count. Failure or
+insufficient history updates only the result, never this last good metadata. Stale run IDs
+cannot overwrite a later claim.
+
+The migration adds `(owner, last_review)` on memory. A single bounded recent-log scan uses
+the existing `review_log(owner, at)` index, and checks both its owner and the referenced memory
+owner. Optimization jobs contain no review history; training data passes
+to the short-lived local process via a pipe. The scheduler revalidates the vector and version
+inside each future review transaction, independently of `user.prefs.desired_retention`.
+
 ## Indexes (minimum)
 
 `lemma(lang, text)` unique · `user(username)` unique · `project(owner)` · `memory(owner, due)` ·
-`memory(owner, sense)` unique · `review_log(owner, at)` · `review_log(owner, attempt_id)` unique ·
+`memory(owner, sense)` unique · `memory(owner, last_review)` · `review_log(owner, at)` ·
+`review_log(owner, attempt_id)` unique · `srs_optimization(owner)` unique ·
 `job(status, run_after)` · `note(owner, target)` ·
 `media(target)` · `refresh_token(token_hash)` unique · `user(role)` (admin bootstrap) ·
 `refresh_token(user)` (session revocation) · `refresh_token(expires_at)` (expiry cleanup).

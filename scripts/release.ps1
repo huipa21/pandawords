@@ -23,10 +23,11 @@ function Invoke-Release {
         [string]$Root = (Split-Path -Parent $PSScriptRoot)
     )
 
-    if ($Arguments.Count -ne 2 -or $Arguments[0] -ine '-Version' -or
+    if ($Arguments.Count -lt 2 -or $Arguments.Count -gt 3 -or $Arguments[0] -ine '-Version' -or
         $Arguments[1] -cnotmatch '\A(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\z' -or
-        $Arguments[1].Length -gt 100) {
-        throw 'Usage: release -Version x.y.z (nonnegative integers, no leading zeros).'
+        $Arguments[1].Length -gt 100 -or
+        ($Arguments.Count -eq 3 -and $Arguments[2] -ine '-FsrsOptimizer')) {
+        throw 'Usage: release -Version x.y.z [-FsrsOptimizer] (nonnegative integers, no leading zeros).'
     }
     $version = $Arguments[1]
     $dist = Join-Path $Root 'dist'
@@ -61,9 +62,13 @@ function Invoke-Release {
         }
         $stage = Join-Path $dist ".release-$([guid]::NewGuid().ToString('N'))"
         New-Item -ItemType Directory -Path $stage | Out-Null
-        [void](Invoke-Quiet -Executable podman -Arguments @(
-            'build', '--tls-verify=true', '--platform', 'linux/amd64',
-            '--file', (Join-Path $Root 'backend\Dockerfile'), '--tag', $images[0], (Join-Path $Root 'backend')))
+        $apiBuild = @('build', '--tls-verify=true', '--platform', 'linux/amd64')
+        if ($Arguments.Count -eq 3) {
+            $apiBuild += @('--build-arg', 'INSTALL_FSRS_OPTIMIZER=true')
+        }
+        $apiBuild += @('--file', (Join-Path $Root 'backend\Dockerfile'),
+            '--tag', $images[0], (Join-Path $Root 'backend'))
+        [void](Invoke-Quiet -Executable podman -Arguments $apiBuild)
         [void](Invoke-Quiet -Executable podman -Arguments @(
             'build', '--tls-verify=true', '--platform', 'linux/amd64',
             '--file', (Join-Path $Root 'frontend\Dockerfile'), '--tag', $images[1], $Root))

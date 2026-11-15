@@ -43,6 +43,7 @@
       "review_log": "DEFINE TABLE review_log TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "sense": "DEFINE TABLE sense TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "sentence": "DEFINE TABLE sentence TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
+      "srs_optimization": "DEFINE TABLE srs_optimization TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "tag": "DEFINE TABLE tag TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "used_in": "DEFINE TABLE used_in TYPE RELATION IN sense OUT lemma | sentence | passage ENFORCED SCHEMAFULL PERMISSIONS NONE",
       "user": "DEFINE TABLE user TYPE NORMAL SCHEMAFULL PERMISSIONS NONE"
@@ -368,6 +369,7 @@
       },
       "indexes": {
         "memory_owner_due": "DEFINE INDEX memory_owner_due ON memory FIELDS owner, due",
+        "memory_owner_last_review": "DEFINE INDEX memory_owner_last_review ON memory FIELDS owner, last_review",
         "memory_owner_sense": "DEFINE INDEX memory_owner_sense ON memory FIELDS owner, sense UNIQUE"
       },
       "lives": {},
@@ -507,7 +509,8 @@
       },
       "indexes": {
         "review_log_owner_at": "DEFINE INDEX review_log_owner_at ON review_log FIELDS owner, at",
-        "review_log_owner_attempt": "DEFINE INDEX review_log_owner_attempt ON review_log FIELDS owner, attempt_id UNIQUE"
+        "review_log_owner_attempt": "DEFINE INDEX review_log_owner_attempt ON review_log FIELDS owner, attempt_id UNIQUE",
+        "review_log_owner_memory_at": "DEFINE INDEX review_log_owner_memory_at ON review_log FIELDS owner, memory, at"
       },
       "lives": {},
       "tables": {}
@@ -544,6 +547,27 @@
         "translation.*": "DEFINE FIELD translation.* ON sentence TYPE string PERMISSIONS FULL"
       },
       "indexes": {},
+      "lives": {},
+      "tables": {}
+    },
+    "srs_optimization": {
+      "events": {},
+      "fields": {
+        "attempted_at": "DEFINE FIELD attempted_at ON srs_optimization TYPE datetime PERMISSIONS FULL",
+        "id": "DEFINE FIELD id ON srs_optimization ASSERT $value = type::record('srs_optimization', [$this.owner]) PERMISSIONS FULL",
+        "optimized_at": "DEFINE FIELD optimized_at ON srs_optimization TYPE none | datetime PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON srs_optimization TYPE record<user> ASSERT $value = record::id($this.id)[0] PERMISSIONS FULL",
+        "parameters": "DEFINE FIELD parameters ON srs_optimization TYPE none | array<float> PERMISSIONS FULL",
+        "parameters.*": "DEFINE FIELD parameters.* ON srs_optimization TYPE float PERMISSIONS FULL",
+        "parameters_fingerprint": "DEFINE FIELD parameters_fingerprint ON srs_optimization TYPE none | string PERMISSIONS FULL",
+        "parameters_version": "DEFINE FIELD parameters_version ON srs_optimization TYPE none | string PERMISSIONS FULL",
+        "result": "DEFINE FIELD result ON srs_optimization TYPE object FLEXIBLE PERMISSIONS FULL",
+        "run_id": "DEFINE FIELD run_id ON srs_optimization TYPE string PERMISSIONS FULL",
+        "trained_reviews": "DEFINE FIELD trained_reviews ON srs_optimization TYPE int DEFAULT 0 PERMISSIONS FULL"
+      },
+      "indexes": {
+        "srs_optimization_owner": "DEFINE INDEX srs_optimization_owner ON srs_optimization FIELDS owner UNIQUE"
+      },
       "lives": {},
       "tables": {}
     },

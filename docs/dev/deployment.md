@@ -248,6 +248,23 @@ Protect and separately copy those assets and the `.env` file. Keep backup volume
 private, copy exports off-host, and prune only after a newer restore-tested backup
 exists. Automatic retention and `restore.sh` are not implemented yet (task 6.1.5).
 
+### Optional FSRS optimizer image (7.1.5)
+
+Normal releases omit the upstream optimizer's large PyTorch, NumPy, pandas and tqdm extra;
+ordinary scheduling works and eligible optimization requests report `unavailable`. To opt in,
+run `.\scripts\dev.ps1 release -Version x.y.z -FsrsOptimizer` on the build machine. This passes
+`INSTALL_FSRS_OPTIMIZER=true` only to the backend image build; the same image supplies the
+worker. The corresponding local development install is `uv sync --frozen --extra optimizer`
+from `backend`. The default release does not install these packages.
+
+The extra is required by the supported py-fsrs optimizer, not by any external provider. Its
+download/image footprint is substantial (Linux resolution may include CUDA packages even
+though optimization runs on CPU). Assess disk, memory and throughput before enabling it:
+the existing worker limit is 768 MiB and the whole server has 4 GiB. Adjust deployment
+capacity only after measuring the opt-in image; its production resource fit has not been
+verified. Training is limited to one CPU thread, 1,024 sampled reviews and 240 seconds;
+missing/failed optimization leaves the last valid or default scheduler intact.
+
 ### Verified local production smoke (task 1.6.4)
 
 Podman with Compose v2.40.3, SurrealDB 3.3.5, API image

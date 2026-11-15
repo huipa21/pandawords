@@ -84,6 +84,7 @@ try {
     Assert-True ($builds.Count -eq 2) 'Expected both image builds.'
     foreach ($build in $builds) {
         Assert-True (($build -join ' ') -like '*--tls-verify=true --platform linux/amd64*') 'Missing platform/TLS flags.'
+        Assert-True ('--build-arg' -notin $build) 'Default release unexpectedly enabled optimizer.'
     }
     $save = @($script:calls | Where-Object { $_[0] -eq 'save' })[0]
     Assert-True (($save[0..4] -join ' ') -eq 'save --format docker-archive --multi-image-archive --output') 'Wrong archive flags.'
@@ -106,6 +107,12 @@ try {
     [IO.File]::WriteAllText((Join-Path $dist '.release.lock'), '')
     Assert-Fails { Invoke-Release -Root $root -Arguments @('-Version', '2.0.0') } '*already exists*'
     Assert-True (Test-Path (Join-Path $dist '.release.lock')) 'Removed another invocation lock.'
+    Remove-Item -LiteralPath $dist -Recurse -Force
+    $script:calls.Clear()
+    Invoke-Release -Root $root -Arguments @('-Version', '1.2.4', '-FsrsOptimizer')
+    $builds = @($script:calls | Where-Object { $_[0] -eq 'build' })
+    Assert-True (($builds[0] -join ' ') -like '*--build-arg INSTALL_FSRS_OPTIMIZER=true*') 'Optimizer was not enabled in the API image.'
+    Assert-True ('--build-arg' -notin $builds[1]) 'Optimizer flag leaked into the frontend build.'
     Write-Host 'Release focused tests passed.'
 }
 finally {

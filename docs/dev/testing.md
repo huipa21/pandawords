@@ -723,6 +723,30 @@ on rerun. Backend emits the existing Starlette/httpx deprecation warning. Pylanc
 could not resolve this worktree's new Python file; `basedpyright`, ruff and runtime tests
 provide the validation instead. No E2E or persistent dev-database operations were performed.
 
+## Per-user FSRS optimization (7.1.5)
+
+From `backend`, run:
+
+```powershell
+uv run --no-sync pytest -q tests\unit\test_fsrs_optimization_unit.py tests\integration\test_fsrs_optimization_integration.py tests\integration\test_fsrs_optimization_resilience.py tests\integration\test_fsrs_optimization_migration.py tests\api\test_fsrs_optimization_api.py tests\integration\test_srs_reviews.py tests\integration\test_schema_snapshot.py
+```
+
+The real optimizer probe uses 512 qualifying transitions and checks that the installed
+py-fsrs optimizer changes its defaults, or explicitly reports `unavailable` when its optional
+extra is absent. Other deterministic tests use injected outputs and isolated owner histories:
+511/512 boundaries, same-day transitions, incomplete/foreign/corrupt/outlier records,
+bounded recent-window selection, repeat/cooldown/new-history behavior, concurrent/stale claims,
+invalid outputs, unavailable/failure preservation, default fallback and future-only reviews.
+They check unchanged cards, receipts, history and nondefault user preferences, plus the actual
+authenticated API → job → worker path. No LLM, audio or image provider is contacted.
+
+Fresh and pre-0024 upgrade databases verify replay, owner identity, data preservation and
+indexes on the existing isolated 8101 harness. Regenerate only the snapshot when needed with
+`uv run --no-sync pytest -q tests\integration\test_schema_snapshot.py --update-snapshot`,
+then rerun without the flag. `pwsh -NoProfile -File scripts\tests\release.Tests.ps1` verifies
+that the optimizer release flag affects only the API image build. No shared service lifecycle
+operation is necessary.
+
 ## Layers
 
 | Layer | Tool | Location | Covers |

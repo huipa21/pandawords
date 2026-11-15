@@ -454,6 +454,24 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/srs/optimization': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Read */
+    get: operations['read_api_srs_optimization_get']
+    put?: never
+    /** Request */
+    post: operations['request_api_srs_optimization_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/projects/{project_id}/tree': {
     parameters: {
       query?: never
@@ -1932,6 +1950,36 @@ export interface components {
       sense_id?: string | null
       /** Edge Id */
       edge_id?: string | null
+    }
+    /** OptimizationRead */
+    'OptimizationRead': {
+      /**
+       * Status
+       * @default not_run
+       * @enum {string}
+       */
+      status: 'not_run' | 'running' | 'unavailable' | 'insufficient_history' | 'failed' | 'success'
+      /** Reason */
+      reason?: string | null
+      /**
+       * Optimizer Version
+       * @default py-fsrs/6.3.3:pandawords-v1
+       */
+      optimizer_version: string
+      /** At */
+      at?: string | null
+      /**
+       * Eligible Reviews
+       * @default 0
+       */
+      eligible_reviews: number
+      /**
+       * Excluded Reviews
+       * @default 0
+       */
+      excluded_reviews: number
+      /** History Fingerprint */
+      history_fingerprint?: string | null
     }
     /** OverrideFields */
     'OverrideFields-Input': {
@@ -3668,6 +3716,46 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['DashboardRead']
+        }
+      }
+    }
+  }
+  read_api_srs_optimization_get: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['OptimizationRead']
+        }
+      }
+    }
+  }
+  request_api_srs_optimization_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['OptimizationRead']
         }
       }
     }
