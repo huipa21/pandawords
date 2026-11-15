@@ -83,6 +83,12 @@ equivalent redaction. Tests use synthetic secrets only.
 
 ## Security core (1.5.2)
 
+If JWT configuration is unavailable, the admission limiter logs the fixed
+`rate_limit_token_identity_unavailable` event and charges requests to the anonymous
+budget. It does not interpret bearer identities or bypass endpoint authentication;
+private routes and readiness retain their existing auth-configuration failures.
+Public diagnostic endpoints can still run and report their own failures.
+
 - `services.auth.login(db, settings, username, password)` and
   `refresh(db, settings, token)` return internal `AuthTokens` (user, access token, refresh token).
   `logout(db, token)` revokes that refresh family and is idempotent for a well-formed token.

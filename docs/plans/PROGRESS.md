@@ -11,40 +11,26 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 
 ### Phase 7 run
 
-Request: implement Phase 7 with dependency-driven parallel agents (maximum five), verify and
-commit all Phase 7 work, merge task branches to main, then remove those branches and worktrees.
-Coordinator baseline: clean main at `be9f23b`; context resume returned no prior journal.
-External dependencies 1.4.3, 1.5.4, 1.6.4, 3.3.2, 4.4.2 and 3.1.2 are all ✅.
-Launch 7.1.1, 7.1.3, 7.1.4 and 7.1.5 independently; launch 7.1.2 only after
-7.1.1 is merged and verified. Serialize integration, generated API/schema files and checks.
-Do not stop/reset shared services or modify unrelated Phase 6 worktrees. Reserve migrations
-0024 for FSRS optimization, 0025 for measured performance (only if justified), 0026 for
-offline leases (only if needed); 0022/0023 remain reserved for Phase 6.
-Agents must not edit PLAN/PROGRESS or merge. Shared topic-doc changes are integrated serially.
+Status: **complete**. All five Phase 7 tasks are ✅, committed and merged into main;
+all Phase 7 branches and worktree folders are removed. Phase 6 worktrees are unchanged.
+External dependencies 1.4.3, 1.5.4, 1.6.4, 3.3.2, 4.4.2 and 3.1.2 were ✅.
+7.1.2 started only after verified 7.1.1 integration.
 
-| Task | Branch | Worktree | State / next step |
-|---|---|---|---|
-| 7.1.1 | merged | removed | ✅ merged at b5d79d1; worktree and branch removed |
-| 7.1.2 | merged | removed | ✅ prepared offline prompts, durable queue and receipt-driven sync |
-| 7.1.3 | merged | removed | ✅ rate limits, deployed CSP and isolation verified |
-| 7.1.4 | merged | removed | ✅ measured batching and enforced bundle budgets |
-| 7.1.5 | merged | removed | ✅ bounded per-user optimization; optional optimizer verified |
+Latest resume followed the user's sequential/no-background-agent instruction: preserved WIP
+in the existing four worktrees before editing, finished each directly, checked/tested/merged,
+and removed it. One synchronous 7.1.2 agent was interrupted by model DNS failure; its partial
+work was checkpointed and completed directly. No background agent was launched in this resume.
+Migrations: 0024 optimizer and 0026 offline guard/flag; 0025 unused (no justified index).
+0022/0023 remain reserved for Phase 6.
 
-Verification: baseline `dev.ps1 check` passed; bounded full frontend baseline passed 218/218
-(34 files). Full isolated backend baseline passed 1124/1124 with one existing Starlette
-deprecation warning against the existing healthy 8101 server.
-Agents run focused suites; the coordinator owns integrated full suites to avoid redundant load.
-The existing API/frontend stack is stopped; no unrelated process was stopped or replaced.
-Production nginx 1.30 and Podman are available for isolated deployed-response acceptance.
-Blockers: none for the first wave.
-Skipped/deferred: 7.1.2 intentionally waits for its prerequisite; unrelated Phase 6 is out of scope.
-
-Resume 2026-11-15: the four initial agents were interrupted by model network/DNS timeouts
-(7.1.4 was cancelled); all four task worktrees contain uncommitted changes and no task commits.
-Main is clean at `72c948c`, and 8101 is healthy. Review, finish and verify those exact
-worktrees rather than replacing them; do not treat their previous partial work as complete.
-7.1.2 remains blocked until 7.1.1 is committed, merged and verified. Follow-up: reassign the
-surviving changes for focused completion, then serialize merges and update task statuses.
+Final main verification: backend **1196 passed** (one existing Starlette warning), frontend
+**253 passed / 39 files**, production PWA/offline Chromium **13 passed**. Actual nginx
+container/browser acceptance passed both locales, protected media, CSP/security headers and
+three forwarding-spoofing probes. `dev.ps1 check`, generated API reproducibility, release
+focused tests and production transfer-budget build passed. Initial JS 183,864 bytes;
+PWA install separately precaches 83 files / 1,123,235 modeled transfer bytes.
+Owned helpers/scratch were removed; no shared service was reset/stopped.
+Blockers/follow-ups: none for Phase 7. No push, deployment or new image release was requested.
 
 Request: implement Phases 4 and 5 with dependency-driven parallel agents (global maximum five), merge all
 task branches to main, commit all task files and remove task branches/worktree folders.
@@ -118,6 +104,36 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-15 — Phase 7 final integration and cleanup
+- Result / completed: all five tasks committed/merged; all task branches and folders removed.
+  Final integration fixes preserve public diagnostic behavior with unconfigured JWT identity,
+  distinguish Compose-only environment keys, restore media-test settings and isolate offline
+  API fixtures from the shared dictionary materialization database.
+- Dependencies: all external prerequisites checked ✅; 7.1.2 waited for merged/verified 7.1.1.
+- Verification: full backend **1196/1196 passed**; existing Starlette/httpx deprecation warning.
+  Full frontend **253/253 passed in 39 files** with two workers. Production build and every
+  transfer budget passed (initial JS **183,864**, CSS **4,593**, static JS **654,214** bytes;
+  separate PWA precache **83 files / 1,123,235 modeled bytes**). Main PWA/offline Chromium
+  **13/13 passed**. Actual production nginx/browser/proxy test passed English/Chinese flows,
+  CSP/header/cache/error/protected-media assertions and three spoofing probes. Final
+  `dev.ps1 check`, `gen-api` (no contract drift) and release focused tests passed.
+- Failures / causes / corrections: initial integrated backend run had four failures: new
+  Compose-only variables were treated as backend fields; security media test inherited another
+  test's production setting; new offline fixtures polluted shared dictionary selections; limiter
+  decoding rejected a public diagnostic before its endpoint when JWT config was unavailable.
+  Root causes fixed and full backend rerun passed. Logging moved to request time to preserve
+  configured JSON rendering. Final fixture type correction passed check and five offline cases.
+  A check raced generated pytest scratch; cleaned it after tests and final check passed.
+- Skipped / deferred: native OS install simulated by existing PWA tests; no cold offline
+  authentication, offline media or manual offline rating (explicit policies documented).
+  Existing dev-stack E2E command not run: production proxy/browser and isolated real-API
+  acceptance were used without taking over shared ports/services. No release image build,
+  transfer or push requested. Phase 6 work is explicitly outside this run.
+- Cleanup: all Phase 7 worktrees/branches gone; only main and original Phase 6 6.1.1/6.1.5
+  worktrees remain. Removed owned pytest output and session smoke helpers. Shared 8101
+  service left running; isolated test databases and proxy-test containers cleaned up.
+- Blockers / follow-ups: none for Phase 7.
 
 ### 2026-11-15 — 7.1.2 Bounded offline review
 - Result / completed: `94d2d82` plus preserved WIP committed and merged. Twenty-active-attempt

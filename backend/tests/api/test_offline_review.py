@@ -4,8 +4,10 @@ from datetime import datetime
 import pytest
 from httpx import AsyncClient
 from surrealdb import AsyncSurrealConnection
+from surrealdb.connections.async_ws import AsyncWsSurrealConnection
 
 from app.db import exercise_test_support as probe
+from app.db.migrate import run_migrations
 from app.domain.add_to_project import AddToProjectCreate
 from app.domain.dictionary_keys import sense_key
 from app.domain.projects import ProjectCreate
@@ -18,9 +20,14 @@ from tests.api.test_exercise_attempts import assert_no_key
 from tests.conftest import UserFactory
 from tests.exercise_support import Clock, FakeGenerator, plugins
 
-pytestmark = pytest.mark.integration
+pytestmark = [pytest.mark.integration, pytest.mark.fresh_db]
 URL = "/api/exercise-attempts"
 SENSES = ("run-move", "run-flow", "run-operate")
+
+
+@pytest.fixture(autouse=True)
+async def offline_database(db: AsyncWsSurrealConnection) -> None:
+    await run_migrations(db)
 
 
 @pytest.fixture

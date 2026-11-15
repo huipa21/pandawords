@@ -12,7 +12,7 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 
 from app.core.config import Settings
 from app.core.errors import AppError, app_error_handler, retry_headers
-from app.core.security import decode_access_token
+from app.core.security import decode_access_token, validate_auth_settings
 
 
 @dataclass
@@ -101,6 +101,12 @@ class RateLimitMiddleware:
         self.settings = settings
         self.limits = limits
         self.proxies = [ip_network(value) for value in settings.trusted_proxy_cidrs]
+        try:
+            validate_auth_settings(settings)
+        except ValueError:
+            self.auth_configured = False
+        else:
+            self.auth_configured = True
 
     def _trusted_peer(self, request: Request) -> bool:
         peer = _canonical_ip(request.client.host) if request.client else None
@@ -146,7 +152,13 @@ class RateLimitMiddleware:
             identity = "ip:" + address
             limit = self.settings.rate_limit_anonymous
             authorization = request.headers.get("authorization", "").split()
-            if len(authorization) == 2 and authorization[0].lower() == "bearer":
+            if authorization and not self.auth_configured:
+                structlog.get_logger().warning("rate_limit_token_identity_unavailable")
+            if (
+                self.auth_configured
+                and len(authorization) == 2
+                and authorization[0].lower() == "bearer"
+            ):
                 try:
                     claims = decode_access_token(authorization[1], self.settings)
                 except AppError:

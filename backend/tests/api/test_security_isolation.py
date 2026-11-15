@@ -30,9 +30,11 @@ async def test_private_records_and_nested_routes_hide_foreign_existence(
     lexicon_reader: LexiconReader,
     test_settings: Settings,
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     app.dependency_overrides[get_lexicon_reader] = lambda: lexicon_reader
-    test_settings.media_dir = tmp_path
+    monkeypatch.setattr(test_settings, "media_dir", tmp_path)
+    monkeypatch.setattr(test_settings, "app_env", "development")
     alice, bob = await make_user(), await make_user(role="admin")
     ah, bh = bearer(await login(client, alice.username)), bearer(await login(client, bob.username))
     project = (await client.post("/api/projects", headers=ah, json={"name": "Private"})).json()

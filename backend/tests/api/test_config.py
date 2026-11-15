@@ -42,7 +42,10 @@ def test_settings_cover_env_example_keys() -> None:
     }
     configured_keys = {name.upper() for name in Settings.model_fields}
 
-    assert env_keys <= configured_keys
+    compose_keys = {"PANDAWORDS_INTERNAL_SUBNET", "PANDAWORDS_WEB_INTERNAL_IP"}
+    compose = (project_root / "deploy" / "compose.yml").read_text(encoding="utf-8")
+    assert all(f"${{{name}" in compose for name in compose_keys)
+    assert env_keys <= configured_keys | compose_keys
 
 
 def test_settings_resolve_the_main_worktree_env_file() -> None:
