@@ -1,5 +1,19 @@
 # Deployment
 
+## Frontend transfer budget (7.1.4)
+
+Node 24/Vite 8 production manifest measurements, including the PWA install script,
+use nginx gzip level 1. Before/after initial JS: 183,977 -> 181,846 bytes; CSS:
+4,715 -> 4,593. Lazy layouts and project graph splitting reduce project-tree JS
+501,680 -> 246,342 bytes. Project graph remains 505,881, all words 469,769 and
+login 210,451 after the change (before: 501,680 / 466,293 / 209,650).
+Total static JS increases slightly (642,452 -> 647,424 bytes) because of splitting.
+First PWA install precaches 78 files / 2,331,222 raw bytes / 1,116,445 modeled
+transfer bytes (before: 69 / 2,326,525 / 1,111,148), plus 5,131 worker transfer
+bytes. This background traffic is separate from foreground initial JS; it is not
+a first-install bandwidth saving. Actual wire bytes also include HTTP overhead.
+The build enforces explicit budgets documented in [testing.md](testing.md).
+
 ## Image request limits
 
 Nginx permits **11 MiB** request bodies (`client_max_body_size 11m`), leaving 1 MiB

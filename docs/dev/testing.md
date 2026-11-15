@@ -1,5 +1,27 @@
 # Testing
 
+## Measured graph and bundle budgets (7.1.4)
+
+Run `tests/integration/test_graph_performance.py` with `-s` against the isolated
+SurrealDB 3.3.5 test server (Python 3.14.3). It alternates 40 baseline/optimized
+runs per workload, checks exact authorized results and deterministic ordering for
+both directions, depth zero and relation/node filters, and records EXPLAIN plans.
+Fixtures contain 30 nodes/42 edges and the maximum 300 nodes/449 edges, plus
+foreign nodes/edges and unrelated/dense foreign tags. On the local Windows/Podman
+run, median/p95 milliseconds were 121.27/165.20 -> 53.36/70.84 (30 nodes)
+and 455.40/545.82 -> 179.76/239.30 (300 nodes). Queries fell from 54 to 22.
+These are local measurements, not server latency guarantees. The test enforces
+at most 22 queries and a deliberately loose 2-second p95 ceiling.
+
+`pnpm run build` emits the Vite manifest and runs `bundle-budget.ts`; it reports
+all initial, route and individual chunk transfer bytes and separately the PWA
+install precache. Compression models production nginx gzip level 1/minimum 1024
+bytes. Bounds: initial JS 183,500 bytes, initial CSS 4,800, per-JS chunk 225,000,
+all static JS 665,000, project tree 255,000, project graph 525,000, all words
+485,000, login 215,000 and PWA precache 1,160,000. Missing budgeted routes fail.
+Focused frontend regressions cover graph lazy-load failure/retry and analyzer
+dependency accounting; run the existing graph/router/project suites as well.
+
 ## Personal semantic relations (4.4.3)
 
 Using the existing test DB on 8101:

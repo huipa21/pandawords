@@ -1,5 +1,16 @@
 # Data model (SurrealDB 3.3)
 
+## Graph query batching (7.1.4)
+
+Breadth-first graph expansion batches the nine allowed relation tables into one
+bounded query per frontier rather than one query per relation. Relation filters,
+independent edge and endpoint owners and the authorized-node set are still checked.
+The single-relation path retains `FROM type::table($relation)` so its plan does
+not scan unrelated tables. Overflow still raises explicitly; it never truncates.
+EXPLAIN showed the same table scans behind the combined multi-table plan; no new
+index or schema migration was justified. Reproducible measurements and bounds
+are in [testing.md](../dev/testing.md#measured-graph-and-bundle-budgets-714). (SurrealDB 3.3)
+
 ## Personal semantic relations (4.4.3)
 
 The existing `relates_to` schema supports synonym, antonym, hypernym, hyponym,
