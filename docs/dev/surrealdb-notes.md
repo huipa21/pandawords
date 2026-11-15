@@ -848,6 +848,26 @@ The regression aid keeps the export in memory. It does not create backup files o
 CLI behavior. Task 1.6.4 can use this verified SDK HTTP path; backup file rotation and
 disaster-recovery procedures remain that task's responsibility.
 
+#### ✅ Site backup export/import to files (6.1.5)
+
+These results were verified on 3.3.5 against the 8101 test DB through the SDK 3.0 HTTP path, and
+are exercised by `tests/integration/test_site_backup.py`:
+
+- `await db.export_to(path)` streams the export to a file. The file begins with `--` comment
+  lines, then `OPTION IMPORT;`. The backup checks that this header is present.
+- `await db.import_(Path(...))` imports from a file. Without `OPTION IMPORT;` the import fails
+  with `HttpStatusError` 400. When one statement fails, it raises `ImportFailedError`, but the
+  other statements are still applied. Because of this, the restore always checks the table row
+  counts against the manifest afterwards.
+- `db.version()` returns `surrealdb-3.3.5`. On an empty database, `INFO FOR DB` returns 12
+  keys, all empty. Emptiness is checked with that result.
+- `SELECT count() AS n FROM $table GROUP ALL` works with `$table` bound as `Table(name)`.
+- If a database was removed with `REMOVE DATABASE`, importing into it fails with "database does
+  not exist", even after `use()`. Run `DEFINE DATABASE IF NOT EXISTS $database` (bound) on the
+  namespace before importing.
+- The 2s request connection timeout is too short for large exports. The backup therefore uses
+  a dedicated connection with `SITE_BACKUP_TIMEOUT_SECONDS`.
+
 ### Full-text and prefix search (N22)
 
 ```surql

@@ -1307,6 +1307,99 @@
         }
       }
     },
+    "/api/admin/backups": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "List Backups",
+        "operationId": "list_backups_api_admin_backups_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteBackupStatus"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Create Backup",
+        "operationId": "create_backup_api_admin_backups_post",
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteBackupStatus"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/admin/backups/{name}": {
+      "get": {
+        "tags": [
+          "admin"
+        ],
+        "summary": "Download Backup",
+        "operationId": "download_backup_api_admin_backups__name__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Name"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/gzip": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/projects": {
       "post": {
         "tags": [
@@ -8804,6 +8897,68 @@
           "span"
         ],
         "title": "SentencePart"
+      },
+      "SiteBackupRead": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "size": {
+            "type": "integer",
+            "title": "Size"
+          },
+          "sha256": {
+            "type": "string",
+            "title": "Sha256"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "created_at",
+          "size",
+          "sha256"
+        ],
+        "title": "SiteBackupRead"
+      },
+      "SiteBackupStatus": {
+        "properties": {
+          "running": {
+            "type": "boolean",
+            "title": "Running"
+          },
+          "last_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Error"
+          },
+          "backups": {
+            "items": {
+              "$ref": "#/components/schemas/SiteBackupRead"
+            },
+            "type": "array",
+            "title": "Backups"
+          }
+        },
+        "type": "object",
+        "required": [
+          "running",
+          "last_error",
+          "backups"
+        ],
+        "title": "SiteBackupStatus"
       },
       "SrsPreferences": {
         "properties": {

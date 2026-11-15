@@ -1,5 +1,27 @@
 # Testing
 
+## Site backup and restore (6.1.5)
+
+Backend selectors:
+- `tests/unit/test_site_backup_archive.py`: manifest/path/limit/checksum validation, exclusions,
+  the schedule and CLI stdin `check`.
+- `tests/integration/test_site_backup.py`: creates disposable databases on 8101 with generated
+  names and uses tmp media and backup directories. It covers:
+  - restore round-trip into a fresh isolated database plus media;
+  - absence of the lexicon and secrets;
+  - permissions (POSIX only);
+  - refusal of a non-empty target, and `--replace`;
+  - a failed database stage leaving media untouched;
+  - scheduled runs with retention;
+  - a failed backup keeping the previous one;
+  - the concurrent lock and a stale lock.
+- `tests/api/test_admin_backup.py`: 401/403 for non-admins on create/list/download, admin
+  create/409/list/download sha256, 404 for unknown or unsafe names, and that there is no restore
+  route.
+
+Combined with `tests/unit/test_backup.py` and `tests/api/test_config.py`, 50 cases pass. The
+`deploy/restore.sh` control flow (stage failures, nonzero exit) was smoke-tested with a stub
+`COMPOSE` command under Git Bash. It has not been run against real Docker.
 ## Offline leases and synchronization (7.1.2)
 
 Backend selectors: `tests/api/test_offline_review.py`,

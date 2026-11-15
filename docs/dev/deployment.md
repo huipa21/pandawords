@@ -74,7 +74,7 @@ Podman, transferred manually, and loaded with Docker on the server (Korea, 2 vCP
 | File | Contents |
 |---|---|
 | `dist/pandawords-x.y.z-images.tar.gz` | `pandawords-api:x.y.z` and `pandawords-web:x.y.z` (`podman build --platform linux/amd64`, `podman save --format docker-archive --multi-image-archive`, gzip) |
-| `dist/pandawords-x.y.z-deploy.tar.gz` | `compose.yml`, `.env.example`, `Caddyfile.snippet`, `VERSION` (`restore.sh` deferred to 6.1.5) |
+| `dist/pandawords-x.y.z-deploy.tar.gz` | `compose.yml`, `.env.example`, `Caddyfile.snippet`, `VERSION`, `restore.sh` |
 | `dist/SHA256SUMS` | SHA-256 checksums of the two release archives, with relative filenames |
 | `dist/pandawords-lexicon-<date>.tar.gz` | `lexicon.sqlite`, `manifest.json`, `SHA256SUMS` (`dev.ps1 lexicon`, only when the lexicon changes) |
 | `dist/pandawords-lexicon-<date>.tar.gz.sha256` | SHA-256 of that lexicon archive; independent of application-release `SHA256SUMS` |
@@ -167,8 +167,9 @@ assets remain immutable, the shell is `no-cache`, and protected media is `privat
 The 429 contract and single-process limitation are in [auth.md](../architecture/auth.md).
 
 The database-only pre-migration export does **not** include media and is not a full-site backup.
-The Phase 6 project/user/site import/export, scheduled backup and restore features are not present
-in this branch; see [import-export.md](../architecture/import-export.md#availability-and-security-scope).
+Whole-site backups and restore are described in [Site backups and restore](#site-backups-and-restore-615).
+Project and user import/export are not present in this branch; see
+[import-export.md](../architecture/import-export.md#availability-and-security-scope).
 
 ### Verified release round trip (task 1.6.5)
 
@@ -331,7 +332,43 @@ bind mount. Do not run `down -v` on production. Exports contain the selected dat
 (schema, users, records, edges), not root/namespace credentials or media/lexicon files.
 Protect and separately copy those assets and the `.env` file. Keep backup volumes
 private, copy exports off-host, and prune only after a newer restore-tested backup
-exists. Automatic retention and `restore.sh` are not implemented yet (task 6.1.5).
+exists. Pre-migration exports are not pruned automatically.
+
+### Site backups and restore (6.1.5)
+
+The `backup` service (same API image, UID 10001, `python -m app.backup`) writes a daily
+`pandawords.site` archive at `SITE_BACKUP_TIME` (UTC) to the `site-backups` volume
+(`/data/site-backups`, 0700; archives 0600). It keeps the newest `SITE_BACKUP_RETAIN`
+complete archives and never prunes after a failed run. Admins can also start, list and
+download archives from `/api/admin/backups`; the API mounts the same volume. The format,
+the exclusions (lexicon, `.env`, keys, secrets) and the lock are described in
+[import-export.md](../architecture/import-export.md#admin-site-backup-format-pandawordssite).
+Settings (see `.env.example`): `SITE_BACKUP_DIR`, `SITE_BACKUP_RETAIN`,
+`SITE_BACKUP_TIME`, `SITE_BACKUP_TIMEOUT_SECONDS`, `SITE_BACKUP_LOCK_STALE_SECONDS`,
+`SITE_BACKUP_MAX_ENTRIES` and `SITE_BACKUP_MAX_BYTES`.
+
+Copy archives off-host regularly. The archive and its `.sha256` sidecar belong together:
+
+```bash
+docker compose run --rm -T --no-deps backup python -m app.backup once   # optional extra backup
+docker compose cp backup:/data/site-backups ./site-backups-copy          # or the admin download
+```
+
+Restore from the deployment directory. `restore.sh` is shipped in the deploy bundle; run it
+with bash, because the executable bit may not survive the transfer:
+
+```bash
+bash restore.sh /path/to/site-<stamp>Z.tar.gz
+```
+
+It verifies the sidecar sha256 (if present) and then the full archive (**preflight**). It stops
+`web`/`api`/`worker`/`backup` (**stop**). It saves the current database as
+`pre-restore-<stamp>.surql`, recreates the database empty, imports and verifies it, then swaps
+and verifies media (**restore**). Finally it starts all services and waits for `/readyz`
+(**restart**). On any failure it prints `RESTORE FAILED at stage '<stage>'` with the next step
+and exits nonzero. After a failed restore stage, services stay stopped; fix the cause and rerun
+with the same archive. Set `COMPOSE="podman compose"` to use Podman. The lexicon is not
+restored; transfer the matching `lexicon_version` separately.
 
 ### Optional FSRS optimizer image (7.1.5)
 
@@ -408,10 +445,11 @@ docker compose up -d                   # migrate makes a pre-migration backup, t
 Migrations only move forward. If a release has to be reverted after migrating:
 
 1. `docker compose down`.
-2. Decompress the selected `pre-migrate-<UTC>-<unique>.surql.gz` from the backups
-   volume and restore with SDK `await db.import_(sql)` into a separate empty database,
-   retaining `OPTION IMPORT;` (N21). Restore media separately. Automated `restore.sh`
-   remains task 6.1.5; do not assume these exports are tar archives.
+2. Either restore a whole-site archive taken before the upgrade with
+   `bash restore.sh <archive>` (database and media), or decompress the selected
+   `pre-migrate-<UTC>-<unique>.surql.gz` from the backups volume and restore it with SDK
+   `await db.import_(sql)` into a separate empty database, retaining `OPTION IMPORT;` (N21).
+   Pre-migration exports are database-only, not tar archives; restore media separately.
 3. Set the previous `APP_VERSION` and run `docker compose up -d`.
 
 ## Resource limits (compose)
@@ -422,6 +460,7 @@ Migrations only move forward. If a release has to be reverted after migrating:
 | api | 768 MB |
 | migrate | 768 MB (one-shot, completes before API starts) |
 | worker | 768 MB (spaCy sm + edge-tts) |
+| backup | 768 MB (daily site archive) |
 | web | 64 MB |
 
 Uvicorn runs with 1 worker. The total leaves headroom for Caddy and the OS.
