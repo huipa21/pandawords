@@ -666,6 +666,7 @@
       "unsafe_entry": "The archive contains unsafe entries and was rejected.",
       "invalid_media": "A media file in the archive is invalid.",
       "apply_failed": "The import could not be saved. Nothing was changed; please retry.",
+      "rejected": "The archive was rejected and nothing was imported. Check the details below.",
       "export_too_large": "Your data exceeds the backup size limits. Please contact an administrator."
     }
   },

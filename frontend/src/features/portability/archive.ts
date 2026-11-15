@@ -84,6 +84,9 @@ export function useTransferErrors() {
     const keys = [
       `portability.errors.${reason}`,
       `errors.${normalized.code.replaceAll('.', '_')}`,
+      ...(normalized.code.startsWith('bundle.')
+        ? ['portability.errors.rejected']
+        : []),
     ]
     const key = keys.find(candidate => te(candidate)) ?? 'errors.generic'
     const stage = normalized.stage && te(`portability.stages.${normalized.stage}`)
