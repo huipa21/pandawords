@@ -31,12 +31,20 @@ Agents must not edit PLAN/PROGRESS or merge. Shared topic-doc changes are integr
 | 7.1.5 | task/7.1.5-fsrs-optimization | ../pandawords.worktrees/7.1.5 | Agent running: bounded per-user optimization |
 
 Verification: baseline `dev.ps1 check` passed; bounded full frontend baseline passed 218/218
-(34 files). Full isolated backend baseline is running against the existing healthy 8101 server.
+(34 files). Full isolated backend baseline passed 1124/1124 with one existing Starlette
+deprecation warning against the existing healthy 8101 server.
 Agents run focused suites; the coordinator owns integrated full suites to avoid redundant load.
 The existing API/frontend stack is stopped; no unrelated process was stopped or replaced.
 Production nginx 1.30 and Podman are available for isolated deployed-response acceptance.
 Blockers: none for the first wave.
 Skipped/deferred: 7.1.2 intentionally waits for its prerequisite; unrelated Phase 6 is out of scope.
+
+Resume 2026-11-15: the four initial agents were interrupted by model network/DNS timeouts
+(7.1.4 was cancelled); all four task worktrees contain uncommitted changes and no task commits.
+Main is clean at `72c948c`, and 8101 is healthy. Review, finish and verify those exact
+worktrees rather than replacing them; do not treat their previous partial work as complete.
+7.1.2 remains blocked until 7.1.1 is committed, merged and verified. Follow-up: reassign the
+surviving changes for focused completion, then serialize merges and update task statuses.
 
 Request: implement Phases 4 and 5 with dependency-driven parallel agents (global maximum five), merge all
 task branches to main, commit all task files and remove task branches/worktree folders.
