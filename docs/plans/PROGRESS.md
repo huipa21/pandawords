@@ -25,7 +25,7 @@ Agents must not edit PLAN/PROGRESS or merge. Shared topic-doc changes are integr
 | Task | Branch | Worktree | State / next step |
 |---|---|---|---|
 | 7.1.1 | merged | removed | ✅ merged at b5d79d1; worktree and branch removed |
-| 7.1.2 | task/7.1.2-offline-review | ../pandawords.worktrees/7.1.2 | Ready: 7.1.1 merged and verified |
+| 7.1.2 | merged | removed | ✅ prepared offline prompts, durable queue and receipt-driven sync |
 | 7.1.3 | merged | removed | ✅ rate limits, deployed CSP and isolation verified |
 | 7.1.4 | merged | removed | ✅ measured batching and enforced bundle budgets |
 | 7.1.5 | merged | removed | ✅ bounded per-user optimization; optional optimizer verified |
@@ -118,6 +118,33 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-15 — 7.1.2 Bounded offline review
+- Result / completed: `94d2d82` plus preserved WIP committed and merged. Twenty-active-attempt
+  cap enforced across concurrent requests, 24-hour explicit leases, owner-partitioned
+  IndexedDB, stable answer/give-up identity, persisted confirmation stage, receipt-only
+  progress, localized online/offline/syncing/failed/expired recovery and logout/account cleanup.
+- Dependencies: 7.1.1 merged/verified before branch creation; 3.3.2 ✅.
+- Verification: 40 focused real-DB cases passed (offline APIs, online attempts, SRS receipts,
+  fresh/upgrade/replay migration 0026 and schema snapshot). Eight offline IndexedDB regressions
+  passed; integrated study/auth/API/router selectors passed 91 cases, including transient auth
+  outage preservation. Production Chromium PWA/offline suite passed 13/13 in both locales.
+  Worktree/main `dev.ps1 check` passed; `gen-api` reproduced contracts; production build budget
+  passed. Initial JS 183,864 bytes, below original PWA baseline 183,977. Initial budget
+  explicitly revised 183,500 -> 184,000 bytes for bilingual offline/auth feedback; other
+  budgets unchanged. No check was bypassed to claim acceptance.
+- Failures / causes / corrections: one synchronous agent was interrupted by model DNS failure;
+  its partial work checkpointed, implementation completed directly (no background agents).
+  Fixed lease identity ordering, final-minute reuse and concurrent issuance; initial UI tests
+  used wrong existing button labels. Port 4179 was occupied, so browser checks used 4187 without
+  stopping its owner. Format/type and initial bundle failures corrected/rechecked.
+- Skipped / deferred: cold offline authentication is intentionally unsupported (no persisted
+  tokens); keep an authenticated tab open. Offline prompts exclude media/hints with an explicit
+  policy; existing online media remains unchanged. Sync uses server-suggested ratings, clearly
+  labelled before answering; ordinary online manual-rating UX is unchanged.
+- Findings: transient refresh outages must hide, not delete, unsynced data; explicit logout or
+  credential rejection purges it. Local discard does not extend/revoke an existing server lease.
+- Blockers / follow-ups: none for this task; final full-suite integration remains.
 
 ### 2026-11-15 — 7.1.5 Per-user FSRS optimization
 - Result / completed: checkpoint `4c512ec` completed and merged (`be69190` plus optional-import
