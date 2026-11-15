@@ -92,6 +92,8 @@ jobs. The pre-0018 migration probe inserts a historical user record without post
 fields. After these integration corrections, the three affected backend files passed **19 tests**.
 The browser selects the Naive UI accent radio with keyboard focus and Space, avoiding a direct
 click on its visually overlaid native input while exercising the accessible control.
+Authenticated delivery is checked against the server's current user, not equality with an older
+access token: normal route reloads can refresh credentials. Assertions never print bearer tokens.
 
 ## Phrase discovery and normal add flow (4.1.2)
 

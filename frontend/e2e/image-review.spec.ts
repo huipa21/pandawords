@@ -179,7 +179,14 @@ test('fixture image review authenticates blobs, persists preferences and confirm
     const delivery = page.waitForResponse(response => response.url().includes('/api/media/') && response.ok())
     await imageRegion.getByRole('button', { name: 'Retry', exact: true }).click()
     const delivered = await delivery
-    expect(delivered.request().headers().authorization).toBe(`Bearer ${auth.access_token}`)
+    const authorization = delivered.request().headers().authorization
+    if (!authorization?.startsWith('Bearer '))
+      throw new Error('Image delivery requires bearer authentication.')
+    const viewer = await page.request.get('/api/auth/me', {
+      headers: { Authorization: authorization },
+    })
+    expect(viewer.ok()).toBe(true)
+    expect((await viewer.json() as components['schemas']['UserRead']).id).toBe(learnerId)
     const image = imageRegion.getByRole('img', { name: 'Private vocabulary image', exact: true })
     await expect(image).toBeVisible()
     await expect.poll(() => image.evaluate(node => (node as HTMLImageElement).naturalWidth)).toBe(96)
