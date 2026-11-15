@@ -94,14 +94,27 @@ test('project export then import round-trips with progress enabled and disabled'
       await dialog.getByTestId('archive-input').setInputFiles(archivePath)
       await expect(dialog.getByTestId('archive-file')).toContainText(download.suggestedFilename())
       await dialog.getByTestId(progress ? 'progress-on' : 'progress-off').click()
-      const importing = page.waitForResponse(response =>
-        response.url().includes('/api/projects/import') && response.request().method() === 'POST',
-      )
+      // Chromium can evict the inspector copy of this response, so read it through the route.
+      let imported: ((value: { status: number, summary: components['schemas']['ImportSummary'], url: string }) => void) | undefined
+      const importing = new Promise<{ status: number, summary: components['schemas']['ImportSummary'], url: string }>((resolve) => {
+        imported = resolve
+      })
+      await page.route('**/api/projects/import**', async (route) => {
+        const upstream = await route.fetch()
+        const body = await upstream.body()
+        imported?.({
+          status: upstream.status(),
+          summary: JSON.parse(body.toString('utf8')) as components['schemas']['ImportSummary'],
+          url: route.request().url(),
+        })
+        await route.fulfill({ response: upstream, body })
+      })
       await dialog.getByTestId('archive-submit').click()
       const response = await importing
-      expect(new URL(response.url()).searchParams.get('include_progress')).toBe(String(progress))
-      expect(response.status(), 'Import must succeed.').toBe(201)
-      const summary = await response.json() as components['schemas']['ImportSummary']
+      await page.unroute('**/api/projects/import**')
+      expect(new URL(response.url).searchParams.get('include_progress')).toBe(String(progress))
+      expect(response.status, 'Import must succeed.').toBe(201)
+      const summary = response.summary
       projectIds.push(...summary.project_ids)
       expect(summary.progress_imported).toBe(progress)
       expect(summary.project_ids).toHaveLength(1)
