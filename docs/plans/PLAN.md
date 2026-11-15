@@ -109,7 +109,7 @@ are in `phase-N.md`. If a phase file doesn't exist yet, the agent asks before wr
 | 4.3.2 | Morphemes from etymology templates (+ LLM fallback), morph groups | 2.1.2, 4.3.1, 3.2.5 | 2 | M | ✅ |
 | 4.4.1 | Graph API: subgraph by focus/depth/filters, node cap | 2.3.4, 4.1.1, 4.2.1, 4.3.1 | 2 | M | ✅ |
 | 4.4.2 | GraphCanvas, legend, toolbar, all-words page, tree/graph toggle | 4.4.1, 2.6.4 | 3 | L | ✅ |
-| 4.4.3 | Relation editing (user `relates_to` create/delete) | 4.4.2 | 4 | S | 🟡 |
+| 4.4.3 | Relation editing (user `relates_to` create/delete) | 4.4.2 | 4 | S | ✅ |
 | 4.4.4 | Exercises use context: cloze from user sentences, tag/morph distractors | 4.2.2, 4.3.2, 3.2.3, 3.2.4 | 3 | M | ✅ |
 
 ## Phase 5 — Dual coding & mnemonics
@@ -118,7 +118,7 @@ are in `phase-N.md`. If a phase file doesn't exist yet, the agent asks before wr
 |---|---|---|---|---|---|
 | 5.1.1 | Image upload + Pixabay search/download, attach to sense | 2.5.1, 2.6.5 | 1 | M | ✅ |
 | 5.1.2 | Mnemonic notes UI + DeepSeek suggestions | 3.2.5, 2.6.5 | 1 | S | ✅ |
-| 5.1.3 | `image2word` exercise + media preferences in review | 5.1.1, 3.3.2 | 2 | M | 🟡 |
+| 5.1.3 | `image2word` exercise + media preferences in review | 5.1.1, 3.3.2 | 2 | M | ✅ |
 
 ## Phase 6 — Import/export & backups ([details](phase-6.md))
 

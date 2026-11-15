@@ -12,7 +12,8 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 Request: implement Phases 4 and 5 with dependency-driven parallel agents (global maximum five), merge all
 task branches to main, commit all task files and remove task branches/worktree folders.
 Interpretation: "phase-34md" means the supplied Phase 4 detail document; Phase 3 is complete.
-Status: implementing/integrating. Main was clean at `a1c8849`; all external Phase 1-3 dependencies are ✅.
+Status: complete. All 14 Phase 4/5 tasks are ✅, committed and merged into main; their branches and
+worktree folders are removed. Main was clean at `a1c8849`; all external Phase 1-3 dependencies are ✅.
 Start internal dependents only after prerequisites are merged and verified. Serialize integration,
 API contract regeneration and snapshot conflict resolution. No dependency junctions or symlinks
 between worktrees; never traverse reparse points during cleanup. Shared services/ports must not be
@@ -22,20 +23,22 @@ Baseline frontend: 161 passed, one pre-existing token-enforcement five-second ti
 default 24-worker load. Its bounded rerun (`--maxWorkers=2 --testTimeout=60000`) passed 12/12;
 the complete bounded frontend baseline then passed 162/162. No unrelated timeout/configuration
 changes made. Main started the owned offline dev stack for syntax/browser verification
-(LLM budget zero, placeholder key, audio networking disabled); 8100/8000/5173 are ready.
+(LLM budget zero, placeholder key, audio networking disabled). Final browser acceptance passed;
+the owned stack is now stopped. The pre-existing shared test DB on 8101 remains healthy and untouched.
 Coordination update: the user subsequently authorized Phase 5 implementation in the other session,
 which handed off sole coordination here. The supplied `phase-5.md` is now explicitly in scope.
 All external Phase 5 dependencies are ✅; 5.1.3 waits for 5.1.1 integration/verification.
 Partition lemma-detail additions into separate components; preserve every locale/API contribution.
 Migration allocations: 0018 tag hierarchy (already committed before the initial reservation);
-0019 image storage/search retry metadata; 0020 reserved for review media preferences;
+0019 image storage/search retry metadata; 0020 review media preferences;
 0021 allocated for morphology provenance/indexes after the agent identified missing schema fields.
-The images agent was notified before integration. Other additions require coordinator allocation.
+The images agent was notified before integration. All four migrations and the combined schema
+snapshot are committed; no additional Phase 4/5 migration was needed.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 4.4.3 | task/4.4.3-relations | ../pandawords.worktrees/4.4.3 | Agent running; prerequisite 4.4.2 verified |
-| 5.1.3 | task/5.1.3-image-review | ../pandawords.worktrees/5.1.3 | Merged c13322c; focused verification passed, browser pending |
+
+No Phase 4/5 task worktrees remain. Unrelated Phase 6 worktrees and branches are preserved below.
 
 ### Phase 6 run (separate coordinator)
 
@@ -78,6 +81,64 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-15 — Final Phase 4/5 integration and cleanup
+- Result / completed: all 11 Phase 4 and three Phase 5 tasks are committed and merged into main.
+  Final closeout follow-ups through `06dfb6e` merged as `c284758`; no task files remain unstaged.
+- Dependencies: every requested task's prerequisites verified before launch; independent tasks ran
+  in separate worktrees, with dependency-ready scheduling and at most five concurrent tasks.
+- Verification: final `dev.ps1 check` passed. `gen-api` reproduced committed OpenAPI/types unchanged.
+  Complete backend suite: **1124 passed**, including schema snapshot comparison, with the existing
+  Starlette/httpx deprecation warning. Complete bounded frontend suite: **218 passed in 34 files**
+  (`--maxWorkers=2 --testTimeout=60000`); production build passed with the existing large-chunk warning.
+  Final `dev.ps1 test -E2E` passed all **five** real-stack Chromium flows with providers disabled:
+  private reading/graph, first login, image review, project/word and review confirmation.
+  Exact-10-MiB deployed nginx/image acceptance was independently verified earlier in this run.
+- Failures / causes / corrections: shared-queue fixture interference, historical migration fixture
+  mismatch, image-only effective-gloss reset and jsdom Canvas2D boundaries were corrected and the
+  full suites passed. Actual image browser execution identified an overlaid Naive UI native radio
+  input and an obsolete pre-refresh token comparison; keyboard selection and a server-verified
+  current-user assertion fixed the test without changing valid production behavior or printing tokens.
+  Cleanup correctly refused an advanced closeout branch; its additional commits were merged before
+  removal. No work was discarded.
+- Skipped / deferred: none of the requested deliverables or acceptance checks. Final frontend tests
+  used two workers rather than repeating the known overloaded default-worker baseline timeout.
+  No push/deployment was requested or performed. Phase 6 implementation belongs to its separate run.
+- Cleanup: all Phase 4/5 worktrees and task branches removed, folder absence checked. Only main and
+  the unrelated `6.1.1`/`6.1.5` worktrees/branches remain. Owned offline stack stopped; existing
+  shared 8101 test DB health remains 200. No unrelated files or resources were removed.
+- Blockers / follow-ups: none for Phases 4/5; main is ready for the Phase 6 coordinator.
+
+### 2026-11-15 — 4.4.3 Personal sense relation editing
+- Result / completed: `3170cf4` merged as `5f79d98`; authenticated create/list/delete, fixed user
+  provenance, visible sense endpoints and owner-specific deterministic relation identities.
+  Detail and graph views expose localized create/remove/retry actions and refresh bounded graphs.
+- Dependencies: 4.4.2 checked ✅.
+- Verification: worktree check, 34 relation/graph API cases and 16 detail/graph UI cases passed.
+  All seven relation types, invalid/self edges, duplicate/concurrent retries, independent owners,
+  hidden/foreign endpoints and immutable shared/foreign identity collisions are covered.
+  API types regenerated; integrated check and full suites passed (see final entry).
+- Failures / causes / corrections: agent transport failed after persisting implementation; the
+  coordinator recovered the existing work, inspected it and ran verification before committing.
+  No duplicate implementation or speculative schema change was introduced.
+- Skipped / deferred: none; existing 0005 schema suffices, so no migration/snapshot change applies.
+- Blockers / follow-ups: none; task branch and folder removed.
+
+### 2026-11-15 — 5.1.3 Image recall and review media preferences
+- Result / completed: `c36812e` merged as `c13322c`; answer-free protected image recall,
+  persistent owner-scoped image/audio/accent preferences, migration 0020 and combined snapshot.
+  Issued attempts remain valid after preference changes or image deletion.
+- Dependencies: 5.1.1 and 3.3.2 checked ✅.
+- Verification: integrated check, 29 focused backend and 51 frontend cases passed before final
+  integration; combined context/image selector then passed 29 cases. Actual image browser passed,
+  verifying authenticated decoded pixels, retry/unavailable states, persisted preferences,
+  Enter submission and one durable receipt/review count after a lost response and reload.
+  Final full suites and all five Chromium flows passed as recorded above.
+- Failures / causes / corrections: effective gloss merges require an explicit empty `zh` value
+  for deterministic image-only eligibility. Browser uses keyboard radio selection and validates
+  the bearer credential's current user rather than requiring an obsolete token value.
+- Skipped / deferred: none. Network providers disabled for deterministic offline acceptance.
+- Blockers / follow-ups: none; original and closeout task branches/folders removed.
 
 ### 2026-11-15 — Phase 6/7 task details
 - Result / completed: added [phase-6.md](phase-6.md) and [phase-7.md](phase-7.md) with task
