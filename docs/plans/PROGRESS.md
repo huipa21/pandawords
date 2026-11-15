@@ -14,19 +14,26 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 Request: avatar/initials header menu with Profile and Sign Out; language options without
 group headings; light/dark toggle only; persistent avatar, editable email/full name and
 fixed user ID, with password change available inside Profile.
-Status: **in progress**. Unnumbered refinement; existing authentication and shell are
+Status: **complete**. Unnumbered refinement; existing authentication and shell are
 available, no numbered prerequisites. One Mode B worktree `header-profile`; backend
 profile persistence and frontend integration have disjoint scopes.
-Implementation: complete in the feature worktree; migration 0028 adds profile fields,
+Implementation: committed as `02ef93b`, merged with browser-test correction `843a022`;
+migration 0028 adds profile fields,
 owner-scoped API, guarded `/profile`, embedded password change, plain dropdowns and
 moon/sun toggle. No new dependency or document. Existing password-change flow reused
 rather than introducing unauthenticated email recovery.
-Verification so far: backend focused **70 passed**, full bounded frontend **286 passed**,
-post-generation affected frontend **37 passed**, regenerated API and `dev.ps1 check`
-clean. Full backend suite is still running; merge, browser verification, dev migration
-and cleanup remain. Initial default-worker frontend run had two stale toggle assertions
-(fixed) and two existing five-second timeouts; bounded rerun passed. First integration
-type check identified four UserRead fixtures needing the new fields; fixed and rechecked.
+Verification: final merged `dev.ps1 check` clean; Chromium **5/5 passed**, including
+keyboard menus, both locales, responsive shell, theme, profile persistence, avatar and
+embedded password/sign-out. Backend focused **70 passed**, final merged profile/admin/schema
+**41 passed**; full bounded frontend **286 passed**, affected post-generation **37 passed**
+and final control regressions **8 passed**. Full backend attempt: **1302 passed**, two
+failures/two errors; profile-test pagination assumption fixed (**38 passed** rerun), and
+unrelated offline tests hit two-second DB timeouts (**5 passed** rerun).
+Migration 0028 applied to dev DB; live anonymous profile PATCH returns expected **401**.
+Owned API watcher had detected changes but hung waiting for its old worker; verified
+supervisor/parent ownership, stopped only that worker, and confirmed automatic reload.
+Temporary preview stopped; feature branch/worktree removed. No push or server deployment.
+Blockers/follow-ups: none. Detailed failures and corrections are recorded below.
 
 ### UI shell refresh (2026-11-15)
 
@@ -133,6 +140,51 @@ Status: Phase 6 complete (all six tasks ✅, merged to main); no Phase 6 worktre
 | 6.1.6 | `portability.errors.export_too_large` i18n key appears unused | small cleanup |
 
 ## Log
+
+### 2026-11-15 — Header account menu and persistent profile
+
+- Completed: avatar/initials account menu with Profile and Sign Out; plain English/简体中文
+  language dropdown retaining the existing icon; moon/sun light/dark toggle without system
+  mode. Added guarded Profile with avatar upload/removal, immutable ID/login username,
+  editable email/full name and embedded existing password change. Both locales, token
+  styling, keyboard menus, touch targets and field/global error feedback are covered.
+- Backend: owner-scoped profile PATCH, canonical bounded raster validation using existing
+  image tooling, compatible legacy defaults, immutable identity, admin projections and
+  forward-only migration `0028_user_profile.surql`; generated schema snapshot/API types.
+  SurrealDB 3.3.5 syntax/schema verified in isolated test databases. No new dependencies.
+- Dependencies: existing authentication/shell available; no numbered prerequisites.
+  Mode B worktree with one backend agent and direct frontend/integration work. Feature
+  commit `02ef93b`, browser assertion correction `843a022`, final merge `9a9e4da`.
+  PLAN unchanged because this is an unnumbered refinement.
+- Verification: full bounded frontend **286/286**; post-generation affected tests **37/37**;
+  final changed control tests **8/8**. Backend initial focused **70/70**; corrected
+  profile/admin **38/38**, merged profile/admin/migration/snapshot **41/41**.
+  Full backend attempt **1302 passed, 2 failed, 2 errors**: the new admin-list assertion
+  incorrectly assumed the owner appeared on page one after other tests created accounts;
+  fixed to paginate by exact ID. Offline cases had two-second SurrealDB transport timeouts;
+  their entire file passed **5/5** on rerun without unrelated changes. Full backend was
+  not rerun after these targeted corrections. Final merged `dev.ps1 check` passed.
+- Browser acceptance: **5/5 Chromium** (desktop both locales, mobile breakpoints/no overflow,
+  dark/light, keyboard menus, failed-save draft retention, saved profile/avatar after reload,
+  password change staying in Profile and Sign Out). Initial Windows path selector found
+  no tests; filename selector corrected it. Initial touch-target assertion sampled the
+  popover's scale transition; now polls for the actual final 44px bounding height.
+- Other corrections: initial default-worker frontend run failed two obsolete direct-toggle
+  assertions and two existing five-second timeouts; assertions updated, bounded suite passed.
+  Four generated UserRead fixture omissions were fixed after type-check feedback.
+  A native file control was replaced with a localized Naive UI chooser after visual review.
+- Runtime: migration applied to dev DB without reset. The existing owned API WatchFiles
+  reloader had detected changes but was stuck awaiting its old worker; verified supervisor
+  identity and parent chain, terminated only worker PID 26732 and verified automatic restart
+  via the new endpoint's expected anonymous **401**. DB, worker and Vite were not restarted.
+  Temporary preview's first port was occupied; used another loopback port and stopped the
+  owned helper. Shared services were not taken over.
+- Cleanup: git removed worktree metadata but its directory deletion returned permission
+  denied. Removed the exact remaining task directory using non-reparse traversal, confirmed
+  it is gone and deleted the merged branch. No scratch files or task helpers remain.
+- Deferred/out of scope: unauthenticated email recovery (existing authenticated password
+  change reused), pushing and server deployment (not requested). No new document/design
+  round. Blockers and follow-ups: none.
 
 ### 2026-11-15 — Screenshot-inspired UI shell refresh
 
