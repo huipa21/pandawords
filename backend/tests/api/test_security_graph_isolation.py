@@ -58,11 +58,13 @@ async def test_graph_dictionary_and_edges_check_each_owner_independently(
     absent_target = {"target_table": "tag", "target_id": rid("tag")}
 
     for method in ("PUT", "DELETE"):
-        kwargs = {"json": private_target} if method == "PUT" else {"params": private_target}
-        missing = {"json": absent_target} if method == "PUT" else {"params": absent_target}
         path = f"/api/tags/{bob_tag['id']}/members"
-        hidden = await client.request(method, path, headers=bh, **kwargs)
-        absent = await client.request(method, path, headers=bh, **missing)
+        if method == "PUT":
+            hidden = await client.put(path, headers=bh, json=private_target)
+            absent = await client.put(path, headers=bh, json=absent_target)
+        else:
+            hidden = await client.delete(path, headers=bh, params=private_target)
+            absent = await client.delete(path, headers=bh, params=absent_target)
         assert hidden.status_code == absent.status_code == 404
         assert hidden.json() == absent.json()
         await same_not_found(

@@ -87,6 +87,11 @@ command or retention policy changes.
 
 ### Security proxy and headers (7.1.3)
 
+Nginx access logs are disabled and its server error log is restricted to `crit`:
+ordinary request errors include full URLs (potentially private query text). Use
+sanitized API events and health probes for routine diagnosis; do not turn on request
+logging in production without a separately reviewed redaction strategy.
+
 Production serves the app **only behind the HTTPS Caddy site** in `Caddyfile.snippet`; do not
 publish nginx or the API directly. Choose a non-overlapping `PANDAWORDS_INTERNAL_SUBNET` and
 reserve its `PANDAWORDS_WEB_INTERNAL_IP` exclusively for web. Compose configures the API to trust

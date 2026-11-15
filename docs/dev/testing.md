@@ -1,5 +1,18 @@
 # Testing
 
+## Security boundaries (7.1.3)
+
+Run the unit rate-limit/logging and API `test_security_*` suites plus exercise-attempt
+and Pixabay integration regressions against the isolated 8101 fixture. They cover
+anonymous/per-user fixed-window boundaries, recovery, proxy spoofing, and independent
+owner checks on projects, graph records/edges, content, media, jobs and review attempts.
+Build the frontend, then run `.\scripts\test-security-proxy.ps1` with a locally
+available API image (`-ApiImage`): this uses actual production nginx responses,
+both locales, protected images, graph/reading flows, CSP enforcement, URL-log privacy,
+and direct/trusted-ingress spoofing probes. It cleans up only its own containers.
+Backup/import/export endpoints are not implemented yet (Phase 6); their isolation
+acceptance remains with those tasks rather than claiming coverage of nonexistent APIs.
+
 ## Personal semantic relations (4.4.3)
 
 Using the existing test DB on 8101:

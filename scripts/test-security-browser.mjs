@@ -152,7 +152,7 @@ try {
     assert.deepEqual(await delivery.body(), image)
 
     await page.goto(`/words/${added.lemma_id}`)
-    const displayed = page.locator(`[data-sense-id="${senseId}"] [data-testid="sense-images"] img`)
+    const displayed = page.locator(`[data-sense-id="${senseId}"] [data-testid="sense-images"] img`).last()
     await displayed.waitFor({ state: 'visible' })
     assert.match(await displayed.getAttribute('src'), /^blob:/)
     assert.equal(await displayed.evaluate(element => element.naturalWidth), 96)

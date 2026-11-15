@@ -223,9 +223,9 @@ async def test_only_trusted_proxy_can_set_https_redirect_scheme() -> None:
     config = settings(trusted_proxy_cidrs=["192.0.2.0/24"])
     limits = RateLimits(config)
     async for client in transport_client(config, limits):
-        assert (
-            await client.get("/api/scheme", headers={"X-Forwarded-Proto": "https"})
-        ).json() == {"scheme": "https"}
+        assert (await client.get("/api/scheme", headers={"X-Forwarded-Proto": "https"})).json() == {
+            "scheme": "https"
+        }
         for value in ("http,https", "javascript", ""):
             assert (
                 await client.get("/api/scheme", headers={"X-Forwarded-Proto": value})
@@ -237,6 +237,6 @@ async def test_only_trusted_proxy_can_set_https_redirect_scheme() -> None:
             )
         ).json() == {"scheme": "http"}
     async for client in transport_client(config, limits, peer="198.51.100.1"):
-        assert (
-            await client.get("/api/scheme", headers={"X-Forwarded-Proto": "https"})
-        ).json() == {"scheme": "http"}
+        assert (await client.get("/api/scheme", headers={"X-Forwarded-Proto": "https"})).json() == {
+            "scheme": "http"
+        }
