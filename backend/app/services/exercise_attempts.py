@@ -89,6 +89,7 @@ async def create_attempt(
     *,
     plugins: ExerciseRegistry = registry,
     ttl: timedelta = ATTEMPT_TTL,
+    offline_limit: int | None = None,
 ) -> AttemptRead:
     project, sense = _decode(data.project_id, "project"), _decode(data.sense_id, "sense")
 
@@ -123,9 +124,15 @@ async def create_attempt(
         issued_at=issued,
         expires_at=issued + ttl,
         skipped=selection.skipped,
+        offline=offline_limit is not None,
     )
 
     async def operation(txn: UUID) -> AttemptRead:
+        if offline_limit is not None:
+            prior = await repository.reserve_offline(db, attempt, _now(), offline_limit, txn)
+            if prior is not None:
+                await _active(db, prior, txn)
+                return public(prior)
         await _active(db, attempt, txn)
         await repository.write(db, attempt, txn, create=True)
         return public(attempt)

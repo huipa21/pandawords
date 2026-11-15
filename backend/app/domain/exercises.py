@@ -183,3 +183,4 @@ class Attempt(ExerciseModel):
     feedback: ExerciseFeedback | None = None
     review: GradedReview | None = None
     receipt: ReviewReceipt | None = None
+    offline: bool = False

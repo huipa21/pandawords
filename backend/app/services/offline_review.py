@@ -31,12 +31,11 @@ async def prefetch(
 ) -> OfflineBatchRead:
     """Return held offline attempts first, then issue new ones up to both bounds.
 
-    Held leases are returned unchanged (same id and expiry), so a re-prefetch after client
-    storage eviction never extends a lease. Online attempts always expire within
-    ``ATTEMPT_TTL``, so any open attempt expiring later is an explicit offline lease.
+    Held leases are returned unchanged (same id and expiry), including their final
+    minutes. A transactional owner guard bounds issuance across concurrent requests.
     """
     plan = await study_plan.read_plan(db, owner, data.project_id, limit=OFFLINE_ACTIVE_LIMIT * 2)
-    cutoff = exercise_attempts._now() + exercise_attempts.ATTEMPT_TTL
+    cutoff = exercise_attempts._now()
 
     async def operation(txn: UUID) -> list[Attempt]:
         return await repository.open_leases_after(db, owner, cutoff, txn)
@@ -46,7 +45,8 @@ async def prefetch(
     current = [
         attempt
         for attempt in held
-        if attempt.project_id == data.project_id
+        if attempt.status == "open"
+        and attempt.project_id == data.project_id
         and versions.get(attempt.sense_id) == attempt.expected_version
     ]
     attempts = [exercise_attempts.public(attempt) for attempt in current[: data.limit]]
@@ -65,8 +65,11 @@ async def prefetch(
                 AttemptCreate(project_id=data.project_id, sense_id=item.memory.sense_id),
                 plugins=plugins,
                 ttl=OFFLINE_ATTEMPT_TTL,
+                offline_limit=OFFLINE_ACTIVE_LIMIT,
             )
         except AppError as error:
+            if error.code == "exercise.offline_limit":
+                break
             if error.code != "exercise.no_usable":
                 raise
             continue
