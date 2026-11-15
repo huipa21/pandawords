@@ -36,16 +36,16 @@ const links = computed(() => props.mobile
     >
       <a
         :href="href" :aria-current="isActive ? 'page' : undefined"
-        class="navigation-link flex items-center justify-center rounded-md no-underline focus-visible:pw-focus-ring"
-        :class="[mobile ? 'flex-1 flex-col gap-0 px-2 py-1 text-xs' : 'justify-start gap-2 p-2 text-sm', isActive ? 'bg-primary-soft text-primary' : 'text-muted hover:bg-raised']"
+        class="navigation-link flex items-center rounded-md no-underline focus-visible:pw-focus-ring"
+        :class="[mobile ? 'flex-1 flex-col justify-center gap-0 px-2 py-1 text-xs' : 'justify-start gap-2 p-2 text-sm', isActive ? 'bg-primary-soft text-primary' : 'text-muted hover:bg-raised']"
         @click="navigate"
       >
-        <i-lucide-folder v-if="link.key === 'projects'" class="navigation-icon" aria-hidden="true" />
-        <i-lucide-book-open v-else-if="link.key === 'words' || link.key === 'reading'" class="navigation-icon" aria-hidden="true" />
-        <i-lucide-graduation-cap v-else-if="link.key === 'review'" class="navigation-icon" aria-hidden="true" />
-        <i-lucide-user v-else-if="link.key === 'me'" class="navigation-icon" aria-hidden="true" />
-        <i-lucide-settings v-else class="navigation-icon" aria-hidden="true" />
-        {{ t(`navigation.${link.key}`) }}
+        <i-lucide-folder v-if="link.key === 'projects'" class="navigation-icon shrink-0" aria-hidden="true" />
+        <i-lucide-book-open v-else-if="link.key === 'words' || link.key === 'reading'" class="navigation-icon shrink-0" aria-hidden="true" />
+        <i-lucide-graduation-cap v-else-if="link.key === 'review'" class="navigation-icon shrink-0" aria-hidden="true" />
+        <i-lucide-user v-else-if="link.key === 'me'" class="navigation-icon shrink-0" aria-hidden="true" />
+        <i-lucide-settings v-else class="navigation-icon shrink-0" aria-hidden="true" />
+        <span class="min-w-0 break-words" :class="mobile ? 'text-center' : 'text-left'">{{ t(`navigation.${link.key}`) }}</span>
       </a>
     </RouterLink>
   </nav>

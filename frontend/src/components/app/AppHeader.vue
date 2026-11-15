@@ -35,11 +35,14 @@ async function logout() {
 </script>
 
 <template>
-  <header class="h-header flex shrink-0 items-center justify-between border-b border-base bg-surface px-4 lg:px-6">
-    <RouterLink to="/projects" class="rounded-sm text-lg text-fg font-semibold no-underline focus-visible:pw-focus-ring">
-      {{ t('app.name') }}
+  <header class="flex w-full shrink-0 flex-wrap items-center justify-between gap-2 rounded-lg border border-base bg-surface px-4 py-1 shadow-1 lg:px-6">
+    <RouterLink to="/projects" class="flex shrink-0 items-center rounded-sm text-lg text-fg font-semibold no-underline focus-visible:pw-focus-ring">
+      <span aria-hidden="true" class="mr-2 inline-flex h-8 w-8 items-center justify-center rounded-md bg-primary text-on-primary">
+        <i-lucide-panda />
+      </span>
+      <span>{{ t('app.name') }}</span>
     </RouterLink>
-    <div class="flex items-center gap-2">
+    <div class="flex shrink-0 flex-wrap items-center justify-end gap-2">
       <RouterLink
         v-if="auth.accessToken && !auth.user?.must_change_password" to="/change-password"
         :aria-label="t('auth.changePassword')" :title="t('auth.changePassword')"
@@ -57,6 +60,10 @@ async function logout() {
 </template>
 
 <style scoped>
+header {
+  min-height: var(--pw-layout-header-height);
+}
+
 .password-link {
   min-height: var(--pw-layout-touch-target);
   min-width: var(--pw-layout-touch-target);
