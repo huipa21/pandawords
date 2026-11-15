@@ -83,7 +83,6 @@ needed) now use 0027 (6.1.1-6.1.4 chain) and 0028 (6.1.5) to keep versions ascen
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
 | 6.1.2 | task/6.1.2-project-export | ../pandawords.worktrees/6.1.2 | Agent running |
-| 6.1.5 | task/6.1.5-site-backup | ../pandawords.worktrees/6.1.5 | Agent relaunched |
 
 ## Blocked
 
@@ -100,6 +99,27 @@ needed) now use 0027 (6.1.1-6.1.4 chain) and 0028 (6.1.5) to keep versions ascen
 Newest first. One entry per finished, blocked, or interrupted task. Every entry records completed
 work, dependencies, verification outcomes, skipped work and reasons, failures and known causes,
 and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets.
+
+### 2026-11-15 — 6.1.5 Admin site backup, restore and scheduled service
+- Result / completed: merged (`555a84a`, `e9e3cf5`, `3d18cf0`). `pandawords.site` archive (manifest
+  first, `db.surql`, `media/`, sha256 + row counts; lexicon/`.env`/keys/symlinks excluded), temp →
+  verify → atomic publish with 0600/0700 permissions, `.sha256` sidecar, retention only after success,
+  lock against concurrent backup/restore. Admin API `POST/GET /api/admin/backups`,
+  `GET /api/admin/backups/{name}` (`require_admin`). Scheduled `backup` Compose service
+  (`python -m app.backup`); pre-migration backup unchanged. `deploy/restore.sh` with staged
+  preflight/stop/restore/restart, pre-restore safety export and nonzero actionable failures. No migration.
+- Dependencies: 1.6.4 checked ✅.
+- Verification: agent check clean, 50 focused backend tests, `release.Tests.ps1`, `bash -n restore.sh`
+  and stubbed-Compose restore.sh smoke (preflight/restore failure/success) passed; gen-api regenerated.
+  Main after merge: `dev.ps1 check` passed; site/admin backup + bundle tests 72 passed.
+- Skipped / deferred: `restore.sh` not run against real Docker; POSIX permission assertions skip on
+  Windows (not executed).
+- Failures / causes / corrections: first agent failed on model-service errors and was relaunched.
+  Merge conflict in import-export.md availability paragraph resolved keeping both 6.1.1 and 6.1.5 text.
+- Findings: SurrealDB 3.3.5 export/import notes recorded in surrealdb-notes.md (import needs
+  `OPTION IMPORT;`, partial import on statement failure, recreate DB after `REMOVE DATABASE`).
+  `lexicon_version` may be `name@unknown`; run restore with `bash restore.sh` in case the exec bit is lost.
+- Blockers / follow-ups: verify restore.sh on the real server; 6.1.6 still waits for 6.1.2–6.1.4.
 
 ### 2026-11-15 — 6.1.1 Bundle format, JSON Schema and serializers
 - Result / completed: merged (`223a7a7` code/tests, `90be775` docs). Versioned `.tar.gz` envelope with

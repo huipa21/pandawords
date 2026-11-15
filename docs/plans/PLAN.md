@@ -128,7 +128,7 @@ are in `phase-N.md`. If a phase file doesn't exist yet, the agent asks before wr
 | 6.1.2 | Project export (including progress and media) | 6.1.1 | 2 | M | 🟡 |
 | 6.1.3 | Project import (merge by ID, remap user-owned, progress option) | 6.1.2 | 3 | L | ⬜ |
 | 6.1.4 | User full backup/restore | 6.1.3 | 4 | M | ⬜ |
-| 6.1.5 | Admin site backup/restore, scheduled `backup` service, `restore.sh` | 1.6.4 | 1 | M | 🟡 |
+| 6.1.5 | Admin site backup/restore, scheduled `backup` service, `restore.sh` | 1.6.4 | 1 | M | ✅ |
 | 6.1.6 | UI for export, import and backup | 6.1.2, 6.1.3, 6.1.4, 6.1.5 | 5 | M | ⬜ |
 
 ## Phase 7 — PWA & hardening ([details](phase-7.md))
