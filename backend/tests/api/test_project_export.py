@@ -9,12 +9,15 @@ import pytest
 from httpx import AsyncClient, Response
 from surrealdb import RecordID
 from surrealdb.connections.async_ws import AsyncWsSurrealConnection
+from surrealdb.types import Value
 
 from app.core.config import Settings
 from app.core.errors import BundleError
 from app.core.record_ids import decode_rid, encode_rid
 from app.db.dictionary_schema_test_support import relate
+from app.db.migration_store import checked_query
 from app.db.project_schema_test_support import put_override
+from app.domain.bundle_records import LexemeRecord, TagRecord
 from app.domain.bundle_refs import shared_ref
 from app.domain.identity import user_key
 from app.services import project_export
@@ -134,7 +137,15 @@ async def test_export_tree_overlays_progress_media_and_isolation(
     image = store_file(dirs.media, "image/aa/alice.png", ALICE_IMAGE)
     await media(db, alice.user, words.move, image)
     audio = store_file(dirs.media, "audio/cc/run.mp3", SHARED_AUDIO)
-    await media(db, None, words.lexeme, audio, kind="audio")
+    shared_audio = await media(db, None, words.lexeme, audio, kind="audio")
+    lost_audio = await media(db, None, words.lexeme, "audio/ff/lost.mp3", kind="audio")
+    pron: list[Value] = [
+        {"accent": "US", "ipa": "/rʌn/", "audio": shared_audio},
+        {"accent": "UK", "ipa": "/rʌn/", "audio": lost_audio},
+    ]
+    await checked_query(
+        db, "UPDATE $lexeme SET pron = $pron;", {"lexeme": words.lexeme, "pron": pron}
+    )
     await media(db, alice.user, words.operate, "image/dd/missing.png")
     (dirs.media / "image" / "ee" / "dir.png").mkdir(parents=True)
     await media(db, alice.user, words.operate, "image/ee/dir.png")
@@ -152,7 +163,12 @@ async def test_export_tree_overlays_progress_media_and_isolation(
 
     response, bundle = await download(client, alice, project, dirs)
     try:
-        assert response.headers["x-pandawords-skipped-media"] == "3"
+        assert response.headers["x-pandawords-skipped-media"] == "4"
+        lexeme = bundle.index.records[shared_ref("lexeme", words.lexeme.id)]
+        assert isinstance(lexeme, LexemeRecord)
+        audio_refs = [p.audio for p in lexeme.pron]
+        assert audio_refs[0] is not None and audio_refs[1] is None
+        assert bundle.index.media[audio_refs[0]].kind == "audio"
         assert "IELTS" in response.headers["content-disposition"]
         data = bundle.data
         assert [p.name for p in data.projects] == ["IELTS 雅思/../x"]
@@ -168,7 +184,7 @@ async def test_export_tree_overlays_progress_media_and_isolation(
             (move, {"definition": "My meaning"})
         ]
         assert sorted(n.text for n in data.notes) == ["project note", "run = 润"]
-        tags = [r for r in data.records if r.table == "tag" and r.owner == "owned"]
+        tags = [r for r in data.records if isinstance(r, TagRecord) and r.owner == "owned"]
         assert [t.name for t in tags] == ["Alice exam"]
         assert {(e.table, e.to) for e in data.edges if e.owner == "owned"} == {
             ("member_of", tags[0].ref)

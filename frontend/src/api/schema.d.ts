@@ -506,6 +506,23 @@ export interface paths {
     patch: operations['set_visibility_api_projects__project_id__tree__table___target_id__visibility_patch']
     trace?: never
   }
+  '/api/projects/{id}/export': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Export Project */
+    get: operations['export_project_api_projects__id__export_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/dictionary/candidates': {
     parameters: {
       query?: never
@@ -3863,6 +3880,37 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ProjectMembershipRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  export_project_api_projects__id__export_get: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Project bundle. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/gzip': unknown
         }
       }
       /** @description Validation Error */

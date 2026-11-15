@@ -1918,6 +1918,49 @@
         }
       }
     },
+    "/api/projects/{id}/export": {
+      "get": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "Export Project",
+        "operationId": "export_project_api_projects__id__export_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Project bundle.",
+            "content": {
+              "application/gzip": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/dictionary/candidates": {
       "post": {
         "tags": [
