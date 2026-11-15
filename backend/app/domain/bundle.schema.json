@@ -1,0 +1,1713 @@
+{
+  "$defs": {
+    "BundleFormat": {
+      "enum": [
+        "pandawords.project",
+        "pandawords.user",
+        "pandawords.site"
+      ],
+      "type": "string"
+    },
+    "Card": {
+      "additionalProperties": false,
+      "properties": {
+        "card_id": {
+          "$ref": "#/$defs/Int"
+        },
+        "difficulty": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Difficulty"
+        },
+        "due": {
+          "$ref": "#/$defs/Instant"
+        },
+        "last_review": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "stability": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stability"
+        },
+        "state": {
+          "maximum": 3,
+          "minimum": 1,
+          "title": "State",
+          "type": "integer"
+        },
+        "step": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonNegative"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "card_id",
+        "state",
+        "due"
+      ],
+      "title": "Card",
+      "type": "object"
+    },
+    "ComposedOfEdge": {
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "$ref": "#/$defs/Ref"
+        },
+        "identity": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/KeyPart"
+          },
+          "maxItems": 8,
+          "title": "Identity",
+          "type": "array"
+        },
+        "order": {
+          "$ref": "#/$defs/Int"
+        },
+        "owner": {
+          "$ref": "#/$defs/Scope"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Short"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "table": {
+          "const": "composed_of",
+          "title": "Table",
+          "type": "string"
+        },
+        "to": {
+          "$ref": "#/$defs/Ref"
+        }
+      },
+      "required": [
+        "owner",
+        "from",
+        "to",
+        "table",
+        "order"
+      ],
+      "title": "ComposedOfEdge",
+      "type": "object"
+    },
+    "ContainsEdge": {
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "$ref": "#/$defs/Ref"
+        },
+        "identity": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/KeyPart"
+          },
+          "maxItems": 8,
+          "title": "Identity",
+          "type": "array"
+        },
+        "owner": {
+          "$ref": "#/$defs/Scope"
+        },
+        "position": {
+          "$ref": "#/$defs/NonNegative"
+        },
+        "table": {
+          "const": "contains",
+          "title": "Table",
+          "type": "string"
+        },
+        "to": {
+          "$ref": "#/$defs/Ref"
+        }
+      },
+      "required": [
+        "owner",
+        "from",
+        "to",
+        "table",
+        "position"
+      ],
+      "title": "ContainsEdge",
+      "type": "object"
+    },
+    "DerivesToEdge": {
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "$ref": "#/$defs/Ref"
+        },
+        "identity": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/KeyPart"
+          },
+          "maxItems": 8,
+          "title": "Identity",
+          "type": "array"
+        },
+        "owner": {
+          "$ref": "#/$defs/Scope"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Short"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "table": {
+          "const": "derives_to",
+          "title": "Table",
+          "type": "string"
+        },
+        "to": {
+          "$ref": "#/$defs/Ref"
+        },
+        "via": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Short"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "owner",
+        "from",
+        "to",
+        "table"
+      ],
+      "title": "DerivesToEdge",
+      "type": "object"
+    },
+    "DictRecord": {
+      "discriminator": {
+        "mapping": {
+          "lemma": "#/$defs/LemmaRecord",
+          "lexeme": "#/$defs/LexemeRecord",
+          "morpheme": "#/$defs/MorphemeRecord",
+          "passage": "#/$defs/PassageRecord",
+          "sense": "#/$defs/SenseRecord",
+          "sentence": "#/$defs/SentenceRecord",
+          "tag": "#/$defs/TagRecord"
+        },
+        "propertyName": "table"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/LemmaRecord"
+        },
+        {
+          "$ref": "#/$defs/LexemeRecord"
+        },
+        {
+          "$ref": "#/$defs/SenseRecord"
+        },
+        {
+          "$ref": "#/$defs/MorphemeRecord"
+        },
+        {
+          "$ref": "#/$defs/TagRecord"
+        },
+        {
+          "$ref": "#/$defs/SentenceRecord"
+        },
+        {
+          "$ref": "#/$defs/PassageRecord"
+        }
+      ]
+    },
+    "EdgeEntry": {
+      "discriminator": {
+        "mapping": {
+          "composed_of": "#/$defs/ComposedOfEdge",
+          "contains": "#/$defs/ContainsEdge",
+          "derives_to": "#/$defs/DerivesToEdge",
+          "has_lexeme": "#/$defs/HasLexemeEdge",
+          "has_sense": "#/$defs/HasSenseEdge",
+          "member_of": "#/$defs/MemberOfEdge",
+          "part_of": "#/$defs/PartOfEdge",
+          "relates_to": "#/$defs/RelatesToEdge",
+          "used_in": "#/$defs/UsedInEdge"
+        },
+        "propertyName": "table"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/HasLexemeEdge"
+        },
+        {
+          "$ref": "#/$defs/HasSenseEdge"
+        },
+        {
+          "$ref": "#/$defs/ComposedOfEdge"
+        },
+        {
+          "$ref": "#/$defs/DerivesToEdge"
+        },
+        {
+          "$ref": "#/$defs/RelatesToEdge"
+        },
+        {
+          "$ref": "#/$defs/MemberOfEdge"
+        },
+        {
+          "$ref": "#/$defs/ContainsEdge"
+        },
+        {
+          "$ref": "#/$defs/UsedInEdge"
+        },
+        {
+          "$ref": "#/$defs/PartOfEdge"
+        }
+      ]
+    },
+    "ExamTagSource": {
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "$ref": "#/$defs/Short"
+        },
+        "tag": {
+          "$ref": "#/$defs/Short"
+        }
+      },
+      "required": [
+        "tag",
+        "source"
+      ],
+      "title": "ExamTagSource",
+      "type": "object"
+    },
+    "Form": {
+      "additionalProperties": false,
+      "properties": {
+        "form": {
+          "$ref": "#/$defs/Short"
+        },
+        "tags": {
+          "$ref": "#/$defs/Strings"
+        }
+      },
+      "required": [
+        "form",
+        "tags"
+      ],
+      "title": "Form",
+      "type": "object"
+    },
+    "Frequency": {
+      "additionalProperties": false,
+      "properties": {
+        "bnc": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Int"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "coca": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Int"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "source": {
+          "$ref": "#/$defs/Short"
+        },
+        "zipf": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Zipf"
+        }
+      },
+      "required": [
+        "source"
+      ],
+      "title": "Frequency",
+      "type": "object"
+    },
+    "HasLexemeEdge": {
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "$ref": "#/$defs/Ref"
+        },
+        "identity": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/KeyPart"
+          },
+          "maxItems": 8,
+          "title": "Identity",
+          "type": "array"
+        },
+        "owner": {
+          "$ref": "#/$defs/Scope"
+        },
+        "table": {
+          "const": "has_lexeme",
+          "title": "Table",
+          "type": "string"
+        },
+        "to": {
+          "$ref": "#/$defs/Ref"
+        }
+      },
+      "required": [
+        "owner",
+        "from",
+        "to",
+        "table"
+      ],
+      "title": "HasLexemeEdge",
+      "type": "object"
+    },
+    "HasSenseEdge": {
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "$ref": "#/$defs/Ref"
+        },
+        "identity": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/KeyPart"
+          },
+          "maxItems": 8,
+          "title": "Identity",
+          "type": "array"
+        },
+        "owner": {
+          "$ref": "#/$defs/Scope"
+        },
+        "rank": {
+          "$ref": "#/$defs/Int"
+        },
+        "table": {
+          "const": "has_sense",
+          "title": "Table",
+          "type": "string"
+        },
+        "to": {
+          "$ref": "#/$defs/Ref"
+        }
+      },
+      "required": [
+        "owner",
+        "from",
+        "to",
+        "table",
+        "rank"
+      ],
+      "title": "HasSenseEdge",
+      "type": "object"
+    },
+    "IncludeEntry": {
+      "additionalProperties": false,
+      "description": "Project membership; ``hidden`` and ``study_order`` carry visibility and sense order.",
+      "properties": {
+        "added_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "hidden": {
+          "title": "Hidden",
+          "type": "boolean"
+        },
+        "project": {
+          "$ref": "#/$defs/Ref"
+        },
+        "study_order": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonNegative"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "target": {
+          "$ref": "#/$defs/Ref"
+        }
+      },
+      "required": [
+        "project",
+        "target",
+        "hidden",
+        "added_at"
+      ],
+      "title": "IncludeEntry",
+      "type": "object"
+    },
+    "Instant": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "Int": {
+      "exclusiveMaximum": 9223372036854775808,
+      "minimum": -9223372036854775808,
+      "type": "integer"
+    },
+    "Items_DictRecord_": {
+      "items": {
+        "$ref": "#/$defs/DictRecord"
+      },
+      "maxItems": 1000000,
+      "type": "array"
+    },
+    "Items_EdgeEntry_": {
+      "items": {
+        "$ref": "#/$defs/EdgeEntry"
+      },
+      "maxItems": 1000000,
+      "type": "array"
+    },
+    "Items_IncludeEntry_": {
+      "items": {
+        "$ref": "#/$defs/IncludeEntry"
+      },
+      "maxItems": 1000000,
+      "type": "array"
+    },
+    "Items_MediaEntry_": {
+      "items": {
+        "$ref": "#/$defs/MediaEntry"
+      },
+      "maxItems": 1000000,
+      "type": "array"
+    },
+    "Items_MemoryEntry_": {
+      "items": {
+        "$ref": "#/$defs/MemoryEntry"
+      },
+      "maxItems": 1000000,
+      "type": "array"
+    },
+    "Items_NoteEntry_": {
+      "items": {
+        "$ref": "#/$defs/NoteEntry"
+      },
+      "maxItems": 1000000,
+      "type": "array"
+    },
+    "Items_OverrideEntry_": {
+      "items": {
+        "$ref": "#/$defs/OverrideEntry"
+      },
+      "maxItems": 1000000,
+      "type": "array"
+    },
+    "Items_ProjectEntry_": {
+      "items": {
+        "$ref": "#/$defs/ProjectEntry"
+      },
+      "maxItems": 1000000,
+      "type": "array"
+    },
+    "Items_ReviewLogEntry_": {
+      "items": {
+        "$ref": "#/$defs/ReviewLogEntry"
+      },
+      "maxItems": 1000000,
+      "type": "array"
+    },
+    "JsonValue": {},
+    "KeyPart": {
+      "anyOf": [
+        {
+          "maxLength": 512,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "$ref": "#/$defs/Int"
+        }
+      ]
+    },
+    "Lang": {
+      "pattern": "^[a-zA-Z]{2,8}(-[a-zA-Z0-9]{1,8})*$",
+      "type": "string"
+    },
+    "LangMap": {
+      "additionalProperties": {
+        "$ref": "#/$defs/Text"
+      },
+      "maxProperties": 64,
+      "propertyNames": {
+        "$ref": "#/$defs/Lang"
+      },
+      "type": "object"
+    },
+    "LemmaRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "cefr": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Short"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "exam_tag_sources": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/ExamTagSource"
+              },
+              "maxItems": 256,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Exam Tag Sources"
+        },
+        "exam_tags": {
+          "$ref": "#/$defs/Strings"
+        },
+        "freq_zipf": {
+          "title": "Freq Zipf",
+          "type": "number"
+        },
+        "frequencies": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/Frequency"
+              },
+              "maxItems": 64,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Frequencies"
+        },
+        "kind": {
+          "enum": [
+            "word",
+            "phrase"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "lang": {
+          "$ref": "#/$defs/Lang"
+        },
+        "owner": {
+          "$ref": "#/$defs/Scope"
+        },
+        "ref": {
+          "$ref": "#/$defs/Ref"
+        },
+        "source": {
+          "$ref": "#/$defs/Short"
+        },
+        "table": {
+          "const": "lemma",
+          "title": "Table",
+          "type": "string"
+        },
+        "text": {
+          "$ref": "#/$defs/Short"
+        }
+      },
+      "required": [
+        "ref",
+        "owner",
+        "table",
+        "text",
+        "lang",
+        "kind",
+        "freq_zipf",
+        "exam_tags",
+        "source"
+      ],
+      "title": "LemmaRecord",
+      "type": "object"
+    },
+    "LexemeRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "etymology_no": {
+          "$ref": "#/$defs/Int"
+        },
+        "etymology_text": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Text"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "forms": {
+          "items": {
+            "$ref": "#/$defs/Form"
+          },
+          "maxItems": 1000,
+          "title": "Forms",
+          "type": "array"
+        },
+        "owner": {
+          "$ref": "#/$defs/Scope"
+        },
+        "pos": {
+          "$ref": "#/$defs/Short"
+        },
+        "pron": {
+          "items": {
+            "$ref": "#/$defs/Pronunciation"
+          },
+          "maxItems": 100,
+          "title": "Pron",
+          "type": "array"
+        },
+        "ref": {
+          "$ref": "#/$defs/Ref"
+        },
+        "table": {
+          "const": "lexeme",
+          "title": "Table",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "owner",
+        "table",
+        "pos",
+        "etymology_no",
+        "forms",
+        "pron"
+      ],
+      "title": "LexemeRecord",
+      "type": "object"
+    },
+    "MediaEntry": {
+      "additionalProperties": false,
+      "description": "Media metadata; bytes live at ``file`` inside the archive, never a storage path.",
+      "properties": {
+        "accent": {
+          "anyOf": [
+            {
+              "enum": [
+                "US",
+                "UK"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Accent"
+        },
+        "attribution": {
+          "anyOf": [
+            {
+              "maxLength": 4000,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Attribution"
+        },
+        "file": {
+          "pattern": "^media/[0-9a-f]{64}\\.(?:mp3|ogg|wav|m4a|webm|jpg|png|webp|gif)$",
+          "title": "File",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "audio",
+            "image"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "mime": {
+          "$ref": "#/$defs/Short"
+        },
+        "owner": {
+          "$ref": "#/$defs/Scope"
+        },
+        "ref": {
+          "$ref": "#/$defs/Ref"
+        },
+        "source": {
+          "enum": [
+            "wiktionary",
+            "edge_tts",
+            "pixabay",
+            "upload"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "target": {
+          "$ref": "#/$defs/Ref"
+        }
+      },
+      "required": [
+        "ref",
+        "owner",
+        "target",
+        "kind",
+        "mime",
+        "source",
+        "file"
+      ],
+      "title": "MediaEntry",
+      "type": "object"
+    },
+    "MemberOfEdge": {
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "$ref": "#/$defs/Ref"
+        },
+        "identity": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/KeyPart"
+          },
+          "maxItems": 8,
+          "title": "Identity",
+          "type": "array"
+        },
+        "owner": {
+          "$ref": "#/$defs/Scope"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Short"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "table": {
+          "const": "member_of",
+          "title": "Table",
+          "type": "string"
+        },
+        "to": {
+          "$ref": "#/$defs/Ref"
+        }
+      },
+      "required": [
+        "owner",
+        "from",
+        "to",
+        "table"
+      ],
+      "title": "MemberOfEdge",
+      "type": "object"
+    },
+    "MemoryEntry": {
+      "additionalProperties": false,
+      "description": "One FSRS card per sense; the memory ID is rebuilt from the importer and sense.",
+      "properties": {
+        "card": {
+          "$ref": "#/$defs/Card"
+        },
+        "introduced": {
+          "title": "Introduced",
+          "type": "boolean"
+        },
+        "sense": {
+          "$ref": "#/$defs/Ref"
+        }
+      },
+      "required": [
+        "sense",
+        "card",
+        "introduced"
+      ],
+      "title": "MemoryEntry",
+      "type": "object"
+    },
+    "MorphemeRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "meaning": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Text"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "owner": {
+          "$ref": "#/$defs/Scope"
+        },
+        "ref": {
+          "$ref": "#/$defs/Ref"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Short"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "table": {
+          "const": "morpheme",
+          "title": "Table",
+          "type": "string"
+        },
+        "text": {
+          "$ref": "#/$defs/Short"
+        },
+        "type": {
+          "enum": [
+            "prefix",
+            "root",
+            "suffix",
+            "infix"
+          ],
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "owner",
+        "table",
+        "text",
+        "type"
+      ],
+      "title": "MorphemeRecord",
+      "type": "object"
+    },
+    "NonNegative": {
+      "exclusiveMaximum": 9223372036854775808,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "NoteEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "note",
+            "mnemonic"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "ref": {
+          "$ref": "#/$defs/Ref"
+        },
+        "target": {
+          "$ref": "#/$defs/Ref"
+        },
+        "text": {
+          "$ref": "#/$defs/Text"
+        }
+      },
+      "required": [
+        "ref",
+        "target",
+        "kind",
+        "text"
+      ],
+      "title": "NoteEntry",
+      "type": "object"
+    },
+    "OverrideEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "fields": {
+          "additionalProperties": {
+            "$ref": "#/$defs/JsonValue"
+          },
+          "maxProperties": 64,
+          "propertyNames": {
+            "$ref": "#/$defs/Short"
+          },
+          "title": "Fields",
+          "type": "object"
+        },
+        "target": {
+          "$ref": "#/$defs/Ref"
+        },
+        "updated_at": {
+          "$ref": "#/$defs/Instant"
+        }
+      },
+      "required": [
+        "target",
+        "fields",
+        "updated_at"
+      ],
+      "title": "OverrideEntry",
+      "type": "object"
+    },
+    "PartOfEdge": {
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "$ref": "#/$defs/Ref"
+        },
+        "identity": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/KeyPart"
+          },
+          "maxItems": 8,
+          "title": "Identity",
+          "type": "array"
+        },
+        "order": {
+          "$ref": "#/$defs/NonNegative"
+        },
+        "owner": {
+          "$ref": "#/$defs/Scope"
+        },
+        "table": {
+          "const": "part_of",
+          "title": "Table",
+          "type": "string"
+        },
+        "to": {
+          "$ref": "#/$defs/Ref"
+        }
+      },
+      "required": [
+        "owner",
+        "from",
+        "to",
+        "table",
+        "order"
+      ],
+      "title": "PartOfEdge",
+      "type": "object"
+    },
+    "PassageRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "lang": {
+          "$ref": "#/$defs/Lang"
+        },
+        "owner": {
+          "$ref": "#/$defs/Scope"
+        },
+        "ref": {
+          "$ref": "#/$defs/Ref"
+        },
+        "source": {
+          "$ref": "#/$defs/Short"
+        },
+        "table": {
+          "const": "passage",
+          "title": "Table",
+          "type": "string"
+        },
+        "text": {
+          "$ref": "#/$defs/Text"
+        },
+        "title": {
+          "$ref": "#/$defs/Short"
+        }
+      },
+      "required": [
+        "ref",
+        "owner",
+        "table",
+        "title",
+        "text",
+        "lang",
+        "source"
+      ],
+      "title": "PassageRecord",
+      "type": "object"
+    },
+    "Plan": {
+      "additionalProperties": false,
+      "properties": {
+        "daily_new": {
+          "$ref": "#/$defs/NonNegative"
+        },
+        "exam_date": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Instant"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "review_cap": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/NonNegative"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "daily_new"
+      ],
+      "title": "Plan",
+      "type": "object"
+    },
+    "Preferences": {
+      "additionalProperties": false,
+      "description": "Learning/display preferences only; account, role and credentials are never exported.",
+      "properties": {
+        "accent": {
+          "enum": [
+            "US",
+            "UK"
+          ],
+          "title": "Accent",
+          "type": "string"
+        },
+        "desired_retention": {
+          "exclusiveMaximum": 1,
+          "exclusiveMinimum": 0,
+          "title": "Desired Retention",
+          "type": "number"
+        },
+        "locale": {
+          "maxLength": 35,
+          "minLength": 1,
+          "title": "Locale",
+          "type": "string"
+        },
+        "review_audio_enabled": {
+          "title": "Review Audio Enabled",
+          "type": "boolean"
+        },
+        "review_images_enabled": {
+          "title": "Review Images Enabled",
+          "type": "boolean"
+        },
+        "source_lang": {
+          "$ref": "#/$defs/Lang"
+        },
+        "target_lang": {
+          "$ref": "#/$defs/Lang"
+        },
+        "theme": {
+          "enum": [
+            "system",
+            "light",
+            "dark"
+          ],
+          "title": "Theme",
+          "type": "string"
+        }
+      },
+      "required": [
+        "theme",
+        "locale",
+        "accent",
+        "desired_retention",
+        "review_images_enabled",
+        "review_audio_enabled",
+        "source_lang",
+        "target_lang"
+      ],
+      "title": "Preferences",
+      "type": "object"
+    },
+    "ProjectEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "created_at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "description": {
+          "maxLength": 10000,
+          "title": "Description",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "plan": {
+          "$ref": "#/$defs/Plan"
+        },
+        "ref": {
+          "$ref": "#/$defs/Ref"
+        },
+        "source_lang": {
+          "maxLength": 35,
+          "minLength": 1,
+          "title": "Source Lang",
+          "type": "string"
+        },
+        "target_lang": {
+          "maxLength": 35,
+          "minLength": 1,
+          "title": "Target Lang",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "name",
+        "description",
+        "target_lang",
+        "source_lang",
+        "plan",
+        "created_at"
+      ],
+      "title": "ProjectEntry",
+      "type": "object"
+    },
+    "Pronunciation": {
+      "additionalProperties": false,
+      "properties": {
+        "accent": {
+          "enum": [
+            "US",
+            "UK"
+          ],
+          "title": "Accent",
+          "type": "string"
+        },
+        "audio": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Ref"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "ipa": {
+          "$ref": "#/$defs/Short"
+        }
+      },
+      "required": [
+        "accent",
+        "ipa"
+      ],
+      "title": "Pronunciation",
+      "type": "object"
+    },
+    "Rating": {
+      "maximum": 4,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "Ref": {
+      "pattern": "^(?:(?:lemma|lexeme|sense|morpheme|tag|sentence|passage|project|note|media):@[1-9][0-9]{0,8}|(?:lemma|lexeme|sense|morpheme|tag|sentence|passage):[\\[\\\"0-9-].{0,2047})$",
+      "type": "string"
+    },
+    "RelatesToEdge": {
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "$ref": "#/$defs/Ref"
+        },
+        "identity": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/KeyPart"
+          },
+          "maxItems": 8,
+          "title": "Identity",
+          "type": "array"
+        },
+        "owner": {
+          "$ref": "#/$defs/Scope"
+        },
+        "source": {
+          "$ref": "#/$defs/Short"
+        },
+        "table": {
+          "const": "relates_to",
+          "title": "Table",
+          "type": "string"
+        },
+        "to": {
+          "$ref": "#/$defs/Ref"
+        },
+        "type": {
+          "enum": [
+            "synonym",
+            "antonym",
+            "hypernym",
+            "hyponym",
+            "confusable",
+            "collocation",
+            "default"
+          ],
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "owner",
+        "from",
+        "to",
+        "table",
+        "type",
+        "source"
+      ],
+      "title": "RelatesToEdge",
+      "type": "object"
+    },
+    "ReviewLogEntry": {
+      "additionalProperties": false,
+      "description": "Completed review. Source receipts/fingerprints embed database IDs and are not exported;\n``card_after`` keeps the resulting card so an importer can rebuild a receipt.",
+      "properties": {
+        "at": {
+          "$ref": "#/$defs/Instant"
+        },
+        "attempt_id": {
+          "maxLength": 256,
+          "minLength": 1,
+          "title": "Attempt Id",
+          "type": "string"
+        },
+        "auto_rating": {
+          "$ref": "#/$defs/Rating"
+        },
+        "card_after": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Card"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "correct": {
+          "title": "Correct",
+          "type": "boolean"
+        },
+        "duration_ms": {
+          "maximum": 60000,
+          "minimum": 0,
+          "title": "Duration Ms",
+          "type": "integer"
+        },
+        "exercise": {
+          "maxLength": 128,
+          "minLength": 1,
+          "title": "Exercise",
+          "type": "string"
+        },
+        "hint_used": {
+          "title": "Hint Used",
+          "type": "boolean"
+        },
+        "is_introduction": {
+          "title": "Is Introduction",
+          "type": "boolean"
+        },
+        "project": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Ref"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "rating": {
+          "$ref": "#/$defs/Rating"
+        },
+        "sense": {
+          "$ref": "#/$defs/Ref"
+        }
+      },
+      "required": [
+        "sense",
+        "project",
+        "exercise",
+        "rating",
+        "auto_rating",
+        "correct",
+        "hint_used",
+        "duration_ms",
+        "at",
+        "is_introduction",
+        "attempt_id"
+      ],
+      "title": "ReviewLogEntry",
+      "type": "object"
+    },
+    "Scope": {
+      "enum": [
+        "shared",
+        "owned"
+      ],
+      "type": "string"
+    },
+    "SenseRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "common": {
+          "title": "Common",
+          "type": "boolean"
+        },
+        "definition": {
+          "$ref": "#/$defs/Text"
+        },
+        "domain": {
+          "$ref": "#/$defs/Strings"
+        },
+        "examples": {
+          "items": {
+            "$ref": "#/$defs/Text"
+          },
+          "maxItems": 1000,
+          "title": "Examples",
+          "type": "array"
+        },
+        "gloss": {
+          "$ref": "#/$defs/LangMap"
+        },
+        "owner": {
+          "$ref": "#/$defs/Scope"
+        },
+        "rank": {
+          "$ref": "#/$defs/Int"
+        },
+        "ref": {
+          "$ref": "#/$defs/Ref"
+        },
+        "register": {
+          "$ref": "#/$defs/Strings"
+        },
+        "source": {
+          "$ref": "#/$defs/Short"
+        },
+        "table": {
+          "const": "sense",
+          "title": "Table",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "owner",
+        "table",
+        "definition",
+        "gloss",
+        "register",
+        "domain",
+        "examples",
+        "rank",
+        "common",
+        "source"
+      ],
+      "title": "SenseRecord",
+      "type": "object"
+    },
+    "SentenceRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "lang": {
+          "$ref": "#/$defs/Lang"
+        },
+        "owner": {
+          "$ref": "#/$defs/Scope"
+        },
+        "ref": {
+          "$ref": "#/$defs/Ref"
+        },
+        "source": {
+          "$ref": "#/$defs/Short"
+        },
+        "table": {
+          "const": "sentence",
+          "title": "Table",
+          "type": "string"
+        },
+        "text": {
+          "$ref": "#/$defs/Text"
+        },
+        "translation": {
+          "$ref": "#/$defs/LangMap"
+        }
+      },
+      "required": [
+        "ref",
+        "owner",
+        "table",
+        "text",
+        "lang",
+        "translation",
+        "source"
+      ],
+      "title": "SentenceRecord",
+      "type": "object"
+    },
+    "Short": {
+      "maxLength": 512,
+      "minLength": 1,
+      "type": "string"
+    },
+    "Strings": {
+      "items": {
+        "$ref": "#/$defs/Short"
+      },
+      "maxItems": 1000,
+      "type": "array"
+    },
+    "TagRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/Short"
+        },
+        "name": {
+          "$ref": "#/$defs/Short"
+        },
+        "owner": {
+          "$ref": "#/$defs/Scope"
+        },
+        "ref": {
+          "$ref": "#/$defs/Ref"
+        },
+        "table": {
+          "const": "tag",
+          "title": "Table",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref",
+        "owner",
+        "table",
+        "kind",
+        "name"
+      ],
+      "title": "TagRecord",
+      "type": "object"
+    },
+    "Text": {
+      "maxLength": 100000,
+      "type": "string"
+    },
+    "UsedInEdge": {
+      "additionalProperties": false,
+      "properties": {
+        "from": {
+          "$ref": "#/$defs/Ref"
+        },
+        "identity": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/KeyPart"
+          },
+          "maxItems": 8,
+          "title": "Identity",
+          "type": "array"
+        },
+        "owner": {
+          "$ref": "#/$defs/Scope"
+        },
+        "span": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/NonNegative"
+              },
+              "maxItems": 2,
+              "minItems": 2,
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Span"
+        },
+        "table": {
+          "const": "used_in",
+          "title": "Table",
+          "type": "string"
+        },
+        "to": {
+          "$ref": "#/$defs/Ref"
+        }
+      },
+      "required": [
+        "owner",
+        "from",
+        "to",
+        "table"
+      ],
+      "title": "UsedInEdge",
+      "type": "object"
+    }
+  },
+  "$id": "https://pandawords.local/schemas/bundle-data-1.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "edges": {
+      "$ref": "#/$defs/Items_EdgeEntry_",
+      "default": []
+    },
+    "format": {
+      "$ref": "#/$defs/BundleFormat"
+    },
+    "includes": {
+      "$ref": "#/$defs/Items_IncludeEntry_",
+      "default": []
+    },
+    "media": {
+      "$ref": "#/$defs/Items_MediaEntry_",
+      "default": []
+    },
+    "memory": {
+      "$ref": "#/$defs/Items_MemoryEntry_",
+      "default": []
+    },
+    "notes": {
+      "$ref": "#/$defs/Items_NoteEntry_",
+      "default": []
+    },
+    "overrides": {
+      "$ref": "#/$defs/Items_OverrideEntry_",
+      "default": []
+    },
+    "preferences": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Preferences"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "projects": {
+      "$ref": "#/$defs/Items_ProjectEntry_",
+      "default": []
+    },
+    "records": {
+      "$ref": "#/$defs/Items_DictRecord_",
+      "default": []
+    },
+    "review_log": {
+      "$ref": "#/$defs/Items_ReviewLogEntry_",
+      "default": []
+    },
+    "schema_revision": {
+      "title": "Schema Revision",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "format",
+    "schema_revision"
+  ],
+  "title": "BundleData",
+  "type": "object"
+}

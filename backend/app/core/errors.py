@@ -54,6 +54,19 @@ class LlmUnavailable(AppError):
         super().__init__("llm." + reason, 503, "Optional LLM is unavailable.")
 
 
+type BundleStage = Literal["archive", "manifest", "data", "references", "media"]
+
+
+class BundleError(AppError):
+    """Rejected bundle; ``problems`` are short, path-free and safe to show to the uploader."""
+
+    def __init__(self, reason: str, stage: BundleStage, problems: list[str] | None = None) -> None:
+        self.reason = reason
+        self.stage = stage
+        self.problems = problems or []
+        super().__init__("bundle." + reason, 422, f"Bundle rejected at {stage} stage.")
+
+
 def _error_response(
     code: str,
     status: int,
