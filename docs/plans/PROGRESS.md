@@ -17,8 +17,16 @@ fixed user ID, with password change available inside Profile.
 Status: **in progress**. Unnumbered refinement; existing authentication and shell are
 available, no numbered prerequisites. One Mode B worktree `header-profile`; backend
 profile persistence and frontend integration have disjoint scopes.
-Verification: pending. No new dependency or document planned. Existing password-change
-flow will be reused rather than introducing unauthenticated email recovery.
+Implementation: complete in the feature worktree; migration 0028 adds profile fields,
+owner-scoped API, guarded `/profile`, embedded password change, plain dropdowns and
+moon/sun toggle. No new dependency or document. Existing password-change flow reused
+rather than introducing unauthenticated email recovery.
+Verification so far: backend focused **70 passed**, full bounded frontend **286 passed**,
+post-generation affected frontend **37 passed**, regenerated API and `dev.ps1 check`
+clean. Full backend suite is still running; merge, browser verification, dev migration
+and cleanup remain. Initial default-worker frontend run had two stale toggle assertions
+(fixed) and two existing five-second timeouts; bounded rerun passed. First integration
+type check identified four UserRead fixtures needing the new fields; fixed and rechecked.
 
 ### UI shell refresh (2026-11-15)
 
