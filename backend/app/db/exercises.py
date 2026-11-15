@@ -1,5 +1,6 @@
 """Owner-bound durable attempts; callers serialize mutations with the SDK transaction."""
 
+from datetime import datetime
 from typing import cast
 from uuid import UUID
 
@@ -28,6 +29,21 @@ async def read(db: AsyncSurrealConnection, owner: str, attempt_id: str, txn: UUI
     if attempt.owner != owner or attempt.id != attempt_id:
         raise AppError("exercise.not_found", 404, "Attempt not found.")
     return attempt
+
+
+async def open_leases_after(
+    db: AsyncSurrealConnection, owner: str, after: datetime, txn: UUID
+) -> list[Attempt]:
+    """Open attempts outliving every online lease, i.e. explicit offline leases."""
+    rows = await _rows(
+        db,
+        "SELECT payload, issued_at FROM exercise_attempt "
+        "WHERE owner = $user AND status = 'open' AND expires_at > $after ORDER BY issued_at;",
+        {"user": user_record(owner), "after": after},
+        txn_id=txn,
+    )
+    attempts = [Attempt.model_validate_json(row["payload"]) for row in rows]
+    return [attempt for attempt in attempts if attempt.owner == owner]
 
 
 async def write(

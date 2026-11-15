@@ -88,6 +88,7 @@ async def create_attempt(
     data: AttemptCreate,
     *,
     plugins: ExerciseRegistry = registry,
+    ttl: timedelta = ATTEMPT_TTL,
 ) -> AttemptRead:
     project, sense = _decode(data.project_id, "project"), _decode(data.sense_id, "sense")
 
@@ -120,7 +121,7 @@ async def create_attempt(
         generated=selection.generated,
         expected_version=memory.version,
         issued_at=issued,
-        expires_at=issued + ATTEMPT_TTL,
+        expires_at=issued + ttl,
         skipped=selection.skipped,
     )
 
@@ -166,10 +167,15 @@ async def submit(
     duration_ms: int,
     *,
     plugins: ExerciseRegistry = registry,
+    client_key: str | None = None,
 ) -> AttemptRead:
     if type(duration_ms) is not int or duration_ms < 0:
         raise AppError("exercise.invalid_duration", 422, "Duration must be a nonnegative integer.")
-    submission = fingerprint({"answer": answer, "duration_ms": duration_ms})
+    # A retry identity binds the single grade to one queued client answer.
+    identity = {"answer": answer, "duration_ms": duration_ms}
+    submission = fingerprint(
+        identity if client_key is None else {**identity, "client_key": client_key}
+    )
 
     async def operation(txn: UUID) -> AttemptRead:
         attempt = await repository.read(db, owner, attempt_id, txn)

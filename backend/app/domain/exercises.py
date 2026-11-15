@@ -89,13 +89,19 @@ class AttemptCreate(ExerciseModel):
     sense_id: str
 
 
+type ClientKey = Annotated[str, Field(min_length=16, max_length=64, pattern=r"^[A-Za-z0-9_-]+$")]
+
+
 class AttemptAnswer(ExerciseModel):
     answer: str = Field(max_length=4096)
     duration_ms: int = Field(strict=True, ge=0)
+    # Stable offline retry identity; retries with the same key replay the same grade.
+    client_key: ClientKey | None = None
 
 
 class AttemptGiveUp(ExerciseModel):
     duration_ms: int = Field(strict=True, ge=0)
+    client_key: ClientKey | None = None
 
 
 class AttemptConfirm(ExerciseModel):
@@ -140,6 +146,20 @@ class AttemptConfirmed(AttemptPublic):
 type AttemptRead = Annotated[
     AttemptOpen | AttemptGraded | AttemptConfirmed, Field(discriminator="status")
 ]
+
+
+class OfflinePrefetch(ExerciseModel):
+    project_id: str
+    limit: int = Field(default=10, strict=True, ge=1, le=20)
+
+
+class OfflineBatchRead(ExerciseModel):
+    """Open prompts under a fixed offline lease; never answer keys or extended leases."""
+
+    project_id: str
+    attempts: tuple[AttemptOpen, ...]
+    lease_seconds: int
+    active_limit: int
 
 
 class Attempt(ExerciseModel):
