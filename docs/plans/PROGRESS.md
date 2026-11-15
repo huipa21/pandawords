@@ -9,6 +9,17 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 
 ## Current run
 
+### Header account menu and profile (2026-11-15)
+
+Request: avatar/initials header menu with Profile and Sign Out; language options without
+group headings; light/dark toggle only; persistent avatar, editable email/full name and
+fixed user ID, with password change available inside Profile.
+Status: **in progress**. Unnumbered refinement; existing authentication and shell are
+available, no numbered prerequisites. One Mode B worktree `header-profile`; backend
+profile persistence and frontend integration have disjoint scopes.
+Verification: pending. No new dependency or document planned. Existing password-change
+flow will be reused rather than introducing unauthenticated email recovery.
+
 ### UI shell refresh (2026-11-15)
 
 Request: screenshot-inspired separated header/sidebar/content containers, icon before
