@@ -1,5 +1,6 @@
 """Owner-bound durable attempts; callers serialize mutations with the SDK transaction."""
 
+from datetime import datetime
 from typing import cast
 from uuid import UUID
 
@@ -30,6 +31,47 @@ async def read(db: AsyncSurrealConnection, owner: str, attempt_id: str, txn: UUI
     return attempt
 
 
+async def open_leases_after(
+    db: AsyncSurrealConnection, owner: str, after: datetime, txn: UUID
+) -> list[Attempt]:
+    """Unconfirmed, unexpired offline attempts, including the last online-TTL minutes."""
+    rows = await _rows(
+        db,
+        "SELECT payload, issued_at FROM exercise_attempt "
+        "WHERE owner = $user AND offline = true AND status != 'confirmed' "
+        "AND expires_at > $after ORDER BY issued_at, id LIMIT $limit;",
+        {"user": user_record(owner), "after": after, "limit": 21},
+        txn_id=txn,
+    )
+    attempts = [Attempt.model_validate_json(row["payload"]) for row in rows]
+    return [attempt for attempt in attempts if attempt.owner == owner and attempt.offline]
+
+
+async def reserve_offline(
+    db: AsyncSurrealConnection, attempt: Attempt, now: datetime, limit: int, txn: UUID
+) -> Attempt | None:
+    user = user_record(attempt.owner)
+    await _rows(
+        db,
+        "UPSERT $id SET owner = $user, version += 1 "
+        "WHERE owner = NONE OR owner = $user RETURN AFTER;",
+        {"id": RecordID("offline_attempt_guard", [user]), "user": user},
+        txn_id=txn,
+    )
+    held = await open_leases_after(db, attempt.owner, now, txn)
+    for prior in held:
+        if (
+            prior.status == "open"
+            and prior.project_id == attempt.project_id
+            and prior.sense_id == attempt.sense_id
+            and prior.expected_version == attempt.expected_version
+        ):
+            return prior
+    if len(held) >= limit:
+        raise AppError("exercise.offline_limit", 409, "Offline attempt limit reached.")
+    return None
+
+
 async def write(
     db: AsyncSurrealConnection, attempt: Attempt, txn: UUID, *, create: bool = False
 ) -> None:
@@ -46,6 +88,7 @@ async def write(
                 "issued_at": attempt.issued_at,
                 "expires_at": attempt.expires_at,
                 "payload": attempt.model_dump_json(),
+                "offline": attempt.offline,
             },
         ),
     }

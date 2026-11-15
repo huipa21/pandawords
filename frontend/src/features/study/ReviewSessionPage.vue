@@ -71,6 +71,9 @@ function play() {
   <section class="mx-auto w-full max-w-3xl space-y-6" data-testid="review-session">
     <PageHeader :title="t('session.title')">
       <template #actions>
+        <NButton size="large" @click="router.push({ name: 'project-offline-review', params: { id: projectId() } })">
+          {{ t('offline.title') }}
+        </NButton>
         <NButton size="large" data-testid="review-exit" @click="exit">
           {{ t('session.exit') }}
         </NButton>

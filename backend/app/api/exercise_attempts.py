@@ -11,13 +11,25 @@ from app.domain.exercises import (
     AttemptCreate,
     AttemptGiveUp,
     AttemptRead,
+    OfflineBatchRead,
+    OfflinePrefetch,
 )
-from app.services import exercise_attempts
+from app.services import exercise_attempts, offline_review
 from app.services.exercise_recall import build_registry
 
 router = APIRouter(prefix="/api/exercise-attempts", tags=["exercises"])
 Actor = Annotated[User, Depends(current_user)]
 Config = Annotated[Settings, Depends(get_settings)]
+
+
+@router.post("/offline")
+async def prefetch_offline(
+    data: OfflinePrefetch, db: Db, config: Config, actor: Actor, response: Response
+) -> OfflineBatchRead:
+    response.headers["Cache-Control"] = "no-store"
+    return await offline_review.prefetch(
+        db, actor.id, data, plugins=build_registry(db, config, actor.prefs.accent)
+    )
 
 
 @router.post("", status_code=201)
@@ -60,6 +72,7 @@ async def answer(
         data.answer,
         data.duration_ms,
         plugins=build_registry(db, config, actor.prefs.accent),
+        client_key=data.client_key,
     )
 
 
@@ -81,6 +94,7 @@ async def give_up(
         None,
         data.duration_ms,
         plugins=build_registry(db, config, actor.prefs.accent),
+        client_key=data.client_key,
     )
 
 

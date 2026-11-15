@@ -1,5 +1,18 @@
 # UI patterns
 
+## Prepared offline reviews (7.1.2)
+
+The review header links to a dedicated offline page with explicit online/offline,
+saving/syncing, failed and expired live-region states. Preparing requires a
+connection; answers are saved before advancing the prompt and remain visibly
+queued, not completed. Sync clearly opts into server-suggested ratings. No local
+answer key or feedback is shown; the normal online review retains manual rating.
+Only receipt counts indicate completion. Errors retain answers with copy/discard
+instructions; discard requires confirmation and explains that server receipts
+remain. The empty state explicitly warns about storage eviction. Both locales
+use existing ExerciseShell keyboard/timing behavior, token styles and large
+buttons. Media/hints are excluded rather than showing an unusable offline prompt.
+
 ## Personal semantic links (4.4.3)
 
 Sense selection in the graph exposes `SenseRelations`; word detail has an expandable

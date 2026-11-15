@@ -1,4 +1,24 @@
 {
+  "offline": {
+    "title": "Offline review",
+    "policy": "Prepare 10 text/choice prompts online, valid 24 hours (20 per account). Keep this signed-in tab open offline. Sync uses server grading and suggested ratings; only receipts count. No hints or media.",
+    "prepare": "Prepare prompts online",
+    "sync": "Sync with suggested ratings",
+    "reload": "Reload saved queue",
+    "counts": "Ready: {ready}. Queued: {pending}. Receipts: {done}.",
+    "failure": "Storage/sync failed. Answers are not completed. Retry online; keep browser data for recovery.",
+    "empty": "No saved prompts (possibly evicted). Prepare online again; leases cannot be extended.",
+    "savedAnswer": "Saved answer: {answer}",
+    "expires": "Lease expires: {at}",
+    "discard": "Discard saved review",
+    "discardWarning": "Delete this device's prompt/answer only? Server receipts remain. Unconfirmed answers do not count. Copy first if needed.",
+    "states": { "online": "Online", "offline": "Offline — answers will be queued", "syncing": "Saving / syncing", "failed": "Recovery required", "expired": "A lease has expired" },
+    "recovery": {
+      "failed": "Unconfirmed. Retry online with the saved retry identity.",
+      "expired": "Expired: saved, not graded. Copy/discard, then prepare online.",
+      "stale": "Card changed/unavailable: answer saved. Copy/discard, then prepare online."
+    }
+  },
   "pwa": {
     "installTitle": "Install PandaWords",
     "installDescription": "Open PandaWords from your home screen. Learning still requires a connection.",
@@ -562,6 +582,7 @@
     }
   },
   "errors": {
+    "offline_storage": "Offline data could not be cleared. Clear this site's browser data before sharing this device.",
     "study_invalid_order": "The project selection changed. Reset the priority draft and try again.",
     "study_too_large": "This project or learning history exceeds planning limits. Reduce the selection or contact an administrator.",
     "project_not_found": "This project is unavailable or no longer exists.",

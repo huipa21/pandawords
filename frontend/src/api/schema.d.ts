@@ -540,6 +540,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/exercise-attempts/offline': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Prefetch Offline */
+    post: operations['prefetch_offline_api_exercise_attempts_offline_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/exercise-attempts': {
     parameters: {
       query?: never
@@ -1069,6 +1086,7 @@ export interface components {
       answer: string
       /** Duration Ms */
       duration_ms: number
+      client_key?: components['schemas']['ClientKey'] | null
     }
     /** AttemptConfirm */
     'AttemptConfirm': {
@@ -1133,6 +1151,7 @@ export interface components {
     'AttemptGiveUp': {
       /** Duration Ms */
       duration_ms: number
+      client_key?: components['schemas']['ClientKey'] | null
     }
     /** AttemptGraded */
     'AttemptGraded': {
@@ -1293,6 +1312,7 @@ export interface components {
       /** Label */
       label: string
     }
+    'ClientKey': string
     /** CompletedCounts */
     'CompletedCounts': {
       /**
@@ -1950,6 +1970,30 @@ export interface components {
       sense_id?: string | null
       /** Edge Id */
       edge_id?: string | null
+    }
+    /**
+     * OfflineBatchRead
+     * @description Open prompts under a fixed offline lease; never answer keys or extended leases.
+     */
+    'OfflineBatchRead': {
+      /** Project Id */
+      project_id: string
+      /** Attempts */
+      attempts: components['schemas']['AttemptOpen'][]
+      /** Lease Seconds */
+      lease_seconds: number
+      /** Active Limit */
+      active_limit: number
+    }
+    /** OfflinePrefetch */
+    'OfflinePrefetch': {
+      /** Project Id */
+      project_id: string
+      /**
+       * Limit
+       * @default 10
+       */
+      limit: number
     }
     /** OptimizationRead */
     'OptimizationRead': {
@@ -3887,6 +3931,39 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ContainingPhrasesRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  prefetch_offline_api_exercise_attempts_offline_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['OfflinePrefetch']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['OfflineBatchRead']
         }
       }
       /** @description Validation Error */

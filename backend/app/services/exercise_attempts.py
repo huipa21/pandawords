@@ -88,6 +88,8 @@ async def create_attempt(
     data: AttemptCreate,
     *,
     plugins: ExerciseRegistry = registry,
+    ttl: timedelta = ATTEMPT_TTL,
+    offline_limit: int | None = None,
 ) -> AttemptRead:
     project, sense = _decode(data.project_id, "project"), _decode(data.sense_id, "sense")
 
@@ -108,6 +110,8 @@ async def create_attempt(
         )
         if not enabled
     )
+    if offline_limit is not None:
+        disabled |= {"image2word", "listen"}
     selection = await plugins.select(context, memory, disabled=disabled)
     issued = _now()
     attempt = Attempt(
@@ -120,11 +124,17 @@ async def create_attempt(
         generated=selection.generated,
         expected_version=memory.version,
         issued_at=issued,
-        expires_at=issued + ATTEMPT_TTL,
+        expires_at=issued + ttl,
         skipped=selection.skipped,
+        offline=offline_limit is not None,
     )
 
     async def operation(txn: UUID) -> AttemptRead:
+        if offline_limit is not None:
+            prior = await repository.reserve_offline(db, attempt, _now(), offline_limit, txn)
+            if prior is not None:
+                await _active(db, prior, txn)
+                return public(prior)
         await _active(db, attempt, txn)
         await repository.write(db, attempt, txn, create=True)
         return public(attempt)
@@ -166,10 +176,15 @@ async def submit(
     duration_ms: int,
     *,
     plugins: ExerciseRegistry = registry,
+    client_key: str | None = None,
 ) -> AttemptRead:
     if type(duration_ms) is not int or duration_ms < 0:
         raise AppError("exercise.invalid_duration", 422, "Duration must be a nonnegative integer.")
-    submission = fingerprint({"answer": answer, "duration_ms": duration_ms})
+    # A retry identity binds the single grade to one queued client answer.
+    identity = {"answer": answer, "duration_ms": duration_ms}
+    submission = fingerprint(
+        identity if client_key is None else {**identity, "client_key": client_key}
+    )
 
     async def operation(txn: UUID) -> AttemptRead:
         attempt = await repository.read(db, owner, attempt_id, txn)

@@ -2048,6 +2048,52 @@
         }
       }
     },
+    "/api/exercise-attempts/offline": {
+      "post": {
+        "tags": [
+          "exercises"
+        ],
+        "summary": "Prefetch Offline",
+        "operationId": "prefetch_offline_api_exercise_attempts_offline_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OfflinePrefetch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OfflineBatchRead"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/api/exercise-attempts": {
       "post": {
         "tags": [
@@ -4435,6 +4481,16 @@
             "type": "integer",
             "minimum": 0.0,
             "title": "Duration Ms"
+          },
+          "client_key": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClientKey"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false,
@@ -4589,6 +4645,16 @@
             "type": "integer",
             "minimum": 0.0,
             "title": "Duration Ms"
+          },
+          "client_key": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ClientKey"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "additionalProperties": false,
@@ -5029,6 +5095,12 @@
           "label"
         ],
         "title": "Choice"
+      },
+      "ClientKey": {
+        "type": "string",
+        "maxLength": 64,
+        "minLength": 16,
+        "pattern": "^[A-Za-z0-9_-]+$"
       },
       "CompletedCounts": {
         "properties": {
@@ -7039,6 +7111,60 @@
           "status"
         ],
         "title": "Occurrence"
+      },
+      "OfflineBatchRead": {
+        "properties": {
+          "project_id": {
+            "type": "string",
+            "title": "Project Id"
+          },
+          "attempts": {
+            "items": {
+              "$ref": "#/components/schemas/AttemptOpen"
+            },
+            "type": "array",
+            "title": "Attempts"
+          },
+          "lease_seconds": {
+            "type": "integer",
+            "title": "Lease Seconds"
+          },
+          "active_limit": {
+            "type": "integer",
+            "title": "Active Limit"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "project_id",
+          "attempts",
+          "lease_seconds",
+          "active_limit"
+        ],
+        "title": "OfflineBatchRead",
+        "description": "Open prompts under a fixed offline lease; never answer keys or extended leases."
+      },
+      "OfflinePrefetch": {
+        "properties": {
+          "project_id": {
+            "type": "string",
+            "title": "Project Id"
+          },
+          "limit": {
+            "type": "integer",
+            "maximum": 20.0,
+            "minimum": 1.0,
+            "title": "Limit",
+            "default": 10
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "project_id"
+        ],
+        "title": "OfflinePrefetch"
       },
       "OptimizationRead": {
         "properties": {

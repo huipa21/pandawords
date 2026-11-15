@@ -1,5 +1,30 @@
 # Testing
 
+## Offline leases and synchronization (7.1.2)
+
+Backend selectors: `tests/api/test_offline_review.py`,
+`tests/api/test_exercise_attempts.py`, `tests/integration/test_offline_migration.py`,
+`tests/integration/test_schema_snapshot.py`, `tests/integration/test_srs_reviews.py`.
+The isolated 8101 run passed 40 cases: bounded/concurrent issuance, unchanged
+lease reuse in the final minute, server timing/grading, duplicate/reordered
+submission, durable receipt replay, stale/expired no-op scheduling and isolation;
+fresh/upgrade/replay schema and snapshot checks are included.
+
+Frontend: `src/features/study/offlineReview.test.ts` uses fake-indexeddb for
+eight persistence, account/logout, storage failure/eviction, expiry, partial sync,
+give-up and lost-grade/receipt-response regressions. Run existing study/auth/API
+tests as well. `pwa/offline.spec.ts` uses real Chromium IndexedDB and both locales,
+network disconnection, lost receipt response, retry, cache inspection and logout
+deletion; run with `pwa.playwright.config.ts` after the production build.
+The service worker still stores no API data. Native OS install remains simulated
+by the PWA suite; offline authentication on a cold reload is intentionally unsupported.
+
+The offline localization/auth cleanup adds foreground bytes. The initial JS
+budget is explicitly revised by 500 bytes to **184,000** (under 180 KiB),
+retaining all route/chunk/precache bounds. The measured final payload remains
+below the pre-optimization PWA baseline (183,977 bytes); build enforcement is
+not skipped. Storage implementation is loaded lazily from auth cleanup.
+
 ## Security boundaries (7.1.3)
 
 Run the unit rate-limit/logging and API `test_security_*` suites plus exercise-attempt
@@ -29,7 +54,7 @@ at most 22 queries and a deliberately loose 2-second p95 ceiling.
 `pnpm run build` emits the Vite manifest and runs `bundle-budget.ts`; it reports
 all initial, route and individual chunk transfer bytes and separately the PWA
 install precache. Compression models production nginx gzip level 1/minimum 1024
-bytes. Bounds: initial JS 183,500 bytes, initial CSS 4,800, per-JS chunk 225,000,
+bytes. Bounds: initial JS 184,000 bytes, initial CSS 4,800, per-JS chunk 225,000,
 all static JS 665,000, project tree 255,000, project graph 525,000, all words
 485,000, login 215,000 and PWA precache 1,160,000. Missing budgeted routes fail.
 Focused frontend regressions cover graph lazy-load failure/retry and analyzer

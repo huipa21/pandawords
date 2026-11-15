@@ -1,5 +1,16 @@
 # Architecture overview
 
+## Offline review boundary (7.1.2)
+
+The authenticated review page links to a separate prepared offline queue.
+Owner-keyed IndexedDB holds only bounded prompts, submitted answers/retry keys,
+confirmation stage and recent receipt IDs. Service-worker caching remains static-only.
+The existing server attempt grader/confirmation transaction is authoritative;
+local answers are never graded as complete. Migration 0026 adds an owner
+issuance guard and an offline-attempt flag for bounded active-lease reads; it
+does not change online expiry or rewrite scheduling/history.
+See [learning-engine.md](learning-engine.md#prepared-offline-review-712).
+
 ## Personal relation editing (4.4.3)
 
 Authenticated `POST /api/relations` accepts `{start, end, type}` with opaque sense

@@ -1,5 +1,33 @@
 # Learning engine
 
+## Prepared offline review (7.1.2)
+
+`POST /api/exercise-attempts/offline` accepts an owned project and limit 1–20
+(UI requests 10). It issues only text/choice exercises with a fixed **24-hour**
+lease; normal online attempts still expire after 30 minutes. Owner-guarded
+transactions cap active unconfirmed offline attempts at 20 across projects and
+concurrent requests. Re-prefetch reuses current open leases, including their last
+minutes, without extending expiry. Stale/graded leases count until confirmation
+or expiry; discarding local data does not silently revoke or renew them.
+
+The separate offline review page stores minimal prompts and queued answers in
+owner-keyed IndexedDB, never Cache Storage. No private answer specifications,
+feedback answer keys, tokens, hints or media bytes are persisted. Image/listening
+exercises are excluded during offline selection only; online media behavior is unchanged.
+Keep an authenticated tab open: offline mode is not an authentication bypass, and
+a cold reload must authenticate online before private queues become accessible.
+
+Each answer/give-up persists its exact attempt ID, timing and UUID client key
+before sync. Reconnect or explicit Sync uses the existing server grader, then
+confirms its suggested rating (explained before answering). Confirmation stage
+and rating are persisted before sending; lost responses retry the same stage.
+Only a matching durable receipt removes the entry and increments the local
+receipt count (last 20 IDs); queued/expired/stale answers never count as completed.
+Server membership/version/expiry checks and timing caps remain authoritative.
+Partial sync retains unrelated entries. Expired/stale/failed entries retain the
+answer and an explicit copy/discard/reprepare recovery path. Browser eviction
+cannot be reversed; the empty state explains recovery without claiming success.
+
 ## Performance envelope (7.1.4)
 
 The graph/API pass changes query batching, not exercise grading or scheduling.

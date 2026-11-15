@@ -34,6 +34,7 @@
       "memory": "DEFINE TABLE memory TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "morpheme": "DEFINE TABLE morpheme TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "note": "DEFINE TABLE note TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
+      "offline_attempt_guard": "DEFINE TABLE offline_attempt_guard TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "override": "DEFINE TABLE override TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
       "part_of": "DEFINE TABLE part_of TYPE RELATION IN sentence OUT passage ENFORCED SCHEMAFULL PERMISSIONS NONE",
       "passage": "DEFINE TABLE passage TYPE NORMAL SCHEMAFULL PERMISSIONS NONE",
@@ -119,6 +120,7 @@
       "fields": {
         "expires_at": "DEFINE FIELD expires_at ON exercise_attempt TYPE datetime ASSERT $value > $this.issued_at PERMISSIONS FULL",
         "issued_at": "DEFINE FIELD issued_at ON exercise_attempt TYPE datetime PERMISSIONS FULL",
+        "offline": "DEFINE FIELD offline ON exercise_attempt TYPE bool DEFAULT false PERMISSIONS FULL",
         "owner": "DEFINE FIELD owner ON exercise_attempt TYPE record<user> PERMISSIONS FULL",
         "payload": "DEFINE FIELD payload ON exercise_attempt TYPE string PERMISSIONS FULL",
         "project": "DEFINE FIELD project ON exercise_attempt TYPE record<project> PERMISSIONS FULL",
@@ -402,6 +404,19 @@
       "lives": {},
       "tables": {}
     },
+    "offline_attempt_guard": {
+      "events": {},
+      "fields": {
+        "id": "DEFINE FIELD id ON offline_attempt_guard ASSERT $value = type::record('offline_attempt_guard', [$this.owner]) PERMISSIONS FULL",
+        "owner": "DEFINE FIELD owner ON offline_attempt_guard TYPE record<user> ASSERT $value = record::id($this.id)[0] PERMISSIONS FULL",
+        "version": "DEFINE FIELD version ON offline_attempt_guard TYPE int DEFAULT 0 PERMISSIONS FULL"
+      },
+      "indexes": {
+        "offline_attempt_guard_owner": "DEFINE INDEX offline_attempt_guard_owner ON offline_attempt_guard FIELDS owner UNIQUE"
+      },
+      "lives": {},
+      "tables": {}
+    },
     "override": {
       "events": {},
       "fields": {
@@ -509,8 +524,7 @@
       },
       "indexes": {
         "review_log_owner_at": "DEFINE INDEX review_log_owner_at ON review_log FIELDS owner, at",
-        "review_log_owner_attempt": "DEFINE INDEX review_log_owner_attempt ON review_log FIELDS owner, attempt_id UNIQUE",
-        "review_log_owner_memory_at": "DEFINE INDEX review_log_owner_memory_at ON review_log FIELDS owner, memory, at"
+        "review_log_owner_attempt": "DEFINE INDEX review_log_owner_attempt ON review_log FIELDS owner, attempt_id UNIQUE"
       },
       "lives": {},
       "tables": {}
