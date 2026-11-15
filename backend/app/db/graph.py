@@ -1,5 +1,6 @@
 """Owner-safe bounded breadth-first graph snapshot; no per-node database calls."""
 
+from pathlib import Path
 from typing import Any, cast, get_args
 from uuid import UUID
 
@@ -18,6 +19,10 @@ from app.domain.identity import user_key
 
 NODE_LIMIT = 300
 _node = TypeAdapter(GraphNode)
+_edge_query = (Path(__file__).parent / "queries" / "graph_edges.surql").read_text(encoding="utf-8")
+_single_edge_query = (Path(__file__).parent / "queries" / "graph_edges_single.surql").read_text(
+    encoding="utf-8"
+)
 
 
 async def seeds(
@@ -69,30 +74,26 @@ async def _edges(
     *,
     induced: bool = False,
 ) -> list[dict[str, Any]]:
-    result: list[dict[str, Any]] = []
-    for table in relations:
-        rows = await bounded_rows(
-            db,
-            "SELECT * FROM type::table($table) WHERE (owner = NONE OR owner = $user) "
-            "AND (in.owner = NONE OR in.owner = $user) "
-            "AND (out.owner = NONE OR out.owner = $user) "
-            "AND in IN $authorized AND out IN $authorized "
-            "AND (($induced AND in IN $frontier AND out IN $frontier) OR "
-            "($induced = false AND (($direction != 'incoming' AND in IN $frontier) OR "
-            "($direction != 'outgoing' AND out IN $frontier)))) LIMIT $limit;",
-            {
-                "table": table,
-                "user": user,
-                "frontier": cast(Value, list(frontier)),
-                "authorized": cast(Value, list(authorized)),
-                "direction": direction,
-                "induced": induced,
-            },
-            txn,
-            MAX_EDGE_ROWS - len(result),
-        )
-        result.extend(rows)
-    return result
+    parameters: dict[str, Value] = {
+        "user": user,
+        "frontier": cast(Value, list(frontier)),
+        "authorized": cast(Value, list(authorized)),
+        "direction": direction,
+        "induced": induced,
+    }
+    if len(relations) == 1:
+        parameters["relation"] = relations[0]
+        query = _single_edge_query
+    else:
+        parameters["relations"] = cast(Value, relations)
+        query = _edge_query
+    return await bounded_rows(
+        db,
+        query,
+        parameters,
+        txn,
+        MAX_EDGE_ROWS,
+    )
 
 
 async def _nodes(

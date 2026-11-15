@@ -1,9 +1,9 @@
 import type { RouteRecordRaw, RouterHistory } from 'vue-router'
 import { createRouter, createWebHistory } from 'vue-router'
-import AppShell from '@/components/app/AppShell.vue'
 import { useAuthStore } from '@/stores/auth'
-import AuthLayout from './layouts/AuthLayout.vue'
 
+const AppShell = () => import('@/components/app/AppShell.vue')
+const AuthLayout = () => import('./layouts/AuthLayout.vue')
 const placeholder = () => import('./pages/PlaceholderPage.vue')
 
 const pages = [

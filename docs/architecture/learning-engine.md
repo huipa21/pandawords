@@ -1,5 +1,14 @@
 # Learning engine
 
+## Performance envelope (7.1.4)
+
+The graph/API pass changes query batching, not exercise grading or scheduling.
+Normal and maximum graph fixtures must preserve identical authorized results and
+ordering. Project graph code loads only when its graph tab is opened; a failed
+chunk load has an explicit localized retry. PWA precaching still downloads all
+static hashed assets, so route splitting improves foreground load but does not
+reduce total first-install bandwidth.
+
 ### Morphology discovery contract (4.3.2)
 
 Existing morphology distractor ranking consumes materialized `morph_group` sense memberships;
