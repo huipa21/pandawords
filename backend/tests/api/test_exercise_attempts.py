@@ -1,5 +1,6 @@
 import asyncio
 import json
+from uuid import uuid4
 
 import pytest
 from fsrs import Rating
@@ -248,6 +249,18 @@ async def test_all_attempt_routes_reject_other_owner_and_unauthenticated(
         ):
             response = await client.post(path + suffix, headers=auth, json=body)
             assert response.status_code == status, response.text
+    missing = f"{URL}/{uuid4().hex}"
+    for method, suffix, body in (
+        ("GET", "", None),
+        ("POST", "/hint", None),
+        ("POST", "/answer", {"answer": "a", "duration_ms": 10}),
+        ("POST", "/giveup", {"duration_ms": 10}),
+        ("POST", "/confirm", {"rating": 4}),
+    ):
+        hidden = await client.request(method, path + suffix, headers=foreign, json=body)
+        absent = await client.request(method, missing + suffix, headers=foreign, json=body)
+        assert hidden.status_code == absent.status_code == 404
+        assert hidden.json() == absent.json()
     assert not (await probe.saved(db, study.user.id, opened["id"])).hint_used
     assert await probe.logs(db, study.user.id) == []
     await client.post(path + "/answer", headers=headers, json={"answer": "a", "duration_ms": 10})

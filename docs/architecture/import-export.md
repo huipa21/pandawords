@@ -8,6 +8,15 @@ All archives are `.tar.gz` with a `manifest.json` at the root:
   "attribution": ["Wiktionary (CC BY-SA)", "Open English WordNet (CC BY 4.0)", "ECDICT (MIT)"] }
 ```
 
+## Availability and security scope
+
+The project bundle import/export, user backup, whole-site backup, scheduled backup and restore
+APIs described below are **Phase 6 designs, not implemented in this branch**. No cross-user
+isolation or archive-content test can be claimed for unavailable paths. The existing production
+pre-migration SurrealDB export is database-only: it does not include media and is not a tested
+whole-site backup or restore. Reaudit ownership, archive validation and privacy when Phase 6 is
+integrated; do not rely on the proposed features until then.
+
 ## Project bundle (`format: pandawords.project`)
 
 ```

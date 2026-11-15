@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import subprocess
+from ipaddress import ip_network
 from pathlib import Path
 from typing import Literal
 from urllib.parse import urlsplit, urlunsplit
@@ -64,6 +65,21 @@ class Settings(BaseSettings):
     public_base_url: str = "http://localhost:5173"
     app_env: Literal["development", "production"] = "development"
     app_version: str = "dev"
+    trusted_proxy_cidrs: list[str] = Field(default_factory=list)
+    rate_limit_window_seconds: int = Field(default=60, gt=0, le=3600)
+    rate_limit_capacity: int = Field(default=16384, gt=0, le=1000000)
+    rate_limit_auth: int = Field(default=30, gt=0)
+    rate_limit_anonymous: int = Field(default=60, gt=0)
+    rate_limit_user: int = Field(default=600, gt=0)
+    rate_limit_expensive: int = Field(default=120, gt=0)
+
+    @field_validator("trusted_proxy_cidrs")
+    @classmethod
+    def validate_trusted_proxies(cls, values: list[str]) -> list[str]:
+        networks = [ip_network(value) for value in values]
+        if any(network.prefixlen == 0 for network in networks):
+            raise ValueError("Trust explicit proxy networks, never every address")
+        return [str(network) for network in networks]
 
     jwt_secret: str = "replace-with-a-long-random-secret"
     jwt_access_ttl_minutes: int = Field(default=60, gt=0)

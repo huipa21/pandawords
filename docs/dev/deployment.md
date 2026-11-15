@@ -85,6 +85,47 @@ schema version, size, hash and build counts. Keep it alongside the database. The
 a separately transferred rebuildable artifact, **not part of site backups**; no backup
 command or retention policy changes.
 
+### Security proxy and headers (7.1.3)
+
+Production serves the app **only behind the HTTPS Caddy site** in `Caddyfile.snippet`; do not
+publish nginx or the API directly. Choose a non-overlapping `PANDAWORDS_INTERNAL_SUBNET` and
+reserve its `PANDAWORDS_WEB_INTERNAL_IP` exclusively for web. Compose configures the API to trust
+only that web address as `/32`; `TRUSTED_PROXY_CIDRS` in the environment cannot widen this
+production trust. The API image must keep one worker and `--no-proxy-headers --no-access-log`.
+Nginx overwrites `X-Forwarded-For` with its vetted peer and sets `X-Forwarded-Proto: https`
+because the edge is HTTPS; this prevents an API trailing-slash redirect from downgrading a
+body-bearing request to HTTP. Caddy overwrites `X-Panda-Client-IP` with `{remote_host}`.
+
+On the external Caddy network, assign Caddy a stable IP and create `proxy-trust` next to
+`compose.yml` before startup. Place a file such as `proxy-trust/caddy.conf` there, replacing
+the documentation-only IP with **that one Caddy IP**:
+
+```nginx
+set_real_ip_from 192.0.2.10/32;
+real_ip_header X-Panda-Client-IP;
+real_ip_recursive off;
+```
+
+Use the corresponding `/128` for a fixed IPv6 peer. Never trust a whole untrusted network or
+client-supplied forwarding chains. Without this file nginx safely ignores the header but every
+proxied client shares Caddy's rate-limit/backoff bucket. Reconfigure the exact trusted address
+if Caddy moves, then validate/reload nginx. Keep access/query logging disabled at Caddy and nginx:
+provider keys, private searches and content must not enter logs.
+
+Nginx 1.30 merges its server security headers into asset/cache and error responses: CSP uses
+`default-src 'none'` and same-origin script/connect/font/manifest/worker, with `blob:` only for
+protected image/media object URLs. `style-src 'unsafe-inline'` is the documented Naive UI runtime
+style exception; scripts do not allow inline code, `unsafe-eval`, or wildcards. `nosniff`,
+`X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`, and a disabled
+camera/microphone/geolocation Permissions Policy are always sent. Caddy sends one-year HSTS on
+HTTPS responses; nginx itself is HTTP internally and must not emit HSTS there. Fingerprinted
+assets remain immutable, the shell is `no-cache`, and protected media is `private, no-store`.
+The 429 contract and single-process limitation are in [auth.md](../architecture/auth.md).
+
+The database-only pre-migration export does **not** include media and is not a full-site backup.
+The Phase 6 project/user/site import/export, scheduled backup and restore features are not present
+in this branch; see [import-export.md](../architecture/import-export.md#availability-and-security-scope).
+
 ### Verified release round trip (task 1.6.5)
 
 Verified with PowerShell 7.7.0, Podman client 5.8.2 / VM 5.8.4:

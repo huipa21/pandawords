@@ -9,8 +9,10 @@ services:
     mem_limit: 64m
     volumes:
       - media:/data/media:ro
+      - ./proxy-trust:/etc/nginx/proxy-trust:ro
     networks:
       internal:
+        ipv4_address: ${PANDAWORDS_WEB_INTERNAL_IP:?Set PANDAWORDS_WEB_INTERNAL_IP}
       caddy:
         aliases:
           - pandawords-web
@@ -30,6 +32,7 @@ services:
       SURREAL_URL: ws://surrealdb:8000/rpc
       MEDIA_DIR: /data/media
       LEXICON_DIR: /data/lexicon
+      TRUSTED_PROXY_CIDRS: '["${PANDAWORDS_WEB_INTERNAL_IP:?Set PANDAWORDS_WEB_INTERNAL_IP}/32"]'
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -123,6 +126,9 @@ volumes:
 networks:
   internal:
     internal: true
+    ipam:
+      config:
+        - subnet: ${PANDAWORDS_INTERNAL_SUBNET:?Set PANDAWORDS_INTERNAL_SUBNET}
   caddy:
     external: true
     name: ${CADDY_NETWORK:?Set CADDY_NETWORK in .env}

@@ -7,7 +7,7 @@ import httpx
 from surrealdb import AsyncSurrealConnection
 
 from app.core.config import Settings
-from app.core.errors import AppError
+from app.core.errors import AppError, retry_headers
 from app.db import images as repository
 from app.domain.images import MAX_BYTES, ImageSelection, PixabayResult, PixabaySearch
 from app.domain.jobs import JobRead, JobRejected
@@ -46,7 +46,12 @@ async def fetch(
                             params = None
                             continue
                         if response.status_code == 429:
-                            raise AppError("image.rate_limit", 429, "Pixabay rate limit reached.")
+                            raise AppError(
+                                "image.rate_limit",
+                                429,
+                                "Pixabay rate limit reached.",
+                                headers=retry_headers(3600),
+                            )
                         response.raise_for_status()
                         length = response.headers.get("content-length")
                         if length and int(length) > limit:

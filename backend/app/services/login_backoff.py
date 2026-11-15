@@ -4,7 +4,7 @@ from collections import OrderedDict
 from collections.abc import Callable
 from dataclasses import dataclass
 
-from app.core.errors import AppError
+from app.core.errors import AppError, retry_headers
 
 
 @dataclass
@@ -38,11 +38,22 @@ class LoginBackoff:
                 del self._attempts[old]
         entry = self._attempts.get(key)
         if entry is not None and (entry.pending or entry.ready_at > now):
-            raise AppError("auth.login_throttled", 429, "Invalid credentials.")
+            raise AppError(
+                "auth.login_throttled",
+                429,
+                "Invalid credentials.",
+                headers=retry_headers(entry.ready_at - now),
+            )
         if entry is None:
             if len(self._attempts) >= self.capacity:
                 # Do not evict active restrictions: spraying new names must not reset backoff.
-                raise AppError("auth.login_throttled", 429, "Invalid credentials.")
+                retry = min(value.expires_at for value in self._attempts.values()) - now
+                raise AppError(
+                    "auth.login_throttled",
+                    429,
+                    "Invalid credentials.",
+                    headers=retry_headers(retry),
+                )
             entry = _Attempt(0, now, now + self.ttl)
             self._attempts[key] = entry
         entry.pending = True
