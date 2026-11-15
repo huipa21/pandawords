@@ -9,6 +9,30 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 
 ## Current run
 
+### Phase 7 run
+
+Request: implement Phase 7 with dependency-driven parallel agents (maximum five), verify and
+commit all Phase 7 work, merge task branches to main, then remove those branches and worktrees.
+Coordinator baseline: clean main at `be9f23b`; context resume returned no prior journal.
+External dependencies 1.4.3, 1.5.4, 1.6.4, 3.3.2, 4.4.2 and 3.1.2 are all ✅.
+Launch 7.1.1, 7.1.3, 7.1.4 and 7.1.5 independently; launch 7.1.2 only after
+7.1.1 is merged and verified. Serialize integration, generated API/schema files and checks.
+Do not stop/reset shared services or modify unrelated Phase 6 worktrees. Reserve migrations
+0024 for FSRS optimization, 0025 for measured performance (only if justified), 0026 for
+offline leases (only if needed); 0022/0023 remain reserved for Phase 6.
+Agents must not edit PLAN/PROGRESS or merge. Shared topic-doc changes are integrated serially.
+
+| Task | Branch | Worktree | State / next step |
+|---|---|---|---|
+| 7.1.1 | task/7.1.1-pwa | ../pandawords.worktrees/7.1.1 | Ready: static-only PWA and install UI |
+| 7.1.2 | task/7.1.2-offline-review | ../pandawords.worktrees/7.1.2 | Waiting for verified 7.1.1 merge |
+| 7.1.3 | task/7.1.3-hardening | ../pandawords.worktrees/7.1.3 | Ready: rate limits, headers, isolation |
+| 7.1.4 | task/7.1.4-performance | ../pandawords.worktrees/7.1.4 | Ready: measured graph and bundle budgets |
+| 7.1.5 | task/7.1.5-fsrs-optimization | ../pandawords.worktrees/7.1.5 | Ready: bounded per-user optimization |
+
+Verification: not yet run for Phase 7. Blockers: none for the first wave.
+Skipped/deferred: 7.1.2 intentionally waits for its prerequisite; unrelated Phase 6 is out of scope.
+
 Request: implement Phases 4 and 5 with dependency-driven parallel agents (global maximum five), merge all
 task branches to main, commit all task files and remove task branches/worktree folders.
 Interpretation: "phase-34md" means the supplied Phase 4 detail document; Phase 3 is complete.
