@@ -82,6 +82,13 @@ keyboard submission, timer, feedback, rating and receipt-driven continuation rem
 - Mobile-first. Below `lg`: header + bottom nav (Projects · Review · Words · Reading · Me).
   From `lg`: header + sidebar (Projects, All words, Reading, Review, Settings, Admin when the
   user is an admin).
+- The shell uses a grey page canvas with separate white, bordered, rounded panels for the
+  full-width header, desktop sidebar and main content. Blue identifies the brand and active
+  navigation; existing dark-mode semantic tokens remain supported. Outer padding is
+  `p-4 lg:p-6`, with `gap-4` between containers. The header places a decorative Lucide panda badge
+  before the localized brand name, including on authentication pages.
+- Desktop navigation aligns icons and labels to the left; only mobile bottom-navigation
+  links use centered columns. Mobile retains safe-area padding and space for the fixed bar.
 
 ### Vocabulary graph (4.4.2)
 
@@ -95,8 +102,8 @@ depth is 0–3 and a 413 shows narrowing instructions instead of a partial/trunc
 Filters and retry remain available after failures. Select a word/phrase to navigate to its
 detail; every node supports explicit expansion without requiring pointer gestures.
 
-- Each page: `PageHeader`, then content in a `max-w-content` container with `p-4 lg:p-6` and
-  `gap-6` between sections.
+- Each page: `PageHeader`, then content in a `max-w-content` container within the main panel
+  with `p-4 lg:p-6` and `gap-6` between sections.
 - Detail pages on mobile open full screen. On desktop, list + detail can sit side by side
   (`lg:grid-cols-[...]` is not allowed; use named grid template classes defined in the uno config).
 - `src/app/router.ts` separates `/login` (auth layout) from the app layout. Documented routes

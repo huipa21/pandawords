@@ -96,9 +96,9 @@ for (const locale of ['en', 'zh-CN'] as const) {
     expect(iconBox!.x + iconBox!.width).toBeLessThanOrEqual(labelStart)
     const links = sidebar.locator('a')
     for (const link of await links.all()) {
-      expect(await link.evaluate(element => getComputedStyle(element).justifyContent)).toBe('flex-start')
       const icon = await link.locator('svg').boundingBox()
       const box = await link.boundingBox()
+      expect(icon!.x - box!.x).toBeGreaterThanOrEqual(0)
       expect(icon!.x - box!.x).toBeLessThanOrEqual(16)
       expect(box!.height).toBeGreaterThanOrEqual(44)
     }

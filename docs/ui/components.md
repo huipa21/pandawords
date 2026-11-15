@@ -74,9 +74,9 @@ size (`text-base` = 16, `text-lg` = 20, `text-xl` = 24).
 
 | Component | Purpose / key props |
 |---|---|
-| `AppShell` | Implemented: header, sidebar (≥ `lg`) / bottom nav (< `lg`), router outlet; root `app/App.vue` owns Naive providers and theme sync |
-| `AppHeader` | Shared brand link and preference controls; authenticated password-change link and logout action |
-| `AppNavigation` | Localized router links with active/keyboard states; admin-only links; `mobile?` selects bottom navigation |
+| `AppShell` | Separate rounded header, desktop sidebar and main-content panels on the grey canvas; bottom nav (< `lg`) with safe-area reserve; router outlet; root `app/App.vue` owns Naive providers and theme sync |
+| `AppHeader` | Full-width rounded panel with decorative blue Lucide panda badge before the shared brand link; preference controls; authenticated password-change link and logout action |
+| `AppNavigation` | Left-aligned desktop localized router links with blue active/keyboard states; admin-only links; `mobile?` selects centered bottom navigation |
 | `PageHeader` | Implemented: `title`, `subtitle?`; wrapping `actions` slot |
 | `EmptyState` | Implemented: NEmpty with `titleKey`, `descKey?`; `action` slot |
 | `ErrorState` | Implemented: NResult with localized retry; `error` (localized text), `loading?`, `@retry` |

@@ -17,12 +17,13 @@ unnumbered UI refinement, not a new PLAN task. Dependencies: existing shell and 
 tokens present; no numbered prerequisites. Shared foundation keeps blue tokens and dark
 mode, makes the light page grey and panels white.
 
-Execution: one `task/ui-shell-refresh` branch/worktree at
-`../pandawords.worktrees/ui-shell-refresh`, with two parallel agents owning disjoint
-header/auth-layout and shell/navigation scopes. Main coordinates shared tokens, docs,
-integration and browser checks. Agents do not commit or touch shared services.
-Verification will cover only related frontend tests, lint/typecheck and desktop/mobile
-browser behavior; no whole-app test reruns. Next: implement independent UI tracks.
+Status: **complete**. Shared styling committed as `efc5862`; two parallel agents completed
+disjoint header/auth-layout and shell/navigation tracks, committed as `7e6ad29` and merged
+into main. Main integrated the focused browser regressions and related documentation.
+Verification: `dev.ps1 check` passed once after integration; 18 focused unit tests passed;
+all four focused Chromium tests passed (desktop in both locales, responsive widths
+320/390/1023/1024, and dark theme). No whole-app tests were run. Task branch/worktree
+cleanup is recorded below. Blockers/follow-ups: none; no push or deployment requested.
 
 ### Phase 7 run
 
@@ -113,6 +114,37 @@ Status: Phase 6 complete (all six tasks ✅, merged to main); no Phase 6 worktre
 | 6.1.6 | `portability.errors.export_too_large` i18n key appears unused | small cleanup |
 
 ## Log
+
+### 2026-11-15 — Screenshot-inspired UI shell refresh
+
+- Completed: decorative Lucide panda badge before the localized brand, rounded full-width
+  header, separate desktop sidebar/main panels, grey light canvas and white surfaces with
+  existing blue accents. Removed conflicting centered/left alignment utilities from desktop
+  navigation; preserved mobile centered links, safe-area reserve, admin gating, accessible
+  actions and dark theme. Narrow authenticated headers wrap without horizontal overflow.
+- Dependencies: existing shell/tokens available; numbered PLAN dependencies not applicable.
+  Used one Mode B feature worktree and two disjoint parallel agents after the shared
+  foundation. No new dependency, API/schema change or new document was required.
+- Verification: `dev.ps1 check` passed after merge; focused Vitest selectors for AppHeader,
+  AppNavigation, AppShell, tokens and generators passed **18/18**. Chromium app-shell tests
+  passed **4/4** across both locales, desktop/mobile breakpoint boundaries and dark mode.
+  Tests mock auth/projects, never use real credentials or mutate shared backend data.
+  Live login header inspection confirmed inset position, white surface, rounded corners
+  and visible icon. The original browser regression failed on the flush header before
+  integration; it passed after the changes.
+- Corrections: two new unit assertions used `.exists()` on typed `.get()` wrappers; changed
+  existence checks and fixed the resulting unused variable, then typecheck passed. Initial
+  browser harness attempts had a Windows regex selector mismatch, overbroad API interception
+  matching Vite source imports, and an ambiguous header selector; all corrected before final
+  verification. Chromium normalizes desktop alignment to `flow-start`; final regression
+  measures rendered left inset rather than requiring a particular CSS serialization.
+  Only failed desktop cases were rerun after that test correction. Final scoped ESLint and
+  frontend typecheck passed. An optional integrated-browser mock preview lost its deferred
+  result/page; no preview acceptance claim was made. Real Chromium tests provide shell
+  acceptance, and the user's existing login page/preferences were left intact.
+- Skipped: full backend/frontend/E2E suites (unrelated to this change), push and deployment
+  (not requested). No secrets or environment files touched. No shared service was started,
+  stopped or reset. No blockers or follow-ups.
 
 Newest first. One entry per finished, blocked, or interrupted task. Every entry records completed
 work, dependencies, verification outcomes, skipped work and reasons, failures and known causes,
