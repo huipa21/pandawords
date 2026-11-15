@@ -1,22 +1,25 @@
 <script setup lang="ts">
 import type { InstallEvent } from './install'
-import { computed, onMounted, onUnmounted, ref, shallowRef } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, shallowRef } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { clearInstallPrompt, subscribeToInstallAvailability } from './install'
 
 const storageKey = 'pandawords.install-dismissed.v1'
 const { t } = useI18n()
 const deferred = shallowRef<InstallEvent>()
+const actions = ref<HTMLElement>()
 const busy = ref(false)
 const dismissed = ref(false)
+const installFailed = ref(false)
 const standalone = window.matchMedia?.('(display-mode: standalone)')
 const installed = ref(standalone?.matches ?? false)
-const visible = computed(() => deferred.value && !dismissed.value && !installed.value)
+const visible = computed(() => (Boolean(deferred.value) || installFailed.value) && !dismissed.value && !installed.value)
 let unsubscribe: (() => void) | undefined
 
 function remember() {
   dismissed.value = true
   deferred.value = undefined
+  installFailed.value = false
   clearInstallPrompt()
   try {
     localStorage.setItem(storageKey, '1')
@@ -31,6 +34,7 @@ async function install() {
   if (!event || busy.value)
     return
   busy.value = true
+  let focusDismiss = false
   try {
     await event.prompt()
     const choice = await event.userChoice
@@ -38,13 +42,21 @@ async function install() {
       remember()
   }
   catch {
-    // A failed native prompt is not a user dismissal.
+    if (!dismissed.value && !installed.value && deferred.value === event) {
+      focusDismiss = document.activeElement === actions.value?.querySelector('button')
+      installFailed.value = true
+    }
   }
   finally {
     clearInstallPrompt(event)
     if (deferred.value === event)
       deferred.value = undefined
     busy.value = false
+  }
+  if (focusDismiss) {
+    await nextTick()
+    if (installFailed.value && !deferred.value && document.activeElement === document.body)
+      actions.value?.querySelector<HTMLButtonElement>('button')?.focus()
   }
 }
 
@@ -65,6 +77,8 @@ onMounted(() => {
     }
     else {
       deferred.value = availability.event
+      if (availability.event)
+        installFailed.value = false
     }
   })
 })
@@ -85,9 +99,12 @@ onUnmounted(() => unsubscribe?.())
         <p class="mb-0 mt-1 text-sm text-muted">
           {{ t('pwa.installDescription') }}
         </p>
+        <p v-if="installFailed" role="alert" class="mb-0 mt-1 text-sm text-error">
+          {{ t('pwa.installFailed') }}
+        </p>
       </div>
-      <div class="flex flex-wrap gap-2">
-        <NButton type="primary" size="large" class="focus-visible:pw-focus-ring" :loading="busy" @click="install">
+      <div ref="actions" class="flex flex-wrap gap-2">
+        <NButton v-if="deferred" type="primary" size="large" class="focus-visible:pw-focus-ring" :loading="busy" @click="install">
           {{ t('pwa.install') }}
         </NButton>
         <NButton size="large" class="focus-visible:pw-focus-ring" :disabled="busy" @click="remember">

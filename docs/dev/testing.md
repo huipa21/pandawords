@@ -28,14 +28,17 @@ pnpm run build
 pnpm run test:pwa
 ```
 
-The focused unit tests exercise registration failures, early/unsupported install events,
-dismissal, both locales, standalone mode, cache isolation and worker lifecycle failures.
+The focused unit tests exercise sanitized registration warnings, localized native-prompt and
+choice failures, recovery from newer install events, early/unsupported events, dismissal, both
+locales, standalone mode, cache isolation and worker lifecycle failures.
 The Playwright command starts its own strict-port loopback preview on 4179 and an ephemeral
 update fixture; neither uses the shared API or database. Set `PWA_TEST_PORT` to a different
 unused port for parallel worktrees; an occupied port is never reused. Chromium checks its own
 installability diagnostics, manifest/icon and precache integrity, credential-free precache
 requests, mocked online login/routing, real offline shell loading, uncached private traffic,
-keyboard focus/install/dismissal and narrow/wide layouts in both locales. A real worker update
+keyboard focus/install/dismissal, failure feedback and narrow/wide layouts in both locales.
+Failure checks also ensure login remains usable and a delayed failure does not steal focus.
+A real worker update
 rejects altered shell bytes, preserves the active version, waits for an old controlled tab, and cleans
 only obsolete app caches after activation. Integrated real-stack authentication remains the
 coordinator's separate regression responsibility.

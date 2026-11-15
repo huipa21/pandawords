@@ -13,8 +13,11 @@ filenames and their references when those public files change.
 
 New workers wait for controlled tabs to close before switching and deleting older shell caches.
 Failed installation, disabled service workers or unavailable storage must not block normal
-online browsing. No API responses, authenticated media or personal page responses enter the
-worker cache; the offline shell alone does not provide offline review.
+online browsing. A registration failure logs the fixed browser-console warning
+`pwa_service_worker_registration_failed` without exception messages or request data.
+Native prompt failures instead show a localized in-page alert. No API responses, authenticated
+media or personal page responses enter the worker cache; the offline shell alone does not
+provide offline review.
 
 ## Image request limits
 

@@ -110,6 +110,70 @@ it.each(['dismissed', 'accepted'] as const)('does not reoffer after native choic
   expect(wrapper.find('section').exists()).toBe(false)
 })
 
+it.each([
+  ['en', 'Installation couldn\'t start. You can continue using PandaWords in your browser.', 'Not now'],
+  ['zh-CN', '无法启动安装。你仍可在浏览器中使用 PandaWords。', '暂不安装'],
+] as const)('shows accessible %s feedback for native prompt failure and recovers on a new event', async (locale, message, dismiss) => {
+  const wrapper = render(locale)
+  available('dismissed', vi.fn(async () => {
+    throw new Error('sensitive native prompt details')
+  }))
+  await flushPromises()
+  await wrapper.findAll('button')[0]!.trigger('click')
+  await flushPromises()
+  expect(wrapper.get('[role="alert"]').text()).toBe(message)
+  expect(wrapper.text()).not.toContain('sensitive native prompt details')
+  expect(wrapper.findAll('button').map(button => button.text())).toEqual([dismiss])
+  expect(localStorage.getItem('pandawords.install-dismissed.v1')).toBeNull()
+
+  const next = available()
+  await flushPromises()
+  expect(wrapper.find('[role="alert"]').exists()).toBe(false)
+  expect(wrapper.findAll('button')).toHaveLength(2)
+  await wrapper.findAll('button')[0]!.trigger('click')
+  await flushPromises()
+  expect(next.prompt).toHaveBeenCalledOnce()
+  expect(wrapper.find('section').exists()).toBe(false)
+})
+
+it('shows feedback if the native user choice rejects', async () => {
+  let rejectChoice!: (reason: Error) => void
+  const userChoice = new Promise<{ outcome: 'accepted' | 'dismissed' }>((_, reject) => {
+    rejectChoice = reject
+  })
+  const wrapper = render()
+  const event = Object.assign(new Event('beforeinstallprompt', { cancelable: true }), {
+    prompt: vi.fn(async () => rejectChoice(new Error('sensitive choice details'))),
+    userChoice,
+  })
+  window.dispatchEvent(event)
+  await flushPromises()
+  await wrapper.findAll('button')[0]!.trigger('click')
+  await flushPromises()
+  expect(wrapper.get('[role="alert"]').text()).toBe('Installation couldn\'t start. You can continue using PandaWords in your browser.')
+  expect(wrapper.text()).not.toContain('sensitive choice details')
+  expect(localStorage.getItem('pandawords.install-dismissed.v1')).toBeNull()
+})
+
+it('does not replace a newer install event with a stale prompt failure', async () => {
+  let rejectPrompt!: (reason: Error) => void
+  const wrapper = render()
+  available('accepted', vi.fn(() => new Promise<void>((_, reject) => {
+    rejectPrompt = reject
+  })))
+  await flushPromises()
+  await wrapper.findAll('button')[0]!.trigger('click')
+  const next = available()
+  await flushPromises()
+  rejectPrompt(new Error('old prompt failed'))
+  await flushPromises()
+  expect(wrapper.find('[role="alert"]').exists()).toBe(false)
+  expect(wrapper.findAll('button')).toHaveLength(2)
+  await wrapper.findAll('button')[0]!.trigger('click')
+  await flushPromises()
+  expect(next.prompt).toHaveBeenCalledOnce()
+})
+
 it('does not persist a native prompt failure, even when storage is denied', async () => {
   vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
     throw new Error('denied')
@@ -124,11 +188,12 @@ it('does not persist a native prompt failure, even when storage is denied', asyn
   await flushPromises()
   await wrapper.findAll('button')[0]!.trigger('click')
   await flushPromises()
-  expect(wrapper.find('section').exists()).toBe(false)
+  expect(wrapper.get('[role="alert"]').text()).toContain('Installation couldn\'t start.')
   expect(save).not.toHaveBeenCalled()
   available()
   await flushPromises()
   expect(wrapper.find('section').exists()).toBe(true)
+  expect(wrapper.find('[role="alert"]').exists()).toBe(false)
   await wrapper.findAll('button')[1]!.trigger('click')
 })
 
@@ -142,11 +207,16 @@ it('does not offer installation in standalone mode', async () => {
 })
 
 it('stops offering installation when the app is installed elsewhere', async () => {
+  let rejectPrompt!: (reason: Error) => void
   const wrapper = render()
-  available()
+  available('accepted', vi.fn(() => new Promise<void>((_, reject) => {
+    rejectPrompt = reject
+  })))
   await flushPromises()
   expect(wrapper.find('section').exists()).toBe(true)
+  await wrapper.findAll('button')[0]!.trigger('click')
   window.dispatchEvent(new Event('appinstalled'))
+  rejectPrompt(new Error('old prompt failed after installation'))
   await flushPromises()
   expect(wrapper.find('section').exists()).toBe(false)
   available()

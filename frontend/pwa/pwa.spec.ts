@@ -201,7 +201,80 @@ test('captures an early install event and invokes the native prompt from the key
   await expect(page.locator('#username')).toBeVisible()
 })
 
+test('reports registration failures without exposing their details or blocking login', async ({ page, context }) => {
+  const messages: string[] = []
+  page.on('console', message => messages.push(message.text()))
+  await context.route('**/api/**', route => route.fulfill({
+    status: 401,
+    json: { code: 'auth.unauthorized' },
+  }))
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator.serviceWorker, 'register', {
+      value: async () => { throw new Error('sensitive registration details') },
+    })
+  })
+  await page.goto('/login')
+  await expect(page.locator('#username')).toBeVisible()
+  await expect.poll(() => messages).toContain('pwa_service_worker_registration_failed')
+  expect(messages.join(' ')).not.toContain('sensitive registration details')
+  await page.locator('#username').fill('reader')
+  await expect(page.locator('#username')).toHaveValue('reader')
+})
+
 for (const locale of ['en', 'zh-CN'] as const) {
+  test(`failed native install remains accessible and does not block login: ${locale}`, async ({ page, context }) => {
+    await page.setViewportSize({ width: 320, height: 800 })
+    await context.route('**/api/**', route => route.fulfill({
+      status: 401,
+      json: { code: 'auth.unauthorized' },
+    }))
+    await page.addInitScript((language) => {
+      localStorage.setItem('pandawords.preferences', JSON.stringify({ locale: language, theme: 'light' }))
+      window.addEventListener('beforeinstallprompt', (event) => {
+        if (event.isTrusted) {
+          event.preventDefault()
+          event.stopImmediatePropagation()
+        }
+      })
+    }, locale)
+    await page.goto('/login')
+    await page.evaluate(() => {
+      window.dispatchEvent(Object.assign(new Event('beforeinstallprompt', { cancelable: true }), {
+        prompt: async () => { throw new Error('sensitive native prompt details') },
+        userChoice: Promise.resolve({ outcome: 'accepted' }),
+      }))
+    })
+    const region = page.locator('section[aria-labelledby="pwa-install-title"]')
+    const install = region.getByRole('button', {
+      name: locale === 'en'
+        ? 'Install'
+        : '安装',
+      exact: true,
+    })
+    const dismiss = region.getByRole('button', {
+      name: locale === 'en'
+        ? 'Not now'
+        : '暂不安装',
+      exact: true,
+    })
+    await install.focus()
+    await page.keyboard.press('Enter')
+    const alert = region.getByRole('alert')
+    await expect(alert).toHaveText(locale === 'en'
+      ? 'Installation couldn\'t start. You can continue using PandaWords in your browser.'
+      : '无法启动安装。你仍可在浏览器中使用 PandaWords。')
+    await expect(install).toHaveCount(0)
+    await expect(dismiss).toBeVisible()
+    await expect(dismiss).toBeFocused()
+    expect(await page.evaluate(() => localStorage.getItem('pandawords.install-dismissed.v1'))).toBeNull()
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
+    await page.keyboard.press('Enter')
+    await expect(region).toHaveCount(0)
+    expect(await page.evaluate(() => localStorage.getItem('pandawords.install-dismissed.v1'))).toBe('1')
+    await page.locator('#username').fill('reader')
+    await expect(page.locator('#username')).toHaveValue('reader')
+  })
+
   for (const width of [320, 1280]) {
     test(`install prompt keyboard, localization and layout: ${locale} ${width}`, async ({ page, context }) => {
       await page.setViewportSize({ width, height: 800 })
@@ -280,3 +353,35 @@ for (const locale of ['en', 'zh-CN'] as const) {
     })
   }
 }
+
+test('a delayed native prompt failure does not steal focus from the login form', async ({ page, context }) => {
+  await context.route('**/api/**', route => route.fulfill({
+    status: 401,
+    json: { code: 'auth.unauthorized' },
+  }))
+  await page.addInitScript(() => {
+    localStorage.setItem('pandawords.preferences', JSON.stringify({ locale: 'en', theme: 'light' }))
+    window.addEventListener('beforeinstallprompt', (event) => {
+      if (event.isTrusted) {
+        event.preventDefault()
+        event.stopImmediatePropagation()
+      }
+    })
+  })
+  await page.goto('/login')
+  await page.evaluate(() => {
+    const state = window as Window & { rejectInstall?: () => void }
+    window.dispatchEvent(Object.assign(new Event('beforeinstallprompt', { cancelable: true }), {
+      prompt: () => new Promise<void>((_, reject) => {
+        state.rejectInstall = () => reject(new Error('native prompt failed'))
+      }),
+      userChoice: Promise.resolve({ outcome: 'accepted' }),
+    }))
+  })
+  const region = page.locator('section[aria-labelledby="pwa-install-title"]')
+  await region.getByRole('button', { name: 'Install', exact: true }).click()
+  await page.locator('#username').focus()
+  await page.evaluate(() => (window as Window & { rejectInstall?: () => void }).rejectInstall?.())
+  await expect(region.getByRole('alert')).toBeVisible()
+  await expect(page.locator('#username')).toBeFocused()
+})

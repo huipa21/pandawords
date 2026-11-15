@@ -2,6 +2,7 @@
   "pwa": {
     "installTitle": "Install PandaWords",
     "installDescription": "Open PandaWords from your home screen. Learning still requires a connection.",
+    "installFailed": "Installation couldn't start. You can continue using PandaWords in your browser.",
     "install": "Install",
     "dismiss": "Not now"
   },
