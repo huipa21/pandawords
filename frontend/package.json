@@ -10,6 +10,7 @@
     "typecheck": "vue-tsc -b --noEmit",
     "lint": "eslint .",
     "test": "vitest run",
+    "test:pwa": "playwright test --config pwa.playwright.config.ts",
     "test:e2e": "playwright test"
   },
   "dependencies": {

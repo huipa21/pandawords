@@ -7,10 +7,12 @@ import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
 import Components from 'unplugin-vue-components/vite'
 import { defineConfig } from 'vitest/config'
 import { designCssPlugin } from './design-css-plugin.ts'
+import { pwaPlugin } from './pwa-plugin.ts'
 
 export default defineConfig({
   plugins: [
     designCssPlugin(),
+    pwaPlugin(),
     UnoCSS(),
     vue(),
     Icons({ compiler: 'vue3' }),

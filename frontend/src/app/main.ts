@@ -1,6 +1,7 @@
 import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 import { configureApiAuth } from '@/api/client'
+import { registerServiceWorker } from '@/features/pwa/register'
 import { createAppI18n } from '@/i18n'
 import { useAuthStore } from '@/stores/auth'
 import App from './App.vue'
@@ -22,3 +23,5 @@ createApp(App)
   .use(createAppI18n())
   .use(createAppRouter())
   .mount('#app')
+
+registerServiceWorker()

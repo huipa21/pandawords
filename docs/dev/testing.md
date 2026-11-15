@@ -18,6 +18,36 @@ identities and protected identity collisions. UI cases cover both locales, expli
 selection, retained choices after failures, retry/removal confirmation and graph refresh.
 `dev.ps1 check` passed. No migration or external provider is required.
 
+## Installable static shell (7.1.1)
+
+From `frontend`:
+
+```powershell
+pnpm exec vitest run src\features\pwa --maxWorkers=2 --testTimeout=60000 --reporter=dot
+pnpm run build
+pnpm run test:pwa
+```
+
+The focused unit tests exercise sanitized registration warnings, localized native-prompt and
+choice failures, recovery from newer install events, early/unsupported events, dismissal, both
+locales, standalone mode, cache isolation and worker lifecycle failures.
+The Playwright command starts its own strict-port loopback preview on 4179 and an ephemeral
+update fixture; neither uses the shared API or database. Set `PWA_TEST_PORT` to a different
+unused port for parallel worktrees; an occupied port is never reused. Chromium checks its own
+installability diagnostics, manifest/icon and precache integrity, credential-free precache
+requests, mocked online login/routing, real offline shell loading, uncached private traffic,
+keyboard focus/install/dismissal, failure feedback and narrow/wide layouts in both locales.
+Failure checks also ensure login remains usable and a delayed failure does not steal focus.
+A real worker update
+rejects altered shell bytes, preserves the active version, waits for an old controlled tab, and cleans
+only obsolete app caches after activation. Integrated real-stack authentication remains the
+coordinator's separate regression responsibility.
+
+Verification on 2026-11-15: the focused PWA/router/login/auth/preferences selection passed
+**38 tests**; `dev.ps1 test -Frontend` passed with `VITEST_MAX_WORKERS=2`. Production build,
+the **7 Chromium PWA tests** (`PWA_TEST_PORT=4181`) and `dev.ps1 check` passed. The build
+retains the existing large-chunk warning. No shared service lifecycle or database reset was used.
+
 ## Reading and inline vocabulary (4.2.3)
 
 Using the existing healthy 8101 server and random isolated database fixture, from `backend`:

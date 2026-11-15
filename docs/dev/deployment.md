@@ -1,5 +1,24 @@
 # Deployment
 
+## Installable web deployment (7.1.1)
+
+Serve the production web build at the origin root over HTTPS (localhost is also a secure
+context). Deploy `index.html`, `sw.js`, the manifest, install-listener script, icons and
+hashed assets together. Do not template or inject user-specific content into the built shell:
+the worker verifies every precached file against its build-time SHA-256 digest and rejects a
+partial or mismatched deployment. Keep `sw.js` and the shell revalidated rather than
+long-lived immutable; the existing nginx rules use `no-cache` for them and immutable caching
+only for hashed assets. Bump the explicit version in the manifest, icon and install-listener
+filenames and their references when those public files change.
+
+New workers wait for controlled tabs to close before switching and deleting older shell caches.
+Failed installation, disabled service workers or unavailable storage must not block normal
+online browsing. A registration failure logs the fixed browser-console warning
+`pwa_service_worker_registration_failed` without exception messages or request data.
+Native prompt failures instead show a localized in-page alert. No API responses, authenticated
+media or personal page responses enter the worker cache; the offline shell alone does not
+provide offline review.
+
 ## Image request limits
 
 Nginx permits **11 MiB** request bodies (`client_max_body_size 11m`), leaving 1 MiB
