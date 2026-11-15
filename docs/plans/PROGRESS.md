@@ -80,9 +80,7 @@ and 7 completed meanwhile. Both worktrees were fast-forwarded to `77c4767` (6.1.
 kept) and agents relaunched. Because 0024/0026 are already applied, Phase 6 migrations (only if
 needed) now use 0027 (6.1.1-6.1.4 chain) and 0028 (6.1.5) to keep versions ascending.
 
-| Task | Branch | Worktree | State / notes |
-|---|---|---|---|
-| 6.1.6 | task/6.1.6-portability-ui | ../pandawords.worktrees/6.1.6 | Agent running |
+Status: Phase 6 complete (all six tasks ✅, merged to main); no Phase 6 worktrees or task branches remain.
 
 ## Blocked
 
@@ -93,12 +91,40 @@ needed) now use 0027 (6.1.1-6.1.4 chain) and 0028 (6.1.5) to keep versions ascen
 
 | Found in | Item | Proposed home (task ID / new task) |
 |---|---|---|
+| 6.1.3 | Importing a word owned by another user returns 409 and reveals that some account owns it (global unique `(lang, text)` index) | new hardening task |
+| 6.1.3 | Missing shared dictionary rows are created from bundle content; consider lexicon cross-check | new hardening task |
+| 6.1.3 | Tag-hierarchy cycle checks are not re-run for imported `member_of` edges | new task |
+| 6.1.5 | Run `deploy/restore.sh` against the real Docker server; POSIX permission tests skip on Windows | deployment verification |
+| 6.1.6 | `portability.errors.export_too_large` i18n key appears unused | small cleanup |
 
 ## Log
 
 Newest first. One entry per finished, blocked, or interrupted task. Every entry records completed
 work, dependencies, verification outcomes, skipped work and reasons, failures and known causes,
 and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets.
+
+### 2026-11-15 — 6.1.6 Export, import and backup UI
+- Result / completed: merged (`a08fee9`, `79c1e1c`, `4d90b37`, `c4fd2c3`, `c45ae16`) plus main fix
+  `237af22`. Project export button and import dialog (client pre-check, progress choice, upload
+  status, cancel, retry keeping file/options, localized summary/errors with stage), user backup /
+  restore section in Settings with confirmation, admin-only site-backup page (create, poll, protected
+  blob download; no browser restore). Portability strings lazy-loaded from `src/i18n/portability/`.
+- Dependencies: 6.1.2, 6.1.3, 6.1.4, 6.1.5 checked ✅.
+- Verification on main: `dev.ps1 check` passed; gen-api no diff; vitest 42 files / 275 tests passed
+  (`--maxWorkers=2 --testTimeout=60000`); `pnpm build` passed; full backend suite (after 6.1.4)
+  1282 passed. Fixture-backed offline stack (`LLM_DAILY_BUDGET=0`, `AUDIO_NETWORK_ENABLED=false`):
+  all 6 Playwright E2E specs passed, including the new portability round-trip (progress on and off).
+- Skipped / deferred: none.
+- Failures / causes / corrections: two UI agents failed on DNS/model-service errors; WIP was
+  preserved, the coordinator fixed harness lint and relaunched a finishing agent. First portability
+  E2E run failed because Chromium evicted the import response body from the inspector cache; the
+  spec now reads it through `page.route`/`route.fetch` (`237af22`). An initial full-E2E run without
+  the offline env vars in the test process failed two pre-checks; rerun with them passed.
+- Findings / decisions: bundle budgets raised slightly (initial JS 184,000→185,500, all JS
+  665,000→675,000, project page 255,000→258,000) for the two new lazy routes and import dialog;
+  accepted by the coordinator (autopilot) and documented in testing.md/deployment.md. Two agent
+  commits used `--no-verify`; final commits and main checks passed hooks.
+- Blockers / follow-ups: see Backlog. Phase 6 complete.
 
 ### 2026-11-15 — 6.1.4 User full backup and restore
 - Result / completed: merged (`5d740d1` wip, `ebd9320`). `GET /api/me/backup` downloads a
