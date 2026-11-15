@@ -1,5 +1,20 @@
 # SurrealDB 3.3 notes
 
+## Bulk import inserts in one transaction (6.1.3) ✅
+
+Verified on the isolated 8101 SurrealDB 3.3.5 harness with SDK 3.0 (`_atomic` transactions):
+`INSERT $rows RETURN NONE;` accepts an array of objects with explicit `id` RecordIDs from
+**mixed tables** and returns `[]`; `INSERT INTO $t $rows` also works, but
+`INSERT INTO type::table($t) …` is a parse error. A duplicate ID raises `AlreadyExistsError`;
+a unique-index violation (e.g. `lemma_lang_text`) raises an internal error naming the index,
+and the statement inserts none of its rows. `INSERT RELATION $rows RETURN NONE;` takes explicit
+`id`/`in`/`out` across mixed edge tables; a missing endpoint on an `ENFORCED` relation raises
+`NotFoundError`; without `id` it auto-generates one. `owner: None` from Python stores NONE.
+`SELECT id, owner = NONE AS shared FROM $ids` returns only existing rows (an identity probe
+without reading content). `FOR $r IN $rows { CREATE $r.id CONTENT $r; }` works but returns no
+result list, so `_rows` rejects it — use `INSERT`. A cancelled transaction leaves none of the
+inserted rows. Retained probes: `tests/api/test_project_import*.py`. No migration.
+
 ## Offline issuance guard (7.1.2) ✅
 
 Verified with the isolated 8101 SurrealDB 3.3.5 harness: owner-bound

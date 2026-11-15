@@ -5,7 +5,7 @@ All archives are `.tar.gz` with a `manifest.json` as the **first** member:
 ```json
 { "format": "pandawords.project", "version": 1, "schema_revision": 1, "app_version": "0.x.y",
   "created_at": "2026-01-02T03:04:05.000000Z", "lexicon_version": "…", "source_lang": "zh",
-  "target_lang": "en",
+  "target_lang": "en", "source": "<64 hex or null>",
   "attribution": ["Wiktionary (CC BY-SA)", "Open English WordNet (CC BY 4.0)", "ECDICT (MIT)"],
   "entries": [{ "path": "data.json", "sha256": "<64 hex>", "size": 1234 }, …] }
 ```
@@ -24,6 +24,7 @@ Implemented in `backend/app/domain/bundle*.py` (pure models/validation) and
 | `schema_revision` | Additive revision of `data.json` within the major (currently `1`). Newer revisions fail with `bundle.unsupported_schema`, because this reader would silently drop unknown fields; older revisions of the same major stay readable. `data.json` repeats it and must match. |
 | `app_version`, `lexicon_version` | Informational. Differences never block an import (shared rows travel in the bundle and existing shared rows are never overwritten); `compatibility_warnings()` reports them, plus source/target language differences from the importer, for the result screen. |
 | `source_lang`, `target_lang` | BCP-47-like tags (letters/digits/hyphens). |
+| `source` | Optional, non-identifying source fingerprint written by project export: HMAC-SHA256 keyed by a key derived from `JWT_SECRET` over the exporting user's key and the `data.json` sha256. Only this server can check it, it is bound to the content (any edit of `data.json` breaks it) and differs per bundle, so it does not link bundles to an account for anyone else. Rotating `JWT_SECRET` makes old bundles count as foreign (progress then defaults to off). |
 | `attribution` | Required (non-empty) when the bundle contains shared dictionary rows. |
 | `entries` | Integrity list: path, sha256, size for every member except the manifest; no duplicates, and the archive must contain exactly these members. |
 
@@ -86,10 +87,10 @@ and UTC timestamps with microseconds, so the same logical input produces byte-id
 `data.json` and, with the same `created_at`, byte-identical archives.
 ## Availability and security scope
 
-The bundle contract, validator and archive helpers (6.1.1) and project **export** (6.1.2, below)
-are implemented. Project import and user backup/restore described below are **Phase 6 designs,
-not implemented in this branch**; no cross-user isolation or archive-content test can be claimed
-for those paths. The admin whole-site backup, scheduled backup and operator restore (task 6.1.5)
+The bundle contract, validator and archive helpers (6.1.1), project **export** (6.1.2) and
+project **import** (6.1.3, below) are implemented. User backup/restore described below is a
+**Phase 6 design, not implemented in this branch**; no cross-user isolation or archive-content
+test can be claimed for that path. The admin whole-site backup, scheduled backup and operator restore (task 6.1.5)
 are implemented as described in [Admin site backup](#admin-site-backup-format-pandawordssite).
 There is deliberately no browser or API site-restore upload. The production pre-migration
 SurrealDB export remains a separate, database-only safety copy.
@@ -138,15 +139,68 @@ media/         images and audio referenced by data.json
     on client disconnect, and on any failure. Only the (bounded) `data.json` is held in memory;
     media is hashed and archived by streaming from disk. Database IDs, storage paths and
     credentials never appear in the archive.
-- **Import**:
-  - Shared dictionary items are merged by deterministic ID. Missing ones are created as shared
-    (`owner = NONE`), and existing ones are not modified.
-  - User-owned items get new IDs owned by the importer, and references are remapped.
-  - Overrides are applied to the importer.
-  - Option **Import progress**: on by default when the bundle came from the same user (a restore),
-    off otherwise. When it's off, memory rows start as new cards.
-  - Senses that already have a memory row for the importer: keep the importer's existing memory
-    (never overwrite).
+- **Import** (6.1.3): `POST /api/projects/import[?include_progress=true|false]`, authenticated,
+  raw request body `application/gzip` (not multipart, so nothing is spooled before the bound).
+  The body is streamed into a private directory under `BUNDLE_WORK_DIR` and rejected with
+  `bundle.too_large` (413, stage `upload`) above `BUNDLE_IMPORT_MAX_BYTES` (default 512 MiB;
+  a larger `Content-Length` is refused up front); the directory is removed afterwards whatever
+  happens. Response `201` `ImportSummary`:
+  `{project_ids: [id], progress_imported, same_source, created: {kind: n}, merged: {kind: n},
+  skipped: {kind: n}, conflicts: [notice], warnings: [compatibility warning]}`.
+  - **Validate everything first**: `load_bundle` (archive safety, manifest, `data.json`,
+    references), then ≤ 500,000 items, then every media file (non-empty; images ≤ 10 MiB and
+    decodable as their declared type via `image_validation`; audio ≤ `AUDIO_MAX_BYTES` with a
+    magic-byte check for its MIME). Failures are `bundle.<reason>` (422) with `stage` and
+    path-free `problems` in the error body; nothing is written.
+  - **Shared items** merge by deterministic ID. Missing ones are created as shared
+    (`owner = NONE`) from the validated bundle data; existing ones are never modified (missing
+    shared edges likewise). New shared lexemes get `pron.audio = null`, so user files never
+    become shared rows. A shared ref/edge ID that is occupied by a **non-shared** row (a forged
+    ref at another user's record) fails with `bundle.identity_conflict` (409, problem
+    `shared_identity: <table>`) without revealing the row.
+  - **User-owned items** (records, edges, project, memberships, notes, media) get fresh IDs owned
+    by the importer and every reference is remapped. Edge endpoints are only verified shared
+    IDs, fresh owned IDs or reused visible lemmas, so no edge can reach another user's rows.
+    Memberships keep `hidden`, `added_at` and `study_order`; the project keeps its name,
+    languages, plan and `created_at`. An owned lemma whose `(lang, text)` already exists as a
+    shared lemma or the importer's own is **reused** (counted in `merged`); if another user owns
+    it (`lemma_lang_text` is globally unique) the import fails with 409 `lemma_identity: lemma`.
+  - **Media**: bundle media is stored as the importer's own (also formerly shared audio, unless
+    its shared target already exists, then it is skipped) under a fresh `{kind}/{id}{ext}`.
+    Owned lexeme pronunciation audio is remapped to the imported media.
+  - **Overlays**: overrides are validated like the API (`OverrideFields`, editable fields) and
+    created for the importer; an existing override of the same target is kept
+    (`override_kept`). Notes are copied.
+  - **Progress** (`include_progress`): default **on only for a verified same-user restore**
+    (`same_source`: the manifest `source` HMAC matches this user and this `data.json`), off
+    otherwise; an explicit query value wins. A sense that already has the importer's memory keeps
+    it untouched, together with the importer's history (`memory_kept`; the bundle's logs of that
+    sense are skipped). On: cards and review logs are imported; logs whose `attempt_id` the
+    importer already has are skipped (`review_log_duplicate`), so completion receipts are never
+    duplicated; a log with `project: null` is attributed to the imported project; when
+    `card_after` is present the completion receipt is rebuilt for the new IDs (its
+    `request_fingerprint` is derived from the imported receipt, so the optimizer can use it but it
+    never matches a client's original request fingerprint). Off: each memory entry
+    becomes a new card (`introduced = false`, default FSRS state) and no logs are imported.
+  - **Repeated imports** are safe and create **another project copy each time** (fresh owned
+    IDs); shared rows/edges merge idempotently, memory/history are not duplicated.
+  - **Atomicity**: all rows are written in one SurrealDB transaction (`INSERT` with explicit
+    IDs, then `INSERT RELATION`, then review logs; `member_of` imports bump
+    `user.tag_revision`). Media files are copied with exclusive creates before commit and
+    removed if anything fails, including commit and transaction-conflict retries. Unexpected
+    database/file failures are `bundle.apply_failed` (500, stage `apply`, no details); a failed
+    import leaves no rows, memberships or media files.
+  - **Reusable core for user restore (6.1.4)**: `app/domain/bundle_import.py`
+    (`ImportOptions`, `allocate`, `state_query`, `ExistingState`, `ImportPlan`,
+    `ImportSummary`, `check_size`), `app/domain/bundle_import_plan.py::build_plan`,
+    `app/db/bundle_import.py` (`read_state`, `write_plan`) and
+    `app/services/bundle_import.py::apply_bundle(db, settings, owner, bundle, options)`
+    (+ `validate_media_files`); `app/services/project_import.py` only adds the upload, format
+    and summary handling.
+  - Known limits: tag-hierarchy cycle checks are not re-run for imported `member_of` edges
+    (imported tags are fresh, so only edges to shared tags matter); creating missing shared rows
+    from a bundle trusts its validated content (the dictionary may gain rows from another
+    instance).
 - The JSON Schema for `data.json` lives at `backend/app/domain/bundle.schema.json` and is
   enforced on import (see Bundle contract above).
 

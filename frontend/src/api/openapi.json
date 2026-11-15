@@ -2054,6 +2054,72 @@
         }
       }
     },
+    "/api/projects/import": {
+      "post": {
+        "tags": [
+          "projects"
+        ],
+        "summary": "Import Project",
+        "description": "Import a ``pandawords.project`` bundle as a new project of the current user.\n\n``include_progress`` defaults to on only when the bundle was exported by this same user.",
+        "operationId": "import_project_api_projects_import_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "include_progress",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Include Progress"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImportSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/gzip": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/dictionary/candidates": {
       "post": {
         "tags": [
@@ -6258,6 +6324,73 @@
           "result_id"
         ],
         "title": "ImageSelection"
+      },
+      "ImportSummary": {
+        "properties": {
+          "project_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Project Ids"
+          },
+          "progress_imported": {
+            "type": "boolean",
+            "title": "Progress Imported"
+          },
+          "same_source": {
+            "type": "boolean",
+            "title": "Same Source"
+          },
+          "created": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Created"
+          },
+          "merged": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Merged"
+          },
+          "skipped": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Skipped"
+          },
+          "conflicts": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Conflicts"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Warnings"
+          }
+        },
+        "type": "object",
+        "required": [
+          "project_ids",
+          "progress_imported",
+          "same_source",
+          "created",
+          "merged",
+          "skipped",
+          "conflicts",
+          "warnings"
+        ],
+        "title": "ImportSummary",
+        "description": "Completion result; counts only, never IDs of other accounts or storage paths."
       },
       "JobRead": {
         "properties": {

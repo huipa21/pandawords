@@ -57,10 +57,10 @@ Build the frontend, then run `.\scripts\test-security-proxy.ps1` with a locally
 available API image (`-ApiImage`): this uses actual production nginx responses,
 both locales, protected images, graph/reading flows, CSP enforcement, URL-log privacy,
 and direct/trusted-ingress spoofing probes. It cleans up only its own containers.
-Project export (6.1.2) isolation is covered by `tests/api/test_project_export.py` (see below).
-User backup, project import, restore and site backup endpoints are not implemented yet
-(Phase 6); their isolation acceptance remains with those tasks rather than claiming coverage of
-nonexistent APIs.
+Project export (6.1.2) and project import (6.1.3) isolation is covered by
+`tests/api/test_project_export.py` and `tests/api/test_project_import*.py` (see below).
+User backup and restore endpoints are not implemented yet (Phase 6); their isolation acceptance
+remains with those tasks rather than claiming coverage of nonexistent APIs.
 
 ## Measured graph and bundle budgets (7.1.4)
 
@@ -1022,6 +1022,27 @@ archive-writer failure leaving no work directory. From `backend`:
 
 ```powershell
 uv run --no-sync pytest -q tests\api\test_project_export.py
+```
+
+## Project import tests (6.1.3)
+
+Real-database API tests on an isolated per-test 8101 database with private media/work dirs
+(`.project-import-*`): `tests/api/test_project_import.py` (round trips) and
+`tests/api/test_project_import_failures.py`, helpers in `tests/api/project_import_support.py`
+(`seed` builds and exports a project; `rebuild` re-packs an export after editing its JSON;
+`snapshot` counts shared rows and each user's owned rows). Covered: shared rows merged without
+overwrite, owned ID/reference remapping (tag + `member_of`, notes, media file copy), hidden and
+ordered memberships, own-lemma reuse, repeated imports (new copy each time), same-source
+default progress on vs. another user's default off, explicit on (card + log, `project: null`
+fallback, rebuilt receipt) and off (new card, no logs), existing memory/override kept and no
+duplicate attempts, cross-user isolation (bob's copies are his own; alice cannot read them),
+lemma-identity and forged shared-ref (`shared_identity`) conflicts, malformed/traversal/empty/
+oversized uploads, oversized and non-decodable media, and database or file-copy failures
+(rollback, copied files removed). Each failure asserts unchanged row counts, unchanged media
+files and an empty work directory. From `backend`:
+
+```powershell
+uv run --no-sync pytest -q tests\api\test_project_import.py tests\api\test_project_import_failures.py
 ```
 
 ## Test database

@@ -1,37 +1,23 @@
-from dataclasses import dataclass
 from typing import Any
 
 import pytest
 from httpx import AsyncClient
 from surrealdb import RecordID
 from surrealdb.connections.async_ws import AsyncWsSurrealConnection
-from surrealdb.types import Value
 
 from app.core.record_ids import decode_rid, encode_rid
-from app.db.dictionary_schema_test_support import relate
 from app.db.migration_store import checked_query
-from app.db.project_schema_test_support import put_override
 from app.services.lexicon import LexiconReader
-from tests.api.project_export_support import (
-    SHARED_AUDIO,
-    Dictionary,
-    dictionary,
-    include,
-    media,
-    owned,
-    progress,
-    store_file,
-)
 from tests.api.project_import_support import (
     Account,
     Dirs,
     accounts,
     db,
     dirs,
-    export,
     media_files,
-    new_project,
     png,
+    rebuild,
+    seed,
     snapshot,
     test_settings,
     upload,
@@ -39,53 +25,6 @@ from tests.api.project_import_support import (
 
 pytestmark = pytest.mark.integration
 __all__ = ["accounts", "db", "dirs", "test_settings"]
-
-
-@dataclass
-class Seeded:
-    words: Dictionary
-    project: RecordID
-    tag: RecordID
-    lemma: RecordID
-    archive: bytes
-
-
-async def seed(
-    client: AsyncClient,
-    db: AsyncWsSurrealConnection,
-    alice: Account,
-    reader: LexiconReader,
-    dirs: Dirs,
-) -> Seeded:
-    words = await dictionary(db, reader)
-    project = await new_project(client, alice, "Source")
-    await include(db, alice.user, project, words.lemma)
-    await include(db, alice.user, project, words.move, study_order=1)
-    await include(db, alice.user, project, words.operate, hidden=True, study_order=0)
-    lemma = await owned(
-        db,
-        "lemma",
-        alice.user,
-        text="blorpzz",
-        lang="en",
-        kind="word",
-        freq_zipf=1.0,
-        exam_tags=[],
-        source="user",
-    )
-    await include(db, alice.user, project, lemma)
-    await put_override(db, alice.user, words.move, {"definition": "My meaning"})
-    await owned(db, "note", alice.user, target=words.move, kind="mnemonic", text="run = 润")
-    await owned(db, "note", alice.user, target=project, kind="note", text="project note")
-    tag = await owned(db, "tag", alice.user, kind="custom", name="Alice exam")
-    await relate(db, "member_of", words.move, tag, {"owner": alice.user})
-    await media(db, alice.user, words.move, store_file(dirs.media, "image/aa/alice.png", png()))
-    audio = store_file(dirs.media, "audio/cc/run.mp3", SHARED_AUDIO)
-    shared_audio = await media(db, None, words.lexeme, audio, kind="audio")
-    pron: list[Value] = [{"accent": "US", "ipa": "/rʌn/", "audio": shared_audio}]
-    await checked_query(db, "UPDATE $l SET pron = $p;", {"l": words.lexeme, "p": pron})
-    await progress(db, alice.user, words.move, project, "alice-1")
-    return Seeded(words, project, tag, lemma, await export(client, alice, project))
 
 
 async def one(db: AsyncWsSurrealConnection, query: str, **variables: Any) -> list[dict[str, Any]]:
@@ -186,7 +125,12 @@ async def test_progress_option_paths_and_isolation(
     await checked_query(db, "DELETE $l;", {"l": seeded.lemma})
     await checked_query(db, "DELETE includes WHERE out = $l;", {"l": seeded.lemma})
 
-    first = await upload(client, bob, seeded.archive, include_progress=True)
+    def receipt_source(raw: dict[str, Any]) -> None:
+        log = raw["review_log"][0]
+        log.update(project=None, card_after=raw["memory"][0]["card"])
+
+    archive = rebuild(dirs, seeded.archive, receipt_source)
+    first = await upload(client, bob, archive, include_progress=True)
     assert first.status_code == 201, first.text
     assert first.json()["same_source"] is False and first.json()["progress_imported"] is True
     project = decode_rid(first.json()["project_ids"][0], "project")
@@ -197,7 +141,11 @@ async def test_progress_option_paths_and_isolation(
         db, "SELECT attempt_id, project, receipt FROM review_log WHERE owner = $u;", u=bob.user
     )
     assert [(log["attempt_id"], log["project"]) for log in logs] == [("alice-1", project)]
-    assert logs[0].get("receipt") is None  # source log had no completion receipt
+    # project=null falls back to the imported project; the receipt is rebuilt from card_after.
+    receipt = logs[0]["receipt"]
+    assert receipt["project_id"] == encode_rid(project, "project")
+    assert receipt["memory"]["id"] == encode_rid(memory, "memory")
+    assert receipt["memory"]["card"]["card_id"] == 7
 
     # Default for another user's bundle is off; existing memory is preserved, no duplicates.
     second = await upload(client, bob, seeded.archive)

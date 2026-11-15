@@ -66,6 +66,15 @@ owner-owned rows become bundle-local refs (`sense:@1`) and are remapped on impor
 only `shared`/`owned`, never a user ID. Memory is keyed by sense, overrides by target and
 memberships by project/target, matching their deterministic database IDs. Storage-only fields
 (media `path`, revisions, review receipts/fingerprints) and all account fields are excluded.
+
+Import (6.1.3, no migration) maps refs back: shared refs to their deterministic IDs (created
+only when free, never overwritten; an ID held by an owned row is a 409 identity conflict),
+owned refs to fresh `uuid4().hex` IDs of the importer, except an owned lemma whose
+`(lang, text)` is already visible to the importer (shared or own), which is reused because
+`lemma_lang_text` is globally unique. Memory IDs are rebuilt as `memory:[importer, sense]`
+(existing memory wins), overrides as `override:[importer, target]` (existing wins), and
+`review_log.project = null` points at the imported project. Media rows get a fresh
+`{kind}/{id}{ext}` path. See [import-export.md](import-export.md#project-bundle-format-pandawordsproject).
 ## Two layers
 
 ### Review media preferences (5.1.3)

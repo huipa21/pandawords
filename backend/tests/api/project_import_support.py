@@ -13,14 +13,29 @@ from httpx import AsyncClient, Response
 from PIL import Image
 from surrealdb import RecordID
 from surrealdb.connections.async_ws import AsyncWsSurrealConnection
+from surrealdb.types import Value
 
 from app.core.config import Settings
 from app.core.record_ids import decode_rid, encode_rid
+from app.db.dictionary_schema_test_support import relate
 from app.db.migration_store import checked_query
+from app.db.project_schema_test_support import put_override
 from app.domain.bundle import parse_data
+from app.domain.bundle_manifest import ManifestHeader
 from app.domain.identity import user_key
 from app.services.bundle_io import export_bundle, load_bundle
+from app.services.lexicon import LexiconReader
 from tests.api.auth_support import bearer, login
+from tests.api.project_export_support import (
+    SHARED_AUDIO,
+    Dictionary,
+    dictionary,
+    include,
+    media,
+    owned,
+    progress,
+    store_file,
+)
 from tests.conftest import UserFactory
 
 PROJECT_FORMATS = frozenset({"pandawords.project"})
@@ -124,7 +139,7 @@ def rebuild(dirs: Dirs, archive: bytes, mutate: Callable[[dict[str, Any]], None]
         raw = bundle.data.model_dump(mode="json")
         mutate(raw)
         data = parse_data(json.dumps(raw).encode())
-        header = bundle.archive.manifest.model_copy(update={"source": None})
+        header = ManifestHeader(**bundle.archive.manifest.model_dump(exclude={"entries", "source"}))
         files = {m.file: bundle.media_path(m.file) for m in bundle.data.media}
         target = dirs.root / "rebuilt.tar.gz"
         target.unlink(missing_ok=True)
@@ -157,3 +172,53 @@ async def snapshot(db: AsyncWsSurrealConnection, *users: RecordID) -> dict[str, 
 
 def media_files(dirs: Dirs) -> set[Path]:
     return {path for path in dirs.media.rglob("*") if path.is_file()}
+
+
+@dataclass
+class Seeded:
+    words: Dictionary
+    project: RecordID
+    tag: RecordID
+    lemma: RecordID
+    archive: bytes
+
+
+async def seed(
+    client: AsyncClient,
+    db: AsyncWsSurrealConnection,
+    alice: Account,
+    reader: LexiconReader,
+    dirs: Dirs,
+    image: bytes | None = None,
+) -> Seeded:
+    words = await dictionary(db, reader)
+    project = await new_project(client, alice, "Source")
+    await include(db, alice.user, project, words.lemma)
+    await include(db, alice.user, project, words.move, study_order=1)
+    await include(db, alice.user, project, words.operate, hidden=True, study_order=0)
+    lemma = await owned(
+        db,
+        "lemma",
+        alice.user,
+        text="blorpzz",
+        lang="en",
+        kind="word",
+        freq_zipf=1.0,
+        exam_tags=[],
+        source="user",
+    )
+    await include(db, alice.user, project, lemma)
+    await put_override(db, alice.user, words.move, {"definition": "My meaning"})
+    await owned(db, "note", alice.user, target=words.move, kind="mnemonic", text="run = 润")
+    await owned(db, "note", alice.user, target=project, kind="note", text="project note")
+    tag = await owned(db, "tag", alice.user, kind="custom", name="Alice exam")
+    await relate(db, "member_of", words.move, tag, {"owner": alice.user})
+    await media(
+        db, alice.user, words.move, store_file(dirs.media, "image/aa/alice.png", image or png())
+    )
+    audio = store_file(dirs.media, "audio/cc/run.mp3", SHARED_AUDIO)
+    shared_audio = await media(db, None, words.lexeme, audio, kind="audio")
+    pron: list[Value] = [{"accent": "US", "ipa": "/rʌn/", "audio": shared_audio}]
+    await checked_query(db, "UPDATE $l SET pron = $p;", {"l": words.lexeme, "p": pron})
+    await progress(db, alice.user, words.move, project, "alice-1")
+    return Seeded(words, project, tag, lemma, await export(client, alice, project))

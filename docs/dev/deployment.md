@@ -49,6 +49,11 @@ frame: at most 25 million pixels/frame, 100 frames and 50 million total pixels.
 Do not expose `/_media/` publicly or replace protected media delivery with provider hotlinks.
 `PIXABAY_API_KEY` stays server-side; omitting it leaves ordinary upload fully functional.
 
+Only `POST /api/projects/import` (bundle import, 6.1.3) allows **512 MiB** bodies, unbuffered
+(`proxy_request_buffering off`); the API streams the body to `BUNDLE_WORK_DIR` and enforces
+`BUNDLE_IMPORT_MAX_BYTES` (default 512 MiB, keep it ≤ the nginx limit). Make sure the work
+directory's volume has room for the upload plus its extracted contents.
+
 The API image seeds `/data/media/.initialized` before switching to UID/GID 10001.
 Keep this marker: with a completely empty fresh Podman volume, a later root nginx mount
 can reinitialize ownership to 0:0, making API uploads fail despite its read-only mount.
