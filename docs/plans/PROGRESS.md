@@ -74,11 +74,16 @@ minutes earlier). Decision (user unavailable; pragmatic option): leave that work
 Phase 6 files by explicit path, and run Phase 6 in isolated worktrees. Migration allocation: Phase 6
 uses 0022 (6.1.1-6.1.4 chain) and 0023 (6.1.5) only if a concrete schema need arises; 0020 stays
 reserved for 5.1.3. Chain: 6.1.1 → 6.1.2 → 6.1.3 → 6.1.4; 6.1.5 parallel; 6.1.6 last.
+Interruption (2026-11-15): both first agents failed with model-service errors before committing
+(6.1.1 left two untracked bundle modules and an `errors.py` edit; 6.1.5 left nothing). Phases 4, 5
+and 7 completed meanwhile. Both worktrees were fast-forwarded to `77c4767` (6.1.1 partial work
+kept) and agents relaunched. Because 0024/0026 are already applied, Phase 6 migrations (only if
+needed) now use 0027 (6.1.1-6.1.4 chain) and 0028 (6.1.5) to keep versions ascending.
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 6.1.1 | task/6.1.1-bundle-format | ../pandawords.worktrees/6.1.1 | Agent running |
-| 6.1.5 | task/6.1.5-site-backup | ../pandawords.worktrees/6.1.5 | Agent running |
+| 6.1.1 | task/6.1.1-bundle-format | ../pandawords.worktrees/6.1.1 | Agent relaunched |
+| 6.1.5 | task/6.1.5-site-backup | ../pandawords.worktrees/6.1.5 | Agent relaunched |
 
 ## Blocked
 
