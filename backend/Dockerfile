@@ -21,13 +21,16 @@ ENV PATH="/app/backend/.venv/bin:${PATH}" \
     PYTHONDONTWRITEBYTECODE=1 \
     APP_ENV=production \
     MEDIA_DIR=/data/media \
-    LEXICON_DIR=/data/lexicon
+    LEXICON_DIR=/data/lexicon \
+    SITE_BACKUP_DIR=/data/site-backups
 # Keep media copy-up nonempty so a later nginx mount cannot reinitialize it as root.
+# Site backups copy up as an owner-only (0700) directory for the non-root API/backup user.
 RUN groupadd --gid 10001 pandawords \
     && useradd --uid 10001 --gid pandawords --no-create-home pandawords \
-    && mkdir -p /data/media /data/lexicon \
+    && mkdir -p /data/media /data/lexicon /data/site-backups \
     && touch /data/media/.initialized \
-    && chown -R pandawords:pandawords /data
+    && chown -R pandawords:pandawords /data \
+    && chmod 700 /data/site-backups
 WORKDIR /app/backend
 COPY --from=build /app/backend/.venv .venv
 COPY app ./app

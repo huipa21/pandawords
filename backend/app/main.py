@@ -12,6 +12,7 @@ from starlette.types import ASGIApp
 
 from app.api.add_to_project import router as add_to_project_router
 from app.api.admin import router as admin_router
+from app.api.admin_backup import router as admin_backup_router
 from app.api.auth import router as auth_router
 from app.api.candidates import router as candidates_router
 from app.api.content import router as content_router
@@ -119,6 +120,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(media_router)
     app.include_router(images_router)
     app.include_router(admin_router)
+    app.include_router(admin_backup_router)
     app.include_router(projects_router)
     app.include_router(study_plan_router)
     app.include_router(srs_optimization_router)

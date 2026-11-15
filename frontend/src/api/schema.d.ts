@@ -366,6 +366,41 @@ export interface paths {
     patch: operations['update_user_api_admin_users__id__patch']
     trace?: never
   }
+  '/api/admin/backups': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** List Backups */
+    get: operations['list_backups_api_admin_backups_get']
+    put?: never
+    /** Create Backup */
+    post: operations['create_backup_api_admin_backups_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/admin/backups/{name}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Download Backup */
+    get: operations['download_backup_api_admin_backups__name__get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/projects': {
     parameters: {
       query?: never
@@ -2518,6 +2553,29 @@ export interface components {
       /** Occurrences */
       occurrences?: components['schemas']['Occurrence'][]
     }
+    /** SiteBackupRead */
+    'SiteBackupRead': {
+      /** Name */
+      name: string
+      /**
+       * Created At
+       * Format: date-time
+       */
+      created_at: string
+      /** Size */
+      size: number
+      /** Sha256 */
+      sha256: string
+    }
+    /** SiteBackupStatus */
+    'SiteBackupStatus': {
+      /** Running */
+      running: boolean
+      /** Last Error */
+      last_error: string | null
+      /** Backups */
+      backups: components['schemas']['SiteBackupRead'][]
+    }
     /** SrsPreferences */
     'SrsPreferences': {
       /**
@@ -3502,6 +3560,77 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['AdminUserResult']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  list_backups_api_admin_backups_get: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SiteBackupStatus']
+        }
+      }
+    }
+  }
+  create_backup_api_admin_backups_post: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['SiteBackupStatus']
+        }
+      }
+    }
+  }
+  download_backup_api_admin_backups__name__get: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        name: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/gzip': unknown
         }
       }
       /** @description Validation Error */

@@ -37,6 +37,7 @@ function Invoke-Release {
         'compose.yml' = 'deploy\compose.yml'
         '.env.example' = '.env.example'
         'Caddyfile.snippet' = 'deploy\Caddyfile.snippet'
+        'restore.sh' = 'deploy\restore.sh'
     }
     foreach ($name in $bundleFiles.Keys) {
         if (-not (Test-Path -LiteralPath (Join-Path $Root $bundleFiles[$name]) -PathType Leaf)) {

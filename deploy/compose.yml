@@ -32,6 +32,7 @@ services:
       SURREAL_URL: ws://surrealdb:8000/rpc
       MEDIA_DIR: /data/media
       LEXICON_DIR: /data/lexicon
+      SITE_BACKUP_DIR: /data/site-backups
       TRUSTED_PROXY_CIDRS: '["${PANDAWORDS_WEB_INTERNAL_IP:?Set PANDAWORDS_WEB_INTERNAL_IP}/32"]'
     depends_on:
       migrate:
@@ -42,6 +43,7 @@ services:
     volumes:
       - media:/data/media
       - ./lexicon:/data/lexicon:ro
+      - site-backups:/data/site-backups
     networks:
       - internal
     healthcheck:
@@ -95,6 +97,34 @@ services:
     networks:
       - internal
 
+  backup:
+    image: pandawords-api:${APP_VERSION:?Set APP_VERSION in .env}
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      APP_ENV: production
+      SURREAL_URL: ws://surrealdb:8000/rpc
+      MEDIA_DIR: /data/media
+      LEXICON_DIR: /data/lexicon
+      SITE_BACKUP_DIR: /data/site-backups
+    # Daily pandawords.site archives; deploy/restore.sh also runs its restore core here.
+    command: ["python", "-m", "app.backup"]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 768m
+    stop_grace_period: 30s
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      surrealdb:
+        condition: service_healthy
+    volumes:
+      - media:/data/media
+      - ./lexicon:/data/lexicon:ro
+      - site-backups:/data/site-backups
+    networks:
+      - internal
+
   surrealdb:
     image: docker.io/surrealdb/surrealdb:v3.3.5
     restart: unless-stopped
@@ -122,6 +152,7 @@ volumes:
   database:
   media:
   backups:
+  site-backups:
 
 networks:
   internal:
