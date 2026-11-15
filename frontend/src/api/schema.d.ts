@@ -580,6 +580,46 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/me/backup': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Download Backup
+     * @description Download all of the current user's data as a ``pandawords.user`` bundle.
+     */
+    get: operations['download_backup_api_me_backup_get']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/api/me/restore': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Restore Backup
+     * @description Merge a ``pandawords.user`` backup into the current user (account fields untouched).
+     */
+    post: operations['restore_backup_api_me_restore_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/dictionary/candidates': {
     parameters: {
       query?: never
@@ -2492,6 +2532,40 @@ export interface components {
       /** Sense Id */
       sense_id: string
     }
+    /**
+     * RestoreSummary
+     * @description ``already_restored``: this exact backup was restored before and nothing was changed.
+     */
+    'RestoreSummary': {
+      /** Project Ids */
+      project_ids: string[]
+      /** Progress Imported */
+      progress_imported: boolean
+      /** Same Source */
+      same_source: boolean
+      /** Created */
+      created: {
+        [key: string]: number
+      }
+      /** Merged */
+      merged: {
+        [key: string]: number
+      }
+      /** Skipped */
+      skipped: {
+        [key: string]: number
+      }
+      /** Conflicts */
+      conflicts: string[]
+      /** Warnings */
+      warnings: string[]
+      /** Already Restored */
+      already_restored: boolean
+      /** Preferences Restored */
+      preferences_restored: string[]
+      /** Preferences Kept */
+      preferences_kept: string[]
+    }
     /** ReviewPreferences */
     'ReviewPreferences': {
       /**
@@ -4125,6 +4199,61 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['ImportSummary']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  download_backup_api_me_backup_get: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description User backup. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/gzip': unknown
+        }
+      }
+    }
+  }
+  restore_backup_api_me_restore_post: {
+    parameters: {
+      query?: {
+        include_progress?: boolean
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/gzip': string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RestoreSummary']
         }
       }
       /** @description Validation Error */

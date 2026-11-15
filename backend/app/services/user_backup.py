@@ -75,9 +75,7 @@ def _write(
     return ProjectArchive(path, filename, len(media.skipped))
 
 
-async def export_user(
-    db: AsyncSurrealConnection, settings: Settings, owner: str
-) -> ProjectArchive:
+async def export_user(db: AsyncSurrealConnection, settings: Settings, owner: str) -> ProjectArchive:
     """Build a validated ``pandawords.user`` archive; the caller must call ``cleanup``."""
     source = await backup_repository.load_user(db, owner)
     owner_record = RecordID("user", user_key(owner))

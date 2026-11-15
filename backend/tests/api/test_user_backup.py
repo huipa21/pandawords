@@ -94,9 +94,13 @@ async def test_backup_contents_round_trip_and_repeat(
         (words.move, False, 1),
         (words.operate, True, 0),
     }
-    card = await rows(db, "SELECT stability, introduced FROM memory WHERE owner = $u;", u=alice.user)
+    card = await rows(
+        db, "SELECT stability, introduced FROM memory WHERE owner = $u;", u=alice.user
+    )
     assert card == [{"stability": 3.5, "introduced": True}]
-    logs = await rows(db, "SELECT attempt_id, project FROM review_log WHERE owner = $u;", u=alice.user)
+    logs = await rows(
+        db, "SELECT attempt_id, project FROM review_log WHERE owner = $u;", u=alice.user
+    )
     assert logs == [{"attempt_id": "alice-1", "project": by_name["Source"]}]
     assert sorted(p.read_bytes() for p in media_files(dirs)) == sorted([png(), SHARED_AUDIO])
 
@@ -154,8 +158,9 @@ async def test_restore_into_other_user_remaps_and_isolates(
     assert body["preferences_restored"] == CHANGED
 
     for table in ("project", "includes", "note", "tag", "member_of", "media", "memory"):
-        owners = await rows(db, "SELECT VALUE owner FROM type::table($t) WHERE owner = $u;",
-                            t=table, u=bob.user)
+        owners = await rows(
+            db, "SELECT VALUE owner FROM type::table($t) WHERE owner = $u;", t=table, u=bob.user
+        )
         assert owners, table
     logs = await rows(db, "SELECT attempt_id, memory FROM review_log WHERE owner = $u;", u=bob.user)
     assert [log["attempt_id"] for log in logs] == ["alice-1"]
@@ -178,4 +183,3 @@ async def test_restore_into_other_user_remaps_and_isolates(
         assert len(alice_backup.data.projects) == 2  # bob's copy never enters alice's backup
     finally:
         alice_backup.close()
-

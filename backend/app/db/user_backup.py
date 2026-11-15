@@ -45,7 +45,9 @@ _EDGE_TABLES = (
     "part_of",
 )
 _OWNED_IDS = {t: f"SELECT id FROM {t} WHERE owner = $user LIMIT $limit;" for t in _RECORD_TABLES}
-_OWNED_ENDS = {t: f"SELECT in, out FROM {t} WHERE owner = $user LIMIT $limit;" for t in _EDGE_TABLES}
+_OWNED_ENDS = {
+    t: f"SELECT in, out FROM {t} WHERE owner = $user LIMIT $limit;" for t in _EDGE_TABLES
+}
 _VISIBLE = "WHERE owner = NONE OR owner = $user;"
 
 
@@ -92,9 +94,7 @@ async def _load(db: AsyncSurrealConnection, user: RecordID, txn: UUID) -> Bundle
     )
     if not accounts:
         raise AppError("auth.user_not_found", 404, "User not found.")
-    projects = await u.rows(
-        "SELECT * FROM project WHERE owner = $user LIMIT $limit;", MAX_PROJECTS
-    )
+    projects = await u.rows("SELECT * FROM project WHERE owner = $user LIMIT $limit;", MAX_PROJECTS)
     includes = await u.rows(
         "SELECT * FROM includes WHERE owner = $user AND in.owner = $user "
         "AND (out.owner = NONE OR out.owner = $user) LIMIT $limit;",
