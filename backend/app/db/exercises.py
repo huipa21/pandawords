@@ -38,8 +38,9 @@ async def open_leases_after(
     rows = await _rows(
         db,
         "SELECT payload, issued_at FROM exercise_attempt "
-        "WHERE owner = $user AND status != 'confirmed' AND expires_at > $after ORDER BY issued_at, id;",
-        {"user": user_record(owner), "after": after},
+        "WHERE owner = $user AND offline = true AND status != 'confirmed' "
+        "AND expires_at > $after ORDER BY issued_at, id LIMIT $limit;",
+        {"user": user_record(owner), "after": after, "limit": 21},
         txn_id=txn,
     )
     attempts = [Attempt.model_validate_json(row["payload"]) for row in rows]
@@ -87,6 +88,7 @@ async def write(
                 "issued_at": attempt.issued_at,
                 "expires_at": attempt.expires_at,
                 "payload": attempt.model_dump_json(),
+                "offline": attempt.offline,
             },
         ),
     }

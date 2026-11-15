@@ -1,5 +1,18 @@
 # SurrealDB 3.3 notes
 
+## Offline issuance guard (7.1.2) ✅
+
+Verified with the isolated 8101 SurrealDB 3.3.5 harness: owner-bound
+`UPSERT $id SET owner = $user, version += 1 WHERE owner = NONE OR owner = $user`
+on deterministic `offline_attempt_guard:[user]` serializes concurrent issuance.
+The active count and new attempt write occur in that same retryable transaction.
+Three concurrent prefetch requests under a two-attempt cap returned only two
+distinct attempt IDs. An explicit offline flag (also in the durable payload)
+distinguishes leases without guessing from remaining lifetime; active-lease reads
+fetch at most 21 rows. The final-minute regression retains exact IDs
+and expiry. Migration 0026 is fresh/upgrade/replay-tested; no dev database or
+shared lifecycle was reset.
+
 ## Personal semantic relation identities (4.4.3) ✅
 
 Verified with the existing isolated loopback 8101 SurrealDB 3.3 harness:

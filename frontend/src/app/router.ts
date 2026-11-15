@@ -15,6 +15,12 @@ export function createAppRouter(history: RouterHistory = createWebHistory()) {
   const children: RouteRecordRaw[] = [
     { path: '', redirect: '/projects' },
     {
+      path: 'projects/:id/offline-review',
+      name: 'project-offline-review',
+      component: () => import('@/features/study/OfflineReviewPage.vue'),
+      meta: { title: 'review' },
+    },
+    {
       path: 'reading/:passageId?',
       name: 'reading',
       component: () => import('@/features/reading/ReadingPage.vue'),

@@ -110,6 +110,8 @@ async def create_attempt(
         )
         if not enabled
     )
+    if offline_limit is not None:
+        disabled |= {"image2word", "listen"}
     selection = await plugins.select(context, memory, disabled=disabled)
     issued = _now()
     attempt = Attempt(

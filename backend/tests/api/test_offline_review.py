@@ -62,7 +62,8 @@ async def prefetch(
     assert response.status_code == 200, response.text
     assert response.headers["cache-control"] == "no-store"
     body = response.json()
-    assert body["lease_seconds"] == 86400 and body["active_limit"] == 20
+    assert body["lease_seconds"] == 86400
+    assert body["active_limit"] == offline_review.OFFLINE_ACTIVE_LIMIT
     return body["attempts"]
 
 
@@ -91,7 +92,9 @@ async def test_prefetch_is_bounded_and_never_extends_leases(
     assert len({a["sense_id"] for a in second}) == 3
     assert await prefetch(client, headers, project, 3) == second
     assert await prefetch(client, headers, project, 1) == second[:1]
-    invalid = await client.post(URL + "/offline", headers=headers, json={"project_id": project, "limit": 21})
+    invalid = await client.post(
+        URL + "/offline", headers=headers, json={"project_id": project, "limit": 21}
+    )
     assert invalid.status_code == 422
 
     monkeypatch.setattr(offline_review, "OFFLINE_ACTIVE_LIMIT", 1)
@@ -190,3 +193,22 @@ async def test_offline_prefetch_and_sync_are_owner_isolated(
     assert (await client.post(path, headers=foreign, json=body)).status_code == 404
     assert await prefetch(client, headers, project, 2) == mine
     assert await probe.logs(db, owner) == []
+
+
+async def test_concurrent_prefetch_is_bounded_and_last_minutes_do_not_renew(
+    client: AsyncClient,
+    db: AsyncSurrealConnection,
+    make_user: UserFactory,
+    lexicon_reader: LexiconReader,
+    clock: Clock,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(offline_review, "OFFLINE_ACTIVE_LIMIT", 2)
+    _, project, headers = await learner(client, db, make_user, lexicon_reader)
+    batches = await asyncio.gather(*(prefetch(client, headers, project, 2) for _ in range(3)))
+    identities = {attempt["id"] for batch in batches for attempt in batch}
+    assert len(identities) == 2
+    clock.advance(24 * 3600 - 60)
+    held = await prefetch(client, headers, project, 2)
+    assert {attempt["id"] for attempt in held} == identities
+    assert all(lease(attempt) == 86400 for attempt in held)

@@ -1,5 +1,18 @@
 # Auth & users
 
+## Offline device data (7.1.2)
+
+Offline review IndexedDB is partitioned by authenticated user ID, capped at 20
+entries and contains no credentials or private grader keys. Explicit logout or
+credential rejection invalidates in-flight client writes synchronously, then
+deletes that owner's data before a queued login can complete. A transient refresh
+outage hides/revokes access to the queue without deleting unsynced answers; a
+successful same-user refresh restores access. Account replacement purges the prior
+owner; BroadcastChannel invalidates open offline views in other tabs. Deletion
+failure logs only `offline_review_purge_failed` and shows a localized warning
+to clear site data before sharing a device. No auth token is persisted to enable
+cold-start offline login; existing network-backed guards remain in force.
+
 - **Bootstrap**: on API startup, if no admin user exists, create one from `ADMIN_USERNAME` /
   `ADMIN_PASSWORD` with `must_change_password = true` in production.
 - **No self-signup.** The admin submits a username and optional role; the API generates a random

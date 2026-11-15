@@ -4,6 +4,7 @@ import { computed, ref } from 'vue'
 import { createApiClient } from '@/api/client'
 import { normalizeApiError } from '@/api/errors'
 import { AuthRequestError, transportError } from '@/features/auth/errors'
+import { activateOfflineOwner, revokeOfflineOwner } from '@/features/study/offlineIdentity'
 
 export const useAuthStore = defineStore('auth', () => {
   const accessToken = ref<string | null>(null)
@@ -16,8 +17,26 @@ export const useAuthStore = defineStore('auth', () => {
   let refreshPromise: Promise<string | null> | undefined
   let mutation: Promise<unknown> = Promise.resolve()
   let cookieAccessToken: string | null = null
+  let offlineCleanup: Promise<void> = Promise.resolve()
+  let offlineAccount = ''
 
-  function reset() {
+  function purgeOffline(owner: string) {
+    revokeOfflineOwner(owner)
+    offlineCleanup = import('@/features/study/offlineStorage').then(module => module.clearOfflineOwner(owner)).catch(() => {
+      sessionError.value = 'offline.storage'
+      console.warn('offline_review_purge_failed')
+    })
+  }
+
+  function reset(purge = true) {
+    if (offlineAccount) {
+      if (purge)
+        purgeOffline(offlineAccount)
+      else
+        revokeOfflineOwner(offlineAccount)
+    }
+    if (purge)
+      offlineAccount = ''
     version++
     accessToken.value = null
     user.value = null
@@ -25,6 +44,10 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   function apply(data: components['schemas']['AuthRead']) {
+    if (offlineAccount && offlineAccount !== data.user.id)
+      purgeOffline(offlineAccount)
+    offlineAccount = data.user.id
+    activateOfflineOwner(data.user.id)
     accessToken.value = data.access_token
     user.value = data.user
   }
@@ -46,7 +69,7 @@ export const useAuthStore = defineStore('auth', () => {
           const error = normalizeApiError(result.error, result.response.status)
           if (result.response.status !== 401)
             sessionError.value = error.code
-          reset()
+          reset([401, 403].includes(result.response.status))
           return null
         }
         apply(result.data)
@@ -55,7 +78,7 @@ export const useAuthStore = defineStore('auth', () => {
       catch {
         if (started === version) {
           sessionError.value = 'transport'
-          reset()
+          reset(false)
         }
         return null
       }
@@ -75,6 +98,7 @@ export const useAuthStore = defineStore('auth', () => {
     const pendingRefresh = refreshPromise
     const result = mutation.then(async () => {
       await pendingRefresh
+      await offlineCleanup
       return operation()
     })
     mutation = result.catch(() => {})
@@ -82,7 +106,7 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   function login(body: components['schemas']['LoginRequest']) {
-    reset()
+    reset(false)
     sessionError.value = null
     const started = version
     return mutate(async () => {

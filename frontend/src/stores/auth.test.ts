@@ -2,7 +2,9 @@ import { createPinia, disposePinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createApiClient } from '@/api/client'
 import { authPayload } from '@/features/auth/testHarness'
+import { activateOfflineOwner, offlineData } from '@/features/study/offlineStorage'
 import { useAuthStore } from './auth'
+import 'fake-indexeddb/auto'
 
 function deferred<T>() {
   let resolve!: (value: T) => void
@@ -13,6 +15,44 @@ function deferred<T>() {
 }
 
 describe('memory-only auth store', () => {
+  it('retains offline answers across a transient refresh outage but deletes them on explicit logout', async () => {
+    let disconnected = false
+    vi.stubGlobal('fetch', vi.fn<typeof globalThis.fetch>(async (input, init) => {
+      if (disconnected)
+        throw new Error('network lost')
+      return new Request(input, init).url.endsWith('/logout')
+        ? new Response(null, { status: 204 })
+        : Response.json(authPayload())
+    }))
+    const auth = useAuthStore()
+    await auth.login({ username: 'learner', password: 'password-for-test' })
+    const owner = auth.user!.id
+    await offlineData(owner, (data) => {
+      data.entries = [
+        {
+          attempt: {
+            id: 'preserved',
+            project_id: 'project',
+            prompt: { text: 'Prompt', input: 'text', choices: [] },
+            exercise: 'cloze',
+            issued_at: '2026-01-01T00:00:00Z',
+            expires_at: '2099-01-01T00:00:00Z',
+          },
+          answer: { answer: 'saved', duration_ms: 10, client_key: 'stable-retry-key' },
+        },
+      ]
+    })
+    disconnected = true
+    await auth.refresh()
+    expect(auth.user).toBeNull()
+    await expect(offlineData(owner)).rejects.toThrow()
+    disconnected = false
+    await auth.refresh()
+    expect((await offlineData(owner)).entries[0]!.answer!.answer).toBe('saved')
+    await auth.logout()
+    activateOfflineOwner(owner)
+    expect((await offlineData(owner)).entries).toEqual([])
+  })
   let pinia: ReturnType<typeof createPinia>
   beforeEach(() => {
     pinia = createPinia()

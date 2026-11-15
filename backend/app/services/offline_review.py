@@ -49,6 +49,8 @@ async def prefetch(
         and attempt.project_id == data.project_id
         and versions.get(attempt.sense_id) == attempt.expected_version
     ]
+    positions = {item.memory.sense_id: index for index, item in enumerate(plan.queue)}
+    current.sort(key=lambda attempt: (positions[attempt.sense_id], attempt.id))
     attempts = [exercise_attempts.public(attempt) for attempt in current[: data.limit]]
     capacity = min(data.limit - len(attempts), OFFLINE_ACTIVE_LIMIT - len(held))
     # Stale held leases stay counted against the bound but no longer block their sense.

@@ -1,4 +1,24 @@
 {
+  "offline": {
+    "title": "离线复习",
+    "policy": "联网预备 10 道文字或选择题，有效期 24 小时（每账号最多 20 道）。离线请保持已登录页面打开。同步采用服务端评分和建议评级，仅回执计入进度。不下载提示或媒体。",
+    "prepare": "联网预备题目",
+    "sync": "采用建议评级同步",
+    "reload": "重新读取本机队列",
+    "counts": "待答：{ready}。待同步：{pending}。已确认：{done}。",
+    "failure": "存储或同步失败，答案未完成。请联网重试，恢复前保留浏览器数据。",
+    "empty": "本机无题目（可能被回收）。请联网预备，有效期不可延长。",
+    "savedAnswer": "已保存的答案：{answer}",
+    "expires": "有效期至：{at}",
+    "discard": "丢弃本机复习",
+    "discardWarning": "删除本机题目和答案？服务端回执不变，未确认答案不计进度。需要时请先复制。",
+    "states": { "online": "在线", "offline": "离线：答案将加入队列", "syncing": "正在保存或同步", "failed": "需要恢复", "expired": "题目已过期" },
+    "recovery": {
+      "failed": "未确认，请使用已保存标识联网重试。",
+      "expired": "已过期：保留答案，未评分。复制或丢弃后联网预备。",
+      "stale": "卡片已变更或不可用，答案保留。复制或丢弃后联网预备。"
+    }
+  },
   "pwa": {
     "installTitle": "安装 PandaWords",
     "installDescription": "从主屏幕打开 PandaWords。学习功能仍需网络连接。",
@@ -562,6 +582,7 @@
     }
   },
   "errors": {
+    "offline_storage": "无法清除离线数据。共用设备前请清除此站点的浏览器数据。",
     "study_invalid_order": "项目选择已变更，请重置优先级草稿后重试。",
     "study_too_large": "此项目或学习历史超出计划计算上限，请减少选择或联系管理员。",
     "project_not_found": "此项目不可用或已不存在。",
