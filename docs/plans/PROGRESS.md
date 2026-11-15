@@ -82,7 +82,7 @@ needed) now use 0027 (6.1.1-6.1.4 chain) and 0028 (6.1.5) to keep versions ascen
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 6.1.1 | task/6.1.1-bundle-format | ../pandawords.worktrees/6.1.1 | Agent relaunched |
+| 6.1.2 | task/6.1.2-project-export | ../pandawords.worktrees/6.1.2 | Agent running |
 | 6.1.5 | task/6.1.5-site-backup | ../pandawords.worktrees/6.1.5 | Agent relaunched |
 
 ## Blocked
@@ -100,6 +100,24 @@ needed) now use 0027 (6.1.1-6.1.4 chain) and 0028 (6.1.5) to keep versions ascen
 Newest first. One entry per finished, blocked, or interrupted task. Every entry records completed
 work, dependencies, verification outcomes, skipped work and reasons, failures and known causes,
 and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets.
+
+### 2026-11-15 — 6.1.1 Bundle format, JSON Schema and serializers
+- Result / completed: merged (`223a7a7` code/tests, `90be775` docs). Versioned `.tar.gz` envelope with
+  first-entry `manifest.json` (major version, schema revision, per-entry sha256/size, attribution);
+  pydantic models generate `backend/app/domain/bundle.schema.json` (drift test); deterministic
+  serializers with shared deterministic IDs and bundle-local `@n` refs for owned rows; validator for
+  references/owner-edge combinations/unsafe media; bounded safe archive read/write helpers
+  (`app/services/bundle_io.py`, `bundle_archive.py`). No migration, no new dependency (no ADR).
+- Dependencies: 3.1.1, 4.2.1, 4.3.1, 5.1.1 checked ✅.
+- Verification: agent `dev.ps1 check` clean, backend unit suite 575 passed (44 new). Main after merge:
+  `dev.ps1 check` passed; bundle unit tests 44 passed. Real-DB tests not applicable (pure contract).
+- Skipped / deferred: DB export/import endpoints belong to 6.1.2/6.1.3.
+- Failures / causes / corrections: first agent failed on model-service errors; relaunched agent reused
+  its partial `BundleError`/bundle modules after review.
+- Findings / follow-ups: standard error body does not yet expose `stage`/`problems` (6.1.3);
+  `review_log.project` is null when the project is outside the bundle (importer decides); media is
+  hashed then streamed (a file changing between would fail integrity on read);
+  `tests/bundle_support.py` is 339 lines. 6.1.2 now ready and started.
 
 <!-- ### YYYY-MM-DD — X.Y.Z Title
 - Result / completed: merged / blocked / partial; work done; branch / commit
