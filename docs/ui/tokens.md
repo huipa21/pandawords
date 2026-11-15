@@ -70,8 +70,8 @@ system by default, with a toggle (system / light / dark) stored in preferences.
 | `text-disabled` | `text-disabled` | `#9E9E9E` | `#6B6B6B` |
 | `border` | `border-base` | `#E0E0E0` | `#3A3A3A` |
 | `divider` | `border-divider` | `#EEEEEE` | `#2A2A2A` |
-| `bg` (page) | `bg-page` | `#FFFFFF` | `#121212` |
-| `surface` (panels, sidebar) | `bg-surface` | `#FAFAFA` | `#1A1A1A` |
+| `bg` (page) | `bg-page` | `#EEEEEE` | `#121212` |
+| `surface` (panels, sidebar) | `bg-surface` | `#FFFFFF` | `#1A1A1A` |
 | `surface-raised` (cards, popovers) | `bg-raised` | `#FFFFFF` | `#232323` |
 | `focus` | ring | = `primary` | = `primary` |
 

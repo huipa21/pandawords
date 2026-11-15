@@ -9,6 +9,21 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 
 ## Current run
 
+### UI shell refresh (2026-11-15)
+
+Request: screenshot-inspired separated header/sidebar/content containers, icon before
+PandaWords, left-aligned desktop navigation, and white/grey/blue styling. This is an
+unnumbered UI refinement, not a new PLAN task. Dependencies: existing shell and design
+tokens present; no numbered prerequisites. Shared foundation keeps blue tokens and dark
+mode, makes the light page grey and panels white.
+
+Execution: one `task/ui-shell-refresh` branch/worktree at
+`../pandawords.worktrees/ui-shell-refresh`, with two parallel agents owning disjoint
+header/auth-layout and shell/navigation scopes. Main coordinates shared tokens, docs,
+integration and browser checks. Agents do not commit or touch shared services.
+Verification will cover only related frontend tests, lint/typecheck and desktop/mobile
+browser behavior; no whole-app test reruns. Next: implement independent UI tracks.
+
 ### Phase 7 run
 
 Status: **complete**. All five Phase 7 tasks are ✅, committed and merged into main;

@@ -17,8 +17,8 @@ const lightColors = {
   'text-disabled': '#9E9E9E',
   'border': '#E0E0E0',
   'divider': '#EEEEEE',
-  'bg': '#FFFFFF',
-  'surface': '#FAFAFA',
+  'bg': '#EEEEEE',
+  'surface': '#FFFFFF',
   'surface-raised': '#FFFFFF',
 } as const
 
