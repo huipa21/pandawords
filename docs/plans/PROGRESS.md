@@ -82,7 +82,7 @@ needed) now use 0027 (6.1.1-6.1.4 chain) and 0028 (6.1.5) to keep versions ascen
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 6.1.3 | task/6.1.3-project-import | ../pandawords.worktrees/6.1.3 | Agent running |
+| 6.1.4 | task/6.1.4-user-backup | ../pandawords.worktrees/6.1.4 | Agent running |
 
 ## Blocked
 
@@ -99,6 +99,27 @@ needed) now use 0027 (6.1.1-6.1.4 chain) and 0028 (6.1.5) to keep versions ascen
 Newest first. One entry per finished, blocked, or interrupted task. Every entry records completed
 work, dependencies, verification outcomes, skipped work and reasons, failures and known causes,
 and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets.
+
+### 2026-11-15 — 6.1.3 Project import and merge
+- Result / completed: merged (`1208b75`, `8211744`). `POST /api/projects/import?include_progress=`
+  (authenticated raw gzip body, `BUNDLE_IMPORT_MAX_BYTES` default 512 MiB) validates the whole archive
+  and media first, then writes all rows in one SurrealDB transaction; media copied before commit and
+  removed on any failure. Shared rows merged by deterministic ID, never overwritten; owned rows get
+  fresh IDs with all references remapped; memberships keep order/hidden; repeated imports create a new
+  project copy; existing memory/overrides preserved; progress on skips logs with existing attempt IDs,
+  off starts new cards; null-project logs attach to the imported project. Export now writes a
+  server-verifiable, non-identifying `source` fingerprint for the same-user progress default.
+  Error bodies expose `stage` and path-free `problems`. nginx gets a 512 MiB unbuffered location for
+  the import path (server-scope security headers still apply). No migration.
+- Dependencies: 6.1.2 checked ✅.
+- Verification: agent check clean, `test -Backend` 1277 passed. Main after merge (no conflicts):
+  `dev.ps1 check` passed; import/export/admin-backup API tests 14 passed; gen-api produced no diff.
+- Skipped / deferred: nginx/security-proxy tests not run for the new location (E2E out of scope).
+- Failures / causes / corrections: none.
+- Findings / follow-ups (Backlog candidates): 409 on a word owned by another user reveals that some
+  account owns it (global unique `(lang, text)` index); missing shared rows are created from bundle
+  content (trust boundary); tag-hierarchy cycle checks not re-run on imported tag edges; rotating
+  `JWT_SECRET` makes old bundles count as foreign (progress defaults off). 6.1.4 now started.
 
 ### 2026-11-15 — 6.1.2 Project export, progress and media
 - Result / completed: merged (`80df72d`, `deb98d0`). `GET /api/projects/{id}/export` (owner-only, 404
