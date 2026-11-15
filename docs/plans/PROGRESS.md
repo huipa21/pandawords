@@ -142,6 +142,12 @@ Status: Phase 6 complete (all six tasks ✅, merged to main); no Phase 6 worktre
   frontend typecheck passed. An optional integrated-browser mock preview lost its deferred
   result/page; no preview acceptance claim was made. Real Chromium tests provide shell
   acceptance, and the user's existing login page/preferences were left intact.
+- Persistence/cleanup: implementation merged at `83c3ffb`; verification/docs committed at
+  `f8421e6`. Initial `git worktree remove --force` removed the registration but left some
+  owned dependency/root files (`Directory not empty`). Inspected the exact remaining folder,
+  removed only its entries without traversing reparse points, and deleted the merged
+  `task/ui-shell-refresh` branch. Verified the folder is absent, only the main worktree
+  remains, and the working tree is clean.
 - Skipped: full backend/frontend/E2E suites (unrelated to this change), push and deployment
   (not requested). No secrets or environment files touched. No shared service was started,
   stopped or reset. No blockers or follow-ups.
