@@ -76,10 +76,26 @@ export interface TransferError {
   problems: string[]
 }
 
+/** Bundle rejections add the failed stage and short, path-free problems that are safe to show. */
+function bundleDetails(body: unknown) {
+  const details = typeof body === 'object' && body !== null
+    ? body as { stage?: unknown, problems?: unknown }
+    : {}
+  return {
+    stage: typeof details.stage === 'string'
+      ? details.stage
+      : '',
+    problems: Array.isArray(details.problems)
+      ? details.problems.filter((problem): problem is string => typeof problem === 'string').slice(0, 20)
+      : [],
+  }
+}
+
 export function useTransferErrors() {
   const { t, te } = usePortabilityI18n()
   return (error: unknown, status: number): TransferError => {
     const normalized = normalizeApiError(error, status)
+    const details = bundleDetails(error)
     const reason = normalized.code.replace(/^bundle\./, '').replaceAll('.', '_')
     const keys = [
       `portability.errors.${reason}`,
@@ -89,13 +105,13 @@ export function useTransferErrors() {
         : []),
     ]
     const key = keys.find(candidate => te(candidate)) ?? 'errors.generic'
-    const stage = normalized.stage && te(`portability.stages.${normalized.stage}`)
-      ? t(`portability.stages.${normalized.stage}`)
+    const stage = details.stage && te(`portability.stages.${details.stage}`)
+      ? t(`portability.stages.${details.stage}`)
       : ''
     return {
       text: t(key),
       stage,
-      problems: normalized.problems ?? [],
+      problems: details.problems,
     }
   }
 }

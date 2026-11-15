@@ -76,12 +76,16 @@ async function send() {
       <legend class="mb-2 p-0 font-semibold">
         {{ t('portability.progress.label') }}
       </legend>
-      <NRadioGroup v-model:value="choice" :name="`${id}-progress`" :disabled="uploading">
-        <div class="flex flex-wrap gap-4">
-          <NRadio v-for="option in choices" :key="option" :value="option" :data-testid="`progress-${option}`">
-            {{ t(`portability.progress.${option}`) }}
-          </NRadio>
-        </div>
+      <NRadioGroup v-model:value="choice" size="large" :name="`${id}-progress`" :disabled="uploading">
+        <NRadioButton
+          v-for="option in choices"
+          :key="option"
+          :value="option"
+          class="min-h-12"
+          :data-testid="`progress-${option}`"
+        >
+          {{ t(`portability.progress.${option}`) }}
+        </NRadioButton>
       </NRadioGroup>
       <p class="m-0 text-sm text-muted" data-testid="progress-hint">
         {{ t(`portability.progress.${choice}Hint`) }}

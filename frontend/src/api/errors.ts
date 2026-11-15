@@ -2,9 +2,6 @@ export interface ApiError {
   code: string
   message: string
   field: string | null
-  /** Bundle rejections: failed stage and short, path-free problems safe to show. */
-  stage?: string
-  problems?: string[]
 }
 
 export async function readApiError(response: Response): Promise<ApiError> {
@@ -32,9 +29,5 @@ export function normalizeApiError(body: unknown, status: number, statusText = ''
     error.message = body.message
   if ('field' in body && typeof body.field === 'string')
     error.field = body.field
-  if ('stage' in body && typeof body.stage === 'string')
-    error.stage = body.stage
-  if ('problems' in body && Array.isArray(body.problems))
-    error.problems = body.problems.filter((problem): problem is string => typeof problem === 'string').slice(0, 20)
   return error
 }
