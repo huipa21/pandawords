@@ -24,13 +24,18 @@ Agents must not edit PLAN/PROGRESS or merge. Shared topic-doc changes are integr
 
 | Task | Branch | Worktree | State / next step |
 |---|---|---|---|
-| 7.1.1 | task/7.1.1-pwa | ../pandawords.worktrees/7.1.1 | Ready: static-only PWA and install UI |
+| 7.1.1 | task/7.1.1-pwa | ../pandawords.worktrees/7.1.1 | Agent running: static-only PWA and install UI |
 | 7.1.2 | task/7.1.2-offline-review | ../pandawords.worktrees/7.1.2 | Waiting for verified 7.1.1 merge |
-| 7.1.3 | task/7.1.3-hardening | ../pandawords.worktrees/7.1.3 | Ready: rate limits, headers, isolation |
-| 7.1.4 | task/7.1.4-performance | ../pandawords.worktrees/7.1.4 | Ready: measured graph and bundle budgets |
-| 7.1.5 | task/7.1.5-fsrs-optimization | ../pandawords.worktrees/7.1.5 | Ready: bounded per-user optimization |
+| 7.1.3 | task/7.1.3-hardening | ../pandawords.worktrees/7.1.3 | Agent running: rate limits, headers, isolation |
+| 7.1.4 | task/7.1.4-performance | ../pandawords.worktrees/7.1.4 | Agent running: measured graph and bundle budgets |
+| 7.1.5 | task/7.1.5-fsrs-optimization | ../pandawords.worktrees/7.1.5 | Agent running: bounded per-user optimization |
 
-Verification: not yet run for Phase 7. Blockers: none for the first wave.
+Verification: baseline `dev.ps1 check` passed; bounded full frontend baseline passed 218/218
+(34 files). Full isolated backend baseline is running against the existing healthy 8101 server.
+Agents run focused suites; the coordinator owns integrated full suites to avoid redundant load.
+The existing API/frontend stack is stopped; no unrelated process was stopped or replaced.
+Production nginx 1.30 and Podman are available for isolated deployed-response acceptance.
+Blockers: none for the first wave.
 Skipped/deferred: 7.1.2 intentionally waits for its prerequisite; unrelated Phase 6 is out of scope.
 
 Request: implement Phases 4 and 5 with dependency-driven parallel agents (global maximum five), merge all
