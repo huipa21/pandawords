@@ -18,7 +18,15 @@ cold-start offline login; existing network-backed guards remain in force.
 - **No self-signup.** The admin submits a username and optional role; the API generates a random
   temporary password. Admin-created accounts must change it at first login in every environment.
 - **Roles**: `admin` (user management) and `user`. Every user's learning data is isolated,
-  including from admins. Site backup/restore is planned but is not implemented on this branch.
+  including from admins. Site backup/restore is an admin/operator capability
+  ([import-export.md](import-export.md#admin-site-backup-format-pandawordssite)).
+- **User backup/restore** (`GET /api/me/backup`, `POST /api/me/restore`) require `current_user`
+  and act only on the caller's own data. A backup never contains username, role, flags,
+  password hash, refresh tokens, `JWT_SECRET` or other configuration; restore merges data into
+  the authenticated account and never creates, replaces or modifies an account, role, password,
+  token or global setting — it may only update the caller's own `prefs`, `source_lang` and
+  `target_lang` under the "still default" rule
+  ([import-export.md](import-export.md#user-backup-format-pandawordsuser)).
 - **Passwords**: argon2id via `pwdlib`. Minimum 10 characters.
 - **Tokens**:
   - Access token: JWT (HS256, `JWT_SECRET`), 60 min, `sub` = user id, `role`. The client keeps it

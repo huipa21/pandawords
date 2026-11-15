@@ -88,9 +88,8 @@ and UTC timestamps with microseconds, so the same logical input produces byte-id
 ## Availability and security scope
 
 The bundle contract, validator and archive helpers (6.1.1), project **export** (6.1.2) and
-project **import** (6.1.3, below) are implemented. User backup/restore described below is a
-**Phase 6 design, not implemented in this branch**; no cross-user isolation or archive-content
-test can be claimed for that path. The admin whole-site backup, scheduled backup and operator restore (task 6.1.5)
+project **import** (6.1.3, below) and user **backup/restore** (6.1.4, below) are implemented.
+The admin whole-site backup, scheduled backup and operator restore (task 6.1.5)
 are implemented as described in [Admin site backup](#admin-site-backup-format-pandawordssite).
 There is deliberately no browser or API site-restore upload. The production pre-migration
 SurrealDB export remains a separate, database-only safety copy.
@@ -206,8 +205,55 @@ media/         images and audio referenced by data.json
 
 ## User backup (`format: pandawords.user`)
 
-The same as a project bundle, but covering all of the user's projects, all user-owned items, notes,
-media, memory, review logs and preferences. Restore works like import with progress always on.
+The same `data.json` contract as a project bundle, covering all of the user's data, plus
+`preferences`. Implemented by `app/db/user_backup.py::load_user`,
+`app/services/user_backup.py` (`export_user`, `restore_user`), `app/db/user_restore.py` and
+`app/domain/user_backup.py`.
+
+- **Download**: `GET /api/me/backup` (authenticated; acts only on the caller) streams
+  `pandawords-backup-<YYYYMMDD>.pandawords-user.tar.gz` (`application/gzip`,
+  `Cache-Control: no-store`, optional `X-PandaWords-Skipped-Media: <n>`). One
+  transaction-consistent, owner-filtered snapshot contains every owned project with all its
+  memberships (hidden/order kept), every owned dictionary-like row (lemma, lexeme, sense,
+  morpheme, tag, sentence, passage) and owned edge, all memory, overrides, notes and owned
+  media, plus the shared rows/edges/audio needed to resolve them (the project-export expansion
+  seeded with all of those), all review logs of the exported memory (logs whose project was
+  deleted get `project: null`), and `preferences` (theme, locale, accent, desired retention,
+  review media toggles, source/target language). Account fields, tokens, secrets, storage paths
+  and database IDs are never written. Optimized FSRS parameters (`srs_optimization`) are not
+  part of the format; they are re-derived from the restored review history by the optimizer.
+  The manifest carries the same-user `source` fingerprint. Bounds: 1,000 projects, 100,000
+  memberships/records/attached rows, 400,000 traversed edges, 500,000 review logs; exceeding
+  them is `backup.export_too_large` (413). Archive building, media handling, cleanup on failure
+  or disconnect are those of project export.
+- **Restore**: `POST /api/me/restore[?include_progress=true|false]` (default **true**), raw
+  `application/gzip` body with the same upload bound, private staging and cleanup as project
+  import (nginx has an equal unbuffered 512 MiB location). Only `pandawords.user` is accepted
+  (`bundle.unexpected_format` otherwise). The whole archive, data, references, size and media
+  are validated before any write; then the shared import core (`apply_bundle`) merges every
+  project, row, edge, membership, overlay, note, media file, memory and review log into the
+  **current** user with the 6.1.3 rules (shared rows merge by ID and are never overwritten,
+  owned rows get fresh IDs, own lemmas are reused, another user's lemma text is a 409
+  `lemma_identity` conflict, existing memory/overrides win, completed `attempt_id`s are never
+  duplicated, `project: null` logs go to the first restored project). The account (username,
+  role, password, flags, tokens) and global configuration are never touched.
+- **Preferences rule**: a bundled preference is applied only where the user still has the
+  account default (`UserPreferences`/`UserCreate` defaults) or no value; a value the user has
+  already changed is kept, listed in `preferences_kept` and reported as conflict
+  `preference_kept`.
+- **Idempotency**: in the same transaction the restore writes
+  `restore_receipt:[user, sha256(data.json)]` with the summary and the created projects.
+  Restoring the same backup again returns that summary with `already_restored: true` and writes
+  nothing, as long as at least one of its restored projects still exists (or it had none); once
+  they were all deleted, the backup can be restored again (memory, overrides, preferences and
+  history are still never duplicated or overwritten). A *different* backup restored over existing
+  data adds new project copies, like project import. A failed or interrupted restore (database,
+  file or commit failure) rolls back rows, receipt and preferences, removes copied media and
+  staging files (`bundle.apply_failed`, 500), and can simply be retried.
+- **Response** `200` `RestoreSummary`: the project import `ImportSummary` fields
+  (`project_ids`, `progress_imported`, `same_source`, `created`, `merged`, `skipped`,
+  `conflicts`, `warnings`) plus `already_restored: bool`, `preferences_restored: [field]`,
+  `preferences_kept: [field]`. Errors are the project-import `bundle.<reason>` errors.
 
 ## Admin site backup (`format: pandawords.site`)
 

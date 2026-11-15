@@ -2120,6 +2120,89 @@
         }
       }
     },
+    "/api/me/backup": {
+      "get": {
+        "tags": [
+          "backup"
+        ],
+        "summary": "Download Backup",
+        "description": "Download all of the current user's data as a ``pandawords.user`` bundle.",
+        "operationId": "download_backup_api_me_backup_get",
+        "responses": {
+          "200": {
+            "description": "User backup.",
+            "content": {
+              "application/gzip": {}
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/me/restore": {
+      "post": {
+        "tags": [
+          "backup"
+        ],
+        "summary": "Restore Backup",
+        "description": "Merge a ``pandawords.user`` backup into the current user (account fields untouched).",
+        "operationId": "restore_backup_api_me_restore_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "include_progress",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true,
+              "title": "Include Progress"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestoreSummary"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/gzip": {
+              "schema": {
+                "type": "string",
+                "format": "binary"
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/dictionary/candidates": {
       "post": {
         "tags": [
@@ -8742,6 +8825,94 @@
           "sense_id"
         ],
         "title": "Resolution"
+      },
+      "RestoreSummary": {
+        "properties": {
+          "project_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Project Ids"
+          },
+          "progress_imported": {
+            "type": "boolean",
+            "title": "Progress Imported"
+          },
+          "same_source": {
+            "type": "boolean",
+            "title": "Same Source"
+          },
+          "created": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Created"
+          },
+          "merged": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Merged"
+          },
+          "skipped": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Skipped"
+          },
+          "conflicts": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Conflicts"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Warnings"
+          },
+          "already_restored": {
+            "type": "boolean",
+            "title": "Already Restored"
+          },
+          "preferences_restored": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Preferences Restored"
+          },
+          "preferences_kept": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Preferences Kept"
+          }
+        },
+        "type": "object",
+        "required": [
+          "project_ids",
+          "progress_imported",
+          "same_source",
+          "created",
+          "merged",
+          "skipped",
+          "conflicts",
+          "warnings",
+          "already_restored",
+          "preferences_restored",
+          "preferences_kept"
+        ],
+        "title": "RestoreSummary",
+        "description": "``already_restored``: this exact backup was restored before and nothing was changed."
       },
       "ReviewPreferences": {
         "properties": {

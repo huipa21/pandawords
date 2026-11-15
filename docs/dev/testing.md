@@ -59,8 +59,8 @@ both locales, protected images, graph/reading flows, CSP enforcement, URL-log pr
 and direct/trusted-ingress spoofing probes. It cleans up only its own containers.
 Project export (6.1.2) and project import (6.1.3) isolation is covered by
 `tests/api/test_project_export.py` and `tests/api/test_project_import*.py` (see below).
-User backup and restore endpoints are not implemented yet (Phase 6); their isolation acceptance
-remains with those tasks rather than claiming coverage of nonexistent APIs.
+User backup/restore (6.1.4) isolation is covered by `tests/api/test_user_backup.py` and
+`tests/api/test_user_restore_failures.py` (see below).
 
 ## Measured graph and bundle budgets (7.1.4)
 
@@ -1043,6 +1043,28 @@ files and an empty work directory. From `backend`:
 
 ```powershell
 uv run --no-sync pytest -q tests\api\test_project_import.py tests\api\test_project_import_failures.py
+```
+
+## User backup and restore tests (6.1.4)
+
+Real-database API tests on the isolated 8101 harness, helpers in
+`tests/api/user_backup_support.py` (`seed_user` = the project-import seed plus a second project
+and customized preferences; `wipe` deletes all of a user's rows; `rebuild_user` re-packs an
+edited backup). `tests/api/test_user_backup.py`: archive content (no account fields or IDs, all
+projects/memberships/notes/overrides/media/memory/logs/preferences); wipe → restore equals the
+original snapshot with preferences restored and account unchanged; repeated restore is a no-op
+(`already_restored`, no new rows/receipts); after deleting the projects a restore runs again
+without duplicating memory/history or overwriting customized preferences; restore into another
+user (lemma-identity 409 without writes, then a rebuilt bundle) remaps ownership while the
+source user's rows, preferences, account and media stay unchanged and inaccessible.
+`tests/api/test_user_restore_failures.py`: anonymous 401, wrong format, garbage, invalid media
+and oversized uploads fail before mutation with an empty work dir; an interrupted restore
+(receipt write failure) rolls back everything incl. copied media; concurrent duplicate restores
+apply once; empty-user round trip; an interrupted backup download leaves no staging files.
+From `backend`:
+
+```powershell
+uv run --no-sync pytest -q tests\api\test_user_backup.py tests\api\test_user_restore_failures.py
 ```
 
 ## Test database

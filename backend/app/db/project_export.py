@@ -62,8 +62,15 @@ def _bounded[T](items: list[T], limit: int) -> list[T]:
 
 
 class _Snapshot:
-    def __init__(self, db: AsyncSurrealConnection, user: RecordID, txn: UUID) -> None:
+    def __init__(
+        self,
+        db: AsyncSurrealConnection,
+        user: RecordID,
+        txn: UUID,
+        limits: tuple[int, int] = (MAX_RECORDS, MAX_EDGES),
+    ) -> None:
         self.db, self.user, self.txn = db, user, txn
+        self.max_records, self.max_edges = limits
         self.records: dict[RecordID, Row] = {}
         self.edges: dict[RecordID, Row] = {}
 
@@ -79,7 +86,7 @@ class _Snapshot:
         )
         for row in found:
             self.records[row["id"]] = row
-        _bounded(list(self.records), MAX_RECORDS)
+        _bounded(list(self.records), self.max_records)
         return [row["id"] for row in found]
 
     async def adjacent(self, frontier: list[RecordID]) -> list[Row]:
@@ -91,7 +98,7 @@ class _Snapshot:
                 found += [e for e in edges if e["id"].table_name in _EDGE_TABLES]
         for edge in found:
             self.edges[edge["id"]] = edge
-        _bounded(list(self.edges), MAX_EDGES)
+        _bounded(list(self.edges), self.max_edges)
         return found
 
     def _pulled(self, edge: Row) -> RecordID | None:

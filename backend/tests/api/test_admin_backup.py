@@ -74,6 +74,6 @@ async def test_admin_creates_lists_and_downloads(
 
 async def test_no_site_restore_endpoint(client: AsyncClient) -> None:
     paths = (await client.get("/api/openapi.json")).json()["paths"]
-    assert not any("restore" in path for path in paths)
+    assert [path for path in paths if "restore" in path] == ["/api/me/restore"]
     assert set(paths[URL]) == {"get", "post"}
     assert set(paths[URL + "/{name}"]) == {"get"}

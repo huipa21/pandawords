@@ -25,7 +25,8 @@ async def test_offline_guard_upgrade_replay_and_snapshot(
     await run_migrations(db, prior)
     user = await make_user()
     before = await find_user(db, user.id)
-    assert await run_migrations(db) == ["0026_offline_attempt_guard.surql"]
+    applied = await run_migrations(db)
+    assert applied[0] == "0026_offline_attempt_guard.surql"
     expected = await snapshot(db)
     assert await run_migrations(db) == []
     await checked_query(db, (MIGRATIONS / "0026_offline_attempt_guard.surql").read_text())
