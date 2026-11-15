@@ -139,4 +139,4 @@ are in `phase-N.md`. If a phase file doesn't exist yet, the agent asks before wr
 | 7.1.2 | Offline review queue (prefetch due cards, sync answers) | 7.1.1, 3.3.2 | 2 | L | 🟡 |
 | 7.1.3 | Security hardening: rate limits, nginx headers/CSP, ownership audit | 1.5.4, 1.6.4 | 1 | M | ✅ |
 | 7.1.4 | Performance pass: graph queries, indexes, bundle size | 4.4.2 | 1 | M | ✅ |
-| 7.1.5 | Per-user FSRS parameter optimization from review logs | 3.1.2 | 1 | M | 🟡 |
+| 7.1.5 | Per-user FSRS parameter optimization from review logs | 3.1.2 | 1 | M | ✅ |

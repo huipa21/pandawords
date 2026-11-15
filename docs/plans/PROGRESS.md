@@ -28,7 +28,7 @@ Agents must not edit PLAN/PROGRESS or merge. Shared topic-doc changes are integr
 | 7.1.2 | task/7.1.2-offline-review | ../pandawords.worktrees/7.1.2 | Ready: 7.1.1 merged and verified |
 | 7.1.3 | merged | removed | ✅ rate limits, deployed CSP and isolation verified |
 | 7.1.4 | merged | removed | ✅ measured batching and enforced bundle budgets |
-| 7.1.5 | task/7.1.5-fsrs-optimization | ../pandawords.worktrees/7.1.5 | Agent running: bounded per-user optimization |
+| 7.1.5 | merged | removed | ✅ bounded per-user optimization; optional optimizer verified |
 
 Verification: baseline `dev.ps1 check` passed; bounded full frontend baseline passed 218/218
 (34 files). Full isolated backend baseline passed 1124/1124 with one existing Starlette
@@ -118,6 +118,24 @@ and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets
 - Failures / causes / corrections: known cause or unknown; corrective action, or none
 - Findings: …
 - Blockers / follow-ups: next action, newly ready tasks; link Backlog / Blocked as needed -->
+
+### 2026-11-15 — 7.1.5 Per-user FSRS optimization
+- Result / completed: checkpoint `4c512ec` completed and merged (`be69190` plus optional-import
+  follow-up). Owner-scoped validated history/parameters, explicit worker statuses, bounded
+  subprocess, cooldown/idempotency and future-only scheduling; migration 0024 and snapshot.
+- Dependencies: 3.1.2 ✅. Optional optimizer dependency decision recorded in existing ADR 0004.
+- Verification: 36 optimizer tests and 70 existing SRS/attempt regressions passed in worktree;
+  actual upstream optimizer ran 512 transitions/16 synthetic cards and returned 21 valid
+  parameters. Migration fresh/upgrade/drift tests passed; generated API unchanged after regeneration.
+  Release focused tests passed. Main `dev.ps1 check` and 20 targeted default-install tests passed.
+- Failures / causes / corrections: initial check found one formatting issue. Main correctly
+  lacked optional torch; a static import broke default type-checking, replaced by an explicit
+  optional runtime import (unavailable remains a public status, not a success fallback).
+- Skipped / deferred: no new optimizer image built/transferred; opt-in build argument tested.
+  No real learner history used; deterministic synthetic histories and real CPU optimizer tested.
+- Findings: upstream optimizer dependencies are large and remain opt-in for API/worker images;
+  ordinary review needs neither torch nor any provider and retains last-good/default parameters.
+- Blockers / follow-ups: none for this task; final full suites remain.
 
 ### 2026-11-15 — 7.1.4 Measured performance
 - Result / completed: checkpoint `e1494cc` finished, merged as `8b8454c`.
