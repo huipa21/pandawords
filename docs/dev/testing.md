@@ -57,8 +57,10 @@ Build the frontend, then run `.\scripts\test-security-proxy.ps1` with a locally
 available API image (`-ApiImage`): this uses actual production nginx responses,
 both locales, protected images, graph/reading flows, CSP enforcement, URL-log privacy,
 and direct/trusted-ingress spoofing probes. It cleans up only its own containers.
-Backup/import/export endpoints are not implemented yet (Phase 6); their isolation
-acceptance remains with those tasks rather than claiming coverage of nonexistent APIs.
+Project export (6.1.2) isolation is covered by `tests/api/test_project_export.py` (see below).
+User backup, project import, restore and site backup endpoints are not implemented yet
+(Phase 6); their isolation acceptance remains with those tasks rather than claiming coverage of
+nonexistent APIs.
 
 ## Measured graph and bundle budgets (7.1.4)
 
@@ -1002,6 +1004,26 @@ versions failing before extraction, unsafe archive members (traversal, absolute,
 symlink, device, duplicates, extras), integrity mismatches, size/count limits and
 no-partial-archive cleanup. Regenerate the schema after model changes with
 `uv run python -m app.domain.bundle`.
+
+## Project export tests (6.1.2)
+
+Real-database API tests (`tests/api/test_project_export.py`, seed helpers in
+`tests/api/project_export_support.py`) run on an isolated per-test database on 8101 with private
+media and `bundle_work_dir` directories under the backend folder (`.project-export-*`, removed
+after each test). They download `GET /api/projects/{id}/export` and open the archive with
+`load_bundle`, checking: project tree (lemma → lexeme → selected senses only), membership
+hidden/`study_order`, overrides, notes (target + project), owned tag edge, memory and review log,
+content-addressed media bytes, attribution, and absence of storage paths and source IDs. A
+second account (project, override, note, owned tag/sentence edges, media, progress on the same
+shared senses) and the user's other project must not appear; foreign export is 404 and anonymous
+401. Also covered: empty project, shared-only project, missing/directory/unsafe media and a
+missing pronunciation audio file (skipped and counted in `X-PandaWords-Skipped-Media`), and an
+archive-writer failure leaving no work directory. From `backend`:
+
+```powershell
+uv run --no-sync pytest -q tests\api\test_project_export.py
+```
+
 ## Test database
 
 - The `test` command starts the in-memory SurrealDB container on 8101 if it isn't running.

@@ -119,7 +119,9 @@ costly-operation windows before routing; ordinary authorization still checks the
 and each relevant row, edge and endpoint. Shared dictionary records remain visible only under
 their existing `owner = NONE` rules, and administrator account management does not grant access
 to another user's learning records. Jobs and protected media are owner-scoped. The regression
-matrix and its unavailable Phase 6 backup/import/export paths are documented in
+matrix, owner-only project export (`GET /api/projects/{id}/export`, owner snapshot →
+validated archive in a private work directory, removed after streaming) and the still
+unavailable Phase 6 import/backup paths are documented in
 [testing.md](../dev/testing.md#security-isolation-and-production-proxy-713).
 
 The HTTPS edge is Caddy → nginx → API. Nginx enforces same-origin CSP/security headers and serves

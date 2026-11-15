@@ -113,6 +113,8 @@ class Settings(BaseSettings):
     media_dir: Path = Path("data/media")
     lexicon_dir: Path = Path("data/lexicon")
     lexicon_path: Path | None = None
+    # Private scratch space for bundle export/import archives; None = system temp directory.
+    bundle_work_dir: Path | None = None
     app_domain: str = "localhost"
     caddy_network: str = "pandawords"
     pixabay_api_key: str = "replace-with-your-api-key"

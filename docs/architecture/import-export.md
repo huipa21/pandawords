@@ -86,13 +86,13 @@ and UTC timestamps with microseconds, so the same logical input produces byte-id
 `data.json` and, with the same `created_at`, byte-identical archives.
 ## Availability and security scope
 
-The project bundle import/export and user backup described below are **Phase 6 designs, not
-implemented in this branch**; only the bundle contract, validator and archive helpers above
-(6.1.1) exist. No cross-user isolation or archive-content test can be claimed for those paths.
-The admin whole-site backup, scheduled backup and operator restore (task 6.1.5) are implemented
-as described in [Admin site backup](#admin-site-backup-format-pandawordssite). There is
-deliberately no browser or API site-restore upload. The production pre-migration SurrealDB
-export remains a separate, database-only safety copy.
+The bundle contract, validator and archive helpers (6.1.1) and project **export** (6.1.2, below)
+are implemented. Project import and user backup/restore described below are **Phase 6 designs,
+not implemented in this branch**; no cross-user isolation or archive-content test can be claimed
+for those paths. The admin whole-site backup, scheduled backup and operator restore (task 6.1.5)
+are implemented as described in [Admin site backup](#admin-site-backup-format-pandawordssite).
+There is deliberately no browser or API site-restore upload. The production pre-migration
+SurrealDB export remains a separate, database-only safety copy.
 
 ## Project bundle (`format: pandawords.project`)
 
@@ -103,7 +103,41 @@ data.json      dictionary subset (lemmas, lexemes, senses, edges), user-owned it
 media/         images and audio referenced by data.json
 ```
 
-- **Export** includes everything, review progress too.
+- **Export** (6.1.2): `GET /api/projects/{id}/export` (authenticated owner; another user's or a
+  missing project is 404) streams `<project name>.pandawords-project.tar.gz`
+  (`application/gzip`, `Cache-Control: no-store`). Implementation:
+  `app/db/project_export.py::load_project(db, owner, project) -> BundleSource` reads one
+  transaction-consistent, owner-filtered snapshot; `app/services/project_export.py::
+  export_project(db, settings, owner, project_id) -> ProjectArchive` hashes media, serializes
+  with `serialize_bundle` and writes with `export_bundle`. Contents:
+  - the project and its `includes` (all of them, hidden ones too, with `hidden`, `added_at`,
+    `study_order`; duplicate legacy memberships of one target merge, hidden wins);
+  - dictionary rows (shared and the owner's) reached from membership targets: a sense's lexeme
+    and lemma, a lemma's lexemes, then outgoing `composed_of` → morphemes, `member_of` → tags
+    (and parent tags), `used_in` → sentences/passages/phrase lemmas and `part_of` → passages,
+    to a fixed point (≤ 12 rounds); senses come only from memberships, so `has_sense` edges are
+    kept only to selected senses. Every visible edge (shared or the owner's, both endpoints
+    visible) between two exported records is included (`relates_to`, `derives_to`, `contains`
+    too);
+  - the owner's overrides of exported records, notes on exported records or the project,
+    memory of the selected (membership) senses and all of the owner's review logs of that
+    memory (logs from other projects get `project: null`);
+  - media targeting exported records plus pronunciation audio they reference: the owner's media
+    and shared audio. Files are read from `MEDIA_DIR` through the protected-path resolver and
+    stored as `media/<sha256><ext>`. Missing, unreadable, non-file or unsafe-path files are
+    skipped (their rows dropped, pronunciation `audio` set to `null`), logged without paths and
+    counted in the `X-PandaWords-Skipped-Media` response header.
+  - The manifest uses the project's source/target language, `app_version`, and the dictionary
+    attribution when shared rows are present.
+  - Bounds: 10,000 memberships, 25,000 records, 100,000 traversed edges, 50,000 notes/media,
+    200,000 review logs, archive limits from `ArchiveLimits`; exceeding them is
+    `project.export_too_large` (413), never a truncated archive.
+  - The archive is built off the event loop in a fresh private directory under
+    `BUNDLE_WORK_DIR` (default: system temp), validated and atomically published by
+    `export_bundle`, streamed with `FileResponse`, and the directory is removed after sending,
+    on client disconnect, and on any failure. Only the (bounded) `data.json` is held in memory;
+    media is hashed and archived by streaming from disk. Database IDs, storage paths and
+    credentials never appear in the archive.
 - **Import**:
   - Shared dictionary items are merged by deterministic ID. Missing ones are created as shared
     (`owner = NONE`), and existing ones are not modified.
