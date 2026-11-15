@@ -54,17 +54,23 @@ class LlmUnavailable(AppError):
         super().__init__("llm." + reason, 503, "Optional LLM is unavailable.")
 
 
-type BundleStage = Literal["archive", "manifest", "data", "references", "media"]
+type BundleStage = Literal["upload", "archive", "manifest", "data", "references", "media", "apply"]
 
 
 class BundleError(AppError):
     """Rejected bundle; ``problems`` are short, path-free and safe to show to the uploader."""
 
-    def __init__(self, reason: str, stage: BundleStage, problems: list[str] | None = None) -> None:
+    def __init__(
+        self,
+        reason: str,
+        stage: BundleStage,
+        problems: list[str] | None = None,
+        status: int = 422,
+    ) -> None:
         self.reason = reason
         self.stage = stage
         self.problems = problems or []
-        super().__init__("bundle." + reason, 422, f"Bundle rejected at {stage} stage.")
+        super().__init__("bundle." + reason, status, f"Bundle rejected at {stage} stage.")
 
 
 def _error_response(
@@ -73,10 +79,11 @@ def _error_response(
     message: str,
     field: str | None = None,
     headers: Mapping[str, str] | None = None,
+    extra: Mapping[str, object] | None = None,
 ) -> JSONResponse:
     return JSONResponse(
         status_code=status,
-        content={"code": code, "message": message, "field": field},
+        content={"code": code, "message": message, "field": field, **(extra or {})},
         headers=headers,
     )
 
@@ -85,7 +92,8 @@ async def app_error_handler(_request: Request, exc: Exception) -> JSONResponse:
     if not isinstance(exc, AppError):
         raise TypeError(f"Expected AppError, received {type(exc).__name__}.")
 
-    return _error_response(exc.code, exc.status, exc.message, exc.field, exc.headers)
+    extra = {"stage": exc.stage, "problems": exc.problems} if isinstance(exc, BundleError) else None
+    return _error_response(exc.code, exc.status, exc.message, exc.field, exc.headers, extra)
 
 
 async def validation_error_handler(

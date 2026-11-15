@@ -558,6 +558,28 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/projects/import': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Import Project
+     * @description Import a ``pandawords.project`` bundle as a new project of the current user.
+     *
+     *     ``include_progress`` defaults to on only when the bundle was exported by this same user.
+     */
+    post: operations['import_project_api_projects_import_post']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/api/dictionary/candidates': {
     parameters: {
       query?: never
@@ -1703,6 +1725,34 @@ export interface components {
       search_id: string
       /** Result Id */
       result_id: number
+    }
+    /**
+     * ImportSummary
+     * @description Completion result; counts only, never IDs of other accounts or storage paths.
+     */
+    'ImportSummary': {
+      /** Project Ids */
+      project_ids: string[]
+      /** Progress Imported */
+      progress_imported: boolean
+      /** Same Source */
+      same_source: boolean
+      /** Created */
+      created: {
+        [key: string]: number
+      }
+      /** Merged */
+      merged: {
+        [key: string]: number
+      }
+      /** Skipped */
+      skipped: {
+        [key: string]: number
+      }
+      /** Conflicts */
+      conflicts: string[]
+      /** Warnings */
+      warnings: string[]
     }
     /** JobRead */
     'JobRead': {
@@ -4040,6 +4090,41 @@ export interface operations {
         }
         content: {
           'application/gzip': unknown
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  import_project_api_projects_import_post: {
+    parameters: {
+      query?: {
+        include_progress?: boolean | null
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/gzip': string
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ImportSummary']
         }
       }
       /** @description Validation Error */
