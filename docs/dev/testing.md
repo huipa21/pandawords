@@ -65,6 +65,14 @@ retaining all route/chunk/precache bounds. The measured final payload remains
 below the pre-optimization PWA baseline (183,977 bytes); build enforcement is
 not skipped. Storage implementation is loaded lazily from auth cleanup.
 
+6.1.6 adds the settings and admin-backup routes plus the project import dialog.
+Portability messages load lazily (`src/i18n/portability/`) and bundle-error
+parsing stays in the feature, but the new lazy routes and shared Naive UI chunks
+(modal, scrollbar split) still add about 1.1 KB to the foreground: measured initial
+JS **184,978** and static JS **671,278**; the project page gains the export button
+(**256,461**). Initial JS is explicitly revised to **185,500**, static JS to
+**675,000** and project tree to **258,000**; all other bounds are unchanged.
+
 ## Security boundaries (7.1.3)
 
 Run the unit rate-limit/logging and API `test_security_*` suites plus exercise-attempt
@@ -96,8 +104,8 @@ at most 22 queries and a deliberately loose 2-second p95 ceiling.
 `pnpm run build` emits the Vite manifest and runs `bundle-budget.ts`; it reports
 all initial, route and individual chunk transfer bytes and separately the PWA
 install precache. Compression models production nginx gzip level 1/minimum 1024
-bytes. Bounds: initial JS 184,000 bytes, initial CSS 4,800, per-JS chunk 225,000,
-all static JS 665,000, project tree 255,000, project graph 525,000, all words
+bytes. Bounds: initial JS 185,500 bytes, initial CSS 4,800, per-JS chunk 225,000,
+all static JS 675,000, project tree 258,000, project graph 525,000, all words
 485,000, login 215,000 and PWA precache 1,160,000. Missing budgeted routes fail.
 Focused frontend regressions cover graph lazy-load failure/retry and analyzer
 dependency accounting; run the existing graph/router/project suites as well.

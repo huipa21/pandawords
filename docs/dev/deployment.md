@@ -26,6 +26,10 @@ CSS **4,593**; static JS is **654,214**. The first-install PWA precache is separ
 **83 files / 1,123,235 modeled transfer bytes**. The initial budget is explicitly
 184,000 bytes to include bilingual offline/auth feedback; all other budgets remain
 unchanged. This remains below the original PWA baseline of 183,977 JS bytes.
+Task 6.1.6 (settings/admin backup routes, import dialog) raises measured initial JS
+to **184,978**, static JS to **671,278** and the project tree route to **256,461**;
+the budgets are explicitly revised to 185,500, 675,000 and 258,000 (see
+[testing.md](testing.md)).
 
 Node 24/Vite 8 production manifest measurements, including the PWA install script,
 use nginx gzip level 1. Before/after initial JS: 183,977 -> 181,846 bytes; CSS:

@@ -39,6 +39,9 @@ These are feature-owned, not shared exercise components. The project plan reuses
   preferences, and Open project for imports.
 - `useArchiveDownload` / `useArchiveUpload`: abortable transfer state; `archive.ts` holds
   pre-checks, safe download names, blob saving and bundle-error localization.
+- `usePortabilityI18n` (`messages.ts`): use instead of `useI18n` for `portability.*` /
+  `siteBackup.*` keys; it merges `src/i18n/portability/{en,zh-CN}.json` on first use so the
+  strings stay out of the initial bundle.
 
 `features/admin/AdminBackupPage` (+ `useSiteBackups`) is the admin-only site-backup list with
 create, polling and protected download. These are feature-owned; no design-preview entry.
