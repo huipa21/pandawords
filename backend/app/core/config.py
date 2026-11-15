@@ -144,6 +144,14 @@ class Settings(BaseSettings):
             raise ValueError("Expected a descriptive Wikimedia User-Agent")
         return value.strip()
 
+    site_backup_dir: Path = Path("data/backups/site")
+    site_backup_retain: int = Field(default=7, ge=1, le=365)
+    site_backup_time: str = Field(default="03:30", pattern=r"^([01]\d|2[0-3]):[0-5]\d$")
+    site_backup_timeout_seconds: float = Field(default=900.0, gt=0)
+    site_backup_lock_stale_seconds: int = Field(default=6 * 3600, ge=60)
+    site_backup_max_entries: int = Field(default=500_000, gt=0)
+    site_backup_max_bytes: int = Field(default=100 * 1024**3, gt=0)
+
     pip_fallback_index_url: str = ""
     npm_fallback_registry: str = ""
     docker_registry_mirror: str = ""
