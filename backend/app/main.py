@@ -23,6 +23,7 @@ from app.api.media import router as media_router
 from app.api.notes import router as notes_router
 from app.api.overrides import router as overrides_router
 from app.api.phrases import router as phrases_router
+from app.api.project_export import router as project_export_router
 from app.api.project_tree import router as project_tree_router
 from app.api.projects import router as projects_router
 from app.api.relations import router as relations_router
@@ -123,6 +124,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(study_plan_router)
     app.include_router(srs_optimization_router)
     app.include_router(project_tree_router)
+    app.include_router(project_export_router)
     app.include_router(candidates_router)
     app.include_router(phrases_router)
     app.include_router(exercise_attempts_router)
