@@ -17,7 +17,12 @@ from app.db.migrate import MIGRATIONS, discover, run_migrations
 from app.db.migration_store import MigrationError, checked_query
 from app.db.snapshot import snapshot
 from app.db.srs import user_record
-from app.db.srs_optimization_test_support import history_plans, insert_foreign_identity, seed, set_preferences
+from app.db.srs_optimization_test_support import (
+    history_plans,
+    insert_foreign_identity,
+    seed,
+    set_preferences,
+)
 from app.domain.auth import UserPreferences
 from app.domain.srs_optimization import OptimizationRead
 from app.services.srs_optimization_history import training_history

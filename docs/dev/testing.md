@@ -1,5 +1,11 @@
 # Testing
 
+The Phase 7 closeout additionally executed the real optional py-fsrs 6.3.3
+optimizer in its bounded subprocess with 512 eligible transitions across 16
+synthetic cards: success with 21 finite, bounds-validated parameters. Focused
+optimizer suites passed 36 cases and existing SRS/attempt regressions passed 70;
+the release test script also verified the opt-in image build argument.
+
 ## Personal semantic relations (4.4.3)
 
 Using the existing test DB on 8101:
