@@ -1,5 +1,6 @@
 import type { Page } from '@playwright/test'
 import type { components } from '../src/api/schema'
+import { Buffer } from 'node:buffer'
 import { expect, test } from '@playwright/test'
 
 async function openShell(page: Page, locale: 'en' | 'zh-CN') {
@@ -9,6 +10,9 @@ async function openShell(page: Page, locale: 'en' | 'zh-CN') {
     user: {
       id: 'user:ui-layout-test',
       username: 'ui-layout-test',
+      email: '',
+      full_name: '',
+      avatar: '',
       role: 'user',
       disabled: false,
       must_change_password: false,
@@ -31,6 +35,28 @@ async function openShell(page: Page, locale: 'en' | 'zh-CN') {
     const path = new URL(route.request().url()).pathname
     if (path === '/api/auth/refresh') {
       await route.fulfill({ json: session })
+    }
+    else if (path === '/api/auth/me/profile') {
+      const body: components['schemas']['ProfileUpdate'] = route.request().postDataJSON()
+      if (body.email === 'fail@example.com') {
+        await route.fulfill({
+          status: 503,
+          json: { code: 'generic', message: 'Failed' },
+        })
+        return
+      }
+      session.user = {
+        ...session.user,
+        ...body,
+      }
+      await route.fulfill({ json: session.user })
+    }
+    else if (path === '/api/auth/password') {
+      session.access_token = 'rotated-ui-layout-test'
+      await route.fulfill({ json: session })
+    }
+    else if (path === '/api/auth/logout') {
+      await route.fulfill({ status: 204 })
     }
     else if (path === '/api/projects') {
       await route.fulfill({
@@ -151,4 +177,64 @@ test('panel styling preserves the existing dark-theme toggle', async ({ page }) 
     await expect(panel).toHaveCSS('background-color', 'rgb(26, 26, 26)')
   }
   await expect(page.locator('aside [aria-current="page"]')).toHaveCSS('color', 'rgb(100, 181, 246)')
+  await page.getByRole('button', { name: /^Theme: Dark/ }).click()
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
+})
+
+test('header menus, persistent profile, avatar and password change work together', async ({ page }) => {
+  await openShell(page, 'en')
+  const header = page.getByRole('banner')
+  await expect(header.getByRole('button', { name: 'Account menu' })).toHaveText('U')
+  await expect(header.getByRole('button', { name: 'Sign out' })).toHaveCount(0)
+  await expect(header.locator('a[href="/change-password"]')).toHaveCount(0)
+  await header.getByRole('button', { name: 'Choose language' }).focus()
+  await page.keyboard.press('Enter')
+  await expect(page.getByRole('menuitem')).toHaveCount(2)
+  await page.keyboard.press('Escape')
+  await expect(page.getByRole('menuitem')).toHaveCount(0)
+  await header.getByRole('button', { name: 'Choose language' }).click()
+  await expect(page.getByRole('menuitem')).toHaveCount(2)
+  await expect(page.getByRole('menuitem', { name: 'English', exact: true })).toBeVisible()
+  const chinese = page.getByRole('menuitem', { name: '简体中文', exact: true })
+  expect((await chinese.boundingBox())!.height).toBeGreaterThanOrEqual(44)
+  await chinese.click()
+  await expect(page.locator('html')).toHaveAttribute('lang', 'zh-CN')
+  await header.getByRole('button', { name: '选择语言' }).click()
+  await page.getByRole('menuitem', { name: 'English', exact: true }).click()
+  await header.getByRole('button', { name: 'Account menu' }).click()
+  await expect(page.getByRole('menuitem')).toHaveCount(2)
+  await page.getByRole('menuitem', { name: 'Profile', exact: true }).click()
+  await expect(page.getByTestId('profile-page')).toBeVisible()
+  await expect(page.locator('#profile-id')).toHaveAttribute('readonly')
+  await expect(page.locator('#profile-username')).toHaveAttribute('readonly')
+  await page.getByLabel('Email address', { exact: true }).fill('fail@example.com')
+  await page.getByLabel('Full Name', { exact: true }).fill('Updated Name')
+  await page.getByRole('button', { name: 'Save profile', exact: true }).click()
+  await expect(page.getByRole('button', { name: 'Save profile', exact: true })).toBeEnabled()
+  await expect(page.getByLabel('Full Name', { exact: true })).toHaveValue('Updated Name')
+  await page.getByLabel('Email address', { exact: true }).fill('updated@example.com')
+  await page.getByRole('button', { name: 'Save profile', exact: true }).click()
+  await expect(header.getByRole('button', { name: 'Account menu' })).toHaveText('UN')
+  await page.locator('#profile-avatar').setInputFiles({
+    name: 'avatar.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aSioAAAAASUVORK5CYII=', 'base64'),
+  })
+  await page.getByRole('button', { name: 'Save profile', exact: true }).click()
+  await expect(header.getByRole('button', { name: 'Account menu' }).locator('img')).toBeVisible()
+  await page.reload()
+  await expect(page.getByLabel('Email address', { exact: true })).toHaveValue('updated@example.com')
+  await expect(page.getByLabel('Full Name', { exact: true })).toHaveValue('Updated Name')
+  await expect(header.getByRole('button', { name: 'Account menu' }).locator('img')).toBeVisible()
+  await page.getByLabel('Current password', { exact: true }).fill('current-password')
+  await page.getByLabel('New password', { exact: true }).fill('changed-password')
+  await page.getByRole('button', { name: 'Change password', exact: true }).click()
+  await expect(page.getByLabel('New password', { exact: true })).toHaveValue('')
+  await expect(page).toHaveURL('/profile')
+  await page.getByRole('button', { name: 'Use initials instead', exact: true }).click()
+  await page.getByRole('button', { name: 'Save profile', exact: true }).click()
+  await expect(header.getByRole('button', { name: 'Account menu' })).toHaveText('UN')
+  await header.getByRole('button', { name: 'Account menu' }).click()
+  await page.getByRole('menuitem', { name: 'Sign out', exact: true }).click()
+  await expect(page).toHaveURL('/login')
 })

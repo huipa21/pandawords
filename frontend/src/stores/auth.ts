@@ -1,7 +1,7 @@
 import type { components } from '@/api/schema'
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { createApiClient } from '@/api/client'
+import { api, createApiClient } from '@/api/client'
 import { normalizeApiError } from '@/api/errors'
 import { AuthRequestError, transportError } from '@/features/auth/errors'
 import { activateOfflineOwner, revokeOfflineOwner } from '@/features/study/offlineIdentity'
@@ -169,6 +169,18 @@ export const useAuthStore = defineStore('auth', () => {
     })
   }
 
+  function updateProfile(body: components['schemas']['ProfileUpdate']) {
+    const started = version
+    const owner = user.value?.id
+    return mutate(async () => {
+      const result = await api.PATCH('/api/auth/me/profile', { body }).catch(transportError)
+      if (!result.data)
+        throw new AuthRequestError(normalizeApiError(result.error, result.response.status))
+      if (started === version && user.value?.id === owner)
+        user.value = result.data
+    })
+  }
+
   return {
     accessToken,
     user,
@@ -180,6 +192,7 @@ export const useAuthStore = defineStore('auth', () => {
     reset,
     login,
     changePassword,
+    updateProfile,
     logout,
   }
 })

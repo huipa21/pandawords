@@ -24,6 +24,9 @@ vi.mock('@/api/client', async (original) => {
 const user: components['schemas']['UserRead'] = {
   id: 'alice',
   username: 'alice',
+  email: '',
+  full_name: '',
+  avatar: '',
   role: 'user',
   disabled: false,
   must_change_password: false,

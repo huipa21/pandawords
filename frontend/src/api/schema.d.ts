@@ -192,6 +192,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/api/auth/me/profile': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    /** Patch Profile */
+    patch: operations['patch_profile_api_auth_me_profile_patch']
+    trace?: never
+  }
   '/api/auth/me/srs-preferences': {
     parameters: {
       query?: never
@@ -2314,6 +2331,15 @@ export interface components {
       /** Results */
       results: components['schemas']['PixabayResult'][]
     }
+    /** ProfileUpdate */
+    'ProfileUpdate': {
+      /** Full Name */
+      full_name: string
+      /** Email */
+      email: string
+      /** Avatar */
+      avatar: string
+    }
     /** ProjectCreate */
     'ProjectCreate': {
       /** Name */
@@ -2886,6 +2912,21 @@ export interface components {
       /** Username */
       username: string
       /**
+       * Email
+       * @default
+       */
+      email: string
+      /**
+       * Full Name
+       * @default
+       */
+      full_name: string
+      /**
+       * Avatar
+       * @default
+       */
+      avatar: string
+      /**
        * Role
        * @enum {string}
        */
@@ -3268,6 +3309,39 @@ export interface operations {
         }
         content: {
           'application/json': components['schemas']['AuthRead']
+        }
+      }
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['HTTPValidationError']
+        }
+      }
+    }
+  }
+  patch_profile_api_auth_me_profile_patch: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['ProfileUpdate']
+      }
+    }
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['UserRead']
         }
       }
       /** @description Validation Error */

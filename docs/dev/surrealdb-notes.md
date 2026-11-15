@@ -1,5 +1,24 @@
 # SurrealDB 3.3 notes
 
+## Personal profile persistence ✅
+
+Verified with the existing loopback **8101** SurrealDB **3.3.5** test server and isolated random databases:
+migration **0028_user_profile** defines three string fields with `DEFAULT ''`; omitted
+profile fields on new accounts receive empty strings. Existing rows remain readable through
+the domain defaults before migration. Backfilling all three missing fields in one `UPDATE`
+avoids required-field validation of partially upgraded legacy records. Replaying the migration
+preserves populated profiles and every other account field.
+
+Bound `UPDATE $user SET full_name = $full_name, email = $email, avatar = $avatar
+WHERE id = $user AND disabled = false AND must_change_password = false RETURN AFTER`
+updates only the authenticated account and returns the complete record. Caller-supplied
+query IDs cannot select a different account; no username or ID reassignment is performed.
+Focused API tests verify persistence through `/me`, login and refresh, isolation, input
+validation, and unchanged identity. The schema snapshot was regenerated from this isolated
+server and then compared normally. Retained probes: `test_auth_profile.py`,
+`test_profile_migration.py`, `test_schema_snapshot.py`. No development database or shared
+service lifecycle was changed.
+
 ## Bulk import inserts in one transaction (6.1.3) ✅
 
 Verified on the isolated 8101 SurrealDB 3.3.5 harness with SDK 3.0 (`_atomic` transactions):

@@ -1,4 +1,19 @@
 {
+  "profile": {
+    "title": "个人资料",
+    "accountMenu": "账户菜单",
+    "avatar": "头像",
+    "chooseAvatar": "选择头像",
+    "avatarHint": "请选择不超过 256 KB 的 PNG、JPEG 或 WebP 图片。",
+    "avatarFailed": "无法读取头像，请重新选择图片。",
+    "removeAvatar": "改用姓名缩写",
+    "userId": "用户 ID（不可修改）",
+    "email": "电子邮箱",
+    "fullName": "姓名",
+    "invalidEmail": "请输入有效的电子邮箱地址。",
+    "save": "保存个人资料",
+    "saved": "个人资料已保存。"
+  },
   "offline": {
     "title": "离线复习",
     "policy": "联网预备 10 道文字或选择题，有效期 24 小时（每账号最多 20 道）。离线请保持已登录页面打开。同步采用服务端评分和建议评级，仅回执计入进度。不下载提示或媒体。",
@@ -464,9 +479,12 @@
     "system": "跟随系统",
     "light": "浅色",
     "dark": "深色",
-    "localeAction": "切换到英文"
+    "localeAction": "选择语言",
+    "english": "English",
+    "chinese": "简体中文"
   },
   "pages": {
+    "profile": "个人资料",
     "tags": "标签",
     "projectCreate": "创建项目",
     "projectEdit": "编辑项目",
@@ -606,6 +624,7 @@
     "auth_disabled": "此账号已被停用。",
     "auth_password_reused": "请使用不同的密码。",
     "validation_invalid": "请检查此项后重试。",
+    "image_invalid": "图片无效，请选择有效的 PNG、JPEG 或 WebP 图片。",
     "http_401": "登录已失效，请重新登录。",
     "http_403": "你没有执行此操作的权限。",
     "http_422": "请检查表单内容后重试。",

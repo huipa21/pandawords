@@ -48,7 +48,7 @@ async def list_users(db: AsyncSurrealConnection, page: int, page_size: int) -> A
         rows = await _rows(
             db,
             "SELECT id, username, role, disabled, must_change_password, source_lang, "
-            "target_lang, prefs FROM user ORDER BY username, id "
+            "target_lang, prefs, email, full_name, avatar FROM user ORDER BY username, id "
             "LIMIT $limit START $start;",
             {"limit": page_size, "start": (page - 1) * page_size},
             txn_id=txn,
@@ -76,7 +76,7 @@ async def create_user(
         rows = await _rows(
             db,
             "CREATE $user CONTENT $content RETURN id, username, role, disabled, "
-            "must_change_password, source_lang, target_lang, prefs;",
+            "must_change_password, source_lang, target_lang, prefs, email, full_name, avatar;",
             {"user": RecordID("user", uuid4().hex), "content": content},
             txn_id=txn,
         )
@@ -105,7 +105,7 @@ async def update_user(
         rows = await _rows(
             db,
             "SELECT id, username, role, disabled, must_change_password, source_lang, "
-            "target_lang, prefs FROM $user WHERE id = $user;",
+            "target_lang, prefs, email, full_name, avatar FROM $user WHERE id = $user;",
             {"user": target},
             txn_id=txn,
         )
@@ -132,7 +132,8 @@ async def update_user(
         updated = await _rows(
             db,
             "UPDATE $user MERGE $changes WHERE id = $user RETURN id, username, role, "
-            "disabled, must_change_password, source_lang, target_lang, prefs;",
+            "disabled, must_change_password, source_lang, target_lang, prefs, "
+            "email, full_name, avatar;",
             {"user": target, "changes": changes},
             txn_id=txn,
         )

@@ -7,6 +7,7 @@ from app.core.config import Settings
 from app.core.errors import AppError
 from app.core.security import invalid_credentials
 from app.domain.auth import AuthRead, AuthTokens, LoginRequest, PasswordChange, User, UserRead
+from app.domain.profile import ProfileUpdate
 from app.domain.review_preferences import ReviewPreferences, ReviewPreferencesUpdate
 from app.domain.srs import SrsPreferences, SrsPreferencesUpdate
 from app.services import auth, review_preferences, srs
@@ -108,6 +109,14 @@ async def password(
 ) -> AuthRead:
     tokens = await auth.change_password(db, settings, user, data)
     return _response(tokens, response, settings)
+
+
+@router.patch("/me/profile")
+async def patch_profile(
+    data: ProfileUpdate, response: Response, db: Db, user: CurrentUser
+) -> UserRead:
+    response.headers["Cache-Control"] = "no-store"
+    return _public_user(await auth.update_profile(db, user, data))
 
 
 @router.get("/me/srs-preferences")

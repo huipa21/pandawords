@@ -1,4 +1,19 @@
 {
+  "profile": {
+    "title": "Profile",
+    "accountMenu": "Account menu",
+    "avatar": "Avatar",
+    "chooseAvatar": "Choose avatar",
+    "avatarHint": "Choose a PNG, JPEG or WebP image up to 256 KB.",
+    "avatarFailed": "Could not read the avatar. Please choose the image again.",
+    "removeAvatar": "Use initials instead",
+    "userId": "User ID (cannot be changed)",
+    "email": "Email address",
+    "fullName": "Full Name",
+    "invalidEmail": "Enter a valid email address.",
+    "save": "Save profile",
+    "saved": "Profile saved."
+  },
   "offline": {
     "title": "Offline review",
     "policy": "Prepare 10 text/choice prompts online, valid 24 hours (20 per account). Keep this signed-in tab open offline. Sync uses server grading and suggested ratings; only receipts count. No hints or media.",
@@ -464,9 +479,12 @@
     "system": "System",
     "light": "Light",
     "dark": "Dark",
-    "localeAction": "Switch to Chinese"
+    "localeAction": "Choose language",
+    "english": "English",
+    "chinese": "简体中文"
   },
   "pages": {
+    "profile": "Profile",
     "tags": "Tags",
     "projectCreate": "Create project",
     "projectEdit": "Edit project",
@@ -606,6 +624,7 @@
     "auth_disabled": "This account is disabled.",
     "auth_password_reused": "Choose a different password.",
     "validation_invalid": "Check this value and try again.",
+    "image_invalid": "This image is invalid. Choose a valid PNG, JPEG or WebP image.",
     "http_401": "Your session has expired. Please sign in again.",
     "http_403": "You do not have permission to perform this action.",
     "http_422": "Check the form values and try again.",

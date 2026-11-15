@@ -50,7 +50,8 @@ including those from UI components. `createCytoscapeStyle(element)` reads comput
 rebuild the styles after changing the theme.
 
 Brand: **Google Material Blue**. Neutrals follow the Material grey scale. Dark mode follows the
-system by default, with a toggle (system / light / dark) stored in preferences.
+explicit light/dark preference (light by default), stored on the device. Legacy system
+preferences fall back to light; the header toggle never selects a system mode.
 
 ## Color — semantic
 

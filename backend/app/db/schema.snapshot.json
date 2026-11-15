@@ -658,7 +658,10 @@
     "user": {
       "events": {},
       "fields": {
+        "avatar": "DEFINE FIELD avatar ON user TYPE string DEFAULT '' PERMISSIONS FULL",
         "disabled": "DEFINE FIELD disabled ON user TYPE bool PERMISSIONS FULL",
+        "email": "DEFINE FIELD email ON user TYPE string DEFAULT '' PERMISSIONS FULL",
+        "full_name": "DEFINE FIELD full_name ON user TYPE string DEFAULT '' PERMISSIONS FULL",
         "must_change_password": "DEFINE FIELD must_change_password ON user TYPE bool PERMISSIONS FULL",
         "password_hash": "DEFINE FIELD password_hash ON user TYPE string PERMISSIONS FULL",
         "prefs": "DEFINE FIELD prefs ON user TYPE object PERMISSIONS FULL",

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
-import { computed, onScopeDispose, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
-export type ThemePreference = 'system' | 'light' | 'dark'
+export type ThemePreference = 'light' | 'dark'
 export type LocalePreference = 'zh-CN' | 'en'
 
 export const preferencesKey = 'pandawords.preferences'
@@ -23,22 +23,12 @@ export const usePreferencesStore = defineStore('preferences', () => {
   const theme = ref<ThemePreference>(
     saved.theme === 'light' || saved.theme === 'dark'
       ? saved.theme
-      : 'system',
+      : 'light',
   )
   const locale = ref<LocalePreference>(saved.locale === 'en'
     ? 'en'
     : 'zh-CN')
-  const media = window.matchMedia?.('(prefers-color-scheme: dark)')
-  const systemDark = ref(media?.matches ?? false)
-  const resolvedTheme = computed(() => theme.value === 'system'
-    ? (systemDark.value ? 'dark' : 'light')
-    : theme.value)
-
-  function followSystem(event: MediaQueryListEvent) {
-    systemDark.value = event.matches
-  }
-  media?.addEventListener('change', followSystem)
-  onScopeDispose(() => media?.removeEventListener('change', followSystem))
+  const resolvedTheme = computed(() => theme.value)
 
   watch([theme, locale], () => {
     try {

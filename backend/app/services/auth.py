@@ -19,7 +19,10 @@ from app.core.security import (
 )
 from app.db import auth as repository
 from app.db import auth_password
+from app.db import profile as profile_repository
 from app.domain.auth import AuthTokens, PasswordChange, User, UserCreate
+from app.domain.profile import ProfileUpdate, decode_avatar
+from app.services import image_validation
 
 
 @lru_cache(maxsize=1)
@@ -30,6 +33,16 @@ def _dummy_hash() -> str:
 async def create_user(db: AsyncSurrealConnection, data: UserCreate) -> User:
     password_hash = await to_thread.run_sync(hash_password, data.password)
     return await repository.create_user(db, data, password_hash)
+
+
+async def update_profile(db: AsyncSurrealConnection, user: User, data: ProfileUpdate) -> User:
+    if data.avatar:
+        content, mime = decode_avatar(data.avatar)
+        await to_thread.run_sync(image_validation.validate, content, mime)
+    updated = await profile_repository.update_profile(db, user.id, data)
+    if updated is None:
+        raise invalid_credentials()
+    return updated
 
 
 async def bootstrap_admin(db: AsyncSurrealConnection, settings: Settings) -> None:

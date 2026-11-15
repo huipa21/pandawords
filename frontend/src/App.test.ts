@@ -1,5 +1,5 @@
 import { flushPromises, mount } from '@vue/test-utils'
-import { NConfigProvider } from 'naive-ui'
+import { NConfigProvider, NDropdown } from 'naive-ui'
 import { createPinia, disposePinia, setActivePinia } from 'pinia'
 import { describe, expect, it, vi } from 'vitest'
 import { nextTick } from 'vue'
@@ -69,6 +69,8 @@ describe('app', () => {
       expect(panels[0]!.attributes('style')).toContain('--pw-color-primary: #1976D2')
       expect(panels[1]!.attributes('style')).toContain('--pw-color-primary: #64B5F6')
       await wrapper.findComponent(LocaleSwitch).get('button').trigger('click')
+      wrapper.findComponent(LocaleSwitch).getComponent(NDropdown).vm.$emit('select', 'en')
+      await nextTick()
       expect(wrapper.get('h1').text()).toBe('Design system laboratory')
       expect(wrapper.text()).toContain('Naive UI playground')
       await wrapper.get('#sample-light').setValue('connection')
@@ -101,6 +103,7 @@ describe('app', () => {
     expect(document.title).toBe('PandaWords')
 
     await wrapper.findComponent(LocaleSwitch).get('button').trigger('click')
+    wrapper.findComponent(LocaleSwitch).getComponent(NDropdown).vm.$emit('select', 'en')
     await nextTick()
 
     expect(wrapper.get('h1').text()).toBe('Projects')

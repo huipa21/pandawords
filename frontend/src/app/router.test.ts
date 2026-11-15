@@ -63,6 +63,7 @@ describe('auth route guards', () => {
     const router = createAppRouter(createMemoryHistory())
     for (const path of [
       '/projects',
+      '/profile',
       '/admin/users',
       '/dev/design',
       '/login',
@@ -80,6 +81,7 @@ describe('auth route guards', () => {
     const router = createAppRouter(createMemoryHistory())
     for (const path of [
       '/projects',
+      '/profile',
       '/reading',
       '/reading/opaque-passage',
       '/admin/backup',
