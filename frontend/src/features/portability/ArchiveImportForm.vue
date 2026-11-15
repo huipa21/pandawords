@@ -2,16 +2,16 @@
 import type { ImportSummary, RestoreSummary } from './requests'
 import type { ProgressChoice, UploadRequest } from './useArchiveUpload'
 import { computed, ref, useId } from 'vue'
-import { useI18n } from 'vue-i18n'
 import ConfirmAction from '@/components/app/ConfirmAction.vue'
 import { formatBytes, MAX_ARCHIVE_BYTES } from './archive'
 import ArchiveSummary from './ArchiveSummary.vue'
+import { usePortabilityI18n } from './messages'
 import { importProject, restoreUserBackup } from './requests'
 import { useArchiveUpload } from './useArchiveUpload'
 
 const props = defineProps<{ kind: 'project' | 'user' }>()
 const emit = defineEmits<{ done: [summary: ImportSummary | RestoreSummary] }>()
-const { t } = useI18n()
+const { t } = usePortabilityI18n()
 const id = useId()
 const input = ref<HTMLInputElement>()
 const confirming = ref(false)

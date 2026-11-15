@@ -1,5 +1,5 @@
-import { useI18n } from 'vue-i18n'
 import { normalizeApiError } from '@/api/errors'
+import { usePortabilityI18n } from './messages'
 
 /** Mirrors the server default `BUNDLE_IMPORT_MAX_BYTES`; the server still enforces its own bound. */
 export const MAX_ARCHIVE_BYTES = 512 * 1024 * 1024
@@ -77,7 +77,7 @@ export interface TransferError {
 }
 
 export function useTransferErrors() {
-  const { t, te } = useI18n()
+  const { t, te } = usePortabilityI18n()
   return (error: unknown, status: number): TransferError => {
     const normalized = normalizeApiError(error, status)
     const reason = normalized.code.replace(/^bundle\./, '').replaceAll('.', '_')

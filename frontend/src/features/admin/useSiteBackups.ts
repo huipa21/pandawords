@@ -1,7 +1,7 @@
 import type { components } from '@/api/schema'
 import { onScopeDispose, ref, shallowRef } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { api } from '@/api/client'
+import { usePortabilityI18n } from '@/features/portability/messages'
 import { useArchiveDownload } from '@/features/portability/useArchiveDownload'
 import { useProjectErrors } from '@/features/projects/useProject'
 
@@ -10,7 +10,7 @@ export const POLL_MS = 3000
 
 /** Admin site-backup status with polling while a backup runs; downloads go through the authenticated client. */
 export function useSiteBackups() {
-  const { t } = useI18n()
+  const { t } = usePortabilityI18n()
   const errorText = useProjectErrors()
   const status = shallowRef<SiteBackupStatus>()
   const loading = ref(false)

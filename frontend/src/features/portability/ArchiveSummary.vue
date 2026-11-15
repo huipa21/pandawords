@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { ImportSummary, RestoreSummary } from './requests'
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { usePortabilityI18n } from './messages'
 
 const props = defineProps<{ kind: 'project' | 'user', summary: ImportSummary | RestoreSummary }>()
-const { t } = useI18n()
+const { t } = usePortabilityI18n()
 const sum = (counts: Record<string, number>) => Object.values(counts).reduce((total, value) => total + value, 0)
 const restore = computed(() => 'already_restored' in props.summary
   ? props.summary

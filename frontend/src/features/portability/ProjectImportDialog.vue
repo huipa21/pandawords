@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
 import ArchiveImportForm from './ArchiveImportForm.vue'
+import { usePortabilityI18n } from './messages'
 
 const emit = defineEmits<{ imported: [] }>()
 const show = defineModel<boolean>('show', { required: true })
-const { t } = useI18n()
+const { t } = usePortabilityI18n()
 </script>
 
 <template>

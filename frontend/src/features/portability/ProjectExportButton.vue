@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { useMessage } from 'naive-ui'
-import { useI18n } from 'vue-i18n'
+import { usePortabilityI18n } from './messages'
 import { exportProject } from './requests'
 import { useArchiveDownload } from './useArchiveDownload'
 
 const props = defineProps<{ projectId: string }>()
-const { t } = useI18n()
+const { t } = usePortabilityI18n()
 const message = useMessage()
 const { busy, error, skipped, download, cancel } = useArchiveDownload('project.pandawords-project.tar.gz')
 

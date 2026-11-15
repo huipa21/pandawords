@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
 import EmptyState from '@/components/app/EmptyState.vue'
 import ErrorState from '@/components/app/ErrorState.vue'
 import PageHeader from '@/components/app/PageHeader.vue'
 import { formatBytes } from '@/features/portability/archive'
+import { usePortabilityI18n } from '@/features/portability/messages'
 import { useSiteBackups } from './useSiteBackups'
 
-const { t, te, locale } = useI18n()
+const { t, te, locale } = usePortabilityI18n()
 const when = (value: string) => new Intl.DateTimeFormat(locale.value, { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value))
 const { status, loading, starting, loadError, actionError, downloading, load, start, download, cancelDownload } = useSiteBackups()
 const running = computed(() => status.value?.running ?? false)

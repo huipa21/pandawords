@@ -1,7 +1,7 @@
 import type { TransferError } from './archive'
 import { onScopeDispose, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { downloadName, isAbort, saveBlob, skippedMedia, useTransferErrors } from './archive'
+import { usePortabilityI18n } from './messages'
 
 export interface DownloadResult {
   data?: unknown
@@ -11,7 +11,7 @@ export interface DownloadResult {
 
 /** Authenticated archive download with cancel; the blob is saved locally, no URL is shown. */
 export function useArchiveDownload(fallbackName: string) {
-  const { t } = useI18n()
+  const { t } = usePortabilityI18n()
   const errorText = useTransferErrors()
   const busy = ref(false)
   const error = ref<TransferError>()

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
 import ArchiveImportForm from './ArchiveImportForm.vue'
+import { usePortabilityI18n } from './messages'
 import { downloadUserBackup } from './requests'
 import { useArchiveDownload } from './useArchiveDownload'
 
-const { t } = useI18n()
+const { t } = usePortabilityI18n()
 const { busy, error, skipped, savedName, download, cancel } = useArchiveDownload('pandawords-backup.pandawords-user.tar.gz')
 </script>
 

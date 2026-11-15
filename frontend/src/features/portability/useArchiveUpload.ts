@@ -1,7 +1,7 @@
 import type { ArchiveProblem, TransferError } from './archive'
 import { onScopeDispose, ref, shallowRef } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { checkArchive, isAbort, useTransferErrors } from './archive'
+import { usePortabilityI18n } from './messages'
 
 export type ProgressChoice = 'auto' | 'on' | 'off'
 export type UploadState = 'idle' | 'uploading' | 'success' | 'error' | 'cancelled'
@@ -19,7 +19,7 @@ export type UploadRequest<T> = (file: File, includeProgress: boolean | undefined
  * options so the same submission can be retried.
  */
 export function useArchiveUpload<T>(request: UploadRequest<T>, initialChoice: ProgressChoice) {
-  const { t } = useI18n()
+  const { t } = usePortabilityI18n()
   const errorText = useTransferErrors()
   const file = shallowRef<File>()
   const problem = ref<ArchiveProblem | null>(null)

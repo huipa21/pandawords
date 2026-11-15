@@ -2,17 +2,17 @@
 import type { Project } from './useProject'
 import { useMessage } from 'naive-ui'
 import { computed, onMounted, onScopeDispose, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { api } from '@/api/client'
 import ConfirmAction from '@/components/app/ConfirmAction.vue'
 import EmptyState from '@/components/app/EmptyState.vue'
 import ErrorState from '@/components/app/ErrorState.vue'
 import PageHeader from '@/components/app/PageHeader.vue'
+import { usePortabilityI18n } from '@/features/portability/messages'
 import ProjectImportDialog from '@/features/portability/ProjectImportDialog.vue'
 import { useProjectErrors } from './useProject'
 
-const { t } = useI18n()
+const { t } = usePortabilityI18n()
 const router = useRouter()
 const message = useMessage()
 const errorText = useProjectErrors()
