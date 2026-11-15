@@ -21,10 +21,12 @@ from surrealdb import AsyncSurrealConnection, RecordID
 
 from app.core.config import Settings
 from app.db import project_export as repository
+from app.domain.bundle import dump_data
 from app.domain.bundle_manifest import ManifestHeader
 from app.domain.bundle_serialize import BundleSource, serialize_bundle
 from app.domain.media import MIME_EXTENSIONS
 from app.services.bundle_io import export_bundle
+from app.services.bundle_source import fingerprint
 from app.services.media import _file  # pyright: ignore[reportPrivateUsage]
 from app.services.projects import _project_id  # pyright: ignore[reportPrivateUsage]
 
@@ -98,7 +100,7 @@ def _filename(name: str) -> str:
 
 
 def _write(
-    settings: Settings, owner: RecordID, source: BundleSource, directory: Path
+    settings: Settings, subject: str, owner: RecordID, source: BundleSource, directory: Path
 ) -> ProjectArchive:
     media = _media_files(settings.media_dir, source.media)
     source = _without_skipped(source, media)
@@ -112,6 +114,7 @@ def _write(
         source_lang=project["source_lang"],
         target_lang=project["target_lang"],
         attribution=ATTRIBUTION if shared else [],
+        source=fingerprint(settings, subject, hashlib.sha256(dump_data(data)).hexdigest()),
     )
     path = directory / "project.tar.gz"
     export_bundle(path, header, data, media.files)
@@ -130,7 +133,7 @@ async def export_project(
         await asyncio.to_thread(work_dir.mkdir, parents=True, exist_ok=True)
     directory = Path(tempfile.mkdtemp(prefix="pandawords-export-", dir=work_dir))
     try:
-        archive = await asyncio.to_thread(_write, settings, owner_record, source, directory)
+        archive = await asyncio.to_thread(_write, settings, owner, owner_record, source, directory)
     except BaseException:
         await asyncio.to_thread(shutil.rmtree, directory, ignore_errors=True)
         logger.warning("project_export_failed", stage="archive")

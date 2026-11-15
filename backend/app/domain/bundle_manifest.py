@@ -45,6 +45,9 @@ class ManifestHeader(Entry):
     source_lang: Lang
     target_lang: Lang
     attribution: Annotated[list[Short], Field(max_length=64)] = []
+    # Keyed HMAC binding the exporting account to this data.json; only the issuing server can
+    # verify it, and it identifies nobody without that server's secret.
+    source: Annotated[str, Field(pattern=SHA256_PATTERN)] | None = None
 
 
 class Manifest(ManifestHeader):

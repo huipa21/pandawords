@@ -115,6 +115,8 @@ class Settings(BaseSettings):
     lexicon_path: Path | None = None
     # Private scratch space for bundle export/import archives; None = system temp directory.
     bundle_work_dir: Path | None = None
+    # Largest accepted project/user bundle upload (compressed bytes).
+    bundle_import_max_bytes: int = Field(default=512 * 1024 * 1024, gt=0)
     app_domain: str = "localhost"
     caddy_network: str = "pandawords"
     pixabay_api_key: str = "replace-with-your-api-key"
