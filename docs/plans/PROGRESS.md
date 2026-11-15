@@ -82,7 +82,7 @@ needed) now use 0027 (6.1.1-6.1.4 chain) and 0028 (6.1.5) to keep versions ascen
 
 | Task | Branch | Worktree | State / notes |
 |---|---|---|---|
-| 6.1.2 | task/6.1.2-project-export | ../pandawords.worktrees/6.1.2 | Agent running |
+| 6.1.3 | task/6.1.3-project-import | ../pandawords.worktrees/6.1.3 | Agent running |
 
 ## Blocked
 
@@ -99,6 +99,23 @@ needed) now use 0027 (6.1.1-6.1.4 chain) and 0028 (6.1.5) to keep versions ascen
 Newest first. One entry per finished, blocked, or interrupted task. Every entry records completed
 work, dependencies, verification outcomes, skipped work and reasons, failures and known causes,
 and follow-ups. Use "none" or "not applicable" explicitly; do not record secrets.
+
+### 2026-11-15 — 6.1.2 Project export, progress and media
+- Result / completed: merged (`80df72d`, `deb98d0`). `GET /api/projects/{id}/export` (owner-only, 404
+  foreign/missing, 401 anonymous) streams a temp-built `pandawords.project` archive: project, ordered
+  and hidden includes, required shared/owned dictionary rows and edges, overrides, notes, memory and
+  review history for selected senses, content-addressed media. Unreadable/unsafe media are dropped
+  and counted in `X-PandaWords-Skipped-Media`; oversized projects return 413; temp dir cleaned on
+  send/disconnect/failure. New `BUNDLE_WORK_DIR` setting. No migration.
+- Dependencies: 6.1.1 checked ✅.
+- Verification: agent check clean; full backend suite 1243 passed. Main after merge: gen-api regenerated
+  from combined backend, `dev.ps1 check` passed, export/backup/bundle/project tests 85 passed.
+- Skipped / deferred: none.
+- Failures / causes / corrections: import-export.md availability paragraph conflicted with 6.1.5;
+  merged to describe 6.1.1, 6.1.2 and 6.1.5 as implemented.
+- Findings / follow-ups: no export time limit (size limits only); a cancelled request can remove the
+  temp dir while the build still writes; review logs selected by `owner, memory IN …` (unindexed,
+  capped 200k). Project IDs must be `encode_rid` form. 6.1.3 now ready and started.
 
 ### 2026-11-15 — 6.1.5 Admin site backup, restore and scheduled service
 - Result / completed: merged (`555a84a`, `e9e3cf5`, `3d18cf0`). `pandawords.site` archive (manifest
