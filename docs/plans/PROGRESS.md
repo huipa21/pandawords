@@ -9,6 +9,21 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 
 ## Current run
 
+### Backup list actions (2026-11-16)
+
+Request: list all site backups with row selection, select-all, grouped download/delete/
+single-selection restore, and title-row Export/Import icons.
+Status: **in progress**. Unnumbered refinement; existing site-backup API and operator
+restore are available, with no numbered prerequisites. Sequential implementation in
+`task/backup-actions`, worktree `backup-actions`.
+Restore constraint: whole-site restore deliberately stops API/worker writers through
+`deploy/restore.sh`. User unavailable for architectural clarification; preserve that
+safeguard and expose explicit operator instructions from Import/Restore, not a live
+database replacement or a success-shaped placeholder.
+Verification: not run yet. Blockers: browser-executed restore requires a separate
+maintenance-mode design; out of scope for this safe UI refinement. No new documents,
+dependencies, deployment or push planned.
+
 ### Header account menu and profile (2026-11-15)
 
 Request: avatar/initials header menu with Profile and Sign Out; language options without
