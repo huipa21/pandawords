@@ -190,3 +190,17 @@ class SiteBackupRunner:
 
 def download_path(settings: Settings, name: str) -> Path:
     return store.resolve(check_locations(settings), name)
+
+
+async def delete_backup(settings: Settings, name: str) -> None:
+    lock = acquire_lock(settings)
+    try:
+        path = store.resolve(lock.path.parent, name)
+        await asyncio.to_thread(path.unlink)
+        await asyncio.to_thread(store.sidecar(path).unlink, missing_ok=True)
+        structlog.get_logger().info("site_backup_deleted", name=name)
+    except OSError as error:
+        structlog.get_logger().error("site_backup_delete_failed", error_type=type(error).__name__)
+        raise SiteBackupError("delete", "Could not delete the site backup.") from error
+    finally:
+        lock.release()

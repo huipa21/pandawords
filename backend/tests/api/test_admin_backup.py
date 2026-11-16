@@ -7,6 +7,7 @@ from httpx import AsyncClient
 
 from app.core.config import Settings
 from app.services.site_backup import SiteBackupRunner
+from app.services.site_backup_store import BackupLock, sidecar
 from tests.api.auth_support import bearer, login
 from tests.conftest import UserFactory
 
@@ -27,7 +28,12 @@ def test_settings(session_db_settings: Settings, tmp_path: Path) -> Settings:
 
 @pytest.mark.parametrize(
     ("method", "path"),
-    [("GET", URL), ("POST", URL), ("GET", f"{URL}/site-20260101T000000000000Z.tar.gz")],
+    [
+        ("GET", URL),
+        ("POST", URL),
+        ("GET", f"{URL}/site-20260101T000000000000Z.tar.gz"),
+        ("DELETE", f"{URL}/site-20260101T000000000000Z.tar.gz"),
+    ],
 )
 async def test_only_admins_reach_site_backups(
     client: AsyncClient, make_user: UserFactory, method: str, path: str
@@ -76,4 +82,35 @@ async def test_no_site_restore_endpoint(client: AsyncClient) -> None:
     paths = (await client.get("/api/openapi.json")).json()["paths"]
     assert [path for path in paths if "restore" in path] == ["/api/me/restore"]
     assert set(paths[URL]) == {"get", "post"}
-    assert set(paths[URL + "/{name}"]) == {"get"}
+    assert set(paths[URL + "/{name}"]) == {"get", "delete"}
+
+
+async def test_admin_deletes_only_completed_backups_under_lock(
+    client: AsyncClient, make_user: UserFactory, test_settings: Settings
+) -> None:
+    admin = await make_user(role="admin")
+    headers = bearer(await login(client, admin.username))
+    directory = test_settings.site_backup_dir
+    directory.mkdir()
+    path = directory / "site-20260101T000000000000Z.tar.gz"
+    path.write_bytes(b"archive")
+    sidecar(path).write_text(f"{'a' * 64}  {path.name}\n", encoding="ascii")
+    unrelated = directory / "keep.txt"
+    unrelated.write_text("keep", encoding="ascii")
+
+    lock = BackupLock(directory, test_settings.site_backup_lock_stale_seconds).acquire()
+    try:
+        conflict = await client.delete(f"{URL}/{path.name}", headers=headers)
+        assert conflict.status_code == 409
+        assert path.exists() and sidecar(path).exists()
+    finally:
+        lock.release()
+    for name in ("keep.txt", "site-20260102T000000000000Z.tar.gz", "..%2Fkeep.txt"):
+        assert (await client.delete(f"{URL}/{name}", headers=headers)).status_code == 404
+    deleted = await client.delete(f"{URL}/{path.name}", headers=headers)
+    assert deleted.status_code == 204
+    assert deleted.headers["cache-control"] == "no-store"
+    assert not path.exists() and not sidecar(path).exists()
+    assert unrelated.read_text("ascii") == "keep"
+    assert (await client.get(URL, headers=headers)).json()["backups"] == []
+    assert (await client.delete(f"{URL}/{path.name}", headers=headers)).status_code == 404

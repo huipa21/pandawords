@@ -601,6 +601,7 @@
   },
   "errors": {
     "site_backup_in_progress": "A site backup or restore is already running.",
+    "site_backup_delete": "Could not delete the backup. Refresh the list and retry.",
     "site_backup_not_found": "This backup no longer exists. Refresh the list.",
     "backup_export_too_large": "Your data exceeds the backup size limits. Please contact an administrator.",
     "offline_storage": "Offline data could not be cleared. Clear this site's browser data before sharing this device.",

@@ -93,6 +93,11 @@ The admin whole-site backup, scheduled backup and operator restore (task 6.1.5)
 are implemented as described in [Admin site backup](#admin-site-backup-format-pandawordssite).
 There is deliberately no browser or API site-restore upload. The production pre-migration
 SurrealDB export remains a separate, database-only safety copy.
+The admin backup page's Import/Restore controls explain this operator-only workflow; they
+do not upload archives or replace a running database. `DELETE /api/admin/backups/{name}`
+is admin-only and removes a completed archive plus its checksum sidecar under the shared
+backup/restore lock. It returns 204, 404 for an invalid/missing archive, or 409 while the
+lock is held. Deletion failures are reported as `site_backup.delete`; no site data changes.
 
 ## Project bundle (`format: pandawords.project`)
 
