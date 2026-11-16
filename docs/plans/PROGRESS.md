@@ -13,16 +13,40 @@ design → ADR in [../decisions/](../decisions/)); the log entry just links to i
 
 Request: list all site backups with row selection, select-all, grouped download/delete/
 single-selection restore, and title-row Export/Import icons.
-Status: **in progress**. Unnumbered refinement; existing site-backup API and operator
+Status: **complete for the safe operator-only scope**. Unnumbered refinement; existing site-backup API and operator
 restore are available, with no numbered prerequisites. Sequential implementation in
 `task/backup-actions`, worktree `backup-actions`.
 Restore constraint: whole-site restore deliberately stops API/worker writers through
 `deploy/restore.sh`. User unavailable for architectural clarification; preserve that
 safeguard and expose explicit operator instructions from Import/Restore, not a live
 database replacement or a success-shaped placeholder.
-Verification: not run yet. Blockers: browser-executed restore requires a separate
-maintenance-mode design; out of scope for this safe UI refinement. No new documents,
-dependencies, deployment or push planned.
+Implementation: `4cef69b`, merged as `bb3dee9`; bilingual title icons, selectable complete
+backup list, sequential cancellable downloads, confirmed grouped deletion, and
+single-selection restore instructions. Deletion is admin-only, checks completed archive
+names and takes the cross-process backup/restore lock. Partial failures retain remaining
+selections and display the error in the confirmation. API types regenerated; directly
+related architecture/UI docs updated. PLAN unchanged (no numbered task).
+Verification: worktree and merged `dev.ps1 check` passed; focused frontend **9 passed**,
+bounded frontend suite **290 passed**; backup API **7 passed**. Full backend:
+**1307 passed, 1 failed**, the existing offline lexicon command argument-forwarding test;
+the same failure reproduced on unchanged main before integration. No unrelated fix made.
+Initial direct API test lacked the repository environment and could not reach the test
+DB; rerun through the loaded dev environment passed. Frontend default five-second router/
+token-lint timeouts under shared load passed with 60-second timeout headroom (17 focused
+and then full 290). Chromium **2 passed**, both locales, keyboard/indeterminate selection,
+single-selection restore, Export, confirmed delete, Import instructions, 320/390/1440
+layouts without horizontal overflow, and measured checkbox targets at least 44 by 44.
+Browser discovery initially found no new cases because the added cases were accidentally
+nested in an existing test; moved registration to top level and reran successfully.
+Blocker/deferred requirement: browser-executed whole-site Import/Restore is **not
+implemented**; it requires a maintenance-mode design beyond the existing operator script.
+No new documents or dependencies, push, deployment, or live database restore. Existing
+shared app services remain untouched. Final merged check and backup API **7/7** passed;
+browser-test registration correction is committed with this closeout. Task branch and
+worktree removed, and folder absence verified. Initial git worktree removal left
+task-only package files behind; inspected for reparse points, removed that exact task
+directory, and confirmed only the main worktree remains. Blockers beyond deferred browser
+restore: none. Unrelated lexicon baseline failure remains out of scope.
 
 ### Header account menu and profile (2026-11-15)
 
