@@ -130,7 +130,10 @@ in `source.metadata.download`. Without a manifest, upstream attribution and an i
 still recorded.
 
 Invalid JSON, non-object/non-English entries, missing word/POS/senses and invalid etymology
-numbers fail with a line number. Missing etymology numbers (including null) default to 1.
+numbers fail with a line number. Missing etymology numbers (including null) default to 1;
+decimal-digit strings (current Kaikki dumps emit `"1"`) are accepted as integers. Whitespace-only
+`punct` entries have no lemma identity, so they are skipped and their senses counted as unusable.
+`dev.ps1 lexicon` runs Python in UTF-8 mode so Windows console encodings cannot break logging.
 Unusable individual senses (no nonblank gloss, including malformed objects) are skipped and
 counted; `raw_glosses` is a fallback. A database without usable senses is rejected. Optional
 forms/sounds/examples can be absent or incomplete. Blank source sense IDs use the gloss hash.

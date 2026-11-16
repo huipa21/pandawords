@@ -170,7 +170,9 @@ class LexiconReader:
         language, normalized = lemma_key(lang, text)
         return await self._many(
             LexiconLemma,
-            "SELECT l.* FROM lemma l JOIN form_index f ON f.lemma_id = l.id "
+            # CROSS JOIN pins form_index as the outer loop; without ANALYZE stats SQLite
+            # otherwise scans every lemma of the language to avoid sorting.
+            "SELECT l.* FROM form_index f CROSS JOIN lemma l ON f.lemma_id = l.id "
             "WHERE f.form = ? AND l.lang = ? ORDER BY l.text, l.id",
             normalized,
             language,
@@ -284,8 +286,8 @@ class LexiconReader:
         language, normalized = lemma_key(lang, text)
         return await self._many(
             LexiconAffix,
-            "SELECT a.* FROM affix a JOIN lexeme x ON a.lexeme_id = x.id "
-            "JOIN lemma l ON x.lemma_id = l.id WHERE a.type = 'root' AND a.text = ? "
+            "SELECT a.* FROM affix a CROSS JOIN lexeme x ON a.lexeme_id = x.id "
+            "CROSS JOIN lemma l ON x.lemma_id = l.id WHERE a.type = 'root' AND a.text = ? "
             "AND l.lang = ? ORDER BY a.lexeme_id, a.position, a.source",
             normalized,
             language,

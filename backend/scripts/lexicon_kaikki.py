@@ -52,6 +52,11 @@ def entries(path: Path) -> Iterator[tuple[int, dict[str, Any]]]:
             yield number, entry
 
 
+def is_whitespace_punctuation_entry(entry: dict[str, Any]) -> bool:
+    word = entry.get("word")
+    return entry.get("pos") == "punct" and isinstance(word, str) and not word.strip()
+
+
 def add_lemma(connection: sqlite3.Connection, word: str) -> str:
     key = lemma_key("en", word)
     identity = key_text(key)
@@ -64,7 +69,22 @@ def add_lemma(connection: sqlite3.Connection, word: str) -> str:
     return identity
 
 
-def add_senses(connection: sqlite3.Connection, entry: dict[str, Any], lexeme_id: str) -> int:
+def parse_etymology_number(value: object) -> int:
+    if value is None:
+        return 1
+    if isinstance(value, str) and value.isascii() and value.isdecimal():
+        value = int(value)
+    if type(value) is not int or value < 1:
+        raise ValueError("Etymology number must be a positive integer")
+    return value
+
+
+def add_senses(
+    connection: sqlite3.Connection,
+    entry: dict[str, Any],
+    lexeme_id: str,
+    etymology_number: int,
+) -> int:
     skipped = 0
     for rank, sense in enumerate(entry["senses"], 1):
         if not isinstance(sense, dict):
@@ -81,7 +101,7 @@ def add_senses(connection: sqlite3.Connection, entry: dict[str, Any], lexeme_id:
             "en",
             entry["word"],
             entry["pos"],
-            entry.get("etymology_number") or 1,
+            etymology_number,
             source_sense_id=source_id,
             gloss=glosses[0],
         )
@@ -145,9 +165,7 @@ def import_entry(connection: sqlite3.Connection, entry: dict[str, Any]) -> int:
     word, pos = entry.get("word"), entry.get("pos")
     if not isinstance(word, str) or not isinstance(pos, str):
         raise ValueError("word and POS must be nonblank strings")
-    etymology = entry.get("etymology_number", 1)
-    if etymology is None:
-        etymology = 1
+    etymology = parse_etymology_number(entry.get("etymology_number", 1))
     key = lexeme_key("en", word, pos, etymology)
     lemma_id = add_lemma(connection, word)
     lexeme_id = key_text(key)
@@ -163,7 +181,7 @@ def import_entry(connection: sqlite3.Connection, entry: dict[str, Any]) -> int:
             "wiktionary",
         ),
     )
-    skipped = add_senses(connection, entry, lexeme_id)
+    skipped = add_senses(connection, entry, lexeme_id, etymology)
     add_sounds(connection, entry, lexeme_id)
     # Import locally because the parser shares canonical JSON helpers with this module.
     from .lexicon_morphology import add_analysis

@@ -22,13 +22,13 @@ Invoke-Lexicon
 $call = $script:calls[-1]
 Assert-True ($call[0] -eq 'uv') 'lexicon did not invoke uv.'
 Assert-True ($call[1] -eq (Join-Path $root 'backend')) 'lexicon used the wrong worktree backend.'
-Assert-True (($call[2] -join ' ') -eq 'run --no-sync python -m scripts.lexicon_release') 'Wrong release entrypoint.'
+Assert-True (($call[2] -join ' ') -eq 'run --no-sync python -X utf8 -m scripts.lexicon_release') 'Wrong release entrypoint.'
 Assert-True ((Get-Location).Path -eq $originalLocation) 'lexicon changed caller location.'
 Invoke-Lexicon @('-RawDir', 'C:\fixture source\raw', '-Output', 'C:\fixture source\lexicon.sqlite',
     '-DistDir', 'C:\fixture source\dist', '-Date', '2026-11-14')
 $cli = $script:calls[-1][2]
-Assert-True ($cli[5] -eq '--raw-dir' -and $cli[6] -eq 'C:\fixture source\raw') 'Raw path was split/lost.'
-Assert-True ($cli[7] -eq '--output' -and $cli[9] -eq '--dist-dir' -and $cli[11] -eq '--date') 'Flags were not forwarded.'
+Assert-True ($cli[7] -eq '--raw-dir' -and $cli[8] -eq 'C:\fixture source\raw') 'Raw path was split/lost.'
+Assert-True ($cli[9] -eq '--output' -and $cli[11] -eq '--dist-dir' -and $cli[13] -eq '--date') 'Flags were not forwarded.'
 foreach ($invalid in @(@('-Bogus', 'x'), @('-RawDir'), @('-Date', ''))) {
     $failed = $false
     try { Invoke-Lexicon $invalid }

@@ -9,7 +9,7 @@ function Invoke-Lexicon {
         '-distdir' = '--dist-dir'
         '-date' = '--date'
     }
-    $cli = @('run', '--no-sync', 'python', '-m', 'scripts.lexicon_release')
+    $cli = @('run', '--no-sync', 'python', '-X', 'utf8', '-m', 'scripts.lexicon_release')
     for ($index = 0; $index -lt $Arguments.Count; $index += 2) {
         $key = $Arguments[$index].ToLowerInvariant()
         if (-not $options.ContainsKey($key) -or $index + 1 -ge $Arguments.Count -or

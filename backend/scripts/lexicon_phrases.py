@@ -9,7 +9,7 @@ import structlog
 
 from app.domain.dictionary_keys import lemma_key
 
-from .lexicon_kaikki import entries, json_text, key_text, objects
+from .lexicon_kaikki import entries, is_whitespace_punctuation_entry, json_text, key_text, objects
 
 log = structlog.get_logger()
 MAX_COMPONENTS = 32
@@ -47,6 +47,8 @@ def resolve_phrases(connection: sqlite3.Connection, path: Path) -> int:
     )
     skipped = 0
     for line, entry in entries(path):
+        if is_whitespace_punctuation_entry(entry):
+            continue
         phrase = key_text(lemma_key("en", entry["word"]))
         if (
             connection.execute(

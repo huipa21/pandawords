@@ -12,7 +12,7 @@ from uuid import uuid4
 from app.domain.dictionary_keys import lemma_key
 
 from .download_lexicon import checked_record, checksum, default_raw_dir, read_manifest
-from .lexicon_kaikki import entries, import_entry, json_text
+from .lexicon_kaikki import entries, import_entry, is_whitespace_punctuation_entry, json_text
 from .lexicon_phrases import resolve_phrases
 from .lexicon_schema import initialize, validate
 from .lexicon_sources import SOURCES
@@ -80,6 +80,12 @@ def build(
                     word = entry.get("word")
                     if not isinstance(word, str):
                         raise ValueError("missing word")
+                    if is_whitespace_punctuation_entry(entry):
+                        senses = entry.get("senses")
+                        if not isinstance(senses, list):
+                            raise ValueError("punctuation entry must include senses")
+                        skipped += len(senses)
+                        continue
                     normalized = str(lemma_key("en", word)[1])
                     if selected is not None and normalized not in selected:
                         continue

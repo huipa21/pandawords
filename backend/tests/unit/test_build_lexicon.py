@@ -69,14 +69,15 @@ def test_core_schema_keys_senses_forms_and_attribution(tmp_path: Path) -> None:
             forms=[{"form": "ＲＡＮ", "tags": ["past"]}],
         ),
         entry(pos="noun", senses=[{"glosses": ["an act of running"]}]),
-        entry(etymology_number=2, senses=[{"glosses": ["a distinct origin"]}]),
+        entry(etymology_number="2", senses=[{"glosses": ["a distinct origin"]}]),
+        entry(" ", pos="punct"),
         entry("kick the bucket", senses=[{"glosses": ["to die"]}]),
         entry("went", senses=[{"glosses": ["past of go"], "form_of": [{"word": "go"}]}]),
         entry("go", senses=[{"glosses": ["move"]}]),
     )
     output = tmp_path / "lexicon.sqlite"
     result = build(source, output)
-    assert result.records == 6 and result.skipped_senses == 0
+    assert result.records == 6 and result.skipped_senses == 1
     with closing(sqlite3.connect(output)) as db:
         assert db.execute("PRAGMA integrity_check").fetchall() == [("ok",)]
         assert db.execute("PRAGMA foreign_key_check").fetchall() == []
@@ -184,6 +185,7 @@ def test_stable_keys_rebuild_duplicates_and_missing_optional_fields(tmp_path: Pa
         json.dumps(entry(lang_code="zh")).encode(),
         json.dumps(entry(pos=" ")).encode(),
         json.dumps(entry(etymology_number=0)).encode(),
+        json.dumps(entry(etymology_number="first")).encode(),
         json.dumps(entry(etymology_number=True)).encode(),
         json.dumps(entry(senses={})).encode(),
         json.dumps(entry(senses=[{}])).encode(),
