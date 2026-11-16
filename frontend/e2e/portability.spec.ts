@@ -26,6 +26,108 @@ test('project export then import round-trips with progress enabled and disabled'
   await page.addInitScript(() => {
     localStorage.setItem('pandawords.preferences', JSON.stringify({ theme: 'system', locale: 'en' }))
   })
+
+  for (const locale of ['en', 'zh-CN'] as const) {
+    test(`backup list supports keyboard selection and grouped actions (${locale})`, async ({ page }) => {
+      const english = locale === 'en'
+      const session: components['schemas']['AuthRead'] = {
+        access_token: 'backup-ui-test',
+        token_type: 'bearer',
+        user: {
+          id: 'user:backup-ui-test',
+          username: 'backup-ui-test',
+          email: '',
+          full_name: '',
+          avatar: '',
+          role: 'admin',
+          disabled: false,
+          must_change_password: false,
+          source_lang: 'zh',
+          target_lang: 'en',
+          prefs: {
+            theme: 'light',
+            locale,
+            accent: 'US',
+            desired_retention: 0.9,
+            review_images_enabled: true,
+            review_audio_enabled: true,
+          },
+        },
+      }
+      let backups = [16, 15].map(day => ({
+        name: `site-202611${day}T100000000000Z.tar.gz`,
+        created_at: `2026-11-${day}T10:00:00Z`,
+        size: 2048,
+        sha256: 'a'.repeat(64),
+      }))
+      let exports = 0
+      await page.addInitScript((language) => {
+        localStorage.setItem('pandawords.preferences', JSON.stringify({ theme: 'light', locale: language }))
+      }, locale)
+      await page.route(url => url.pathname.startsWith('/api/'), async (route) => {
+        const path = new URL(route.request().url()).pathname
+        if (path === '/api/auth/refresh') {
+          await route.fulfill({ json: session })
+        }
+        else if (path === '/api/admin/backups') {
+          if (route.request().method() === 'POST')
+            exports++
+          await route.fulfill({
+            json: { running: false, last_error: null, backups },
+          })
+        }
+        else if (path.startsWith('/api/admin/backups/') && route.request().method() === 'DELETE') {
+          backups = backups.filter(backup => !path.endsWith(backup.name))
+          await route.fulfill({ status: 204 })
+        }
+        else {
+          await route.abort()
+          throw new Error(`Unexpected API request: ${path}`)
+        }
+      })
+      await page.goto('/admin/backup')
+      const rows = page.getByTestId('site-backup-select')
+      await expect(rows).toHaveCount(2)
+      const restore = page.getByTestId('site-backup-restore')
+      await expect(restore).toBeDisabled()
+      await rows.first().focus()
+      await page.keyboard.press('Space')
+      await expect(restore).toBeEnabled()
+      await expect(page.getByTestId('site-backup-select-all')).toHaveAttribute('aria-checked', 'mixed')
+      await restore.click()
+      await expect(page.getByRole('dialog')).toContainText(backups[0]!.name)
+      await expect(page.getByRole('dialog')).toContainText('bash restore.sh')
+      await page.getByRole('button', {
+        name: english ? 'Close' : '关闭',
+        exact: true,
+      }).click()
+      await page.getByTestId('site-backup-select-all').click()
+      await expect(restore).toBeDisabled()
+      for (const width of [320, 390, 1440]) {
+        await page.setViewportSize({ width, height: 900 })
+        expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width)
+        const target = await rows.first().boundingBox()
+        expect(target!.height).toBeGreaterThanOrEqual(44)
+        expect(target!.width).toBeGreaterThanOrEqual(44)
+      }
+      await page.getByTestId('site-backup-import').click()
+      await expect(page.getByRole('dialog')).toContainText(english ? 'does not upload or restore files' : '不会上传或恢复文件')
+      await page.getByRole('button', {
+        name: english ? 'Close' : '关闭',
+        exact: true,
+      }).click()
+      await page.getByTestId('site-backup-start').click()
+      await expect.poll(() => exports).toBe(1)
+      await page.getByTestId('site-backup-delete').click()
+      await expect(rows).toHaveCount(2)
+      await page.getByRole('button', {
+        name: english ? 'Confirm' : '确认',
+        exact: true,
+      }).click()
+      await expect(rows).toHaveCount(0)
+      await expect(page.getByTestId('admin-backup-page')).toContainText(english ? 'No site backups yet.' : '暂无站点备份。')
+    })
+  }
   const password = requiredCredential('ADMIN_PASSWORD')
   await page.goto('/login')
   const auth = await login(page, requiredCredential('ADMIN_USERNAME'), password)

@@ -18,10 +18,12 @@ export function useSiteBackups() {
   const loadError = ref('')
   const actionError = ref('')
   const downloading = ref('')
+  const processing = ref<'' | 'download' | 'delete'>('')
   const archive = useArchiveDownload('site.tar.gz')
   let timer: ReturnType<typeof setTimeout> | undefined
   let request = 0
   let disposed = false
+  let cancelled = false
 
   function schedule() {
     clearTimeout(timer)
@@ -100,11 +102,65 @@ export function useSiteBackups() {
     if (!ok && archive.error.value)
       actionError.value = archive.error.value.text
     downloading.value = ''
+    return ok
   }
 
   function cancelDownload() {
+    cancelled = true
     archive.cancel()
-    downloading.value = ''
+  }
+
+  async function downloadSelected(names: string[]) {
+    if (processing.value)
+      return
+    processing.value = 'download'
+    cancelled = false
+    try {
+      for (const name of names) {
+        if (cancelled || disposed || !await download(name))
+          break
+      }
+    }
+    finally {
+      processing.value = ''
+    }
+  }
+
+  async function deleteSelected(names: string[]) {
+    if (processing.value)
+      return false
+    processing.value = 'delete'
+    actionError.value = ''
+    try {
+      for (const name of names) {
+        if (disposed)
+          return false
+        const result = await api.DELETE('/api/admin/backups/{name}', {
+          params: {
+            path: { name },
+          },
+        })
+        if (!result.response.ok) {
+          actionError.value = errorText(result.error, result.response.status)
+          return false
+        }
+        if (status.value) {
+          status.value = {
+            ...status.value,
+            backups: status.value.backups.filter(backup => backup.name !== name),
+          }
+        }
+      }
+      return true
+    }
+    catch {
+      if (!disposed)
+        actionError.value = t('errors.transport')
+      return false
+    }
+    finally {
+      processing.value = ''
+    }
   }
 
   onScopeDispose(() => {
@@ -119,9 +175,12 @@ export function useSiteBackups() {
     loadError,
     actionError,
     downloading,
+    processing,
     load,
     start,
     download,
+    downloadSelected,
+    deleteSelected,
     cancelDownload,
   }
 }

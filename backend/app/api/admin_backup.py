@@ -56,3 +56,9 @@ async def download_backup(actor: Admin, settings: AppSettings, name: str) -> Fil
         filename=path.name,
         headers={"Cache-Control": "no-store", "X-Content-Type-Options": "nosniff"},
     )
+
+
+@router.delete("/{name}", status_code=204)
+async def delete_backup(actor: Admin, settings: AppSettings, name: str) -> Response:
+    await site_backup.delete_backup(settings, name)
+    return Response(status_code=204, headers={"Cache-Control": "no-store"})

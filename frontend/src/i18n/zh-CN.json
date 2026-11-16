@@ -601,6 +601,7 @@
   },
   "errors": {
     "site_backup_in_progress": "已有站点备份或恢复正在进行。",
+    "site_backup_delete": "无法删除备份。请刷新列表后重试。",
     "site_backup_not_found": "此备份已不存在，请刷新列表。",
     "backup_export_too_large": "你的数据超过备份大小上限，请联系管理员。",
     "offline_storage": "无法清除离线数据。共用设备前请清除此站点的浏览器数据。",

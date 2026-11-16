@@ -64,8 +64,14 @@ live status with Cancel (`AbortController`); failures show the localized reason,
 stage and the server's path-free problem list. Failure and cancellation keep the file and
 options, and the submit button becomes Retry. Success shows `ArchiveSummary`
 (created/merged/skipped totals, progress/source, notices, and Open project for imports). The
-admin-only `/admin/backup` page creates a site backup, polls while it runs, lists and downloads
-archives, and states that restore is operator-only (`deploy/restore.sh`).
+admin-only `/admin/backup` page lists all retained site backups with row checkboxes, an
+indeterminate select-all header and grouped download/delete/restore actions. Export in the
+title row creates a backup and polls while it runs; Import opens explicit server-side
+instructions, not an upload. Downloads run sequentially and can be cancelled; a failure stops
+the group. Deletion requires confirmation and removes only archives, not site data; partial
+success removes completed entries and retains failed/unprocessed selections. Restore is enabled
+only for one selection and opens archive-specific operator instructions (`deploy/restore.sh`).
+Site restore remains operator-only because API/worker writers must stop before replacement.
 
 ## Image review and media preferences (5.1.3)
 

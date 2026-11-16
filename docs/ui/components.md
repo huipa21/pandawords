@@ -44,7 +44,8 @@ These are feature-owned, not shared exercise components. The project plan reuses
   strings stay out of the initial bundle.
 
 `features/admin/AdminBackupPage` (+ `useSiteBackups`) is the admin-only site-backup list with
-create, polling and protected download. These are feature-owned; no design-preview entry.
+title-row Export/Import, polling, row/select-all selection, grouped protected download/delete,
+and single-selection operator restore instructions. These are feature-owned; no design-preview entry.
 
 Use these. If something is missing, add it here **and** to `src/components/`, with an entry on the
 `/dev/design` preview page. Feature-only components stay in `src/features/<x>/components/`.
